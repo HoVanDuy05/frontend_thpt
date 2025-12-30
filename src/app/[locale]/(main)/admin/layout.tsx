@@ -12,8 +12,6 @@ import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { LanguagePicker } from "@/shared/components/LanguagePicker";
 
-// function AdminLayout({ ... } -> renamed to AdminLayoutComponent or just wrap export
-// Let's keep component name AdminLayout but export wrapped
 const AdminLayout = ({
     children,
 }: {
@@ -47,9 +45,9 @@ const AdminLayout = ({
             transitionDuration={300}
             transitionTimingFunction="ease"
         >
-            <AppShell.Header className="flex items-center px-4 justify-between border-b bg-white dark:bg-zinc-950">
+            <AppShell.Header className="flex items-center px-3 sm:px-4 justify-between border-b bg-white dark:bg-zinc-950">
                 <Group gap="xs">
-                    {/* Mobile Toggle - only shown on mobile */}
+                    {/* Mobile Toggle */}
                     <ActionIcon
                         variant="subtle"
                         onClick={toggleMobile}
@@ -67,23 +65,27 @@ const AdminLayout = ({
 
                     <Group gap={8} align="center">
                         <Stack gap={0}>
-                            <Title order={4} className="text-zinc-800 dark:text-zinc-100 font-bold leading-tight">
+                            <Title
+                                order={4}
+                                className="text-zinc-800 dark:text-zinc-100 font-bold leading-tight text-base sm:text-lg"
+                            >
                                 {dashboardTitle}
                             </Title>
-                            <Text size="xs" c="dimmed" fw={500}>
+                            <Text size="xs" c="dimmed" fw={500} visibleFrom="sm">
                                 {ROLE_LABELS[userRole]?.label || "School Portal"}
                             </Text>
                         </Stack>
                     </Group>
                 </Group>
 
-                <Group gap="md">
+                <Group gap="sm">
                     {/* Notification Icon */}
                     <ActionIcon
                         variant="subtle"
                         size="lg"
                         radius="md"
                         className="relative"
+                        visibleFrom="sm"
                     >
                         <IconBell size={20} stroke={1.5} />
                         <div className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
@@ -104,7 +106,7 @@ const AdminLayout = ({
                                         {ROLE_LABELS[userRole]?.label || "User"}
                                     </Text>
                                 </div>
-                                <IconChevronDown size={14} stroke={2} className="text-zinc-400" />
+                                <IconChevronDown size={14} stroke={2} className="text-zinc-400 hidden sm:block" />
                             </UnstyledButton>
                         </Menu.Target>
 
@@ -162,7 +164,7 @@ const AdminLayout = ({
                 <AdminSidebar collapsed={desktopCollapsed} onToggle={toggleDesktop} />
             </AppShell.Navbar>
 
-            <AppShell.Main className="bg-zinc-50 dark:bg-zinc-900 p-0 overflow-x-hidden w-full">
+            <AppShell.Main className="bg-zinc-50 dark:bg-zinc-900 p-0 overflow-x-hidden w-full min-h-screen">
                 {children}
             </AppShell.Main>
         </AppShell>

@@ -4,17 +4,12 @@ import { PostForm } from "@/feauture/admin/portal/components/PostForm";
 import { usePostManager } from "@/feauture/admin/portal/hooks/usePostManager";
 import { useRouter } from "@/i18n/routing";
 import { AppQuery } from "@/api/AppQuery";
-import { LoadingOverlay, Center, Loader } from "@mantine/core";
-import { useParams } from "next/navigation"; // useParams from navigation is fine for client component params
+import { LoadingOverlay, Center, Loader, Container } from "@mantine/core";
+import { useParams } from "next/navigation";
 
 export default function EditPostPage({ params }: { params: { id: string } }) {
-    // Note: params.id might be a string, or you can use useParams() hook. 
-    // The component prop `params` is standard in Next 13+ page files.
-    // However, since we are inside `[id]`, extracting it safely:
     const { id } = useParams();
 
-    // We need to fetch details. We can reuse useDetail hook if available or use raw query here.
-    // Added usePostDetail to AppQuery previously.
     const { data: post, isLoading } = AppQuery.portal.usePostDetail(Number(id), {
         enabled: !!id
     });
@@ -32,11 +27,13 @@ export default function EditPostPage({ params }: { params: { id: string } }) {
     }
 
     return (
-        <PostForm
-            title="Chỉnh sửa bài viết"
-            initialData={post}
-            onSubmit={handleSubmit}
-            loading={isPending}
-        />
+        <Container size="xl" p={{ base: "sm", sm: "md" }} className="max-w-full">
+            <PostForm
+                title="Chỉnh sửa bài viết"
+                initialData={post}
+                onSubmit={handleSubmit}
+                loading={isPending}
+            />
+        </Container>
     );
 }

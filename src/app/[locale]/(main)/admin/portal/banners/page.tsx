@@ -52,8 +52,9 @@ export default function BannerPage() {
     };
 
     const PageActions = (
-        <AppButton leftSection={<IconPlus size={18} />} onClick={handleOpenCreate}>
-            Thêm Banner
+        <AppButton leftSection={<IconPlus size={18} />} onClick={handleOpenCreate} size="sm">
+            <span className="hidden sm:inline">Thêm Banner</span>
+            <span className="sm:hidden">Thêm</span>
         </AppButton>
     );
 
@@ -64,7 +65,12 @@ export default function BannerPage() {
             actions={PageActions}
             loading={isLoading}
         >
-            <Paper radius="lg" withBorder shadow="sm" className="bg-white/50 dark:bg-zinc-950/50 backdrop-blur-sm border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden">
+            <Paper
+                radius="lg"
+                withBorder
+                shadow="sm"
+                className="bg-white/50 dark:bg-zinc-950/50 backdrop-blur-sm border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden"
+            >
                 {banners && banners.length > 0 ? (
                     <BannerTable
                         banners={banners}
@@ -72,15 +78,15 @@ export default function BannerPage() {
                         onDelete={confirmDelete}
                     />
                 ) : (
-                    <Stack align="center" py={80} gap="md">
+                    <Stack align="center" py={{ base: 60, sm: 80 }} gap="md" px="md">
                         <Box className="bg-zinc-100 dark:bg-zinc-900 p-8 rounded-full">
                             <IconPhotoOff size={56} className="text-zinc-400" />
                         </Box>
                         <Stack gap={4} align="center">
-                            <Text fw={700} fz="lg">Chưa có banner nào</Text>
-                            <Text size="sm" c="dimmed">Bắt đầu bằng cách tạo banner đầu tiên của bạn</Text>
+                            <Text fw={700} fz={{ base: "md", sm: "lg" }}>Chưa có banner nào</Text>
+                            <Text size="sm" c="dimmed" ta="center">Bắt đầu bằng cách tạo banner đầu tiên của bạn</Text>
                         </Stack>
-                        <AppButton variant="light" onClick={handleOpenCreate} mt="md">
+                        <AppButton variant="light" onClick={handleOpenCreate} mt="md" size="sm">
                             Tạo banner ngay
                         </AppButton>
                     </Stack>

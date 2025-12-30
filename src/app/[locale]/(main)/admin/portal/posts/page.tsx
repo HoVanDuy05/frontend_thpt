@@ -1,11 +1,11 @@
 "use client";
 
-import { Box, Button, Group, Title, Paper, Skeleton, Stack, Text, Tabs } from "@mantine/core";
+import { Box, Button, Group, Title, Paper, Skeleton, Stack, Text, Tabs, ScrollArea } from "@mantine/core";
 import { usePostManager } from "@/feauture/admin/portal/hooks/usePostManager";
 import { PostTable } from "@/feauture/admin/portal/components/PostTable";
 import { useState } from "react";
 import { TBaiViet, ELoaiBaiViet } from "@/shared/types/portal.type";
-import { IconPlus, IconNews, IconAlertCircle, IconFileExport } from "@tabler/icons-react";
+import { IconPlus, IconNews, IconAlertCircle, IconFileExport, IconCalendarEvent, IconBell } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
 import { LayoutList } from "@/shared/components/LayoutList";
 import { AppButton } from "@/shared/components/AppButton";
@@ -40,17 +40,24 @@ export default function PostPage() {
     };
 
     const PageActions = (
-        <Group gap="sm">
+        <Group gap="sm" wrap="wrap">
             <AppButton
                 variant="light"
                 color="teal"
                 leftSection={<IconFileExport size={18} />}
                 onClick={handleExport}
+                size="sm"
+                visibleFrom="sm"
             >
                 Xuất Excel
             </AppButton>
-            <AppButton leftSection={<IconPlus size={18} />} onClick={handleCreate}>
-                Tạo bài viết
+            <AppButton
+                leftSection={<IconPlus size={18} />}
+                onClick={handleCreate}
+                size="sm"
+            >
+                <span className="hidden sm:inline">Tạo bài viết</span>
+                <span className="sm:hidden">Tạo</span>
             </AppButton>
         </Group>
     );
@@ -62,23 +69,38 @@ export default function PostPage() {
             actions={PageActions}
         >
             <Tabs value={activeTab} onChange={setActiveTab} variant="pills" radius="md">
-                <Box px="md" pt="md">
-                    <Tabs.List className="bg-zinc-50 dark:bg-zinc-900/50 p-1 rounded-lg inline-flex border border-zinc-200 dark:border-zinc-800">
-                        <Tabs.Tab value={ELoaiBaiViet.TIN_TUC} leftSection={<IconNews size={16} />} px="xl">
-                            Tin tức
+                <ScrollArea>
+                    <Tabs.List className="bg-zinc-50 dark:bg-zinc-900/50 p-1 rounded-lg inline-flex border border-zinc-200 dark:border-zinc-800 mb-4">
+                        <Tabs.Tab
+                            value={ELoaiBaiViet.TIN_TUC}
+                            leftSection={<IconNews size={16} />}
+                            px={{ base: "md", sm: "xl" }}
+                        >
+                            <span className="hidden sm:inline">Tin tức</span>
+                            <span className="sm:hidden">Tin</span>
                         </Tabs.Tab>
-                        <Tabs.Tab value={ELoaiBaiViet.SU_KIEN} leftSection={<IconNews size={16} />} px="xl">
-                            Sự kiện
+                        <Tabs.Tab
+                            value={ELoaiBaiViet.SU_KIEN}
+                            leftSection={<IconCalendarEvent size={16} />}
+                            px={{ base: "md", sm: "xl" }}
+                        >
+                            <span className="hidden sm:inline">Sự kiện</span>
+                            <span className="sm:hidden">SK</span>
                         </Tabs.Tab>
-                        <Tabs.Tab value={ELoaiBaiViet.THONG_BAO_CHUNG} leftSection={<IconNews size={16} />} px="xl">
-                            Thông báo
+                        <Tabs.Tab
+                            value={ELoaiBaiViet.THONG_BAO_CHUNG}
+                            leftSection={<IconBell size={16} />}
+                            px={{ base: "md", sm: "xl" }}
+                        >
+                            <span className="hidden sm:inline">Thông báo</span>
+                            <span className="sm:hidden">TB</span>
                         </Tabs.Tab>
                     </Tabs.List>
-                </Box>
+                </ScrollArea>
 
-                <Box mt="md">
+                <Box>
                     {isLoading ? (
-                        <Stack p="xl" gap="md">
+                        <Stack gap="md">
                             <Skeleton h={50} radius="md" />
                             <Skeleton h={50} radius="md" />
                             <Skeleton h={200} radius="md" />
@@ -101,10 +123,4 @@ export default function PostPage() {
             </Tabs>
         </LayoutList>
     );
-}
-
-// Fixed typo in handleOpenCreate
-function setEditingBanner(arg0: null) {
-    // This was a typo in the original file (setEditingPost vs setEditingBanner)
-    // Actually, I should use setEditingPost in the component
 }
