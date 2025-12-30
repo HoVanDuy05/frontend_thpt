@@ -3,30 +3,25 @@
 import { Box, Button, Group, Title, Paper, Skeleton, Stack, Text, Tabs } from "@mantine/core";
 import { usePostManager } from "@/feauture/admin/portal/hooks/usePostManager";
 import { PostTable } from "@/feauture/admin/portal/components/PostTable";
-import { PostModal } from "@/feauture/admin/portal/components/PostModal";
-import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { TBaiViet, ELoaiBaiViet } from "@/shared/types/portal.type";
 import { IconPlus, IconNews, IconAlertCircle, IconFileExport } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
 import { LayoutList } from "@/shared/components/LayoutList";
 import { AppButton } from "@/shared/components/AppButton";
+import { useRouter } from "@/i18n/routing";
 
 export default function PostPage() {
     const [activeTab, setActiveTab] = useState<string | null>(ELoaiBaiViet.TIN_TUC);
-    const { posts, isLoading, handleCreate, handleUpdate, handleDelete, handleExport, isPending } = usePostManager(activeTab as ELoaiBaiViet);
+    const { posts, isLoading, handleDelete, handleExport } = usePostManager(activeTab as ELoaiBaiViet);
+    const router = useRouter();
 
-    const [opened, { open, close }] = useDisclosure(false);
-    const [editingPost, setEditingPost] = useState<TBaiViet | null>(null);
-
-    const handleOpenCreate = () => {
-        setEditingPost(null);
-        open();
+    const handleCreate = () => {
+        router.push("/admin/portal/posts/create");
     };
 
-    const handleOpenEdit = (post: TBaiViet) => {
-        setEditingPost(post);
-        open();
+    const handleEdit = (post: TBaiViet) => {
+        router.push(`/admin/portal/posts/${post.id}/edit`);
     };
 
     const confirmDelete = (id: number) => {
@@ -44,15 +39,6 @@ export default function PostPage() {
         });
     };
 
-    const handleSubmit = async (data: any) => {
-        if (editingPost) {
-            await handleUpdate(editingPost.id, data);
-        } else {
-            await handleCreate(data);
-        }
-        close();
-    };
-
     const PageActions = (
         <Group gap="sm">
             <AppButton
@@ -63,7 +49,7 @@ export default function PostPage() {
             >
                 Xuất Excel
             </AppButton>
-            <AppButton leftSection={<IconPlus size={18} />} onClick={handleOpenCreate}>
+            <AppButton leftSection={<IconPlus size={18} />} onClick={handleCreate}>
                 Tạo bài viết
             </AppButton>
         </Group>
@@ -100,7 +86,7 @@ export default function PostPage() {
                     ) : (posts && posts.length > 0) ? (
                         <PostTable
                             posts={posts}
-                            onEdit={handleOpenEdit}
+                            onEdit={handleEdit}
                             onDelete={confirmDelete}
                         />
                     ) : (
@@ -113,14 +99,6 @@ export default function PostPage() {
                     )}
                 </Box>
             </Tabs>
-
-            <PostModal
-                opened={opened}
-                onClose={close}
-                onSubmit={handleSubmit}
-                initialData={editingPost}
-                loading={isPending}
-            />
         </LayoutList>
     );
 }

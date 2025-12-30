@@ -56,71 +56,92 @@ export default function LandingPage() {
     return (
         <Box className="overflow-hidden" suppressHydrationWarning>
             {/* Hero Section */}
-            <section className="relative pt-20 pb-24 lg:pt-32 lg:pb-40 overflow-hidden bg-white dark:bg-zinc-950">
-                <Box className="absolute top-0 left-0 w-full h-[800px] bg-gradient-to-b from-blue-50/50 to-transparent dark:from-blue-900/5 -z-10" />
+            <section className="relative pt-32 pb-40 lg:pt-48 lg:pb-64 overflow-hidden bg-white dark:bg-zinc-950">
+                <Box className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+                    <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-blue-100/40 dark:bg-blue-900/10 rounded-full blur-[100px]" />
+                    <div className="absolute bottom-[10%] left-[-10%] w-[500px] h-[500px] bg-indigo-100/40 dark:bg-indigo-900/10 rounded-full blur-[100px]" />
+                </Box>
 
-                <Container size="lg">
-                    <SimpleGrid cols={{ base: 1, md: 2 }} spacing={60}>
-                        <Stack gap="xl">
+                <Box className="absolute top-0 left-0 w-full h-[800px] bg-gradient-to-b from-blue-50/80 to-transparent dark:from-blue-900/10 -z-10" />
+
+                <Container size="lg" className="relative z-10">
+                    <SimpleGrid cols={{ base: 1, lg: 2 }} spacing={80} verticalSpacing={60}>
+                        <Stack gap="xl" className="justify-center">
                             <Box>
-                                <Badge size="lg" variant="filled" color="blue" className="mb-6 h-9 px-4 uppercase tracking-widest font-bold">
+                                <Badge size="xl" variant="gradient" gradient={{ from: 'blue', to: 'indigo' }} className="mb-6 px-5 py-3 uppercase tracking-widest font-bold shadow-lg shadow-blue-500/20">
                                     Thành tích - Kỷ cương - Tình thương
                                 </Badge>
-                                <Title className="text-5xl lg:text-7xl font-black leading-[1.1] text-zinc-900 dark:text-white">
+                                <Title className="text-6xl lg:text-8xl font-black leading-[1.05] tracking-tight text-zinc-900 dark:text-white mb-6">
                                     Trường THPT <br />
-                                    <span className="bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">Chuyên Nguyễn Huệ</span>
+                                    <span className="bg-gradient-to-r from-blue-700 via-indigo-600 to-violet-600 bg-clip-text text-transparent">
+                                        Chuyên Nguyễn Huệ
+                                    </span>
                                 </Title>
-                                <Stack gap="md" mt="xl">
-                                    <Text size="xl" className="text-zinc-600 dark:text-zinc-400 font-medium leading-relaxed">
-                                        Nơi ươm mầm tài năng, rèn luyện nhân cách và kiến tạo tương lai vững chắc cho thế hệ học sinh trong kỷ nguyên số.
-                                    </Text>
-                                    <Group gap="lg">
-                                        <Group gap="xs">
-                                            <IconAward size={24} className="text-blue-600" />
-                                            <Text fw={600}>Top 10 trường xuất sắc</Text>
-                                        </Group>
-                                        <Group gap="xs">
-                                            <IconFlag size={24} className="text-blue-600" />
-                                            <Text fw={600}>Hơn 50 năm truyền thống</Text>
-                                        </Group>
-                                    </Group>
-                                </Stack>
+                                <Text size="xl" className="text-zinc-600 dark:text-zinc-300 font-medium leading-relaxed max-w-xl text-lg">
+                                    Nơi ươm mầm những tài năng trẻ, kiến tạo môi trường giáo dục tiên tiến và rèn luyện nhân cách toàn diện cho thế hệ công dân toàn cầu.
+                                </Text>
                             </Box>
 
-                            <Group gap="md">
+                            <Group gap="md" mt="sm">
                                 <Button
                                     size="xl"
-                                    radius="md"
-                                    className="bg-blue-600 hover:bg-blue-700 h-16 px-10 shadow-xl shadow-blue-500/20"
+                                    radius="xl"
+                                    className="bg-blue-600 hover:bg-blue-700 h-16 px-12 text-lg shadow-xl shadow-blue-600/30 hover:scale-105 transition-transform duration-200"
                                     component={Link}
                                     href="/auth/register"
-                                    rightSection={<IconArrowRight size={20} />}
+                                    rightSection={<IconArrowRight size={22} />}
                                 >
                                     Đăng ký tuyển sinh
                                 </Button>
                                 <Button
                                     size="xl"
-                                    radius="md"
+                                    radius="xl"
                                     variant="outline"
-                                    className="border-zinc-300 dark:border-zinc-700 h-16 px-10"
+                                    className="border-zinc-200 dark:border-zinc-700 h-16 px-10 text-lg hover:bg-zinc-50 dark:hover:bg-zinc-900"
                                     component={Link}
                                     href="/auth/login"
                                 >
                                     Cổng thông tin HS
                                 </Button>
                             </Group>
+
+                            <Group gap="xl" mt="lg">
+                                <Group gap="xs">
+                                    <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-full text-blue-600">
+                                        <IconAward size={28} />
+                                    </div>
+                                    <div>
+                                        <Text fw={700} size="sm">Top 10 Toàn Quốc</Text>
+                                        <Text size="xs" c="dimmed">Thành tích xuất sắc</Text>
+                                    </div>
+                                </Group>
+                                <Group gap="xs">
+                                    <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-full text-indigo-600">
+                                        <IconSchool size={28} />
+                                    </div>
+                                    <div>
+                                        <Text fw={700} size="sm">50+ Năm Lịch Sử</Text>
+                                        <Text size="xs" c="dimmed">Truyền thống vẻ vang</Text>
+                                    </div>
+                                </Group>
+                            </Group>
                         </Stack>
 
-                        <Box className="relative">
-                            <Box className="absolute inset-0 bg-blue-600/10 blur-[120px] rounded-full scale-110" />
-                            <Box className="relative z-10 p-2 bg-white dark:bg-zinc-900 rounded-[40px] shadow-2xl border border-zinc-100 dark:border-zinc-800">
-                                <Card padding={0} radius="32px" className="overflow-hidden">
+                        <Box className="relative lg:h-auto hidden md:block">
+                            <Box className="absolute inset-0 bg-blue-600/20 blur-[120px] rounded-full scale-90 translate-y-20" />
+                            <Box className="relative z-10 transform hover:scale-[1.02] transition-transform duration-700 ease-out">
+                                <Card padding={0} radius="40px" className="overflow-hidden shadow-2xl border-4 border-white dark:border-zinc-800 rotate-2">
                                     <Image
                                         src="https://images.unsplash.com/photo-1523050849901-72439178ad38?q=80&w=1200&auto=format&fit=crop"
                                         alt="School Campus"
-                                        className="w-full h-auto"
+                                        className="w-full h-auto object-cover aspect-[4/5]"
                                     />
                                     <Overlay color="#000" opacity={0.1} zIndex={1} />
+
+                                    <div className="absolute bottom-0 left-0 w-full p-8 bg-gradient-to-t from-black/80 to-transparent z-10">
+                                        <Text className="text-white font-bold text-xl">Campus Hiện Đại</Text>
+                                        <Text className="text-white/80 text-sm">Môi trường học tập tiêu chuẩn quốc tế</Text>
+                                    </div>
                                 </Card>
                             </Box>
                         </Box>
@@ -129,45 +150,46 @@ export default function LandingPage() {
             </section>
 
             {/* News Section */}
-            <section id="news" className="py-24 bg-zinc-50 dark:bg-zinc-900/50">
+            <section id="news" className="py-32 bg-zinc-50/50 dark:bg-zinc-900/50">
                 <Container size="lg">
                     <Group justify="space-between" align="end" mb={60}>
                         <Box>
-                            <Badge variant="dot" size="lg" mb="sm">Tin tức & Thông báo</Badge>
-                            <Title order={2} className="text-4xl font-black">Cập nhật mới nhất từ nhà trường</Title>
+                            <Badge variant="light" size="lg" mb="md" color="blue">Tin tức & Thông báo</Badge>
+                            <Title order={2} className="text-4xl lg:text-5xl font-black tracking-tight text-zinc-900 dark:text-white">
+                                Nhịp sống Nguyễn Huệ
+                            </Title>
                         </Box>
-                        <Button variant="subtle" size="lg" color="blue" rightSection={<IconArrowRight size={18} />}>
+                        <Button variant="light" size="lg" color="blue" radius="xl" rightSection={<IconArrowRight size={18} />}>
                             Xem tất cả tin tức
                         </Button>
                     </Group>
 
                     <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="xl">
                         {news.map((item, index) => (
-                            <Card key={index} radius="xl" padding="xl" className="border-none shadow-sm hover:shadow-xl transition-all duration-500 group">
-                                <Card.Section>
-                                    <AspectRatio ratio={16 / 9} className="overflow-hidden">
-                                        <Image
-                                            src={item.image}
-                                            alt={item.title}
-                                            className="group-hover:scale-110 transition-transform duration-700"
-                                        />
-                                    </AspectRatio>
+                            <Card key={index} radius="24px" padding="none" withBorder className="bg-white dark:bg-zinc-900 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group overflow-hidden">
+                                <Card.Section className="aspect-[16/10] overflow-hidden relative">
+                                    <Image
+                                        src={item.image}
+                                        alt={item.title}
+                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                    />
+                                    <div className="absolute top-4 left-4">
+                                        <Badge color="white" className="text-blue-700 shadow-md font-bold">{item.category}</Badge>
+                                    </div>
                                 </Card.Section>
 
-                                <Stack mt="xl" gap="xs">
-                                    <Group justify="space-between">
-                                        <Badge variant="light" color="blue">{item.category}</Badge>
-                                        <Text size="xs" c="dimmed" fw={600}>{item.date}</Text>
-                                    </Group>
-                                    <Title order={4} className="leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors">
+                                <Stack p="xl" gap="sm">
+                                    <Text size="xs" c="dimmed" fw={700} tt="uppercase" className="tracking-wider">{item.date}</Text>
+                                    <Title order={4} className="leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors text-xl font-bold">
                                         {item.title}
                                     </Title>
-                                    <Text size="sm" c="dimmed" className="line-clamp-3">
+                                    <Text size="sm" c="dimmed" className="line-clamp-3 leading-relaxed">
                                         {item.description}
                                     </Text>
-                                    <Button variant="subtle" p={0} h="auto" mt="sm" justify="start" color="blue" fw={700}>
-                                        Đọc tiếp
-                                    </Button>
+                                    <Group mt="md" className="group/btn">
+                                        <Text size="sm" fw={700} className="text-blue-600">Đọc chi tiết</Text>
+                                        <IconArrowRight size={16} className="text-blue-600 transform group-hover/btn:translate-x-1 transition-transform" />
+                                    </Group>
                                 </Stack>
                             </Card>
                         ))}
@@ -176,58 +198,73 @@ export default function LandingPage() {
             </section>
 
             {/* Events & Quick Access */}
-            <section id="events" className="py-24">
+            <section id="events" className="py-32">
                 <Container size="lg">
-                    <SimpleGrid cols={{ base: 1, md: 2 }} spacing={80}>
+                    <SimpleGrid cols={{ base: 1, lg: 2 }} spacing={100} verticalSpacing={60}>
                         <div>
-                            <Badge variant="dot" size="lg" mb="sm">Sự kiện sắp tới</Badge>
-                            <Title order={2} className="text-3xl font-black mb-12">Lịch hoạt động & Sự kiện</Title>
+                            <Badge variant="dot" size="lg" mb="md">Sự kiện sắp tới</Badge>
+                            <Title order={2} className="text-4xl font-black mb-12">Lịch hoạt động & Sự kiện</Title>
 
                             <Stack gap="lg">
                                 {events.map((event, index) => (
-                                    <Group key={index} wrap="nowrap" align="start" className="p-6 rounded-3xl border border-zinc-100 dark:border-zinc-800 hover:bg-white dark:hover:bg-zinc-900 hover:shadow-lg transition-all">
-                                        <Box className="bg-blue-600 text-white w-20 h-20 rounded-2xl flex flex-col items-center justify-center shrink-0">
+                                    <Group key={index} wrap="nowrap" align="center" className="p-6 rounded-3xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:shadow-xl hover:border-blue-100 dark:hover:border-blue-900 transition-all cursor-pointer group">
+                                        <Stack align="center" justify="center" gap={2} className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white w-20 h-20 rounded-2xl shadow-lg shadow-blue-500/30 shrink-0">
                                             <Text fw={900} size="xl" className="leading-none">{event.date}</Text>
-                                            <Text size="xs" fw={700} className="uppercase mt-1">{event.month}</Text>
-                                        </Box>
-                                        <Stack gap={4}>
-                                            <Text fw={700} size="lg" className="line-clamp-1">{event.title}</Text>
-                                            <Group gap="xs">
-                                                <IconCalendar size={14} className="text-zinc-400" />
-                                                <Text size="xs" c="dimmed">{event.time}</Text>
-                                                <IconMapPin size={14} className="text-zinc-400 ml-2" />
-                                                <Text size="xs" c="dimmed">{event.location}</Text>
+                                            <Text size="xs" fw={700} className="uppercase opacity-90">{event.month}</Text>
+                                        </Stack>
+                                        <Stack gap={4} className="flex-1">
+                                            <Text fw={700} size="lg" className="line-clamp-1 group-hover:text-blue-600 transition-colors">{event.title}</Text>
+                                            <Group gap="md">
+                                                <Group gap={6}>
+                                                    <IconCalendar size={16} className="text-blue-500" />
+                                                    <Text size="xs" fw={500} c="dimmed">{event.time}</Text>
+                                                </Group>
+                                                <Group gap={6}>
+                                                    <IconMapPin size={16} className="text-blue-500" />
+                                                    <Text size="xs" fw={500} c="dimmed">{event.location}</Text>
+                                                </Group>
                                             </Group>
                                         </Stack>
+                                        <div className="w-10 h-10 rounded-full bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <IconArrowRight size={18} />
+                                        </div>
                                     </Group>
                                 ))}
                             </Stack>
                         </div>
 
                         <div>
-                            <Badge variant="dot" size="lg" mb="sm" color="indigo">Dành cho học sinh</Badge>
-                            <Title order={2} className="text-3xl font-black mb-12">Truy cập nhanh Nguyễn Huệ</Title>
+                            <Badge variant="dot" size="lg" mb="md" color="indigo">Dành cho học sinh</Badge>
+                            <Title order={2} className="text-4xl font-black mb-12">Truy cập nhanh</Title>
 
-                            <SimpleGrid cols={2} spacing="md">
-                                <Card padding="xl" radius="24px" className="bg-blue-600 text-white border-none group cursor-pointer hover:-translate-y-2 transition-transform">
-                                    <IconSchool size={40} stroke={1.5} />
-                                    <Text fw={700} mt="lg">Kết quả học tập</Text>
-                                    <Text size="xs" mt={4} className="opacity-80">Tra cứu nhanh điểm số</Text>
+                            <SimpleGrid cols={2} spacing="lg">
+                                <Card padding="xl" radius="32px" className="bg-gradient-to-br from-blue-600 to-blue-700 text-white border-none group cursor-pointer hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-300">
+                                    <Box className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-6">
+                                        <IconSchool size={28} stroke={1.5} />
+                                    </Box>
+                                    <Text fw={700} size="lg">Kết quả học tập</Text>
+                                    <Text size="sm" mt={4} className="opacity-80">Tra cứu nhanh điểm số</Text>
                                 </Card>
-                                <Card padding="xl" radius="24px" className="bg-zinc-900 text-white border-none group cursor-pointer hover:-translate-y-2 transition-transform">
-                                    <IconNewSection size={40} stroke={1.5} className="text-blue-500" />
-                                    <Text fw={700} mt="lg">Thư viện đề thi</Text>
-                                    <Text size="xs" mt={4} className="opacity-80">Ôn tập trực tuyến</Text>
+                                <Card padding="xl" radius="32px" className="bg-zinc-900 dark:bg-zinc-800 text-white border-none group cursor-pointer hover:-translate-y-2 hover:shadow-xl transition-all duration-300">
+                                    <Box className="w-12 h-12 rounded-2xl bg-zinc-800 dark:bg-zinc-700 flex items-center justify-center mb-6">
+                                        <IconNewSection size={28} stroke={1.5} className="text-blue-400" />
+                                    </Box>
+                                    <Text fw={700} size="lg">Thư viện đề thi</Text>
+                                    <Text size="sm" mt={4} className="opacity-80">Ôn tập trực tuyến</Text>
                                 </Card>
-                                <Card padding="xl" radius="24px" className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 group cursor-pointer hover:-translate-y-2 transition-transform shadow-sm">
-                                    <IconUsers size={40} stroke={1.5} className="text-blue-600" />
-                                    <Text fw={700} mt="lg">Câu lạc bộ</Text>
-                                    <Text size="xs" mt={4} c="dimmed">Hoạt động ngoại khóa</Text>
+                                <Card padding="xl" radius="32px" withBorder className="bg-white dark:bg-zinc-900 group cursor-pointer hover:-translate-y-2 hover:shadow-xl transition-all duration-300 hover:border-blue-200 dark:hover:border-blue-900">
+                                    <Box className="w-12 h-12 rounded-2xl bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-6 text-blue-600">
+                                        <IconUsers size={28} stroke={1.5} />
+                                    </Box>
+                                    <Text fw={700} size="lg">Câu lạc bộ</Text>
+                                    <Text size="sm" mt={4} c="dimmed">Hoạt động ngoại khóa</Text>
                                 </Card>
-                                <Card padding="xl" radius="24px" className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 group cursor-pointer hover:-translate-y-2 transition-transform shadow-sm">
-                                    <IconFlag size={40} stroke={1.5} className="text-indigo-600" />
-                                    <Text fw={700} mt="lg">Lịch giảng dạy</Text>
-                                    <Text size="xs" mt={4} c="dimmed">Theo dõi thời khóa biểu</Text>
+                                <Card padding="xl" radius="32px" withBorder className="bg-white dark:bg-zinc-900 group cursor-pointer hover:-translate-y-2 hover:shadow-xl transition-all duration-300 hover:border-indigo-200 dark:hover:border-indigo-900">
+                                    <Box className="w-12 h-12 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center mb-6 text-indigo-600">
+                                        <IconFlag size={28} stroke={1.5} />
+                                    </Box>
+                                    <Text fw={700} size="lg">Lịch giảng dạy</Text>
+                                    <Text size="sm" mt={4} c="dimmed">Thời khóa biểu</Text>
                                 </Card>
                             </SimpleGrid>
                         </div>
@@ -238,22 +275,23 @@ export default function LandingPage() {
             {/* Admissions Banner */}
             <section id="admissions" className="py-24">
                 <Container size="lg">
-                    <Box className="relative p-12 lg:p-20 rounded-[50px] bg-blue-700 overflow-hidden text-white">
-                        <Box className="absolute top-0 right-0 w-[500px] h-[500px] bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-[80px]" />
-                        <Box className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-900/40 rounded-full translate-y-1/2 -translate-x-1/2 blur-[80px]" />
+                    <Box className="relative p-12 lg:p-24 rounded-[48px] bg-gradient-to-r from-blue-700 to-indigo-800 overflow-hidden text-white shadow-2xl shadow-blue-900/40">
+                        <Box className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/10 rounded-full -translate-y-1/3 translate-x-1/3 blur-[100px]" />
+                        <Box className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-500/30 rounded-full translate-y-1/3 -translate-x-1/4 blur-[100px]" />
 
-                        <SimpleGrid cols={{ base: 1, md: 2 }} spacing={50} className="relative z-10">
+                        <SimpleGrid cols={{ base: 1, md: 2 }} spacing={60} className="relative z-10 items-center">
                             <Stack gap="xl">
-                                <Title order={2} className="text-4xl lg:text-5xl font-black leading-tight">
-                                    Chào mừng các tân học sinh gia nhập mái nhà PMS
+                                <Badge color="white" variant="white" size="lg" className="self-start text-blue-800 shadow-md">Tuyển sinh 2025</Badge>
+                                <Title order={2} className="text-4xl lg:text-6xl font-black leading-tight text-white">
+                                    Chào mừng <br /> Thế hệ tương lai
                                 </Title>
-                                <Text size="lg" className="opacity-90 max-w-md">
-                                    Hãy trở thành một phần của cộng đồng học sinh năng động, sáng tạo và cùng nhau xây dựng những kỷ niệm đẹp nhất thời áo trắng.
+                                <Text size="xl" className="text-blue-100 max-w-md leading-relaxed">
+                                    Gia nhập cộng đồng học sinh năng động, sáng tạo và cùng nhau xây dựng những kỷ niệm đẹp nhất thời áo trắng.
                                 </Text>
-                                <Group gap="md">
+                                <Group gap="md" mt="md">
                                     <Button
                                         size="xl"
-                                        radius="md"
+                                        radius="xl"
                                         className="bg-zinc-900 text-white hover:bg-zinc-800 border-none h-16 px-10 shadow-xl"
                                         component={Link}
                                         href="/auth/register"
@@ -262,19 +300,20 @@ export default function LandingPage() {
                                     </Button>
                                     <Button
                                         size="xl"
-                                        radius="md"
+                                        radius="xl"
                                         variant="white"
-                                        className="text-blue-700 h-16 px-10"
+                                        className="text-blue-800 border-none h-16 px-10 shadow-sm hover:shadow-lg transition-shadow"
                                     >
                                         Tìm hiểu thêm
                                     </Button>
                                 </Group>
                             </Stack>
-                            <Box className="hidden md:block">
+                            <Box className="hidden md:block relative">
+                                <Box className="absolute inset-0 bg-black/20 blur-xl rounded-full transform translate-y-4" />
                                 <Image
                                     src="https://images.unsplash.com/photo-1525921429624-479b6a2ee2b4?q=80&w=800&auto=format&fit=crop"
                                     alt="Students"
-                                    className="rounded-3xl shadow-2xl rotate-3"
+                                    className="rounded-3xl shadow-2xl rotate-3 object-cover border-4 border-white/20"
                                 />
                             </Box>
                         </SimpleGrid>

@@ -162,7 +162,7 @@ const AdminLayout = ({
                 <AdminSidebar collapsed={desktopCollapsed} onToggle={toggleDesktop} />
             </AppShell.Navbar>
 
-            <AppShell.Main className="bg-zinc-50 dark:bg-zinc-900 p-0">
+            <AppShell.Main className="bg-zinc-50 dark:bg-zinc-900 p-0 overflow-x-hidden w-full">
                 {children}
             </AppShell.Main>
         </AppShell>

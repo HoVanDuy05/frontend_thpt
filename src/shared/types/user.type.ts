@@ -17,6 +17,7 @@ export interface THoSoGiaoVien {
     maSoGv: string;
     hoTen: string;
     chuyenMon?: string;
+    avatar?: string;
 }
 
 export interface THoSoHocSinh {
@@ -26,4 +27,5 @@ export interface THoSoHocSinh {
     hoTen: string;
     ngaySinh?: string;
     lopId?: number;
+    avatar?: string;
 }

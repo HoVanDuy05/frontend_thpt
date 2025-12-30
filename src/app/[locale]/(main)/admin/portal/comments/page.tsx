@@ -103,9 +103,9 @@ export default function CommentManagementPage() {
                                             <Skeleton h={100} radius="lg" />
                                             <Skeleton h={100} radius="lg" />
                                         </Stack>
-                                    ) : (comments as any) && (comments as any).length > 0 ? (
+                                    ) : comments && comments.length > 0 ? (
                                         <Stack gap="xl">
-                                            {(comments as any).map((comment: any) => (
+                                            {comments.map((comment: TBinhLuan) => (
                                                 <CommentItem
                                                     key={comment.id}
                                                     comment={comment}
@@ -144,9 +144,9 @@ export default function CommentManagementPage() {
     );
 }
 
-function CommentItem({ comment, onDelete }: { comment: any; onDelete: (id: number) => void }) {
+function CommentItem({ comment, onDelete }: { comment: TBinhLuan; onDelete: (id: number) => void }) {
     const displayName = comment.nguoiDung?.hoSoGiaoVien?.hoTen || comment.nguoiDung?.hoSoHocSinh?.hoTen || comment.nguoiDung?.taiKhoan || "Người dùng";
-    const avatar = (comment.nguoiDung?.hoSoGiaoVien as any)?.avatar || (comment.nguoiDung?.hoSoHocSinh as any)?.avatar;
+    const avatar = comment.nguoiDung?.hoSoGiaoVien?.avatar || comment.nguoiDung?.hoSoHocSinh?.avatar;
 
     return (
         <Group align="flex-start" wrap="nowrap" gap="md">
