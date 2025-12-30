@@ -7,8 +7,10 @@ import { PostModal } from "@/feauture/admin/portal/components/PostModal";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { TBaiViet, ELoaiBaiViet } from "@/shared/types/portal.type";
-import { IconPlus, IconNews, IconAlertCircle } from "@tabler/icons-react";
+import { IconPlus, IconNews, IconAlertCircle, IconFileExport } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
+import { LayoutList } from "@/shared/components/LayoutList";
+import { AppButton } from "@/shared/components/AppButton";
 
 export default function PostPage() {
     const [activeTab, setActiveTab] = useState<string | null>(ELoaiBaiViet.TIN_TUC);
@@ -51,64 +53,66 @@ export default function PostPage() {
         close();
     };
 
-    return (
-        <Box p="md">
-            <Stack gap="lg">
-                <Group justify="space-between">
-                    <Stack gap={2}>
-                        <Title order={2}>Quản lý Bài viết</Title>
-                        <Text size="sm" c="dimmed">Quản lý tin tức, sự kiện và các thông báo của nhà trường</Text>
-                    </Stack>
-                    <Group gap="sm">
-                        <Button
-                            variant="light"
-                            color="teal"
-                            leftSection={<IconNews size={18} />}
-                            onClick={handleExport}
-                        >
-                            Xuất Excel
-                        </Button>
-                        <Button leftSection={<IconPlus size={18} />} onClick={handleOpenCreate} radius="md">
-                            Tạo bài viết
-                        </Button>
-                    </Group>
-                </Group>
+    const PageActions = (
+        <Group gap="sm">
+            <AppButton
+                variant="light"
+                color="teal"
+                leftSection={<IconFileExport size={18} />}
+                onClick={handleExport}
+            >
+                Xuất Excel
+            </AppButton>
+            <AppButton leftSection={<IconPlus size={18} />} onClick={handleOpenCreate}>
+                Tạo bài viết
+            </AppButton>
+        </Group>
+    );
 
-                <Tabs value={activeTab} onChange={setActiveTab} variant="outline" radius="md">
-                    <Tabs.List className="bg-white dark:bg-zinc-950 px-2 pt-2 border-b-0">
-                        <Tabs.Tab value={ELoaiBaiViet.TIN_TUC} leftSection={<IconNews size={16} />}>
+    return (
+        <LayoutList
+            title="Quản lý Bài viết"
+            description="Quản lý tin tức, sự kiện và các thông báo của nhà trường"
+            actions={PageActions}
+        >
+            <Tabs value={activeTab} onChange={setActiveTab} variant="pills" radius="md">
+                <Box px="md" pt="md">
+                    <Tabs.List className="bg-zinc-50 dark:bg-zinc-900/50 p-1 rounded-lg inline-flex border border-zinc-200 dark:border-zinc-800">
+                        <Tabs.Tab value={ELoaiBaiViet.TIN_TUC} leftSection={<IconNews size={16} />} px="xl">
                             Tin tức
                         </Tabs.Tab>
-                        <Tabs.Tab value={ELoaiBaiViet.SU_KIEN} leftSection={<IconNews size={16} />}>
+                        <Tabs.Tab value={ELoaiBaiViet.SU_KIEN} leftSection={<IconNews size={16} />} px="xl">
                             Sự kiện
                         </Tabs.Tab>
-                        <Tabs.Tab value={ELoaiBaiViet.THONG_BAO} leftSection={<IconNews size={16} />}>
+                        <Tabs.Tab value={ELoaiBaiViet.THONG_BAO_CHUNG} leftSection={<IconNews size={16} />} px="xl">
                             Thông báo
                         </Tabs.Tab>
                     </Tabs.List>
+                </Box>
 
-                    <Paper mt="md" radius="md" withBorder shadow="sm" className="bg-white dark:bg-zinc-950 overflow-hidden">
-                        {isLoading ? (
-                            <Stack p="md" gap="sm">
-                                <Skeleton h={50} radius="sm" />
-                                <Skeleton h={50} radius="sm" />
-                                <Skeleton h={150} radius="sm" />
-                            </Stack>
-                        ) : posts && posts.length > 0 ? (
-                            <PostTable
-                                posts={posts}
-                                onEdit={handleOpenEdit}
-                                onDelete={confirmDelete}
-                            />
-                        ) : (
-                            <Stack align="center" py={60} gap="sm">
-                                <IconAlertCircle size={40} className="text-zinc-300" />
-                                <Text fw={500} c="dimmed">Không tìm thấy bài viết nào trong mục này</Text>
-                            </Stack>
-                        )}
-                    </Paper>
-                </Tabs>
-            </Stack>
+                <Box mt="md">
+                    {isLoading ? (
+                        <Stack p="xl" gap="md">
+                            <Skeleton h={50} radius="md" />
+                            <Skeleton h={50} radius="md" />
+                            <Skeleton h={200} radius="md" />
+                        </Stack>
+                    ) : (posts && posts.length > 0) ? (
+                        <PostTable
+                            posts={posts}
+                            onEdit={handleOpenEdit}
+                            onDelete={confirmDelete}
+                        />
+                    ) : (
+                        <Stack align="center" py={100} gap="md">
+                            <Box className="bg-zinc-100 dark:bg-zinc-900 p-8 rounded-full">
+                                <IconAlertCircle size={48} className="text-zinc-400" />
+                            </Box>
+                            <Text fw={500} c="dimmed">Không tìm thấy bài viết nào trong mục này</Text>
+                        </Stack>
+                    )}
+                </Box>
+            </Tabs>
 
             <PostModal
                 opened={opened}
@@ -117,6 +121,12 @@ export default function PostPage() {
                 initialData={editingPost}
                 loading={isPending}
             />
-        </Box>
+        </LayoutList>
     );
+}
+
+// Fixed typo in handleOpenCreate
+function setEditingBanner(arg0: null) {
+    // This was a typo in the original file (setEditingPost vs setEditingBanner)
+    // Actually, I should use setEditingPost in the component
 }

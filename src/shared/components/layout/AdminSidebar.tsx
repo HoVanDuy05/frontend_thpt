@@ -100,7 +100,7 @@ export function AdminSidebar({ collapsed = false, onToggle }: AdminSidebarProps)
                             </div>
                             <div className="flex flex-col overflow-hidden whitespace-nowrap">
                                 <span className="font-bold text-sm text-gray-900 dark:text-gray-100">
-                                    School PMS
+                                    Nguyễn Huệ
                                 </span>
                                 <span className="text-xs text-gray-500 dark:text-gray-400">
                                     v1.0.0

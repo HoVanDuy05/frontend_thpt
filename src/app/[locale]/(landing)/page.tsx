@@ -68,7 +68,7 @@ export default function LandingPage() {
                                 </Badge>
                                 <Title className="text-5xl lg:text-7xl font-black leading-[1.1] text-zinc-900 dark:text-white">
                                     Trường THPT <br />
-                                    <span className="bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">Năng Khiếu PMS</span>
+                                    <span className="bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">Chuyên Nguyễn Huệ</span>
                                 </Title>
                                 <Stack gap="md" mt="xl">
                                     <Text size="xl" className="text-zinc-600 dark:text-zinc-400 font-medium leading-relaxed">
@@ -206,7 +206,7 @@ export default function LandingPage() {
 
                         <div>
                             <Badge variant="dot" size="lg" mb="sm" color="indigo">Dành cho học sinh</Badge>
-                            <Title order={2} className="text-3xl font-black mb-12">Truy cập nhanh PMS</Title>
+                            <Title order={2} className="text-3xl font-black mb-12">Truy cập nhanh Nguyễn Huệ</Title>
 
                             <SimpleGrid cols={2} spacing="md">
                                 <Card padding="xl" radius="24px" className="bg-blue-600 text-white border-none group cursor-pointer hover:-translate-y-2 transition-transform">
@@ -289,7 +289,7 @@ export default function LandingPage() {
                         <Stack gap="md">
                             <Group gap="xs">
                                 <Box className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">P</Box>
-                                <Title order={3} className="bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">PMS Academy</Title>
+                                <Title order={3} className="bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">Nguyễn Huệ Academy</Title>
                             </Group>
                             <Text size="sm" c="dimmed">
                                 Hệ thống quản lý trường học hiện đại, kết nối nhà trường, giáo viên, học sinh và phụ huynh.
@@ -333,7 +333,7 @@ export default function LandingPage() {
 
                     <Box mt={60} pt={30} className="border-t border-zinc-100 dark:border-zinc-800">
                         <Group justify="space-between">
-                            <Text size="xs" c="dimmed">© 2025 PMS Education Environment. All rights reserved.</Text>
+                            <Text size="xs" c="dimmed">© 2025 Nguyễn Huệ Education Environment. All rights reserved.</Text>
                             <Group gap="xl">
                                 <Text size="xs" c="dimmed">Privacy Policy</Text>
                                 <Text size="xs" c="dimmed">Terms of Service</Text>

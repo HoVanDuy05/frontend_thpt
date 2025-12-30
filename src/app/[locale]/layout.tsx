@@ -15,7 +15,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 
 export const metadata: Metadata = {
-  title: "PMS - Project Management System",
+  title: "Nguyễn Huệ - Hệ thống Quản lý Trường học",
   description: "Modern Project Management System built with Next.js 15",
 };
 

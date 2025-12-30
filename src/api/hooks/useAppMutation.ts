@@ -30,7 +30,7 @@ export const useAppMutation = <T extends keyof ApiMutationType>({
             const mergedParams = {
                 ...(url as any)?.urlParams,
                 ...((payload as any)?.urlParams || {}),
-                ...(payload as any) // also try to find params in the payload root if it matches placeholders
+                ...((payload as any) instanceof FormData ? {} : (payload as any || {}))
             };
 
             const urlApi = replaceDynamicValues(

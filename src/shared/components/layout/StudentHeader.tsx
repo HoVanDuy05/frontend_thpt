@@ -18,7 +18,7 @@ export function StudentHeader() {
                 <Group justify="space-between">
                     <Link href="/student" className="no-underline text-inherit">
                         <Title order={3} className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                            PMS Student
+                            Nguyễn Huệ Student
                         </Title>
                     </Link>
 

@@ -41,12 +41,12 @@ export default function Home() {
 
   const handleLogin = () => {
     setUser({
-      id: "1",
-      name: "Admin",
+      id: 1,
+      taiKhoan: "admin",
       email: "admin@pms.com",
-      role: "ADMIN",
-      permissions: ["DASHBOARD", "ACCOUNT_MANAGEMENT", "ACADEMIC_MANAGEMENT", "EXAM_MANAGEMENT", "REPORT_MANAGEMENT", "SETTINGS"]
-    });
+      vaiTro: "ADMIN",
+      ngayTao: new Date().toISOString()
+    } as any);
     notifications.show({
       title: "Success",
       message: "Logged in as Admin (Zustand store working)",
@@ -59,7 +59,7 @@ export default function Home() {
       <Stack gap="xl">
         <Group justify="space-between">
           <Stack gap={0}>
-            <Title order={1}>PMS Dashboard</Title>
+            <Title order={1}>Nguyễn Huệ Dashboard</Title>
             <Text c="dimmed" suppressHydrationWarning>{dayjs().format("DD MMMM YYYY, HH:mm")}</Text>
           </Stack>
           <ActionIcon
@@ -94,7 +94,7 @@ export default function Home() {
                   Login (Mock)
                 </Button>
               ) : (
-                <Text fw={500}>Welcome, {user.name}!</Text>
+                <Text fw={500}>Welcome, {user.taiKhoan}!</Text>
               )}
             </Group>
           </Stack>

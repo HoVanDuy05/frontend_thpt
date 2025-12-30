@@ -9,9 +9,11 @@ import { useState } from "react";
 import { TBanner } from "@/shared/types/portal.type";
 import { IconPlus, IconPhotoOff, IconAlertCircle } from "@tabler/icons-react";
 import { modals } from "@mantine/modals";
+import { LayoutList } from "@/shared/components/LayoutList";
+import { AppButton } from "@/shared/components/AppButton";
 
 export default function BannerPage() {
-    const { banners, isLoading, handleCreate, handleUpdate, handleDelete, isCreating } = useBannerManager();
+    const { banners, isLoading, handleCreate, handleUpdate, handleDelete, isCreating, isUpdating, isDeleting } = useBannerManager();
     const [opened, { open, close }] = useDisclosure(false);
     const [editingBanner, setEditingBanner] = useState<TBanner | null>(null);
 
@@ -35,7 +37,7 @@ export default function BannerPage() {
                 </Text>
             ),
             labels: { confirm: "Xóa", cancel: "Hủy" },
-            confirmProps: { color: "red" },
+            confirmProps: { color: "red", loading: isDeleting },
             onConfirm: () => handleDelete(id),
         });
     };
@@ -49,51 +51,49 @@ export default function BannerPage() {
         close();
     };
 
-    return (
-        <Box p="md">
-            <Stack gap="lg">
-                <Group justify="space-between">
-                    <Stack gap={0}>
-                        <Title order={2}>Quản lý Banner</Title>
-                        <Text size="sm" c="dimmed">Cấu hình các banner hiển thị trên trang chủ</Text>
-                    </Stack>
-                    <Button leftSection={<IconPlus size={18} />} onClick={handleOpenCreate} radius="md">
-                        Thêm Banner
-                    </Button>
-                </Group>
+    const PageActions = (
+        <AppButton leftSection={<IconPlus size={18} />} onClick={handleOpenCreate}>
+            Thêm Banner
+        </AppButton>
+    );
 
-                <Paper radius="md" withBorder shadow="sm" className="bg-white dark:bg-zinc-950 overflow-hidden">
-                    {isLoading ? (
-                        <Stack p="md" gap="sm">
-                            <Skeleton h={50} radius="md" />
-                            <Skeleton h={50} radius="md" />
-                            <Skeleton h={50} radius="md" />
+    return (
+        <LayoutList
+            title="Quản lý Banner"
+            description="Cấu hình các banner hiển thị trên trang chủ"
+            actions={PageActions}
+            loading={isLoading}
+        >
+            <Paper radius="lg" withBorder shadow="sm" className="bg-white/50 dark:bg-zinc-950/50 backdrop-blur-sm border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden">
+                {banners && banners.length > 0 ? (
+                    <BannerTable
+                        banners={banners}
+                        onEdit={handleOpenEdit}
+                        onDelete={confirmDelete}
+                    />
+                ) : (
+                    <Stack align="center" py={80} gap="md">
+                        <Box className="bg-zinc-100 dark:bg-zinc-900 p-8 rounded-full">
+                            <IconPhotoOff size={56} className="text-zinc-400" />
+                        </Box>
+                        <Stack gap={4} align="center">
+                            <Text fw={700} fz="lg">Chưa có banner nào</Text>
+                            <Text size="sm" c="dimmed">Bắt đầu bằng cách tạo banner đầu tiên của bạn</Text>
                         </Stack>
-                    ) : banners && banners.length > 0 ? (
-                        <BannerTable
-                            banners={banners}
-                            onEdit={handleOpenEdit}
-                            onDelete={confirmDelete}
-                        />
-                    ) : (
-                        <Stack align="center" py={60} gap="md">
-                            <Box className="bg-zinc-100 dark:bg-zinc-900 p-6 rounded-full">
-                                <IconPhotoOff size={48} className="text-zinc-400" />
-                            </Box>
-                            <Text fw={500} c="dimmed">Chưa có banner nào được tạo</Text>
-                            <Button variant="light" onClick={handleOpenCreate}>Tạo banner đầu tiên</Button>
-                        </Stack>
-                    )}
-                </Paper>
-            </Stack>
+                        <AppButton variant="light" onClick={handleOpenCreate} mt="md">
+                            Tạo banner ngay
+                        </AppButton>
+                    </Stack>
+                )}
+            </Paper>
 
             <BannerModal
                 opened={opened}
                 onClose={close}
                 onSubmit={handleSubmit}
                 initialData={editingBanner}
-                loading={isCreating}
+                loading={isCreating || isUpdating}
             />
-        </Box>
+        </LayoutList>
     );
 }

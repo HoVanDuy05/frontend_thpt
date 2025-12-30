@@ -29,14 +29,15 @@ export function withAuth<P extends object>(
                     return;
                 }
 
-                try {
-                    // Always fetch fresh profile to ensure current role is used
-                    const profile = await axiosClient.get("/auth/profile");
-                    setUser(profile as any);
-                } catch (error) {
-                    // Token invalid or expired
-                    router.replace("/auth/login");
-                    return;
+                // If we have token, ensure we have basic profile data
+                if (!user) {
+                    try {
+                        const profile = await axiosClient.get("/auth/profile");
+                        setUser(profile as any);
+                    } catch (error) {
+                        router.replace("/auth/login");
+                        return;
+                    }
                 }
 
                 setVerifying(false);

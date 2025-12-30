@@ -31,9 +31,7 @@ export function FileUpload({ value, onChange, label, type = "image" }: FileUploa
         formData.append("file", file);
 
         try {
-            const result = await uploadMutation.mutateAsync({
-                payload: formData
-            } as any);
+            const result = await uploadMutation.mutateAsync(formData as any);
 
             onChange(result.url);
             notifications.show({

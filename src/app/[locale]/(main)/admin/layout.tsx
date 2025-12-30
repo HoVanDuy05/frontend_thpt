@@ -43,7 +43,7 @@ const AdminLayout = ({
                 breakpoint: "sm",
                 collapsed: { mobile: !mobileOpened },
             }}
-            padding="lg"
+            padding={0}
             transitionDuration={300}
             transitionTimingFunction="ease"
         >
@@ -162,7 +162,7 @@ const AdminLayout = ({
                 <AdminSidebar collapsed={desktopCollapsed} onToggle={toggleDesktop} />
             </AppShell.Navbar>
 
-            <AppShell.Main className="bg-zinc-50 dark:bg-zinc-900">
+            <AppShell.Main className="bg-zinc-50 dark:bg-zinc-900 p-0">
                 {children}
             </AppShell.Main>
         </AppShell>

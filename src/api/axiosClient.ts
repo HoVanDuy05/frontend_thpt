@@ -3,9 +3,6 @@ import { useAppStore } from "@/providers/store/useAppStore";
 
 const axiosClient = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
-    headers: {
-        "Content-Type": "application/json",
-    },
 });
 
 // Add a request interceptor
