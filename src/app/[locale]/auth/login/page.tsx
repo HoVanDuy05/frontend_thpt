@@ -85,8 +85,8 @@ export default function LoginPage() {
                         switch (data.user.vaiTro) {
                             case "ADMIN": targetUrl = "/admin/dashboard"; break;
                             case "GIAO_VIEN": targetUrl = "/admin/dashboard"; break;
-                            case "HOC_SINH": targetUrl = "/student/dashboard"; break;
-                            default: targetUrl = "/student/dashboard";
+                            case "HOC_SINH": targetUrl = "/student"; break;
+                            default: targetUrl = "/student";
                         }
                     }
 

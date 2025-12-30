@@ -10,7 +10,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/vi";
 import { useState } from "react";
 import { modals } from "@mantine/modals";
-import { PageLayout } from "@/shared/components/PageLayout";
+import { LayoutList } from "@/shared/components/LayoutList";
 import { AppButton } from "@/shared/components/AppButton";
 
 dayjs.extend(relativeTime);
@@ -34,7 +34,7 @@ export default function CommentManagementPage() {
     };
 
     return (
-        <PageLayout
+        <LayoutList
             title="Quản lý Bình luận"
             description="Kiểm duyệt và phản hồi ý kiến của người dùng trên trang portal"
         >
@@ -140,7 +140,7 @@ export default function CommentManagementPage() {
                     </Box>
                 </Group>
             </Box>
-        </PageLayout>
+        </LayoutList>
     );
 }
 
