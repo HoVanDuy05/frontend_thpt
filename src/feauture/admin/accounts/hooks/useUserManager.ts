@@ -13,10 +13,11 @@ export const useUserManager = (role?: UserRole) => {
     const search = searchParams.get("search") || "";
 
     // Query parameters
+
     const params = {
-        page,
-        limit,
-        filters: role ? { vaiTro: role, content: search } : { content: search },
+        skip: (page - 1) * limit,
+        take: limit,
+        where: role ? { vaiTro: role, content: search } : { content: search },
     };
 
     const { data: users, isLoading, refetch } = AppQuery.user.useList(params);
