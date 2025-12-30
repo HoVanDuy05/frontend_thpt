@@ -1,0 +1,161 @@
+{
+    "menu": {
+        "dashboard": "Bảng điều khiển",
+        "accounts": {
+            "title": "Quản lý tài khoản",
+            "students": "Học sinh",
+            "teachers": "Giáo viên",
+            "staff": "Nhân viên",
+            "roles": "Phân quyền"
+        },
+        "academic": {
+            "title": "Học tập",
+            "classes": "Lớp học",
+            "subjects": "Môn học",
+            "courses": "Khóa học",
+            "schedule": "Thời khóa biểu"
+        },
+        "examination": {
+            "title": "Khảo thí",
+            "list": "Kỳ thi",
+            "results": "Kết quả học tập"
+        },
+        "reports": {
+            "title": "Báo cáo",
+            "attendance": "Điểm danh",
+            "finance": "Tài chính"
+        },
+        "portal": {
+            "title": "Cổng thông tin",
+            "banners": "Banners",
+            "posts": "Bài viết",
+            "comments": "Bình luận"
+        },
+        "communication": {
+            "title": "Liên lạc",
+            "notifications": "Thông báo",
+            "chat": "Tin nhắn"
+        },
+        "settings": "Cài đặt hệ thống"
+    },
+    "layout": {
+        "admin_portal": "Cổng Quản trị",
+        "back_to_student": "Quay lại trang học sinh",
+        "admin_panel": "Trang Dashboard",
+        "logout": "Đăng xuất",
+        "sign_in": "Đăng nhập"
+    },
+    "admin": {
+        "header": {
+            "account": "Tài khoản",
+            "profile": "Hồ sơ cá nhân",
+            "settings": "Cài đặt",
+            "dark_mode": "Chế độ tối",
+            "light_mode": "Chế độ sáng",
+            "language": "Ngôn ngữ",
+            "logout": "Đăng xuất"
+        }
+    },
+    "error_page": {
+        "title": "Đã xảy ra lỗi!",
+        "description": "Đã có lỗi xảy ra. Vui lòng thử lại sau hoặc liên hệ quản trị viên.",
+        "retry": "Thử lại"
+    },
+    "notFoundPage": {
+        "title": "Không tìm thấy trang!",
+        "description": "Trang bạn đang tìm kiếm không tồn tại hoặc đã được di chuyển."
+    },
+    "auth": {
+        "login": {
+            "title": "Chào mừng trở lại",
+            "subtitle": "Vui lòng đăng nhập để tiếp tục",
+            "username": "Tên đăng nhập",
+            "password": "Mật khẩu",
+            "submit": "Đăng nhập",
+            "forgot_password": "Quên mật khẩu?",
+            "error": "Thông tin đăng nhập không chính xác",
+            "success": "Đăng nhập thành công",
+            "no_account": "Chưa có tài khoản?",
+            "register_link": "Đăng ký ngay"
+        },
+        "register": {
+            "title": "Tạo tài khoản mới",
+            "subtitle": "Vào ngay để bắt đầu học tập",
+            "username": "Tên đăng nhập",
+            "email": "Email",
+            "password": "Mật khẩu",
+            "confirm_password": "Xác nhận mật khẩu",
+            "submit": "Đăng ký",
+            "error": "Đăng ký thất bại",
+            "success": "Đăng ký thành công!",
+            "have_account": "Đã có tài khoản?",
+            "login_link": "Đăng nhập"
+        },
+        "forgot": {
+            "title": "Quên mật khẩu?",
+            "subtitle": "Nhập email để nhận link khôi phục",
+            "email": "Email",
+            "submit": "Gửi link khôi phục",
+            "back_to_login": "Quay lại đăng nhập",
+            "success": "Nếu email tồn tại, link khôi phục đã được gửi",
+            "error": "Có lỗi xảy ra"
+        },
+        "reset": {
+            "title": "Khôi phục mật khẩu",
+            "subtitle": "Nhập mật khẩu mới của bạn",
+            "password": "Mật khẩu mới",
+            "confirm_password": "Xác nhận mật khẩu",
+            "submit": "Cập nhật mật khẩu",
+            "success": "Mật khẩu đã được cập nhật",
+            "error": "Token không hợp lệ hoặc đã hết hạn"
+        }
+    },
+    "validation": {
+        "required": "Trường này là bắt buộc",
+        "minLength": "Tối thiểu {{min}} ký tự",
+        "maxLength": "Tối đa {{max}} ký tự",
+        "username": {
+            "required": "Tên đăng nhập là bắt buộc",
+            "minLength": "Tên đăng nhập ít nhất 3 ký tự",
+            "maxLength": "Tên đăng nhập tối đa 50 ký tự",
+            "invalid_pattern": "Tên đăng nhập chỉ chứa chữ, số và dấu gạch dưới",
+            "invalid_type": "Tên đăng nhập phải là chuỗi ký tự"
+        },
+        "email": {
+            "required": "Email là bắt buộc",
+            "invalid": "Email không hợp lệ"
+        },
+        "password": {
+            "required": "Mật khẩu là bắt buộc",
+            "minLength": "Mật khẩu ít nhất 6 ký tự",
+            "maxLength": "Mật khẩu tối đa 100 ký tự",
+            "invalid_type": "Mật khẩu phải là chuỗi ký tự"
+        },
+        "confirmPassword": {
+            "required": "Vui lòng xác nhận mật khẩu",
+            "notMatch": "Mật khẩu không khớp"
+        },
+        "token": {
+            "required": "Token không được để trống",
+            "invalid_type": "Token phải là chuỗi ký tự"
+        },
+        "phone": {
+            "invalid": "Số điện thoại không hợp lệ (10-11 chữ số)"
+        },
+        "date": {
+            "invalid": "Ngày không hợp lệ"
+        },
+        "age": {
+            "min": "Tuổi tối thiểu {{min}}",
+            "max": "Tuổi tối đa {{max}}"
+        },
+        "url": {
+            "invalid": "URL không hợp lệ"
+        },
+        "number": {
+            "invalid": "Giá trị phải là số",
+            "min": "Giá trị tối thiểu {{min}}",
+            "max": "Giá trị tối đa {{max}}"
+        }
+    }
+}

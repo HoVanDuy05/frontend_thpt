@@ -1,0 +1,38 @@
+<svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="errorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#EF4444;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F43F5E;stop-opacity:1" />
+    </linearGradient>
+    <filter id="errorShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="10" />
+      <feOffset dx="0" dy="8" result="offsetblur" />
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.2" />
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="400" height="400" fill="transparent"/>
+  
+  <!-- Outer glowing rings -->
+  <circle cx="200" cy="200" r="140" stroke="url(#errorGrad)" stroke-width="2" opacity="0.1" />
+  <circle cx="200" cy="200" r="120" stroke="url(#errorGrad)" stroke-width="1" opacity="0.05" />
+  
+  <!-- Shield/Warning Shape -->
+  <path d="M200 80L340 160V240L200 320L60 240V160L200 80Z" fill="url(#errorGrad)" opacity="0.05" />
+  <path d="M200 100L320 170V230L200 300L80 230V170L200 100Z" stroke="url(#errorGrad)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" filter="url(#errorShadow)" />
+  
+  <!-- Critical Mark -->
+  <rect x="190" y="140" width="20" height="80" rx="10" fill="url(#errorGrad)" />
+  <circle cx="200" cy="250" r="12" fill="url(#errorGrad)" />
+  
+  <!-- Floating bits -->
+  <circle cx="100" cy="120" r="5" fill="#F87171" opacity="0.4" />
+  <circle cx="310" cy="280" r="8" fill="#FB7185" opacity="0.3" />
+  <rect x="70" y="260" width="12" height="12" rx="3" fill="#EF4444" opacity="0.2" transform="rotate(20 70 260)" />
+</svg>

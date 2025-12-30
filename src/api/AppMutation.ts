@@ -1,0 +1,189 @@
+import { useQueryClient } from "@tanstack/react-query";
+import { useAppStore } from "@/providers/store/useAppStore";
+import { useAppMutation } from "./hooks/useAppMutation";
+
+export const AppMutation = () => {
+    const queryClient = useQueryClient();
+    const { setToken } = useAppStore();
+
+    return {
+        auth: {
+            useLogin: () => useAppMutation<"login">({
+                url: { baseUrl: "/auth/login" },
+                onSuccess: (data) => {
+                    setToken(data.access_token);
+                }
+            }),
+            useRegister: () => useAppMutation<"register">({
+                url: { baseUrl: "/auth/register" }
+            }),
+            useForgotPassword: () => useAppMutation<"forgotPassword">({
+                url: { baseUrl: "/auth/forgot-password" }
+            }),
+            useResetPassword: () => useAppMutation<"resetPassword">({
+                url: { baseUrl: "/auth/reset-password" }
+            }),
+        },
+        user: {
+            useUpdate: (id: number) => useAppMutation<"updateUser">({
+                url: { baseUrl: "/users/:id", urlParams: { id } },
+                method: "PATCH",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/users"] as any });
+                }
+            }),
+            useDelete: (id: number) => useAppMutation<"deleteUser">({
+                url: { baseUrl: "/users/:id", urlParams: { id } },
+                method: "DELETE",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/users"] as any });
+                }
+            }),
+            useCreateTeacher: () => useAppMutation<"createTeacher">({
+                url: { baseUrl: "/users/teachers" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/users"] as any });
+                }
+            }),
+            useCreateStudent: () => useAppMutation<"createStudent">({
+                url: { baseUrl: "/users/students" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/users"] as any });
+                }
+            }),
+        },
+        academic: {
+            useCreateYear: () => useAppMutation<"createYear">({
+                url: { baseUrl: "/academic/years" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/years"] as any });
+                }
+            }),
+            useCreateSubject: () => useAppMutation<"createSubject">({
+                url: { baseUrl: "/academic/subjects" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/subjects"] as any });
+                }
+            }),
+            useCreateClass: () => useAppMutation<"createClass">({
+                url: { baseUrl: "/academic/classes" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/classes"] as any });
+                }
+            }),
+            useCreateCalendar: () => useAppMutation<"createCalendar">({
+                url: { baseUrl: "/calendar" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/calendar"] as any });
+                }
+            }),
+            useUpdateCalendar: (id: number) => useAppMutation<"updateCalendar">({
+                url: { baseUrl: "/calendar/:id", urlParams: { id } },
+                method: "PATCH",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/calendar"] as any });
+                }
+            }),
+            useDeleteCalendar: (id: number) => useAppMutation<"deleteCalendar">({
+                url: { baseUrl: "/calendar/:id", urlParams: { id } },
+                method: "DELETE",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/calendar"] as any });
+                }
+            }),
+        },
+        assessment: {
+            useCreateQuestion: () => useAppMutation<"createQuestion">({
+                url: { baseUrl: "/assessments/questions" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/assessments/questions"] as any });
+                }
+            }),
+            useCreateExam: () => useAppMutation<"createExam">({
+                url: { baseUrl: "/assessments/exams" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/assessments/exams"] as any });
+                }
+            }),
+        },
+        submission: {
+            useCreate: () => useAppMutation<"createSubmission">({
+                url: { baseUrl: "/submissions" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/submissions"] as any });
+                }
+            }),
+        },
+        grading: {
+            useCreate: () => useAppMutation<"createGrading">({
+                url: { baseUrl: "/grading" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/grading"] as any });
+                }
+            }),
+        },
+        portal: {
+            useCreateBanner: () => useAppMutation<"createBanner">({
+                url: { baseUrl: "/portal/banners" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/portal/banners"] as any });
+                }
+            }),
+            useUpdateBanner: () => useAppMutation<"updateBanner">({
+                url: { baseUrl: "/portal/banners/:id" },
+                method: "PATCH",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/portal/banners"] as any });
+                }
+            }),
+            useDeleteBanner: () => useAppMutation<"deleteBanner">({
+                url: { baseUrl: "/portal/banners/:id" },
+                method: "DELETE",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/portal/banners"] as any });
+                }
+            }),
+            useCreatePost: () => useAppMutation<"createPost">({
+                url: { baseUrl: "/portal/posts" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/portal/posts"] as any });
+                }
+            }),
+            useUpdatePost: () => useAppMutation<"updatePost">({
+                url: { baseUrl: "/portal/posts/:id" },
+                method: "PATCH",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/portal/posts"] as any });
+                }
+            }),
+            useDeletePost: () => useAppMutation<"deletePost">({
+                url: { baseUrl: "/portal/posts/:id" },
+                method: "DELETE",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/portal/posts"] as any });
+                }
+            }),
+            useCreateComment: () => useAppMutation<"createComment">({
+                url: { baseUrl: "/portal/comments" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/portal/comments"] as any });
+                }
+            }),
+            useDeleteComment: () => useAppMutation<"deleteComment">({
+                url: { baseUrl: "/portal/comments/:id" },
+                method: "DELETE",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/portal/comments"] as any });
+                }
+            }),
+        },
+        upload: {
+            useUploadImage: () => useAppMutation<"uploadImage">({
+                url: { baseUrl: "/upload/image" },
+            }),
+            useUploadAvatar: () => useAppMutation<"uploadAvatar">({
+                url: { baseUrl: "/upload/avatar" },
+            }),
+        }
+    };
+};

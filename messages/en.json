@@ -1,0 +1,30 @@
+{
+    "menu": {
+        "dashboard": "Dashboard",
+        "accounts": {
+            "title": "Account Management",
+            "students": "Students",
+            "teachers": "Teachers",
+            "staff": "Staff",
+            "roles": "Roles & Permissions"
+        },
+        "academic": {
+            "title": "Academic",
+            "classes": "Classes",
+            "subjects": "Subjects",
+            "courses": "Courses",
+            "schedule": "Schedule"
+        },
+        "examination": {
+            "title": "Examination",
+            "list": "Exams",
+            "results": "Academic Results"
+        },
+        "reports": {
+            "title": "Reports",
+            "attendance": "Attendance",
+            "finance": "Finance"
+        },
+        "settings": "System Settings"
+    }
+}

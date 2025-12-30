@@ -1,0 +1,28 @@
+{
+    "dashboard": "Bảng điều khiển",
+    "accounts": {
+        "title": "Quản lý tài khoản",
+        "students": "Học sinh",
+        "teachers": "Giáo viên",
+        "staff": "Nhân viên",
+        "roles": "Phân quyền"
+    },
+    "academic": {
+        "title": "Học tập",
+        "classes": "Lớp học",
+        "subjects": "Môn học",
+        "courses": "Khóa học",
+        "schedule": "Thời khóa biểu"
+    },
+    "examination": {
+        "title": "Khảo thí",
+        "list": "Kỳ thi",
+        "results": "Kết quả học tập"
+    },
+    "reports": {
+        "title": "Báo cáo",
+        "attendance": "Điểm danh",
+        "finance": "Tài chính"
+    },
+    "settings": "Cài đặt hệ thống"
+}

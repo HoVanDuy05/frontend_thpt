@@ -1,0 +1,150 @@
+{
+    "menu": {
+        "dashboard": "Dashboard",
+        "accounts": {
+            "title": "Account Management",
+            "students": "Students",
+            "teachers": "Teachers",
+            "staff": "Staff",
+            "roles": "Roles & Permissions"
+        },
+        "academic": {
+            "title": "Academic",
+            "classes": "Classes",
+            "subjects": "Subjects",
+            "courses": "Courses",
+            "schedule": "Schedule"
+        },
+        "examination": {
+            "title": "Examination",
+            "list": "Exams",
+            "results": "Academic Results"
+        },
+        "reports": {
+            "title": "Reports",
+            "attendance": "Attendance",
+            "finance": "Finance"
+        },
+        "settings": "System Settings"
+    },
+    "layout": {
+        "admin_portal": "Admin Portal",
+        "back_to_student": "Back to Student Site",
+        "admin_panel": "Dashboard",
+        "logout": "Logout",
+        "sign_in": "Sign In"
+    },
+    "admin": {
+        "header": {
+            "account": "Account",
+            "profile": "Profile",
+            "settings": "Settings",
+            "dark_mode": "Dark Mode",
+            "light_mode": "Light Mode",
+            "language": "Language",
+            "logout": "Logout"
+        }
+    },
+    "error_page": {
+        "title": "Something went wrong!",
+        "description": "An unexpected error occurred. Please try again later or contact support.",
+        "retry": "Try again"
+    },
+    "notFoundPage": {
+        "title": "Page Not Found!",
+        "description": "The page you are looking for doesn't exist or has been moved."
+    },
+    "auth": {
+        "login": {
+            "title": "Welcome Back",
+            "subtitle": "Please sign in to continue",
+            "username": "Username",
+            "password": "Password",
+            "submit": "Sign In",
+            "forgot_password": "Forgot password?",
+            "error": "Invalid credentials",
+            "success": "Login successful",
+            "no_account": "Don't have an account?",
+            "register_link": "Sign up now"
+        },
+        "register": {
+            "title": "Create New Account",
+            "subtitle": "Join us to start learning",
+            "username": "Username",
+            "email": "Email",
+            "password": "Password",
+            "confirm_password": "Confirm Password",
+            "submit": "Sign Up",
+            "error": "Registration failed",
+            "success": "Registration successful!",
+            "have_account": "Already have an account?",
+            "login_link": "Sign in"
+        },
+        "forgot": {
+            "title": "Forgot Password?",
+            "subtitle": "Enter your email to receive reset link",
+            "email": "Email",
+            "submit": "Send Reset Link",
+            "back_to_login": "Back to login",
+            "success": "If email exists, a reset link has been sent",
+            "error": "An error occurred"
+        },
+        "reset": {
+            "title": "Reset Password",
+            "subtitle": "Enter your new password",
+            "password": "New Password",
+            "confirm_password": "Confirm Password",
+            "submit": "Update Password",
+            "success": "Password has been updated",
+            "error": "Invalid or expired token"
+        }
+    },
+    "validation": {
+        "required": "This field is required",
+        "minLength": "Minimum {{min}} characters",
+        "maxLength": "Maximum {{max}} characters",
+        "username": {
+            "required": "Username is required",
+            "minLength": "Username must be at least 3 characters",
+            "maxLength": "Username must be at most 50 characters",
+            "invalid_pattern": "Username can only contain letters, numbers and underscores",
+            "invalid_type": "Username must be a string"
+        },
+        "email": {
+            "required": "Email is required",
+            "invalid": "Invalid email address"
+        },
+        "password": {
+            "required": "Password is required",
+            "minLength": "Password must be at least 6 characters",
+            "maxLength": "Password must be at most 100 characters",
+            "invalid_type": "Password must be a string"
+        },
+        "confirmPassword": {
+            "required": "Please confirm your password",
+            "notMatch": "Passwords do not match"
+        },
+        "token": {
+            "required": "Token is required",
+            "invalid_type": "Token must be a string"
+        },
+        "phone": {
+            "invalid": "Invalid phone number (10-11 digits)"
+        },
+        "date": {
+            "invalid": "Invalid date"
+        },
+        "age": {
+            "min": "Minimum age is {{min}}",
+            "max": "Maximum age is {{max}}"
+        },
+        "url": {
+            "invalid": "Invalid URL"
+        },
+        "number": {
+            "invalid": "Value must be a number",
+            "min": "Minimum value is {{min}}",
+            "max": "Maximum value is {{max}}"
+        }
+    }
+}

@@ -1,0 +1,7 @@
+{
+    "auth": {
+        "login": "Đăng nhập",
+        "logout": "Đăng xuất",
+        "welcome": "Chào mừng"
+    }
+}
