@@ -56,37 +56,42 @@ export default function LandingPage() {
     return (
         <Box className="overflow-hidden" suppressHydrationWarning>
             {/* Hero Section */}
-            <section className="relative pt-32 pb-40 lg:pt-48 lg:pb-64 overflow-hidden bg-white dark:bg-zinc-950">
+            <section className="relative pt-24 pb-20 sm:pt-32 sm:pb-40 lg:pt-48 lg:pb-64 overflow-hidden bg-white dark:bg-zinc-950">
                 <Box className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-                    <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-blue-100/40 dark:bg-blue-900/10 rounded-full blur-[100px]" />
-                    <div className="absolute bottom-[10%] left-[-10%] w-[500px] h-[500px] bg-indigo-100/40 dark:bg-indigo-900/10 rounded-full blur-[100px]" />
+                    <div className="absolute top-[-10%] right-[-5%] w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-blue-100/40 dark:bg-blue-900/10 rounded-full blur-[60px] sm:blur-[100px]" />
+                    <div className="absolute bottom-[10%] left-[-10%] w-[250px] sm:w-[500px] h-[250px] sm:h-[500px] bg-indigo-100/40 dark:bg-indigo-900/10 rounded-full blur-[60px] sm:blur-[100px]" />
                 </Box>
 
-                <Box className="absolute top-0 left-0 w-full h-[800px] bg-gradient-to-b from-blue-50/80 to-transparent dark:from-blue-900/10 -z-10" />
+                <Box className="absolute top-0 left-0 w-full h-[500px] sm:h-[800px] bg-gradient-to-b from-blue-50/80 to-transparent dark:from-blue-900/10 -z-10" />
 
-                <Container size="lg" className="relative z-10">
-                    <SimpleGrid cols={{ base: 1, lg: 2 }} spacing={80} verticalSpacing={60}>
+                <Container size="lg" className="relative z-10 px-4">
+                    <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="xl" verticalSpacing={40}>
                         <Stack gap="xl" className="justify-center">
                             <Box>
-                                <Badge size="xl" variant="gradient" gradient={{ from: 'blue', to: 'indigo' }} className="mb-6 px-5 py-3 uppercase tracking-widest font-bold shadow-lg shadow-blue-500/20">
+                                <Badge
+                                    size="lg"
+                                    variant="gradient"
+                                    gradient={{ from: 'blue', to: 'indigo' }}
+                                    className="mb-6 px-4 py-2 uppercase tracking-widest font-bold shadow-lg shadow-blue-500/20"
+                                >
                                     Thành tích - Kỷ cương - Tình thương
                                 </Badge>
-                                <Title className="text-6xl lg:text-8xl font-black leading-[1.05] tracking-tight text-zinc-900 dark:text-white mb-6">
+                                <Title className="text-4xl sm:text-6xl lg:text-8xl font-black leading-[1.1] tracking-tight text-zinc-900 dark:text-white mb-6">
                                     Trường THPT <br />
                                     <span className="bg-gradient-to-r from-blue-700 via-indigo-600 to-violet-600 bg-clip-text text-transparent">
                                         Chuyên Nguyễn Huệ
                                     </span>
                                 </Title>
-                                <Text size="xl" className="text-zinc-600 dark:text-zinc-300 font-medium leading-relaxed max-w-xl text-lg">
+                                <Text className="text-zinc-600 dark:text-zinc-300 font-medium leading-relaxed max-w-xl text-base sm:text-lg">
                                     Nơi ươm mầm những tài năng trẻ, kiến tạo môi trường giáo dục tiên tiến và rèn luyện nhân cách toàn diện cho thế hệ công dân toàn cầu.
                                 </Text>
                             </Box>
 
-                            <Group gap="md" mt="sm">
+                            <Group gap="md">
                                 <Button
-                                    size="xl"
+                                    size="lg"
                                     radius="xl"
-                                    className="bg-blue-600 hover:bg-blue-700 h-16 px-12 text-lg shadow-xl shadow-blue-600/30 hover:scale-105 transition-transform duration-200"
+                                    className="bg-blue-600 hover:bg-blue-700 h-14 sm:h-16 px-8 sm:px-12 text-base sm:text-lg shadow-xl shadow-blue-600/30 hover:scale-105 transition-transform duration-200 flex-1 sm:flex-none"
                                     component={Link}
                                     href="/auth/register"
                                     rightSection={<IconArrowRight size={22} />}
@@ -94,10 +99,10 @@ export default function LandingPage() {
                                     Đăng ký tuyển sinh
                                 </Button>
                                 <Button
-                                    size="xl"
+                                    size="lg"
                                     radius="xl"
                                     variant="outline"
-                                    className="border-zinc-200 dark:border-zinc-700 h-16 px-10 text-lg hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                                    className="border-zinc-200 dark:border-zinc-700 h-14 sm:h-16 px-8 sm:px-10 text-base sm:text-lg hover:bg-zinc-50 dark:hover:bg-zinc-900 flex-1 sm:flex-none"
                                     component={Link}
                                     href="/auth/login"
                                 >
@@ -108,26 +113,26 @@ export default function LandingPage() {
                             <Group gap="xl" mt="lg">
                                 <Group gap="xs">
                                     <div className="p-2 bg-blue-50 dark:bg-blue-900/30 rounded-full text-blue-600">
-                                        <IconAward size={28} />
+                                        <IconAward size={24} />
                                     </div>
                                     <div>
-                                        <Text fw={700} size="sm">Top 10 Toàn Quốc</Text>
-                                        <Text size="xs" c="dimmed">Thành tích xuất sắc</Text>
+                                        <Text fw={700} size="xs">Top 10 Toàn Quốc</Text>
+                                        <Text size="10px" c="dimmed" tt="uppercase">Thành tích xuất sắc</Text>
                                     </div>
                                 </Group>
                                 <Group gap="xs">
                                     <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-full text-indigo-600">
-                                        <IconSchool size={28} />
+                                        <IconSchool size={24} />
                                     </div>
                                     <div>
-                                        <Text fw={700} size="sm">50+ Năm Lịch Sử</Text>
-                                        <Text size="xs" c="dimmed">Truyền thống vẻ vang</Text>
+                                        <Text fw={700} size="xs">50+ Năm Lịch Sử</Text>
+                                        <Text size="10px" c="dimmed" tt="uppercase">Truyền thống vẻ vang</Text>
                                     </div>
                                 </Group>
                             </Group>
                         </Stack>
 
-                        <Box className="relative lg:h-auto hidden md:block">
+                        <Box className="relative lg:h-auto hidden lg:block">
                             <Box className="absolute inset-0 bg-blue-600/20 blur-[120px] rounded-full scale-90 translate-y-20" />
                             <Box className="relative z-10 transform hover:scale-[1.02] transition-transform duration-700 ease-out">
                                 <Card padding={0} radius="40px" className="overflow-hidden shadow-2xl border-4 border-white dark:border-zinc-800 rotate-2">
@@ -150,19 +155,28 @@ export default function LandingPage() {
             </section>
 
             {/* News Section */}
-            <section id="news" className="py-32 bg-zinc-50/50 dark:bg-zinc-900/50">
-                <Container size="lg">
-                    <Group justify="space-between" align="end" mb={60}>
-                        <Box>
-                            <Badge variant="light" size="lg" mb="md" color="blue">Tin tức & Thông báo</Badge>
-                            <Title order={2} className="text-4xl lg:text-5xl font-black tracking-tight text-zinc-900 dark:text-white">
-                                Nhịp sống Nguyễn Huệ
-                            </Title>
-                        </Box>
-                        <Button variant="light" size="lg" color="blue" radius="xl" rightSection={<IconArrowRight size={18} />}>
-                            Xem tất cả tin tức
-                        </Button>
-                    </Group>
+            <section id="news" className="py-16 sm:py-32 bg-zinc-50/50 dark:bg-zinc-900/50">
+                <Container size="lg" className="px-4">
+                    <Stack gap="xl" mb={60}>
+                        <Group justify="space-between" align="end">
+                            <Box>
+                                <Badge variant="light" size="lg" mb="sm" color="blue">Tin tức & Thông báo</Badge>
+                                <Title order={2} className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-zinc-900 dark:text-white leading-tight">
+                                    Nhịp sống Nguyễn Huệ
+                                </Title>
+                            </Box>
+                            <Button
+                                variant="light"
+                                size="md"
+                                color="blue"
+                                radius="xl"
+                                rightSection={<IconArrowRight size={18} />}
+                                visibleFrom="sm"
+                            >
+                                Xem tất cả
+                            </Button>
+                        </Group>
+                    </Stack>
 
                     <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="xl">
                         {news.map((item, index) => (
@@ -174,13 +188,13 @@ export default function LandingPage() {
                                         className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                     />
                                     <div className="absolute top-4 left-4">
-                                        <Badge color="white" className="text-blue-700 shadow-md font-bold">{item.category}</Badge>
+                                        <Badge color="white" className="text-blue-700 shadow-md font-bold text-xs">{item.category}</Badge>
                                     </div>
                                 </Card.Section>
 
                                 <Stack p="xl" gap="sm">
                                     <Text size="xs" c="dimmed" fw={700} tt="uppercase" className="tracking-wider">{item.date}</Text>
-                                    <Title order={4} className="leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors text-xl font-bold">
+                                    <Title order={4} className="leading-snug line-clamp-2 group-hover:text-blue-600 transition-colors text-lg sm:text-xl font-bold">
                                         {item.title}
                                     </Title>
                                     <Text size="sm" c="dimmed" className="line-clamp-3 leading-relaxed">
@@ -194,38 +208,51 @@ export default function LandingPage() {
                             </Card>
                         ))}
                     </SimpleGrid>
+
+                    <Button
+                        variant="light"
+                        size="md"
+                        color="blue"
+                        radius="xl"
+                        fullWidth
+                        mt="xl"
+                        rightSection={<IconArrowRight size={18} />}
+                        hiddenFrom="sm"
+                    >
+                        Xem tất cả tin tức
+                    </Button>
                 </Container>
             </section>
 
             {/* Events & Quick Access */}
-            <section id="events" className="py-32">
-                <Container size="lg">
-                    <SimpleGrid cols={{ base: 1, lg: 2 }} spacing={100} verticalSpacing={60}>
+            <section id="events" className="py-16 sm:py-32">
+                <Container size="lg" className="px-4">
+                    <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="xl">
                         <div>
-                            <Badge variant="dot" size="lg" mb="md">Sự kiện sắp tới</Badge>
-                            <Title order={2} className="text-4xl font-black mb-12">Lịch hoạt động & Sự kiện</Title>
+                            <Badge variant="dot" size="lg" mb="sm">Sự kiện sắp tới</Badge>
+                            <Title order={2} className="text-3xl sm:text-4xl font-black mb-8 sm:mb-12 leading-tight">Lịch hoạt động & Sự kiện</Title>
 
-                            <Stack gap="lg">
+                            <Stack gap="md">
                                 {events.map((event, index) => (
-                                    <Group key={index} wrap="nowrap" align="center" className="p-6 rounded-3xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:shadow-xl hover:border-blue-100 dark:hover:border-blue-900 transition-all cursor-pointer group">
-                                        <Stack align="center" justify="center" gap={2} className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white w-20 h-20 rounded-2xl shadow-lg shadow-blue-500/30 shrink-0">
-                                            <Text fw={900} size="xl" className="leading-none">{event.date}</Text>
-                                            <Text size="xs" fw={700} className="uppercase opacity-90">{event.month}</Text>
+                                    <Group key={index} wrap="nowrap" align="center" className="p-4 sm:p-6 rounded-3xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:shadow-xl hover:border-blue-100 dark:hover:border-blue-900 transition-all cursor-pointer group">
+                                        <Stack align="center" justify="center" gap={2} className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white w-16 h-16 sm:w-20 sm:h-20 rounded-2xl shadow-lg shadow-blue-500/30 shrink-0">
+                                            <Text fw={900} size="lg" className="sm:text-xl leading-none">{event.date}</Text>
+                                            <Text size="10px" fw={700} className="uppercase opacity-90">{event.month}</Text>
                                         </Stack>
-                                        <Stack gap={4} className="flex-1">
-                                            <Text fw={700} size="lg" className="line-clamp-1 group-hover:text-blue-600 transition-colors">{event.title}</Text>
+                                        <Stack gap={4} className="flex-1 min-w-0">
+                                            <Text fw={700} size="md" className="sm:text-lg line-clamp-1 group-hover:text-blue-600 transition-colors">{event.title}</Text>
                                             <Group gap="md">
-                                                <Group gap={6}>
-                                                    <IconCalendar size={16} className="text-blue-500" />
+                                                <Group gap={4}>
+                                                    <IconCalendar size={14} className="text-blue-500" />
                                                     <Text size="xs" fw={500} c="dimmed">{event.time}</Text>
                                                 </Group>
-                                                <Group gap={6}>
-                                                    <IconMapPin size={16} className="text-blue-500" />
-                                                    <Text size="xs" fw={500} c="dimmed">{event.location}</Text>
+                                                <Group gap={4}>
+                                                    <IconMapPin size={14} className="text-blue-500" />
+                                                    <Text size="xs" fw={500} c="dimmed" className="line-clamp-1">{event.location}</Text>
                                                 </Group>
                                             </Group>
                                         </Stack>
-                                        <div className="w-10 h-10 rounded-full bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div className="hidden sm:flex w-10 h-10 rounded-full bg-zinc-50 dark:bg-zinc-800 items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                             <IconArrowRight size={18} />
                                         </div>
                                     </Group>
@@ -234,10 +261,10 @@ export default function LandingPage() {
                         </div>
 
                         <div>
-                            <Badge variant="dot" size="lg" mb="md" color="indigo">Dành cho học sinh</Badge>
-                            <Title order={2} className="text-4xl font-black mb-12">Truy cập nhanh</Title>
+                            <Badge variant="dot" size="lg" mb="sm" color="indigo">Dành cho học sinh</Badge>
+                            <Title order={2} className="text-3xl sm:text-4xl font-black mb-8 sm:mb-12 leading-tight">Truy cập nhanh</Title>
 
-                            <SimpleGrid cols={2} spacing="lg">
+                            <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="lg">
                                 <Card padding="xl" radius="32px" className="bg-gradient-to-br from-blue-600 to-blue-700 text-white border-none group cursor-pointer hover:-translate-y-2 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-300">
                                     <Box className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center mb-6">
                                         <IconSchool size={28} stroke={1.5} />
@@ -273,36 +300,36 @@ export default function LandingPage() {
             </section>
 
             {/* Admissions Banner */}
-            <section id="admissions" className="py-24">
-                <Container size="lg">
-                    <Box className="relative p-12 lg:p-24 rounded-[48px] bg-gradient-to-r from-blue-700 to-indigo-800 overflow-hidden text-white shadow-2xl shadow-blue-900/40">
-                        <Box className="absolute top-0 right-0 w-[600px] h-[600px] bg-white/10 rounded-full -translate-y-1/3 translate-x-1/3 blur-[100px]" />
-                        <Box className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-indigo-500/30 rounded-full translate-y-1/3 -translate-x-1/4 blur-[100px]" />
+            <section id="admissions" className="py-12 sm:py-24">
+                <Container size="lg" className="px-4">
+                    <Box className="relative p-8 sm:p-12 lg:p-24 rounded-[32px] sm:rounded-[48px] bg-gradient-to-r from-blue-700 to-indigo-800 overflow-hidden text-white shadow-2xl shadow-blue-900/40">
+                        <Box className="absolute top-0 right-0 w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-white/10 rounded-full -translate-y-1/3 translate-x-1/3 blur-[60px] sm:blur-[100px]" />
+                        <Box className="absolute bottom-0 left-0 w-[250px] sm:w-[500px] h-[250px] sm:h-[500px] bg-indigo-500/30 rounded-full translate-y-1/3 -translate-x-1/4 blur-[60px] sm:blur-[100px]" />
 
-                        <SimpleGrid cols={{ base: 1, md: 2 }} spacing={60} className="relative z-10 items-center">
+                        <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl" className="relative z-10 items-center">
                             <Stack gap="xl">
                                 <Badge color="white" variant="white" size="lg" className="self-start text-blue-800 shadow-md">Tuyển sinh 2025</Badge>
-                                <Title order={2} className="text-4xl lg:text-6xl font-black leading-tight text-white">
+                                <Title order={2} className="text-3xl sm:text-4xl lg:text-6xl font-black leading-tight text-white">
                                     Chào mừng <br /> Thế hệ tương lai
                                 </Title>
-                                <Text size="xl" className="text-blue-100 max-w-md leading-relaxed">
+                                <Text className="text-blue-100 max-w-md leading-relaxed text-base sm:text-xl">
                                     Gia nhập cộng đồng học sinh năng động, sáng tạo và cùng nhau xây dựng những kỷ niệm đẹp nhất thời áo trắng.
                                 </Text>
                                 <Group gap="md" mt="md">
                                     <Button
-                                        size="xl"
+                                        size="lg"
                                         radius="xl"
-                                        className="bg-zinc-900 text-white hover:bg-zinc-800 border-none h-16 px-10 shadow-xl"
+                                        className="bg-zinc-900 text-white hover:bg-zinc-800 border-none h-14 sm:h-16 px-8 sm:px-10 shadow-xl flex-1 sm:flex-none"
                                         component={Link}
                                         href="/auth/register"
                                     >
                                         Đăng ký ngay
                                     </Button>
                                     <Button
-                                        size="xl"
+                                        size="lg"
                                         radius="xl"
                                         variant="white"
-                                        className="text-blue-800 border-none h-16 px-10 shadow-sm hover:shadow-lg transition-shadow"
+                                        className="text-blue-800 border-none h-14 sm:h-16 px-8 sm:px-10 shadow-sm hover:shadow-lg transition-shadow flex-1 sm:flex-none"
                                     >
                                         Tìm hiểu thêm
                                     </Button>
@@ -322,13 +349,13 @@ export default function LandingPage() {
             </section>
 
             {/* Footer */}
-            <Box component="footer" className="py-20 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950">
-                <Container size="lg">
+            <Box component="footer" className="py-12 sm:py-20 border-t border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+                <Container size="lg" className="px-4">
                     <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="xl">
                         <Stack gap="md">
                             <Group gap="xs">
-                                <Box className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">P</Box>
-                                <Title order={3} className="bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">Nguyễn Huệ Academy</Title>
+                                <Box className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg sm:text-xl">P</Box>
+                                <Title order={3} className="text-xl sm:text-2xl bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent">Nguyễn Huệ Academy</Title>
                             </Group>
                             <Text size="sm" c="dimmed">
                                 Hệ thống quản lý trường học hiện đại, kết nối nhà trường, giáo viên, học sinh và phụ huynh.
@@ -370,10 +397,10 @@ export default function LandingPage() {
                         </Stack>
                     </SimpleGrid>
 
-                    <Box mt={60} pt={30} className="border-t border-zinc-100 dark:border-zinc-800">
-                        <Group justify="space-between">
-                            <Text size="xs" c="dimmed">© 2025 Nguyễn Huệ Education Environment. All rights reserved.</Text>
-                            <Group gap="xl">
+                    <Box mt={{ base: 40, sm: 60 }} pt={30} className="border-t border-zinc-100 dark:border-zinc-800">
+                        <Group justify="space-between" align="center" gap="md">
+                            <Text size="xs" c="dimmed" className="text-center sm:text-left">© 2025 Nguyễn Huệ Education Environment. All rights reserved.</Text>
+                            <Group gap="xl" className="justify-center sm:justify-end">
                                 <Text size="xs" c="dimmed">Privacy Policy</Text>
                                 <Text size="xs" c="dimmed">Terms of Service</Text>
                             </Group>
