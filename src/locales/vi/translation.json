@@ -69,6 +69,7 @@
         "login": {
             "title": "Chào mừng trở lại",
             "subtitle": "Vui lòng đăng nhập để tiếp tục",
+            "email": "Email",
             "username": "Tên đăng nhập",
             "password": "Mật khẩu",
             "submit": "Đăng nhập",
@@ -76,7 +77,8 @@
             "error": "Thông tin đăng nhập không chính xác",
             "success": "Đăng nhập thành công",
             "no_account": "Chưa có tài khoản?",
-            "register_link": "Đăng ký ngay"
+            "register_link": "Đăng ký ngay",
+            "or": "hoặc"
         },
         "register": {
             "title": "Tạo tài khoản mới",
@@ -89,7 +91,8 @@
             "error": "Đăng ký thất bại",
             "success": "Đăng ký thành công!",
             "have_account": "Đã có tài khoản?",
-            "login_link": "Đăng nhập"
+            "login_link": "Đăng nhập",
+            "or": "hoặc"
         },
         "forgot": {
             "title": "Quên mật khẩu?",

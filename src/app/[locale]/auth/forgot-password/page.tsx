@@ -1,12 +1,12 @@
 "use client";
 
-import { TextInput, Button, Title, Text, Stack, Anchor, Group } from "@mantine/core";
+import { TextInput, Button, Title, Text, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { AppMutation } from "@/api/AppMutation";
 import { notifications } from "@mantine/notifications";
-import { IconMail, IconArrowLeft, IconCheck, IconX } from "@tabler/icons-react";
+import { IconCheck, IconX, IconArrowLeft } from "@tabler/icons-react";
 
 import { useValidation } from "@/shared/common/useValidation";
 import { useTranslationError } from "@/shared/common/useTranslationError";
@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
 
     const handleSubmit = (values: typeof form.values) => {
         forgotMutation.mutate(values, {
-            onSuccess: (data) => {
+            onSuccess: () => {
                 notifications.show({
                     title: t("success"),
                     message: "Vui lòng kiểm tra email của bạn để nhận hướng dẫn khôi phục mật khẩu.",
@@ -49,12 +49,12 @@ export default function ForgotPasswordPage() {
     };
 
     return (
-        <Stack gap="xl">
-            <Stack gap={4} align="center">
-                <Title order={1} ta="center" className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent" fz={28} fw={800}>
+        <Stack gap="xl" justify="center" h="100%">
+            <Stack gap={4} mb="xs">
+                <Title order={1} fz={26} fw={800} c="dark.8">
                     {t("title")}
                 </Title>
-                <Text c="dimmed" size="sm" ta="center" fw={500}>
+                <Text c="dimmed" fz="sm">
                     {t("subtitle")}
                 </Text>
             </Stack>
@@ -64,30 +64,46 @@ export default function ForgotPasswordPage() {
                     <TextInput
                         label={t("email")}
                         placeholder="your@email.com"
-                        leftSection={<IconMail size={16} className="text-zinc-400" />}
                         type="email"
                         required
+                        variant="filled"
                         size="md"
                         radius="md"
+                        styles={{
+                            input: { fontSize: '15px' },
+                            label: { fontSize: '14px', fontWeight: 600, marginBottom: '6px' }
+                        }}
                         {...form.getInputProps("email")}
                     />
 
                     <Button
                         type="submit"
                         fullWidth
-                        mt="lg"
-                        size="md"
+                        size="lg"
                         radius="md"
+                        color="blue"
                         loading={forgotMutation.isPending}
-                        className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg shadow-blue-500/20"
+                        style={{
+                            fontSize: '16px',
+                            fontWeight: 600,
+                        }}
                     >
                         {t("submit")}
                     </Button>
 
-                    <Anchor component={Link} href="/auth/login" size="sm" ta="center" fw={600} className="flex items-center justify-center gap-2">
-                        <IconArrowLeft size={16} />
+                    <Button
+                        component={Link}
+                        href="/auth/login"
+                        variant="subtle"
+                        color="gray"
+                        size="md"
+                        radius="md"
+                        fullWidth
+                        leftSection={<IconArrowLeft size={18} stroke={2.5} />}
+                        style={{ fontWeight: 600 }}
+                    >
                         {t("back_to_login")}
-                    </Anchor>
+                    </Button>
                 </Stack>
             </form>
         </Stack>

@@ -3,7 +3,7 @@
 import { Box, Button, Group, Title, Paper, Skeleton, Stack, Text, Alert } from "@mantine/core";
 import { useBannerManager } from "@/feauture/admin/portal/hooks/useBannerManager";
 import { BannerTable } from "@/feauture/admin/portal/components/BannerTable";
-import { BannerModal } from "@/feauture/admin/portal/components/BannerModal";
+import { BannerDrawer } from "@/feauture/admin/portal/components/BannerDrawer";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { TBanner } from "@/shared/types/portal.type";
@@ -87,7 +87,7 @@ export default function BannerPage() {
                 )}
             </Paper>
 
-            <BannerModal
+            <BannerDrawer
                 opened={opened}
                 onClose={close}
                 onSubmit={handleSubmit}

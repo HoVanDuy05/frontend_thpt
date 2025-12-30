@@ -1,13 +1,12 @@
 "use client";
 
-import { TextInput, PasswordInput, Button, Title, Text, Stack, Anchor, Group, Divider } from "@mantine/core";
+import { TextInput, Button, Title, Text, Stack, Anchor, Group, Box } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/routing";
 import { AppMutation } from "@/api/AppMutation";
-import { useAppStore } from "@/providers/store/useAppStore";
 import { notifications } from "@mantine/notifications";
-import { IconCheck, IconX, IconLock, IconMail, IconUser } from "@tabler/icons-react";
+import { IconCheck, IconX } from "@tabler/icons-react";
 
 import { useValidation } from "@/shared/common/useValidation";
 import { useTranslationError } from "@/shared/common/useTranslationError";
@@ -15,7 +14,6 @@ import { useTranslationError } from "@/shared/common/useTranslationError";
 export default function RegisterPage() {
     const t = useTranslations("auth.register");
     const router = useRouter();
-    const { setUser } = useAppStore();
     const registerMutation = AppMutation().auth.useRegister();
     const validate = useValidation();
     const translateError = useTranslationError();
@@ -61,76 +59,71 @@ export default function RegisterPage() {
     };
 
     return (
-        <Stack gap="xl">
-            <Stack gap={4} align="center">
-                <Title order={1} ta="center" className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent" fz={28} fw={800}>
+        <Stack gap="lg">
+            <Box>
+                <Title order={1} fz={28} fw={700} c="dark.9" mb={4}>
                     {t("title")}
                 </Title>
-                <Text c="dimmed" size="sm" ta="center" fw={500}>
+                <Text c="dimmed">
                     {t("subtitle")}
                 </Text>
-            </Stack>
+            </Box>
 
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack gap="md">
                     <TextInput
                         label={t("username")}
                         placeholder="johndoe"
-                        leftSection={<IconUser size={16} className="text-zinc-400" />}
                         required
                         size="md"
-                        radius="md"
+                        radius="sm"
                         {...form.getInputProps("taiKhoan")}
                     />
 
                     <TextInput
                         label={t("email")}
-                        placeholder="your@email.com"
-                        leftSection={<IconMail size={16} className="text-zinc-400" />}
-                        type="email"
+                        placeholder="example@student.edu.vn"
                         required
                         size="md"
-                        radius="md"
+                        radius="sm"
                         {...form.getInputProps("email")}
                     />
 
-                    <PasswordInput
+                    <TextInput
+                        type="password"
                         label={t("password")}
                         placeholder="••••••••"
-                        leftSection={<IconLock size={16} className="text-zinc-400" />}
                         required
                         size="md"
-                        radius="md"
+                        radius="sm"
                         {...form.getInputProps("matKhau")}
                     />
 
-                    <PasswordInput
+                    <TextInput
+                        type="password"
                         label={t("confirm_password")}
                         placeholder="••••••••"
-                        leftSection={<IconLock size={16} className="text-zinc-400" />}
                         required
                         size="md"
-                        radius="md"
+                        radius="sm"
                         {...form.getInputProps("confirmPassword")}
                     />
 
                     <Button
                         type="submit"
                         fullWidth
-                        mt="lg"
                         size="md"
-                        radius="md"
+                        radius="sm"
+                        color="blue"
                         loading={registerMutation.isPending}
-                        className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg shadow-blue-500/20"
+                        fw={600}
                     >
                         {t("submit")}
                     </Button>
 
-                    <Divider label="hoặc" labelPosition="center" my="sm" />
-
                     <Text ta="center" size="sm" c="dimmed">
                         {t("have_account")}{" "}
-                        <Anchor component={Link} href="/auth/login" fw={700} className="text-blue-600">
+                        <Anchor component={Link} href="/auth/login" fw={600} c="blue.6">
                             {t("login_link")}
                         </Anchor>
                     </Text>

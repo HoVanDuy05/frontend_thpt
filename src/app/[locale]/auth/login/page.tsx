@@ -1,6 +1,6 @@
 "use client";
 
-import { TextInput, PasswordInput, Button, Title, Text, Stack, Anchor, Group, Checkbox, Divider } from "@mantine/core";
+import { TextInput, PasswordInput, Button, Title, Text, Stack, Anchor, Group, Divider, Alert, Box } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/routing";
@@ -9,7 +9,7 @@ import { AppMutation } from "@/api/AppMutation";
 import { useAppStore } from "@/providers/store/useAppStore";
 import { notifications } from "@mantine/notifications";
 import { useEffect, useState } from "react";
-import { IconCheck, IconX, IconLock, IconMail } from "@tabler/icons-react";
+import { IconCheck, IconX, IconInfoCircle } from "@tabler/icons-react";
 
 import { useValidation } from "@/shared/common/useValidation";
 import { useTranslationError } from "@/shared/common/useTranslationError";
@@ -36,7 +36,6 @@ export default function LoginPage() {
         },
     });
 
-    // Load saved credentials if remember me was checked
     useEffect(() => {
         const saved = localStorage.getItem("school_remember");
         if (saved) {
@@ -55,14 +54,9 @@ export default function LoginPage() {
             onSuccess: async (data) => {
                 try {
                     const payload = JSON.parse(atob(data.access_token.split('.')[1]));
-
-                    // 1. Set Token
                     useAppStore.getState().setToken(data.access_token);
-
-                    // 2. Set Basic User (from login response)
                     setUser(data.user);
 
-                    // Handle remember me
                     if (rememberMe) {
                         localStorage.setItem("school_remember", JSON.stringify({
                             email: values.email,
@@ -79,7 +73,6 @@ export default function LoginPage() {
                         icon: <IconCheck size={16} />,
                     });
 
-                    // Determine redirect path
                     let targetUrl = redirect;
                     if (targetUrl === "/student" || !targetUrl) {
                         switch (data.user.vaiTro) {
@@ -92,7 +85,6 @@ export default function LoginPage() {
 
                     router.push(targetUrl);
                 } catch (e) {
-                    console.error("Login process error", e);
                     notifications.show({
                         title: t("error"),
                         message: "Authentication failed",
@@ -101,7 +93,6 @@ export default function LoginPage() {
                     });
                 }
             },
-
             onError: (error: any) => {
                 notifications.show({
                     title: t("error"),
@@ -114,71 +105,64 @@ export default function LoginPage() {
     };
 
     return (
-        <Stack gap="xl">
-            <Stack gap={4} align="center">
-                <Title order={1} ta="center" className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent" fz={28} fw={800}>
+        <Stack gap="lg">
+            <Box>
+                <Title order={1} fz={28} fw={700} c="dark.9" mb={4}>
                     {t("title")}
                 </Title>
-                <Text c="dimmed" size="sm" ta="center" fw={500}>
+                <Text c="dimmed">
                     {t("subtitle")}
                 </Text>
-            </Stack>
+            </Box>
+
+            {/* FPT-style Info Alert for context */}
+            <Alert variant="light" color="blue" title="Lưu ý" icon={<IconInfoCircle size={16} />}>
+                Sử dụng tài khoản nhà trường cấp để đăng nhập.
+            </Alert>
 
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack gap="md">
                     <TextInput
                         label={t("email")}
-                        placeholder="your@email.com"
-                        leftSection={<IconMail size={16} className="text-zinc-400" />}
+                        placeholder="example@student.edu.vn"
                         required
                         size="md"
-                        radius="md"
+                        // FPT style is boxy, default mantine input is perfect for this.
+                        // Removing 'variant="filled"' to keep it standard border.
+                        radius="sm"
                         {...form.getInputProps("email")}
                     />
 
                     <PasswordInput
                         label={t("password")}
                         placeholder="••••••••"
-                        leftSection={<IconLock size={16} className="text-zinc-400" />}
                         required
                         size="md"
-                        radius="md"
+                        radius="sm"
                         {...form.getInputProps("matKhau")}
                     />
-
-                    <Group justify="space-between" mt="xs">
-                        <Checkbox
-                            label="Ghi nhớ đăng nhập"
-                            size="sm"
-                            fw={500}
-                            checked={rememberMe}
-                            onChange={(e) => setRememberMe(e.currentTarget.checked)}
-                        />
-                        <Anchor component={Link} href="/auth/forgot-password" size="sm" fw={600}>
-                            {t("forgot_password")}
-                        </Anchor>
-                    </Group>
 
                     <Button
                         type="submit"
                         fullWidth
-                        mt="lg"
-                        size="md"
-                        radius="md"
+                        size="md" // Standard button size
+                        radius="sm" // Boxy button
+                        color="blue"
                         loading={loginMutation.isPending}
-                        className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 shadow-lg shadow-blue-500/20"
+                        fw={600}
                     >
                         {t("submit")}
                     </Button>
 
-                    <Divider label="hoặc" labelPosition="center" my="sm" />
+                    <Group justify="space-between" mt={4}>
+                        <Anchor component={Link} href="/auth/forgot-password" fz="sm" fw={500} c="blue">
+                            {t("forgot_password")}?
+                        </Anchor>
 
-                    <Text ta="center" size="sm" c="dimmed">
-                        {t("no_account")}{" "}
-                        <Anchor component={Link} href="/auth/register" fw={700} className="text-blue-600">
+                        <Anchor component={Link} href="/auth/register" fz="sm" fw={600} c="blue">
                             {t("register_link")}
                         </Anchor>
-                    </Text>
+                    </Group>
                 </Stack>
             </form>
         </Stack>
