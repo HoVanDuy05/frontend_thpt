@@ -37,4 +37,6 @@ export const PMS_PATH = {
         CHAT: "/admin/communication/chat",
     },
     SETTINGS: "/admin/settings",
+    APPROVALS: "/admin/approvals",
+    SOCIAL: "/admin/social",
 };

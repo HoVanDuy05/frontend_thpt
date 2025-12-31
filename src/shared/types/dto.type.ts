@@ -76,3 +76,41 @@ export interface TCreateGradingDto {
     diemSo: number;
     nhanXetCuaGv?: string;
 }
+
+// Approval DTOs
+export interface TCreateFlowDto {
+    name: string;
+    description?: string;
+    status?: string;
+}
+
+export interface TAddFlowStepDto {
+    step_order: number;
+    name: string;
+    rule_type: 'any' | 'all';
+}
+
+export interface TAddStepApproverDto {
+    approver_type: 'NGUOI_DUNG' | 'VAI_TRO' | 'NHOM';
+    approver_id: string | number;
+}
+
+export interface TCreateFlowFieldsDto {
+    fields: {
+        name: string;
+        label: string;
+        type: string;
+        required?: boolean;
+        options?: string;
+        order: number;
+    }[];
+}
+
+export interface TSubmitFlowInstanceDto {
+    flow_id: number;
+    target_id: any;
+}
+
+export interface TApproveStepDto {
+    note?: string;
+}

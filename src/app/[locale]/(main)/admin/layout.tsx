@@ -11,6 +11,7 @@ import { Text, Stack } from "@mantine/core";
 import { useRouter } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { LanguagePicker } from "@/shared/components/LanguagePicker";
+import { rem } from "@mantine/core";
 
 const AdminLayout = ({
     children,
@@ -45,7 +46,13 @@ const AdminLayout = ({
             transitionDuration={300}
             transitionTimingFunction="ease"
         >
-            <AppShell.Header className="flex items-center px-3 sm:px-4 justify-between border-b bg-white dark:bg-zinc-950">
+            <AppShell.Header
+                style={{
+                    borderBottomWidth: rem(1),
+                    background: 'var(--mantine-color-body)'
+                }}
+                className="flex items-center px-4 justify-between"
+            >
                 <Group gap="xs">
                     {/* Mobile Toggle */}
                     <ActionIcon
@@ -67,7 +74,8 @@ const AdminLayout = ({
                         <Stack gap={0}>
                             <Title
                                 order={4}
-                                className="text-zinc-800 dark:text-zinc-100 font-bold leading-tight text-base sm:text-lg"
+                                className="leading-tight text-base sm:text-lg"
+                                c="var(--mantine-color-text)"
                             >
                                 {dashboardTitle}
                             </Title>
@@ -92,21 +100,27 @@ const AdminLayout = ({
                     </ActionIcon>
 
                     {/* User Menu */}
-                    <Menu shadow="md" width={220} position="bottom-end" withArrow>
+                    <Menu shadow="md" width={220} position="bottom-end" withArrow radius="md">
                         <Menu.Target>
-                            <UnstyledButton className="flex items-center gap-2 px-2 py-1.5 rounded-md hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
-                                <Avatar size="sm" radius="xl" color="blue">
+                            <UnstyledButton
+                                style={{
+                                    padding: '4px 8px',
+                                    borderRadius: 'var(--mantine-radius-md)',
+                                }}
+                                className="flex items-center gap-2 hover:bg-[var(--mantine-color-gray-light-hover)] dark:hover:bg-[var(--mantine-color-dark-theme-hover)] transition-colors"
+                            >
+                                <Avatar size="sm" radius="xl" color="indigo" variant="light">
                                     {user?.taiKhoan?.charAt(0).toUpperCase() || "U"}
                                 </Avatar>
                                 <div className="hidden sm:block">
-                                    <Text size="sm" fw={600} className="leading-none text-zinc-800 dark:text-zinc-200">
+                                    <Text size="sm" fw={600} className="leading-none" c="var(--mantine-color-text)">
                                         {user?.taiKhoan || "User"}
                                     </Text>
                                     <Text size="xs" c="dimmed" className="leading-none mt-1">
                                         {ROLE_LABELS[userRole]?.label || "User"}
                                     </Text>
                                 </div>
-                                <IconChevronDown size={14} stroke={2} className="text-zinc-400 hidden sm:block" />
+                                <IconChevronDown size={14} stroke={2} color="dimmed" className="hidden sm:block" />
                             </UnstyledButton>
                         </Menu.Target>
 
@@ -164,10 +178,15 @@ const AdminLayout = ({
                 <AdminSidebar collapsed={desktopCollapsed} onToggle={toggleDesktop} />
             </AppShell.Navbar>
 
-            <AppShell.Main className="bg-zinc-50 dark:bg-zinc-900 p-0 overflow-x-hidden w-full min-h-screen">
+            <AppShell.Main
+                style={{
+                    background: 'var(--mantine-color-body)',
+                }}
+                className="p-0 overflow-x-hidden w-full min-h-screen"
+            >
                 {children}
             </AppShell.Main>
-        </AppShell>
+        </AppShell >
     );
 };
 

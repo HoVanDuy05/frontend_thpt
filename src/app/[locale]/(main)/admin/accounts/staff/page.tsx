@@ -64,8 +64,11 @@ export default function StaffPage() {
                     />
                 ) : (
                     <Stack align="center" py={60} gap="md">
-                        <Box className="bg-zinc-100 dark:bg-zinc-900 p-6 rounded-full">
-                            <IconAlertCircle size={48} className="text-zinc-400" />
+                        <Box
+                            style={{ background: 'var(--mantine-color-default-hover)' }}
+                            className="p-6 rounded-full"
+                        >
+                            <IconAlertCircle size={48} className="text-[var(--mantine-color-dimmed)]" />
                         </Box>
                         <Text fw={500} c="dimmed">Chưa có dữ liệu nhân viên</Text>
                     </Stack>

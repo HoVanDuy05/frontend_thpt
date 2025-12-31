@@ -1,7 +1,8 @@
 "use client";
 
-import { TextInput, Textarea, Select, Switch, Button, Stack, Group, Paper, Title, Text, Grid, Box, ActionIcon, Space } from "@mantine/core";
+import { TextInput, Textarea, Select, Switch, Button, Stack, Group, Paper, Title, Text, Grid, Box, ActionIcon, Space, rem } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
+import { useTranslations } from "next-intl";
 import { postSchema, TPostSchema } from "../schemas/post.schema";
 import { TBaiViet, ELoaiBaiViet } from "@/shared/types/portal.type";
 import { useEffect } from "react";
@@ -55,6 +56,8 @@ function generateSlug(text: string): string {
 
 export function PostForm({ initialData, onSubmit, loading, title }: PostFormProps) {
     const router = useRouter();
+    const t = useTranslations("portal.posts.form");
+    const tCommon = useTranslations("common");
 
     const form = useForm<TPostSchema>({
         initialValues: {
@@ -116,12 +119,12 @@ export function PostForm({ initialData, onSubmit, loading, title }: PostFormProp
                     onClick={handleCancel}
                     size="sm"
                 >
-                    Quay lại
+                    {tCommon("actions.back")}
                 </Button>
 
                 <Group gap="sm">
                     <Button variant="default" onClick={handleCancel} size="sm">
-                        Hủy bỏ
+                        {tCommon("actions.cancel")}
                     </Button>
                     <Button
                         leftSection={<IconDeviceFloppy size={18} />}
@@ -130,7 +133,7 @@ export function PostForm({ initialData, onSubmit, loading, title }: PostFormProp
                         color="blue"
                         size="sm"
                     >
-                        Lưu
+                        {tCommon("actions.save")}
                     </Button>
                 </Group>
             </Group>
@@ -144,21 +147,21 @@ export function PostForm({ initialData, onSubmit, loading, title }: PostFormProp
                                 <Stack gap="md">
                                     <Title order={3} className="text-lg sm:text-xl">{title}</Title>
                                     <TextInput
-                                        label="Tiêu đề bài viết"
-                                        placeholder="Nhập tiêu đề hấp dẫn..."
+                                        label={t("title_label")}
+                                        placeholder={t("title_placeholder")}
                                         size="md"
                                         fw={500}
                                         variant="filled"
                                         required
-                                        leftSection={<IconArticle size={20} className="text-gray-500" />}
+                                        leftSection={<IconArticle size={20} className="text-[var(--mantine-color-dimmed)]" />}
                                         {...form.getInputProps("tieuDe")}
                                     />
                                     <TextInput
-                                        label="Đường dẫn tĩnh (Slug)"
-                                        description="Tự động tạo từ tiêu đề. Bạn có thể chỉnh sửa nếu cần."
+                                        label={t("slug_label")}
+                                        description={t("slug_description")}
                                         placeholder="duong-dan-bai-viet"
                                         variant="filled"
-                                        leftSection={<IconLink size={18} className="text-gray-500" />}
+                                        leftSection={<IconLink size={18} className="text-[var(--mantine-color-dimmed)]" />}
                                         rightSection={
                                             <ActionIcon
                                                 variant="subtle"
@@ -172,8 +175,8 @@ export function PostForm({ initialData, onSubmit, loading, title }: PostFormProp
                                         {...form.getInputProps("duongDan")}
                                     />
                                     <Textarea
-                                        label="Tóm tắt (Excerpt)"
-                                        description="Đoạn văn ngắn hiển thị dưới tiêu đề trong danh sách"
+                                        label={t("excerpt_label")}
+                                        description={t("excerpt_description")}
                                         placeholder="Tóm tắt nội dung chính..."
                                         minRows={3}
                                         autosize
@@ -184,23 +187,29 @@ export function PostForm({ initialData, onSubmit, loading, title }: PostFormProp
                             </Paper>
 
                             <Paper radius="md" withBorder shadow="sm" className="overflow-hidden">
-                                <Box className="border-b border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-zinc-900 p-2 flex gap-1 items-center flex-wrap">
-                                    <Text size="sm" fw={600} mr="xs" px={{ base: "xs", sm: "md" }}>Nội dung</Text>
+                                <Box
+                                    style={{
+                                        borderBottom: `${rem(1)} solid var(--mantine-color-default-border)`,
+                                        background: 'var(--mantine-color-default-hover)'
+                                    }}
+                                    className="p-2 flex gap-1 items-center flex-wrap"
+                                >
+                                    <Text size="sm" fw={600} mr="xs" px={{ base: "xs", sm: "md" }}>{t("content_label")}</Text>
                                     {/* Mock Toolbar for Markdown */}
                                     <Group gap={4} visibleFrom="sm">
                                         <ActionIcon variant="subtle" color="gray" title="Bold"><IconBold size={16} /></ActionIcon>
                                         <ActionIcon variant="subtle" color="gray" title="Italic"><IconItalic size={16} /></ActionIcon>
                                         <ActionIcon variant="subtle" color="gray" title="Heading"><IconH1 size={16} /></ActionIcon>
-                                        <div className="w-[1px] h-4 bg-gray-300 mx-1" />
+                                        <div className="w-[1px] h-4 bg-[var(--mantine-color-default-border)] mx-1" />
                                         <ActionIcon variant="subtle" color="gray" title="List"><IconList size={16} /></ActionIcon>
                                         <ActionIcon variant="subtle" color="gray" title="Link"><IconLink size={16} /></ActionIcon>
                                     </Group>
                                     <Space flex={1} />
-                                    <Button size="xs" variant="subtle" hiddenFrom="sm">Guide</Button>
+                                    <Button size="xs" variant="subtle" hiddenFrom="sm">HN</Button>
                                     <Button size="xs" variant="subtle" visibleFrom="sm">Markdown Guide</Button>
                                 </Box>
                                 <Textarea
-                                    placeholder="Viết nội dung bài viết ở đây (Hỗ trợ Markdown)..."
+                                    placeholder={t("content_placeholder")}
                                     required
                                     minRows={15}
                                     autosize
@@ -219,12 +228,18 @@ export function PostForm({ initialData, onSubmit, loading, title }: PostFormProp
                             {/* Publishing Status */}
                             <Paper p="md" radius="md" withBorder shadow="sm">
                                 <Stack gap="xs">
-                                    <Title order={5} mb="xs">Trạng thái</Title>
-                                    <Box className="bg-gray-50 dark:bg-zinc-900 p-3 rounded-md border border-gray-200 dark:border-gray-800">
+                                    <Title order={5} mb="xs">{t("status_label")}</Title>
+                                    <Box
+                                        style={{
+                                            background: 'var(--mantine-color-default-hover)',
+                                            border: `${rem(1)} solid var(--mantine-color-default-border)`
+                                        }}
+                                        className="p-3 rounded-md"
+                                    >
                                         <Group justify="space-between" wrap="nowrap">
                                             <Stack gap={0} className="flex-1 min-w-0">
-                                                <Text size="sm" fw={600}>Hiển thị công khai</Text>
-                                                <Text size="xs" c="dimmed">Bài viết sẽ hiển thị trên web</Text>
+                                                <Text size="sm" fw={600}>{t("publish_label")}</Text>
+                                                <Text size="xs" c="dimmed">{t("publish_description")}</Text>
                                             </Stack>
                                             <Switch
                                                 size="lg"
@@ -238,10 +253,10 @@ export function PostForm({ initialData, onSubmit, loading, title }: PostFormProp
                             {/* Organization */}
                             <Paper p="md" radius="md" withBorder shadow="sm">
                                 <Stack gap="md">
-                                    <Title order={5}>Phân loại</Title>
+                                    <Title order={5}>{t("category_label")}</Title>
                                     <Select
-                                        label="Chuyên mục"
-                                        placeholder="Chọn chuyên mục"
+                                        label={t("category_label")}
+                                        placeholder={tCommon("actions.filter")}
                                         data={[
                                             { value: ELoaiBaiViet.TIN_TUC, label: "Tin tức" },
                                             { value: ELoaiBaiViet.SU_KIEN, label: "Sự kiện" },
@@ -257,19 +272,19 @@ export function PostForm({ initialData, onSubmit, loading, title }: PostFormProp
                             {/* Thumbnail */}
                             <Paper p="md" radius="md" withBorder shadow="sm">
                                 <Stack gap="md">
-                                    <Title order={5}>Ảnh bìa</Title>
+                                    <Title order={5}>{t("thumbnail_label")}</Title>
                                     <FileUpload
                                         value={form.values.anhBia || ""}
                                         onChange={(url) => form.setFieldValue("anhBia", url)}
                                         aspectRatio={16 / 9}
                                     />
-                                    <Text size="xs" c="dimmed">Tỉ lệ khuyến nghị 16:9. Dung lượng tối đa 5MB.</Text>
+                                    <Text size="xs" c="dimmed">{t("thumbnail_description")}</Text>
                                 </Stack>
                             </Paper>
                         </Stack>
                     </Grid.Col>
                 </Grid>
             </form>
-        </Stack>
+        </Stack >
     );
 }

@@ -9,11 +9,11 @@
             "roles": "Phân quyền"
         },
         "academic": {
-            "title": "Học tập",
+            "title": "Học thuật",
             "classes": "Lớp học",
             "subjects": "Môn học",
             "courses": "Khóa học",
-            "schedule": "Thời khóa biểu"
+            "schedule": "Lịch học"
         },
         "examination": {
             "title": "Khảo thí",
@@ -27,7 +27,7 @@
         },
         "portal": {
             "title": "Cổng thông tin",
-            "banners": "Banners",
+            "banners": "Banner",
             "posts": "Bài viết",
             "comments": "Bình luận"
         },
@@ -36,7 +36,77 @@
             "notifications": "Thông báo",
             "chat": "Tin nhắn"
         },
-        "settings": "Cài đặt hệ thống"
+        "settings": "Cài đặt",
+        "approvals": "Phê duyệt",
+        "social": "Mạng xã hội"
+    },
+    "academic": {
+        "schedule": {
+            "title": "Quản lý Lịch học",
+            "subtitle": "Quản lý thời khóa biểu của toàn trường",
+            "create": "Thêm lịch học",
+            "columns": {
+                "day": "Thứ",
+                "class": "Lớp",
+                "subject": "Môn học",
+                "period": "Tiết",
+                "room": "Phòng",
+                "teacher": "Giáo viên",
+                "actions": "Thao tác"
+            },
+            "no_data": "Chưa có lịch học nào",
+            "no_data_subtitle": "Bắt đầu bằng cách tạo thời khóa biểu đầu tiên"
+        }
+    },
+    "portal": {
+        "banners": {
+            "title": "Quản lý Banner",
+            "subtitle": "Cấu hình các banner hiển thị trên trang chủ",
+            "create": "Thêm Banner",
+            "no_data": "Chưa có banner nào",
+            "no_data_subtitle": "Bắt đầu bằng cách tạo banner đầu tiên của bạn",
+            "create_now": "Tạo banner ngay"
+        },
+        "posts": {
+            "title": "Quản lý Bài viết",
+            "subtitle": "Quản lý tin tức, sự kiện và các thông báo của nhà trường",
+            "create": "Tạo bài viết",
+            "edit": "Chỉnh sửa bài viết",
+            "form": {
+                "title_label": "Tiêu đề bài viết",
+                "title_placeholder": "Nhập tiêu đề hấp dẫn...",
+                "slug_label": "Đường dẫn tĩnh (Slug)",
+                "slug_description": "Tự động tạo từ tiêu đề. Bạn có thể chỉnh sửa nếu cần.",
+                "excerpt_label": "Tóm tắt (Excerpt)",
+                "excerpt_description": "Đoạn văn ngắn hiển thị dưới tiêu đề trong danh sách",
+                "content_label": "Nội dung",
+                "content_placeholder": "Viết nội dung bài viết ở đây (Hỗ trợ Markdown)...",
+                "status_label": "Trạng thái",
+                "publish_label": "Hiển thị công khai",
+                "publish_description": "Bài viết sẽ hiển thị trên web",
+                "category_label": "Chuyên mục",
+                "thumbnail_label": "Ảnh bìa",
+                "thumbnail_description": "Tỉ lệ khuyến nghị 16:9. Dung lượng tối đa 5MB."
+            },
+            "tabs": {
+                "news": "Tin tức",
+                "events": "Sự kiện",
+                "notices": "Thông báo"
+            },
+            "no_data": "Không tìm thấy bài viết nào trong mục này",
+            "export": "Xuất Excel"
+        },
+        "comments": {
+            "title": "Quản lý Bình luận",
+            "subtitle": "Kiểm duyệt và phản hồi ý kiến của người dùng trên trang portal",
+            "list_title": "Danh sách bài viết",
+            "select_post": "Hãy chọn một bài viết",
+            "select_post_subtitle": "Chọn bài viết ở danh sách bên trái để quản lý bình luận",
+            "no_comments": "Chưa có bình luận nào",
+            "no_comments_subtitle": "Người dùng chưa để lại bình luận nào cho bài viết này",
+            "count_suffix": "bình luận",
+            "reply": "Phản hồi"
+        }
     },
     "layout": {
         "admin_portal": "Cổng Quản trị",
@@ -159,6 +229,62 @@
             "invalid": "Giá trị phải là số",
             "min": "Giá trị tối thiểu {{min}}",
             "max": "Giá trị tối đa {{max}}"
+        }
+    },
+    "common": {
+        "actions": {
+            "create": "Tạo mới",
+            "edit": "Chỉnh sửa",
+            "delete": "Xóa",
+            "save": "Lưu",
+            "cancel": "Hủy",
+            "confirm": "Xác nhận",
+            "search": "Tìm kiếm",
+            "export": "Xuất dữ liệu",
+            "view": "Xem",
+            "back": "Quay lại",
+            "add": "Thêm",
+            "submit": "Gửi",
+            "filter": "Lọc"
+        },
+        "status": {
+            "active": "Hoạt động",
+            "inactive": "Ngưng hoạt động",
+            "pending": "Chờ duyệt",
+            "completed": "Hoàn tất",
+            "error": "Lỗi",
+            "success": "Thành công",
+            "loading": "Đang tải..."
+        },
+        "no_data": "Không có dữ liệu",
+        "confirm_delete": "Bạn có chắc chắn muốn xóa mục này? Hành động này không thể hoàn tác.",
+        "delete_title": "Xác nhận xóa"
+    },
+    "splash": {
+        "init": "Đang khởi tạo hệ thống...",
+        "user": "Tải cấu hình người dùng...",
+        "sync": "Đồng bộ dữ liệu học thuật...",
+        "ready": "Sẵn sàng!",
+        "subtitle": "HỆ THỐNG QUẢN LÝ TRƯỜNG HỌC"
+    },
+    "dashboard": {
+        "title": "Bảng điều khiển Admin",
+        "subtitle": "Xem tổng quan về hiệu suất hệ thống và quản lý thực thể.",
+        "stats": {
+            "total_students": "Tổng học sinh",
+            "active_courses": "Khóa học hoạt động",
+            "pending_requests": "Yêu cầu chờ duyệt",
+            "completed_tasks": "Nhiệm vụ hoàn tất",
+            "this_month": "trong tháng này"
+        },
+        "health": {
+            "title": "Sức khỏe hệ thống",
+            "subtitle": "Trạng thái vận hành trong 24h qua",
+            "detailed_report": "Xem báo cáo chi tiết",
+            "normal": "Tất cả hệ thống đang hoạt động bình thường. Không phát hiện lỗi nghiêm trọng nào."
+        },
+        "recent_activity": {
+            "title": "Hoạt động gần đây"
         }
     }
 }

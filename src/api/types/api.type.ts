@@ -7,6 +7,15 @@ import { TQueryConfig } from "@/shared/types/common.type";
 import { TLoginRequest, TLoginResponse } from "@/shared/types/auth.type";
 import { TCreateUserDto, TCreateTeacherDto, TCreateStudentDto, TCreateNamHocDto, TCreateMonHocDto, TCreateLopHocDto, TCreateQuestionDto, TCreateExamDto, TCreateSubmissionDto, TCreateGradingDto } from "@/shared/types/dto.type";
 import { TBanner, TBaiViet, TBinhLuan, ELoaiBaiViet } from "@/shared/types/portal.type";
+import { TQuyTrinh, TPhienQuyTrinh, TNhatKyPheDuyetQuyTrinh, TTruongFormQuyTrinh } from "@/shared/types/approval.type";
+import {
+    TCreateFlowDto,
+    TAddFlowStepDto,
+    TAddStepApproverDto,
+    TCreateFlowFieldsDto,
+    TSubmitFlowInstanceDto,
+    TApproveStepDto
+} from "@/shared/types/dto.type";
 
 export type ApiQueryType = {
     // ... (rest remains same)
@@ -114,6 +123,28 @@ export type ApiQueryType = {
     getCalendarByClass: {
         url: { baseUrl: "/calendar/class/:id", urlParams: { id: number } };
         response: any[];
+    };
+
+    // Approvals
+    getAllFlows: {
+        url: { baseUrl: "/flow" };
+        response: TQuyTrinh[];
+    };
+    getFlowFormFields: {
+        url: { baseUrl: "/flow/:id/form-fields", urlParams: { id: number } };
+        response: TTruongFormQuyTrinh[];
+    };
+    getMyFlows: {
+        url: { baseUrl: "/my-flow", queryParams?: { status?: string } };
+        response: TPhienQuyTrinh[];
+    };
+    getFlowInstance: {
+        url: { baseUrl: "/flow-instance/:id", urlParams: { id: number } };
+        response: TPhienQuyTrinh;
+    };
+    getFlowLogs: {
+        url: { baseUrl: "/flow-instance/:id/logs", urlParams: { id: number } };
+        response: TNhatKyPheDuyetQuyTrinh[];
     };
 };
 
@@ -341,5 +372,47 @@ export type ApiMutationType = {
         url: { baseUrl: "/calendar/:id"; urlParams: { id: number } };
         payload: undefined;
         response: void;
+    };
+
+    // Approvals
+    createFlow: {
+        url: { baseUrl: "/flow" };
+        payload: TCreateFlowDto;
+        response: TQuyTrinh;
+    };
+    updateFlow: {
+        url: { baseUrl: "/flow/:id", urlParams: { id: number } };
+        payload: Partial<TCreateFlowDto>;
+        response: TQuyTrinh;
+    };
+    addFlowStep: {
+        url: { baseUrl: "/flow/:id/step", urlParams: { id: number } };
+        payload: TAddFlowStepDto;
+        response: any;
+    };
+    addStepApprover: {
+        url: { baseUrl: "/flow/:stepId/approver", urlParams: { stepId: number } };
+        payload: TAddStepApproverDto;
+        response: any;
+    };
+    createFlowFields: {
+        url: { baseUrl: "/flow/:id/fields", urlParams: { id: number } };
+        payload: TCreateFlowFieldsDto;
+        response: any;
+    };
+    submitFlow: {
+        url: { baseUrl: "/submit-flow" };
+        payload: TSubmitFlowInstanceDto;
+        response: TPhienQuyTrinh;
+    };
+    approveStep: {
+        url: { baseUrl: "/flow-instance/:id/approve", urlParams: { id: number } };
+        payload: TApproveStepDto;
+        response: any;
+    };
+    rejectStep: {
+        url: { baseUrl: "/flow-instance/:id/reject", urlParams: { id: number } };
+        payload: TApproveStepDto;
+        response: any;
     };
 };

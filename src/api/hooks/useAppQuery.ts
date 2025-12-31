@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery, UseQueryOptions, Query } from "@tanstack/react-query";
+import { nprogress } from "@mantine/nprogress";
 import { ResponseType } from "axios";
 import axiosClient from "../axiosClient";
 import { ApiQueryType } from "../types/api.type";
@@ -56,6 +57,7 @@ export const useAppQuery = <T extends keyof ApiQueryType>({
         retry: retry ?? false,
         queryKey: [requestKey, ...(options?.queryKey || [])],
         queryFn: async (): Promise<ApiQueryType[T]["response"]> => {
+            nprogress.start();
             try {
                 const response = await axiosClient.get(urlApi, {
                     params: (url as any)?.queryParams,
@@ -70,6 +72,8 @@ export const useAppQuery = <T extends keyof ApiQueryType>({
             } catch (error) {
                 onError?.(error);
                 return Promise.reject(error);
+            } finally {
+                nprogress.complete();
             }
         },
     });

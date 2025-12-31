@@ -57,4 +57,16 @@ export const AppQuery = {
         useComments: (postId: number, options?: AppQueryOptions<"getComments">) =>
             useAppQuery({ url: { baseUrl: "/portal/comments/post/:postId", urlParams: { postId } }, options }),
     },
+    approvals: {
+        useFlows: (options?: AppQueryOptions<"getAllFlows">) =>
+            useAppQuery({ url: { baseUrl: "/flow" }, options }),
+        useFormFields: (id: number, options?: AppQueryOptions<"getFlowFormFields">) =>
+            useAppQuery({ url: { baseUrl: "/flow/:id/form-fields", urlParams: { id } }, options }),
+        useMyFlows: (status?: string, options?: AppQueryOptions<"getMyFlows">) =>
+            useAppQuery({ url: { baseUrl: "/my-flow", queryParams: { status } }, options }),
+        useInstance: (id: number, options?: AppQueryOptions<"getFlowInstance">) =>
+            useAppQuery({ url: { baseUrl: "/flow-instance/:id", urlParams: { id } }, options }),
+        useLogs: (id: number, options?: AppQueryOptions<"getFlowLogs">) =>
+            useAppQuery({ url: { baseUrl: "/flow-instance/:id/logs", urlParams: { id } }, options }),
+    }
 };

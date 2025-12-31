@@ -18,6 +18,8 @@ import {
     IconMessage,
     IconBell,
     IconPhoto,
+    IconChecklist,
+    IconShare,
     IconProps,
 } from "@tabler/icons-react";
 import { useTranslations } from "next-intl";
@@ -237,6 +239,22 @@ export const useMenu = () => {
                     color: "#868e96",
                     showMenu: !isTeacher, // Only hidden for Teacher (Admin can see)
                 },
+                {
+                    key: "approvals",
+                    label: t("menu.approvals"),
+                    icon: IconChecklist,
+                    path: PMS_PATH.APPROVALS,
+                    color: "#fd7e14",
+                    showMenu: true,
+                },
+                {
+                    key: "social",
+                    label: t("menu.social"),
+                    icon: IconShare,
+                    path: PMS_PATH.SOCIAL,
+                    color: "#e64980",
+                    showMenu: true,
+                }
             ].filter((item) => item.showMenu),
         [t, hasScreen, isAdmin, isTeacher]
     );

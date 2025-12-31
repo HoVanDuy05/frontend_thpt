@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Box, Paper, Stack, Text, Title, Group, Transition } from "@mantine/core";
+import { Box, Paper, Stack, Text, Title, Group, Transition, rem } from "@mantine/core";
 import { IconArrowLeft } from "@tabler/icons-react";
 import React, { ReactNode } from "react";
 
@@ -53,7 +53,12 @@ export const LayoutList = React.forwardRef<HTMLDivElement, LayoutProps>(
                 <Stack className="flex flex-1" gap={0} h="100%">
                     {showHeader && (
                         <Paper
-                            className="z-10 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md border-b border-zinc-200 dark:border-zinc-800"
+                            style={{
+                                zIndex: 10,
+                                background: 'rgba(var(--mantine-color-body-rgb), 0.8)',
+                                backdropFilter: 'blur(12px)',
+                                borderBottom: `${rem(1)} solid var(--mantine-color-default-border)`,
+                            }}
                             px={{ base: "sm", sm: "md" }}
                             py={{ base: "xs", sm: "sm" }}
                             ref={ref}
@@ -77,7 +82,8 @@ export const LayoutList = React.forwardRef<HTMLDivElement, LayoutProps>(
                                     <Title
                                         order={2}
                                         fw={800}
-                                        className="tracking-tight text-zinc-900 dark:text-zinc-50 text-xl sm:text-2xl"
+                                        style={{ color: 'var(--mantine-color-text)' }}
+                                        className="tracking-tight text-xl sm:text-2xl"
                                     >
                                         {title}
                                     </Title>
@@ -99,7 +105,10 @@ export const LayoutList = React.forwardRef<HTMLDivElement, LayoutProps>(
                     )}
 
                     <Box
-                        className="flex-1 overflow-auto bg-zinc-50/50 dark:bg-zinc-900/10"
+                        style={{
+                            background: 'var(--mantine-color-body)',
+                        }}
+                        className="flex-1 overflow-auto"
                         p={{ base: "sm", sm: "md" }}
                     >
                         {filters && <Box mb="md">{filters}</Box>}
@@ -119,8 +128,14 @@ export const LayoutList = React.forwardRef<HTMLDivElement, LayoutProps>(
 
                         {loading && (
                             <Stack gap="md">
-                                <Box className="h-40 bg-zinc-100 dark:bg-zinc-900 animate-pulse rounded-xl" />
-                                <Box className="h-40 bg-zinc-100 dark:bg-zinc-900 animate-pulse rounded-xl" />
+                                <Box
+                                    style={{ background: 'var(--mantine-color-default-hover)' }}
+                                    className="h-40 animate-pulse rounded-xl"
+                                />
+                                <Box
+                                    style={{ background: 'var(--mantine-color-default-hover)' }}
+                                    className="h-40 animate-pulse rounded-xl"
+                                />
                             </Stack>
                         )}
                     </Box>

@@ -12,7 +12,11 @@ import { modals } from "@mantine/modals";
 import { LayoutList } from "@/shared/components/LayoutList";
 import { AppButton } from "@/shared/components/AppButton";
 
+import { useTranslations } from "next-intl";
+
 export default function BannerPage() {
+    const t = useTranslations("portal.banners");
+    const tCommon = useTranslations("common");
     const { banners, isLoading, handleCreate, handleUpdate, handleDelete, isCreating, isUpdating, isDeleting } = useBannerManager();
     const [opened, { open, close }] = useDisclosure(false);
     const [editingBanner, setEditingBanner] = useState<TBanner | null>(null);
@@ -29,14 +33,14 @@ export default function BannerPage() {
 
     const confirmDelete = (id: number) => {
         modals.openConfirmModal({
-            title: "Xác nhận xóa",
+            title: tCommon("delete_title"),
             centered: true,
             children: (
                 <Text size="sm">
-                    Bạn có chắc chắn muốn xóa banner này? Hành động này không thể hoàn tác.
+                    {tCommon("confirm_delete")}
                 </Text>
             ),
-            labels: { confirm: "Xóa", cancel: "Hủy" },
+            labels: { confirm: tCommon("actions.delete"), cancel: tCommon("actions.cancel") },
             confirmProps: { color: "red", loading: isDeleting },
             onConfirm: () => handleDelete(id),
         });
@@ -53,15 +57,15 @@ export default function BannerPage() {
 
     const PageActions = (
         <AppButton leftSection={<IconPlus size={18} />} onClick={handleOpenCreate} size="sm">
-            <span className="hidden sm:inline">Thêm Banner</span>
-            <span className="sm:hidden">Thêm</span>
+            <span className="hidden sm:inline">{t("create")}</span>
+            <span className="sm:hidden">{tCommon("actions.create")}</span>
         </AppButton>
     );
 
     return (
         <LayoutList
-            title="Quản lý Banner"
-            description="Cấu hình các banner hiển thị trên trang chủ"
+            title={t("title")}
+            description={t("subtitle")}
             actions={PageActions}
             loading={isLoading}
         >
@@ -69,7 +73,11 @@ export default function BannerPage() {
                 radius="lg"
                 withBorder
                 shadow="sm"
-                className="bg-white/50 dark:bg-zinc-950/50 backdrop-blur-sm border-zinc-200/50 dark:border-zinc-800/50 overflow-hidden"
+                style={{
+                    background: 'rgba(var(--mantine-color-body-rgb), 0.5)',
+                    backdropFilter: 'blur(8px)',
+                }}
+                className="overflow-hidden"
             >
                 {banners && banners.length > 0 ? (
                     <BannerTable
@@ -79,15 +87,18 @@ export default function BannerPage() {
                     />
                 ) : (
                     <Stack align="center" py={{ base: 60, sm: 80 }} gap="md" px="md">
-                        <Box className="bg-zinc-100 dark:bg-zinc-900 p-8 rounded-full">
-                            <IconPhotoOff size={56} className="text-zinc-400" />
+                        <Box
+                            style={{ background: 'var(--mantine-color-default-hover)' }}
+                            className="p-8 rounded-full"
+                        >
+                            <IconPhotoOff size={56} className="text-[var(--mantine-color-dimmed)]" />
                         </Box>
                         <Stack gap={4} align="center">
-                            <Text fw={700} fz={{ base: "md", sm: "lg" }}>Chưa có banner nào</Text>
-                            <Text size="sm" c="dimmed" ta="center">Bắt đầu bằng cách tạo banner đầu tiên của bạn</Text>
+                            <Text fw={700} fz={{ base: "md", sm: "lg" }}>{t("no_data")}</Text>
+                            <Text size="sm" c="dimmed" ta="center">{t("no_data_subtitle")}</Text>
                         </Stack>
                         <AppButton variant="light" onClick={handleOpenCreate} mt="md" size="sm">
-                            Tạo banner ngay
+                            {t("create_now")}
                         </AppButton>
                     </Stack>
                 )}

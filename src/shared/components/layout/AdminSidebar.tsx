@@ -1,6 +1,6 @@
 "use client";
 
-import { Stack, NavLink, ScrollArea, Box, Tooltip, Center, Menu, ActionIcon } from "@mantine/core";
+import { Stack, NavLink, ScrollArea, Box, Tooltip, Center, Menu, ActionIcon, rem, Text } from "@mantine/core";
 import { IconSchool, IconChevronRight, IconLayoutSidebarLeftCollapse, IconLayoutSidebarLeftExpand } from "@tabler/icons-react";
 import { usePathname, Link } from "@/i18n/routing";
 import { useMenu, MenuItem } from "@/shared/hooks/useMenu";
@@ -24,16 +24,27 @@ export function AdminSidebar({ collapsed = false, onToggle }: AdminSidebarProps)
                 <NavLink
                     key={item.key}
                     active={isActive}
-                    label={collapsed && !isChild ? null : item.label}
-                    leftSection={item.icon ? <item.icon size={22} stroke={1.5} /> : null}
+                    label={collapsed && !isChild ? null : <Text size="sm" fw={isActive ? 600 : 400}>{item.label}</Text>}
+                    leftSection={item.icon ? <item.icon size={20} stroke={1.5} /> : null}
                     rightSection={!collapsed && hasChildren ? <IconChevronRight size={14} className="opacity-50" /> : null}
                     component={hasChildren && !collapsed ? "div" : (Link as any)}
                     href={hasChildren && !collapsed ? undefined : item.path}
-                    variant="filled"
-                    className={`rounded-lg transition-all duration-200 ${collapsed && !isChild ? "px-0 justify-center h-12" : "text-sm"}`}
+                    variant="light"
+                    color="indigo"
+                    className={`rounded-md transition-all duration-200 mb-0.5 ${collapsed && !isChild ? "px-0 justify-center h-10" : "py-2.5"}`}
+                    styles={{
+                        root: {
+                            color: isActive ? 'var(--mantine-primary-color-filled)' : 'var(--mantine-color-text)',
+                            backgroundColor: isActive ? 'var(--mantine-primary-color-light)' : 'transparent',
+                        }
+                    }}
                     defaultOpened={isActive}
                 >
-                    {!collapsed && hasChildren && renderNavItems(item.children!, true)}
+                    {!collapsed && hasChildren && (
+                        <Box pl="md" className="border-l ml-4 border-[var(--mantine-color-default-border)]" mt={4}>
+                            {renderNavItems(item.children!, true)}
+                        </Box>
+                    )}
                 </NavLink>
             );
 
@@ -60,7 +71,10 @@ export function AdminSidebar({ collapsed = false, onToggle }: AdminSidebarProps)
                                         component={Link as any}
                                         href={child.path}
                                         leftSection={child.icon ? <child.icon size={16} /> : null}
-                                        className={`rounded-md mb-1 ${pathname === child.path ? "bg-blue-50 text-blue-600 font-medium" : ""}`}
+                                        className={`rounded-md mb-1 transition-colors ${pathname === child.path
+                                            ? "bg-[var(--mantine-primary-color-light)] text-[var(--mantine-primary-color-filled)] font-medium"
+                                            : "text-[var(--mantine-color-text)] hover:bg-[var(--mantine-color-default-hover)]"
+                                            }`}
                                     >
                                         {child.label}
                                     </Menu.Item>
@@ -89,22 +103,39 @@ export function AdminSidebar({ collapsed = false, onToggle }: AdminSidebarProps)
     };
 
     return (
-        <nav className={`h-full flex flex-col transition-all duration-300 bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800 w-full`}>
+        <Box
+            component="nav"
+            style={{
+                background: 'var(--mantine-color-body)',
+                borderRight: `${rem(1)} solid var(--mantine-color-default-border)`
+            }}
+            className="h-full flex flex-col transition-all duration-300 w-full"
+        >
             {/* Logo Section */}
-            <div className={`p-4 border-b border-gray-200 dark:border-zinc-800 transition-all duration-300 ${collapsed ? "px-0" : "px-4"}`}>
+            <div
+                style={{
+                    borderBottom: `${rem(1)} solid var(--mantine-color-default-border)`
+                }}
+                className={`p-4 transition-all duration-300 ${collapsed ? "px-0" : "px-4"}`}
+            >
                 <div className={`flex items-center transition-all ${collapsed ? "justify-center" : "justify-between"}`}>
                     {!collapsed && (
                         <div className="flex items-center gap-3">
-                            <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-2.5 rounded-lg shadow-md shrink-0">
+                            <Box
+                                style={{
+                                    background: 'linear-gradient(135deg, var(--mantine-color-indigo-6) 0%, var(--mantine-color-indigo-8) 100%)'
+                                }}
+                                className="p-2.5 rounded-lg shadow-md shrink-0"
+                            >
                                 <IconSchool size={24} className="text-white" stroke={2} />
-                            </div>
+                            </Box>
                             <div className="flex flex-col overflow-hidden whitespace-nowrap">
-                                <span className="font-bold text-sm text-gray-900 dark:text-gray-100">
+                                <Text fw={700} size="sm" c="var(--mantine-color-text)">
                                     Nguyễn Huệ
-                                </span>
-                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                </Text>
+                                <Text size="xs" c="dimmed">
                                     v1.0.0
-                                </span>
+                                </Text>
                             </div>
                         </div>
                     )}
@@ -117,7 +148,6 @@ export function AdminSidebar({ collapsed = false, onToggle }: AdminSidebarProps)
                             visibleFrom="sm"
                             size={collapsed ? "lg" : "md"}
                             c="dimmed"
-                            className="hover:bg-gray-100 dark:hover:bg-zinc-800"
                         >
                             {collapsed ? (
                                 <IconLayoutSidebarLeftExpand size={20} stroke={1.5} />
@@ -135,6 +165,6 @@ export function AdminSidebar({ collapsed = false, onToggle }: AdminSidebarProps)
                     {renderNavItems(menu)}
                 </Stack>
             </ScrollArea>
-        </nav>
+        </Box>
     );
 }

@@ -184,6 +184,59 @@ export const AppMutation = () => {
             useUploadAvatar: () => useAppMutation<"uploadAvatar">({
                 url: { baseUrl: "/upload/avatar" },
             }),
+        },
+        approvals: {
+            useCreateFlow: () => useAppMutation<"createFlow">({
+                url: { baseUrl: "/flow" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/flow"] as any });
+                }
+            }),
+            useUpdateFlow: (id: number) => useAppMutation<"updateFlow">({
+                url: { baseUrl: "/flow/:id", urlParams: { id } },
+                method: "PUT",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/flow"] as any });
+                }
+            }),
+            useAddStep: (id: number) => useAppMutation<"addFlowStep">({
+                url: { baseUrl: "/flow/:id/step", urlParams: { id } },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/flow"] as any });
+                }
+            }),
+            useAddApprover: (stepId: number) => useAppMutation<"addStepApprover">({
+                url: { baseUrl: "/flow/:stepId/approver", urlParams: { stepId } },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/flow"] as any });
+                }
+            }),
+            useCreateFields: (id: number) => useAppMutation<"createFlowFields">({
+                url: { baseUrl: "/flow/:id/fields", urlParams: { id } },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/flow"] as any });
+                }
+            }),
+            useSubmit: () => useAppMutation<"submitFlow">({
+                url: { baseUrl: "/submit-flow" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/my-flow"] as any });
+                }
+            }),
+            useApprove: (id: number) => useAppMutation<"approveStep">({
+                url: { baseUrl: "/flow-instance/:id/approve", urlParams: { id } },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/flow-instance"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/my-flow"] as any });
+                }
+            }),
+            useReject: (id: number) => useAppMutation<"rejectStep">({
+                url: { baseUrl: "/flow-instance/:id/reject", urlParams: { id } },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/flow-instance"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/my-flow"] as any });
+                }
+            }),
         }
     };
 };

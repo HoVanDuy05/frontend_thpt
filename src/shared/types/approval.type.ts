@@ -1,0 +1,120 @@
+export enum TrangThaiQuyTrinh {
+    NHAP = 'NHAP',
+    HOAT_DONG = 'HOAT_DONG',
+    NGUNG_HOAT_DONG = 'NGUNG_HOAT_DONG'
+}
+
+export enum LoaiQuyTacBuoc {
+    BAT_KY = 'BAT_KY',
+    TAT_CA = 'TAT_CA'
+}
+
+export enum LoaiNguoiPheDuyet {
+    NGUOI_DUNG = 'NGUOI_DUNG',
+    VAI_TRO = 'VAI_TRO',
+    NHOM = 'NHOM'
+}
+
+export enum LoaiTruongForm {
+    TEXT = 'TEXT',
+    NUMBER = 'NUMBER',
+    TEXTAREA = 'TEXTAREA',
+    SELECT = 'SELECT',
+    DATE = 'DATE',
+    DATETIME = 'DATETIME'
+}
+
+export enum TrangThaiPhien {
+    CHO_DUYET = 'CHO_DUYET',
+    DA_DUYET = 'DA_DUYET',
+    TU_CHOI = 'TU_CHOI',
+    HUY_BO = 'HUY_BO'
+}
+
+export enum TrangThaiBuocPhien {
+    CHO_DUYET = 'CHO_DUYET',
+    DA_DUYET = 'DA_DUYET',
+    TU_CHOI = 'TU_CHOI',
+    BO_QUA = 'BO_QUA'
+}
+
+export enum HanhDongPheDuyet {
+    PHE_DUYET = 'PHE_DUYET',
+    TU_CHOI = 'TU_CHOI',
+    YEU_CAU_CHINH_SUA = 'YEU_CAU_CHINH_SUA'
+}
+
+export interface TQuyTrinh {
+    id: number;
+    ten: string;
+    moTa?: string;
+    trangThai: TrangThaiQuyTrinh;
+    nguoiTaoId: number;
+    ngayTao: string;
+    cacBuoc?: TBuocQuyTrinh[];
+    cacTruong?: TTruongFormQuyTrinh[];
+    _count?: {
+        cacBuoc: number;
+    };
+}
+
+export interface TBuocQuyTrinh {
+    id: number;
+    quyTrinhId: number;
+    thuTuBuoc: number;
+    ten: string;
+    loaiQuyTac: LoaiQuyTacBuoc;
+    nguoiDuyets?: TNguoiPheDuyetBuoc[];
+}
+
+export interface TNguoiPheDuyetBuoc {
+    id: number;
+    buocId: number;
+    loaiNguoiPheDuyet: LoaiNguoiPheDuyet;
+    approverId: string; // ID of user/role/group
+}
+
+export interface TTruongFormQuyTrinh {
+    id: number;
+    quyTrinhId: number;
+    tenTruong: string;
+    nhan: string;
+    loai: LoaiTruongForm;
+    batBuoc: boolean;
+    tuyChon?: string; // JSON string of options
+    thuTu: number;
+}
+
+export interface TPhienQuyTrinh {
+    id: number;
+    quyTrinhId: number;
+    quyTrinh?: TQuyTrinh;
+    doiTuongLienQuan?: any; // Form data
+    trangThai: TrangThaiPhien;
+    buocHienTai: number;
+    nguoiTaoId: number;
+    ngayTao: string;
+    buocPhiens?: TBuocPhienQuyTrinh[];
+    nhatKy?: TNhatKyPheDuyetQuyTrinh[];
+}
+
+export interface TBuocPhienQuyTrinh {
+    id: number;
+    phienId: number;
+    buocId: number;
+    buoc?: TBuocQuyTrinh;
+    trangThai: TrangThaiBuocPhien;
+    nguoiPheDuyetId?: number;
+    ngayPheDuyet?: string;
+}
+
+export interface TNhatKyPheDuyetQuyTrinh {
+    id: number;
+    phienId: number;
+    buocId?: number;
+    nguoiDungId: number;
+    nguoiDung?: { id: number; taiKhoan: string };
+    hanhDong: HanhDongPheDuyet;
+    noiDung?: string;
+    ngayTao: string;
+}

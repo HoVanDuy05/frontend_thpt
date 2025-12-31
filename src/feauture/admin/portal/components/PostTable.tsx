@@ -143,7 +143,7 @@ function DesktopPostTable({ posts, onEdit, onDelete }: PostTableProps) {
     return (
         <ScrollArea>
             <Table verticalSpacing="sm" highlightOnHover className="min-w-[800px]">
-                <Table.Thead className="bg-zinc-50 dark:bg-zinc-900">
+                <Table.Thead style={{ background: 'var(--mantine-color-default-hover)' }}>
                     <Table.Tr>
                         <Table.Th>Bài viết</Table.Th>
                         <Table.Th w={120}>Loại</Table.Th>
