@@ -6,9 +6,10 @@ import { notifications } from "@mantine/notifications";
 
 interface ChatInputProps {
     channelId: number;
+    onTyping?: () => void;
 }
 
-export const ChatInput: React.FC<ChatInputProps> = ({ channelId }) => {
+export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping }) => {
     const [content, setContent] = useState("");
     const sendMessageMutation = AppMutation().chat.useSendMessage();
 
@@ -51,7 +52,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId }) => {
 
             <Textarea
                 value={content}
-                onChange={(e) => setContent(e.currentTarget.value)}
+                onChange={(e) => {
+                    setContent(e.currentTarget.value);
+                    onTyping?.();
+                }}
                 onKeyDown={handleKeyDown}
                 placeholder="Message..."
                 autosize

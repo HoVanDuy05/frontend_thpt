@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { Box, Title, Stack, Text, Avatar, Group, Button, Tabs, Center, Loader, ActionIcon, Badge } from "@mantine/core";
-import { IconShare, IconLink, IconDots, IconUserPlus, IconUserCheck, IconUserX, IconMessage } from "@tabler/icons-react";
+import { IconShare, IconLink, IconDots, IconUserPlus, IconUserCheck, IconUserX, IconMessage, IconSend, IconUser } from "@tabler/icons-react";
 import { AppQuery } from "@/api/AppQuery";
 import { AppMutation } from "@/api/AppMutation";
 import { ThreadFeed } from "@/feauture/social/components/ThreadFeed";
@@ -101,121 +101,156 @@ export default function UserProfilePage() {
     };
 
     return (
-        <Stack gap={32}>
-            {/* User Info Header */}
-            <Stack gap="xl">
-                <Group justify="space-between" align="flex-start">
-                    <Stack gap={8}>
-                        <Group gap="sm">
-                            <Title order={1} className="text-4xl font-black tracking-tighter">
+        <Stack gap="xl">
+            {/* Profile Header */}
+            <Group justify="space-between" align="flex-start" wrap="nowrap">
+                <Group gap="lg" align="flex-start">
+                    <Avatar
+                        src={profile.avatar}
+                        size={100}
+                        radius="xl"
+                        className="ring-2 ring-gray-200 dark:ring-zinc-800"
+                    />
+                    <Stack gap="xs">
+                        <Group gap="sm" align="center">
+                            <Title order={1} className="text-3xl font-bold">
                                 {profile.hoTen || profile.taiKhoan}
                             </Title>
                             <Badge
-                                variant="outline"
+                                variant="light"
                                 color={getRoleColor(profile.vaiTro)}
-                                size="sm"
-                                radius="sm"
-                                className="font-black uppercase tracking-widest px-2"
+                                size="md"
+                                radius="md"
+                                className="font-semibold"
                             >
                                 {profile.vaiTro}
                             </Badge>
                         </Group>
-                        <Group gap={6}>
-                            <Text size="md" fw={600} className="text-zinc-500">
-                                @{profile.taiKhoan}
-                            </Text>
-                            <Box className="bg-zinc-100 dark:bg-zinc-900 px-2 py-0.5 rounded text-[10px] font-black uppercase text-zinc-400">
-                                threads.net
-                            </Box>
-                        </Group>
+                        <Text size="sm" c="dimmed" fw={500}>
+                            @{profile.taiKhoan}
+                        </Text>
+                        <Text className="text-gray-600 dark:text-gray-400 max-w-md">
+                            Hồ sơ mạng xã hội của {profile.hoTen || profile.taiKhoan}
+                        </Text>
                     </Stack>
-                    <Avatar
-                        src={profile.avatar}
-                        size={84}
-                        radius="xl"
-                        className="shadow-2xl ring-4 ring-zinc-50 dark:ring-zinc-900"
-                    />
                 </Group>
 
-                <Text className="text-zinc-600 dark:text-zinc-400 font-medium max-w-[450px] leading-relaxed">
-                    Hồ sơ mạng xã hội của {profile.hoTen || profile.taiKhoan}. Tham gia để kết nối và chia sẻ.
-                </Text>
-
-                <Group justify="space-between" align="center">
-                    <Group gap="xs">
-                        <Text size="sm" fw={700} className="text-zinc-400">
-                            {profile._count.followers} người theo dõi
-                        </Text>
-                        <Box className="w-1 h-1 rounded-full bg-zinc-300" />
-                        <Text size="sm" component="a" href="#" className="text-zinc-400 hover:underline font-semibold">
-                            mxh.hue.edu.vn
-                        </Text>
-                    </Group>
-                    <Group gap="xs">
-                        <ActionIcon variant="subtle" color="gray" radius="xl" size="lg" className="border border-zinc-100 dark:border-zinc-800">
-                            <IconShare size={18} />
-                        </ActionIcon>
-                        <ActionIcon variant="subtle" color="gray" radius="xl" size="lg" className="border border-zinc-100 dark:border-zinc-800">
-                            <IconDots size={20} />
-                        </ActionIcon>
-                    </Group>
+                <Group gap="xs">
+                    <ActionIcon variant="light" color="gray" radius="xl" size="lg">
+                        <IconShare size={18} />
+                    </ActionIcon>
+                    <ActionIcon variant="light" color="gray" radius="xl" size="lg">
+                        <IconDots size={20} />
+                    </ActionIcon>
                 </Group>
+            </Group>
 
-                <Group grow gap="md">
-                    <Button
-                        {...actionBtn}
-                        leftSection={actionBtn.icon}
-                        radius="md"
-                        size="md"
-                        fw={900}
-                        onClick={handleAction}
-                        loading={sendRequestMutation.isPending || handleRequestMutation.isPending || unfriendMutation.isPending}
-                        className={`uppercase tracking-widest text-[11px] h-[48px] shadow-sm transform transition-all active:scale-95 ${actionBtn.variant === 'filled' && actionBtn.color === 'black' ? 'dark:bg-white dark:text-black' : ''}`}
-                    >
-                        {actionBtn.children}
-                    </Button>
-                    <Button
-                        variant="outline"
-                        color="gray"
-                        radius="md"
-                        size="md"
-                        fw={900}
-                        leftSection={<IconMessage size={18} />}
-                        onClick={handleMessage}
-                        loading={createChannelMutation.isPending}
-                        className="border-gray-200 dark:border-zinc-800 uppercase tracking-widest text-[11px] h-[48px]"
-                    >
-                        Nhắn tin
-                    </Button>
-                </Group>
-            </Stack>
+            {/* Stats */}
+            <Group gap="xl">
+                <Stack gap={4}>
+                    <Text size="xl" fw={700}>
+                        {profile._count.followers}
+                    </Text>
+                    <Text size="sm" c="dimmed">
+                        Người theo dõi
+                    </Text>
+                </Stack>
+                <Stack gap={4}>
+                    <Text size="xl" fw={700}>
+                        {profile._count.following}
+                    </Text>
+                    <Text size="sm" c="dimmed">
+                        Đang theo dõi
+                    </Text>
+                </Stack>
+                <Stack gap={4}>
+                    <Text size="xl" fw={700}>
+                        {userThreads?.length || 0}
+                    </Text>
+                    <Text size="sm" c="dimmed">
+                        Bài viết
+                    </Text>
+                </Stack>
+            </Group>
+
+            {/* Action Buttons */}
+            <Group gap="sm">
+                <Button
+                    {...actionBtn}
+                    leftSection={actionBtn.icon}
+                    radius="md"
+                    size="md"
+                    fw={600}
+                    onClick={handleAction}
+                    loading={sendRequestMutation.isPending || handleRequestMutation.isPending || unfriendMutation.isPending}
+                    className="flex-1"
+                >
+                    {actionBtn.children}
+                </Button>
+                <Button
+                    variant="light"
+                    color="gray"
+                    radius="md"
+                    size="md"
+                    fw={600}
+                    leftSection={<IconMessage size={18} />}
+                    onClick={handleMessage}
+                    loading={createChannelMutation.isPending}
+                    className="flex-1"
+                >
+                    Nhắn tin
+                </Button>
+            </Group>
 
             {/* Content Tabs */}
-            <Tabs defaultValue="threads" variant="none" classNames={{
-                root: "w-full",
-                list: "border-b border-gray-100 dark:border-zinc-900 flex justify-around",
-                tab: "pb-4 px-0 fw-800 text-sm tracking-widest uppercase transition-all border-b-2 border-transparent data-[active=true]:border-black dark:data-[active=true]:border-white data-[active=true]:text-black dark:data-[active=true]:text-white text-zinc-400"
-            }}>
+            <Tabs
+                defaultValue="threads"
+                variant="pills"
+                classNames={{
+                    root: "w-full",
+                    list: "gap-2",
+                    tab: "font-semibold data-[active=true]:bg-black data-[active=true]:text-white dark:data-[active=true]:bg-white dark:data-[active=true]:text-black"
+                }}
+            >
                 <Tabs.List>
-                    <Tabs.Tab value="threads">Social</Tabs.Tab>
-                    <Tabs.Tab value="replies">Replies</Tabs.Tab>
-                    <Tabs.Tab value="reposts">Reposts</Tabs.Tab>
+                    <Tabs.Tab value="threads">Bài viết</Tabs.Tab>
+                    <Tabs.Tab value="replies">Phản hồi</Tabs.Tab>
+                    <Tabs.Tab value="reposts">Chia sẻ</Tabs.Tab>
                 </Tabs.List>
 
-                <Tabs.Panel value="threads" pt="md">
+                <Tabs.Panel value="threads" pt="lg">
                     {isLoadingThreads ? (
-                        <Center py={40}><Loader color="indigo" size="sm" /></Center>
-                    ) : (
+                        <Center py={40}>
+                            <Loader color="gray" size="md" />
+                        </Center>
+                    ) : userThreads && userThreads.length > 0 ? (
                         <ThreadFeed threads={userThreads} />
+                    ) : (
+                        <Center py={60}>
+                            <Stack align="center" gap="sm">
+                                <IconUser size={48} className="text-gray-300" />
+                                <Text c="dimmed">Chưa có bài viết nào</Text>
+                            </Stack>
+                        </Center>
                     )}
                 </Tabs.Panel>
 
-                <Tabs.Panel value="replies">
-                    <Center py={100} className="text-zinc-400 font-medium">Chưa có phản hồi nào</Center>
+                <Tabs.Panel value="replies" pt="lg">
+                    <Center py={60}>
+                        <Stack align="center" gap="sm">
+                            <IconMessage size={48} className="text-gray-300" />
+                            <Text c="dimmed">Chưa có phản hồi nào</Text>
+                        </Stack>
+                    </Center>
                 </Tabs.Panel>
 
-                <Tabs.Panel value="reposts">
-                    <Center py={100} className="text-zinc-400 font-medium">Chưa có bài đăng lại nào</Center>
+                <Tabs.Panel value="reposts" pt="lg">
+                    <Center py={60}>
+                        <Stack align="center" gap="sm">
+                            <IconShare size={48} className="text-gray-300" />
+                            <Text c="dimmed">Chưa có bài đăng lại nào</Text>
+                        </Stack>
+                    </Center>
                 </Tabs.Panel>
             </Tabs>
         </Stack>

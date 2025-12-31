@@ -118,7 +118,6 @@ export function LandingHeader() {
                                                 radius="xl"
                                                 component={Link as any}
                                                 href="/social"
-                                                className="hidden md:flex"
                                                 title="Mạng xã hội"
                                             >
                                                 <IconUsers size={20} />
@@ -130,7 +129,6 @@ export function LandingHeader() {
                                                 radius="xl"
                                                 component={Link as any}
                                                 href="/chat"
-                                                className="hidden md:flex mr-2"
                                                 title="Tin nhắn"
                                             >
                                                 <IconMessageCircle size={20} />

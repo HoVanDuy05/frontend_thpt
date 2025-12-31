@@ -12,7 +12,7 @@ const StudentLayout = ({
 }) => {
     return (
         <RoleGuard allowedRoles={["HOC_SINH"]}>
-            <div className="min-h-screen flex flex-col pt-16">
+            <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-zinc-950">
                 <StudentHeader />
                 <main className="flex-1">
                     {children}

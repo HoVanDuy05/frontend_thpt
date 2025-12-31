@@ -2,10 +2,11 @@ import { Paper, Group, ActionIcon, Avatar, Text, Stack, ScrollArea, Box, Loader,
 import { IconArrowLeft, IconDotsVertical, IconPhone, IconVideo } from "@tabler/icons-react";
 import { TChannel } from "@/api/types/api.type";
 import { AppQuery } from "@/api/AppQuery";
-import { AppMutation } from "@/api/AppMutation";
 import { useAppStore } from "@/providers/store/useAppStore";
 import { useEffect, useRef, useState } from "react";
 import { ChatInput } from "./ChatInput";
+import { useSocket } from "@/shared/hooks/useSocket";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface ChatWindowProps {
     channel: TChannel;
@@ -14,11 +15,51 @@ interface ChatWindowProps {
 
 export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
     const { user } = useAppStore();
-    const { data: messages, isLoading } = AppQuery.chat.useMessages(channel.id, { page: 1 }, {
-        refetchInterval: 3000 // Poll every 3s
-    });
-
+    const queryClient = useQueryClient();
+    const { data: messages, isLoading } = AppQuery.chat.useMessages(channel.id, { page: 1 });
+    const { on, off, joinChannel, leaveChannel, startTyping, stopTyping, isConnected } = useSocket();
+    const [typingUsers, setTypingUsers] = useState<string[]>([]);
+    const typingTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
     const viewport = useRef<HTMLDivElement>(null);
+
+    // Join channel on mount
+    useEffect(() => {
+        if (isConnected && channel.id) {
+            joinChannel(channel.id);
+        }
+        return () => {
+            if (channel.id) {
+                leaveChannel(channel.id);
+            }
+        };
+    }, [isConnected, channel.id, joinChannel, leaveChannel]);
+
+    // Listen for new messages
+    useEffect(() => {
+        const handleNewMessage = (message: any) => {
+            if (message.kenhId === channel.id) {
+                queryClient.invalidateQueries({ queryKey: ['chat', 'messages', channel.id] });
+            }
+        };
+
+        const handleTypingStart = ({ userName }: { userName: string }) => {
+            setTypingUsers(prev => [...new Set([...prev, userName])]);
+        };
+
+        const handleTypingStop = ({ userId }: { userId: number }) => {
+            setTypingUsers(prev => prev.filter(name => name !== userId.toString()));
+        };
+
+        on('message:new', handleNewMessage);
+        on('typing:start', handleTypingStart);
+        on('typing:stop', handleTypingStop);
+
+        return () => {
+            off('message:new', handleNewMessage);
+            off('typing:start', handleTypingStart);
+            off('typing:stop', handleTypingStop);
+        };
+    }, [channel.id, on, off, queryClient]);
 
     // Scroll to bottom on new messages
     useEffect(() => {
@@ -26,6 +67,19 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
             viewport.current.scrollTo({ top: viewport.current.scrollHeight, behavior: 'smooth' });
         }
     }, [messages]);
+
+    // Handle typing indicator
+    const handleTyping = () => {
+        if (typingTimeoutRef.current) {
+            clearTimeout(typingTimeoutRef.current);
+        }
+
+        startTyping(channel.id, user?.hoTen || user?.taiKhoan || 'User');
+
+        typingTimeoutRef.current = setTimeout(() => {
+            stopTyping(channel.id);
+        }, 2000);
+    };
 
     const getOtherMember = () => {
         return channel.thanhViens.find(m => m.nguoiDungId !== user?.id)?.nguoiDung;
@@ -47,8 +101,14 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
                         {channel.loaiKenh === 'NHOM' ? channel.tenKenh : (targetUser?.hoTen || targetUser?.taiKhoan)}
                     </Text>
                     <Text size="xs" c="dimmed" className="flex items-center gap-1">
-                        <Box component="span" className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                        Active now
+                        {typingUsers.length > 0 ? (
+                            <span className="text-blue-500 italic">đang nhập...</span>
+                        ) : (
+                            <>
+                                <Box component="span" className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-green-500' : 'bg-gray-400'}`} />
+                                {isConnected ? 'Đang hoạt động' : 'Ngoại tuyến'}
+                            </>
+                        )}
                     </Text>
                 </Stack>
 
@@ -70,7 +130,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
                 <Stack gap="xs" p="md">
                     {isLoading ? (
                         <Center py={50}><Loader color="indigo" size="sm" /></Center>
-                    ) : (messages || []).slice().reverse().map((msg) => { // Reverse to show latest at bottom
+                    ) : (messages || []).slice().reverse().map((msg) => {
                         const isMe = msg.nguoiGuiId === user?.id;
                         return (
                             <Group
@@ -95,7 +155,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
                                     {msg.loai === 'VAN_BAN' && (
                                         <Text size="sm" className="leading-snug">{msg.noiDung}</Text>
                                     )}
-                                    {/* Add Image support here */}
                                 </Paper>
                             </Group>
                         );
@@ -104,7 +163,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
             </ScrollArea>
 
             {/* Input Area */}
-            <ChatInput channelId={channel.id} />
+            <ChatInput channelId={channel.id} onTyping={handleTyping} />
         </div>
     );
 }
