@@ -1,21 +1,33 @@
 {
-    "name": "School NHers",
+    "id": "com.nguyenhue.school",
+    "name": "Nguyễn Huệ",
     "short_name": "NHers",
     "description": "Hệ thống Quản lý Trường THPT Nguyễn Huệ",
-    "start_url": "/",
+    "start_url": "/vi",
     "display": "standalone",
+    "display_override": [
+        "window-controls-overlay",
+        "minimal-ui"
+    ],
     "background_color": "#ffffff",
     "theme_color": "#4f46e5",
+    "orientation": "portrait",
+    "categories": [
+        "education",
+        "productivity"
+    ],
     "icons": [
         {
             "src": "/icons/icon-192x192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         },
         {
             "src": "/icons/icon-512x512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         }
     ]
 }

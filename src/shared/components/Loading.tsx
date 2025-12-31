@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Loader, Text, Stack } from "@mantine/core";
+import { Box, Text, Stack } from "@mantine/core";
 import { useEffect, useState } from "react";
 
 interface LoadingProps {
@@ -19,29 +19,31 @@ export function Loading({ fullScreen = false, message }: LoadingProps) {
     }, []);
 
     const content = (
-        <Stack align="center" gap="xl">
-            {/* Modern animated loader */}
-            <Box className="relative">
-                {/* Outer ring */}
-                <Box className="absolute inset-0 w-24 h-24 border-4 border-blue-200 dark:border-blue-900 rounded-full animate-ping opacity-20" />
-
-                {/* Middle ring */}
-                <Box className="absolute inset-2 w-20 h-20 border-4 border-blue-300 dark:border-blue-800 rounded-full animate-spin"
-                    style={{ animationDuration: "1.5s" }} />
-
-                {/* Inner loader */}
-                <Box className="relative w-24 h-24 flex items-center justify-center">
-                    <Loader size="lg" color="blue" />
+        <Stack align="center" gap="lg" className="relative z-10">
+            {/* Professional Loading Spinner */}
+            <Box className="relative w-16 h-16">
+                <Box
+                    className="absolute inset-0 rounded-full border-[3px] border-slate-100"
+                />
+                <Box
+                    className="absolute inset-0 rounded-full border-[3px] border-indigo-600 border-t-transparent animate-spin"
+                    style={{ animationDuration: '0.8s' }}
+                />
+                <Box className="absolute inset-0 flex items-center justify-center">
+                    <Box className="w-2 h-2 bg-indigo-600 rounded-full shadow-[0_0_10px_rgba(79,70,229,0.4)] animate-pulse" />
                 </Box>
             </Box>
 
-            {/* Loading text */}
-            <Stack align="center" gap="xs">
-                <Text size="lg" fw={600} className="text-gray-700 dark:text-gray-300">
-                    {message || "Đang tải"}
+            <Stack align="center" gap={4}>
+                <Text
+                    size="md"
+                    fw={700}
+                    className="text-slate-900 tracking-[0.1em]"
+                >
+                    {message || "Đang xử lý"}
                     <span className="inline-block w-8 text-left">{dots}</span>
                 </Text>
-                <Text size="sm" c="dimmed">
+                <Text size="xs" className="text-slate-400 font-medium uppercase tracking-[0.15em]">
                     Vui lòng đợi trong giây lát
                 </Text>
             </Stack>
@@ -50,8 +52,16 @@ export function Loading({ fullScreen = false, message }: LoadingProps) {
 
     if (fullScreen) {
         return (
-            <Box className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 z-50">
-                {content}
+            <Box
+                className="fixed inset-0 flex items-center justify-center z-50 transition-all duration-300"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.9)' }}
+            >
+                <Box className="absolute inset-0 backdrop-blur-[2px]" />
+                <Box
+                    className="p-12 bg-white rounded-[32px] shadow-[0_20px_70px_rgba(0,0,0,0.06)] border border-slate-50"
+                >
+                    {content}
+                </Box>
             </Box>
         );
     }

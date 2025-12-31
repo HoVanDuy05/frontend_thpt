@@ -48,6 +48,31 @@ body {
   color: var(--foreground);
   font-family: var(--font-be-vietnam-pro), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   overflow-x: hidden;
+
+  /* Native App Feel */
+  overscroll-behavior-y: none;
+  /* Disable pull-to-refresh */
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  /* Prevent selection as default, enable on content */
+
+  /* Support for notch/safe areas */
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Enable selection for specific content types */
+p,
+span,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+input,
+textarea {
+  user-select: text;
 }
 
 /* Custom System Loading Animation */
