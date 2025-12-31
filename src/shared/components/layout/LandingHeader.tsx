@@ -30,6 +30,9 @@ export function LandingHeader() {
         { href: "#events", label: "Sự kiện", icon: <IconCalendarEvent size={20} /> },
         { href: "#admissions", label: "Tuyển sinh", icon: <IconSchool size={20} /> },
         { href: "#about", label: "Về chúng tôi", icon: <IconInfoCircle size={20} /> },
+        // social
+        { href: "/social", label: "Mạng xã hội", icon: <IconUsers size={20} /> },
+        { href: "/chat", label: "Tin nhắn", icon: <IconMessageCircle size={20} /> },
     ];
 
     return (
