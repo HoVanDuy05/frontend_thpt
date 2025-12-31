@@ -94,6 +94,10 @@ export const AppQuery = {
             useAppQuery({ url: { baseUrl: "/friends/pending" }, options }),
         useStatus: (id: number, options?: AppQueryOptions<"getFriendStatus">) =>
             useAppQuery({ url: { baseUrl: "/friends/status/:id", urlParams: { id } }, options }),
+        useReceivedRequests: (options?: AppQueryOptions<"getReceivedRequests">) =>
+            useAppQuery({ url: { baseUrl: "/social/friend-requests/received" }, options }),
+        useSentRequests: (options?: AppQueryOptions<"getSentRequests">) =>
+            useAppQuery({ url: { baseUrl: "/social/friend-requests/sent" }, options }),
     },
     chat: {
         useChannels: (options?: AppQueryOptions<"getChannels">) =>

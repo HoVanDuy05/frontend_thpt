@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Container, Group, ActionIcon, Title, rem, Stack, useMantineColorScheme, UnstyledButton } from "@mantine/core";
-import { IconHome, IconSearch, IconPlus, IconHeart, IconUser, IconChevronLeft, IconLayoutNavbar, IconCompass, IconMessage } from "@tabler/icons-react";
+import { IconHome, IconSearch, IconPlus, IconHeart, IconUser, IconChevronLeft, IconLayoutNavbar, IconCompass, IconMessage, IconUsers } from "@tabler/icons-react";
 import { useRouter, usePathname, Link } from "@/i18n/routing";
 import { withAuth } from "@/shared/hocs/withAuth";
 import { UserMenu } from "@/shared/components/UserMenu";
@@ -39,6 +39,7 @@ const SocialLayout = ({ children }: { children: React.ReactNode }) => {
                     <NavIcon icon={IconSearch} href="/social/explore" active={pathname === "/social/explore"} />
                     <NavIcon icon={IconPlus} href="/social/create" active={pathname === "/social/create"} />
                     <NavIcon icon={IconMessage} href="/chat" active={pathname.startsWith("/chat")} />
+                    <NavIcon icon={IconUsers} href="/social/friends" active={pathname === "/social/friends"} />
                     <NavIcon icon={IconHeart} href="/social/activity" active={pathname === "/social/activity"} />
                     <NavIcon icon={IconUser} href="/social/profile" active={pathname.startsWith("/social/profile")} />
                 </Stack>
@@ -100,6 +101,7 @@ const SocialLayout = ({ children }: { children: React.ReactNode }) => {
                         <NavIcon icon={IconSearch} href="/social/explore" active={pathname === "/social/explore"} />
                         <NavIcon icon={IconPlus} href="/social/create" active={pathname === "/social/create"} />
                         <NavIcon icon={IconMessage} href="/chat" active={pathname.startsWith("/chat")} />
+                        <NavIcon icon={IconUsers} href="/social/friends" active={pathname === "/social/friends"} />
                         <NavIcon icon={IconHeart} href="/social/activity" active={pathname === "/social/activity"} />
                         <NavIcon icon={IconUser} href="/social/profile" active={pathname.startsWith("/social/profile")} />
                     </Group>

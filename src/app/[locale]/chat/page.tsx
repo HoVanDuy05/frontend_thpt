@@ -77,44 +77,49 @@ export default function ChatPage() {
                         {isLoadingChannels ? (
                             <Center py="xl"><Loader size="sm" color="indigo" /></Center>
                         ) : channels && channels.length > 0 ? (
-                            channels.map((channel: TChannel) => (
-                                <Group
-                                    key={channel.id}
-                                    wrap="nowrap"
-                                    className={`p-3 rounded-xl cursor-pointer transition-all duration-200 group ${selectedChannelId === channel.id
-                                        ? 'bg-blue-50/50 dark:bg-blue-500/10'
-                                        : 'hover:bg-gray-50 dark:hover:bg-zinc-900'
-                                        }`}
-                                    onClick={() => handleSelectChannel(channel.id)}
-                                >
-                                    <Box className="relative">
-                                        <Avatar
-                                            src={getChannelAvatar(channel, user?.id)}
-                                            size={56}
-                                            radius="xl"
-                                        />
-                                        <Box className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-black rounded-full" />
-                                    </Box>
-                                    <Stack gap={1} style={{ flex: 1, overflow: 'hidden' }}>
-                                        <Text size="md" fw={500} c={selectedChannelId === channel.id ? undefined : "dimmed"} className={selectedChannelId === channel.id ? "text-gray-900 dark:text-white font-semibold" : "text-gray-900 dark:text-gray-200"}>
-                                            {getChannelName(channel, user?.id)}
-                                        </Text>
-                                        <Group gap="xs" wrap="nowrap">
-                                            <Text size="sm" c="dimmed" truncate style={{ flex: 1 }} fw={channelIdParam ? 400 : 500}>
-                                                {channel.tinNhans?.[0]
-                                                    ? (channel.tinNhans[0].nguoiGuiId === user?.id ? "Bạn: " : "") +
-                                                    (channel.tinNhans[0].loai === 'HINH_ANH' ? 'Đã gửi một ảnh' : channel.tinNhans[0].noiDung)
-                                                    : "Chưa có tin nhắn"}
+                            channels.map((channel: TChannel) => {
+                                // Skip channels without members to prevent errors
+                                if (!channel || !channel.thanhViens) return null;
+
+                                return (
+                                    <Group
+                                        key={channel.id}
+                                        wrap="nowrap"
+                                        className={`p-3 rounded-xl cursor-pointer transition-all duration-200 group ${selectedChannelId === channel.id
+                                            ? 'bg-blue-50/50 dark:bg-blue-500/10'
+                                            : 'hover:bg-gray-50 dark:hover:bg-zinc-900'
+                                            }`}
+                                        onClick={() => handleSelectChannel(channel.id)}
+                                    >
+                                        <Box className="relative">
+                                            <Avatar
+                                                src={getChannelAvatar(channel, user?.id)}
+                                                size={56}
+                                                radius="xl"
+                                            />
+                                            <Box className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-black rounded-full" />
+                                        </Box>
+                                        <Stack gap={1} style={{ flex: 1, overflow: 'hidden' }}>
+                                            <Text size="md" fw={500} c={selectedChannelId === channel.id ? undefined : "dimmed"} className={selectedChannelId === channel.id ? "text-gray-900 dark:text-white font-semibold" : "text-gray-900 dark:text-gray-200"}>
+                                                {getChannelName(channel, user?.id)}
                                             </Text>
-                                            <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
-                                                · {formatTime(channel.updatedAt)}
-                                            </Text>
-                                        </Group>
-                                    </Stack>
-                                    {/* Unread indicator mock - would be conditional */}
-                                    {/* <Box className="w-3 h-3 bg-blue-500 rounded-full" /> */}
-                                </Group>
-                            ))
+                                            <Group gap="xs" wrap="nowrap">
+                                                <Text size="sm" c="dimmed" truncate style={{ flex: 1 }} fw={channelIdParam ? 400 : 500}>
+                                                    {channel.tinNhans?.[0]
+                                                        ? (channel.tinNhans[0].nguoiGuiId === user?.id ? "Bạn: " : "") +
+                                                        (channel.tinNhans[0].loai === 'HINH_ANH' ? 'Đã gửi một ảnh' : channel.tinNhans[0].noiDung)
+                                                        : "Chưa có tin nhắn"}
+                                                </Text>
+                                                <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
+                                                    · {formatTime(channel.updatedAt)}
+                                                </Text>
+                                            </Group>
+                                        </Stack>
+                                        {/* Unread indicator mock - would be conditional */}
+                                        {/* <Box className="w-3 h-3 bg-blue-500 rounded-full" /> */}
+                                    </Group>
+                                );
+                            })
                         ) : (
                             <Center py="xl" className="flex-col gap-2 text-center text-gray-400">
                                 <Text size="sm">Chưa có cuộc trò chuyện nào</Text>
@@ -227,12 +232,14 @@ const ChannelInfoSidebar = ({ channel, currentUserId }: { channel: TChannel, cur
 // Helpers
 function getChannelName(channel: TChannel, currentUserId?: number) {
     if (channel.loaiKenh === 'NHOM') return channel.tenKenh || "Nhóm";
+    if (!channel.thanhViens || channel.thanhViens.length === 0) return "Người dùng";
     const member = channel.thanhViens.find(m => m.nguoiDung.id !== currentUserId);
     return member?.nguoiDung.hoTen || member?.nguoiDung.taiKhoan || "Người dùng";
 }
 
 function getChannelAvatar(channel: TChannel, currentUserId?: number) {
     if (channel.loaiKenh === 'NHOM') return null; // Default group icon
+    if (!channel.thanhViens || channel.thanhViens.length === 0) return null;
     const member = channel.thanhViens.find(m => m.nguoiDung.id !== currentUserId);
     return member?.nguoiDung.avatar;
 }

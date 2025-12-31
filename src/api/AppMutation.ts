@@ -276,6 +276,7 @@ export const AppMutation = () => {
                 url: { baseUrl: "/friends/request/:id", urlParams: { id } },
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["/friends"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/social/friend-requests"] as any });
                 }
             }),
             useHandleRequest: (id: number) => useAppMutation<"handleFriendRequest">({
@@ -283,6 +284,7 @@ export const AppMutation = () => {
                 method: "PUT",
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["/friends"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/social/friend-requests"] as any });
                 }
             }),
             useUnfriend: (id: number) => useAppMutation<"unfriend">({

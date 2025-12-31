@@ -21,3 +21,13 @@ export interface Thread {
     };
     liked?: boolean;
 }
+
+export interface FriendRequest {
+    id: number;
+    nguoiGuiId: number;
+    nguoiNhanId: number;
+    trangThai: string;
+    ngayTao: string;
+    nguoiGui?: UserBasic;
+    nguoiNhan?: UserBasic;
+}

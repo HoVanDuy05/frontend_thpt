@@ -16,7 +16,7 @@ import {
     TSubmitFlowInstanceDto,
     TApproveStepDto
 } from "@/shared/types/dto.type";
-import { Thread, UserBasic } from "@/feauture/social/types";
+import { Thread, UserBasic, FriendRequest } from "@/feauture/social/types";
 
 export type ApiQueryType = {
     // ... (rest remains same)
@@ -194,6 +194,14 @@ export type ApiQueryType = {
     getFriendStatus: {
         url: { baseUrl: "/friends/status/:id"; urlParams: { id: number } };
         response: { status: 'NONE' | 'FRIEND' | 'SENT' | 'RECEIVED' | 'BLOCKED' };
+    };
+    getReceivedRequests: {
+        url: { baseUrl: "/social/friend-requests/received" };
+        response: FriendRequest[];
+    };
+    getSentRequests: {
+        url: { baseUrl: "/social/friend-requests/sent" };
+        response: FriendRequest[];
     };
 
     // --- Chat ---
