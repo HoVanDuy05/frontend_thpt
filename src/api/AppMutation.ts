@@ -51,6 +51,12 @@ export const AppMutation = () => {
                     queryClient.invalidateQueries({ queryKey: ["/users"] as any });
                 }
             }),
+            useCreateUser: () => useAppMutation<"createUser">({
+                url: { baseUrl: "/users" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/users"] as any });
+                }
+            }),
         },
         academic: {
             useCreateYear: () => useAppMutation<"createYear">({
@@ -235,6 +241,12 @@ export const AppMutation = () => {
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["/flow-instance"] as any });
                     queryClient.invalidateQueries({ queryKey: ["/my-flow"] as any });
+                }
+            }),
+            useCreateCategory: () => useAppMutation<"createCategory">({
+                url: { baseUrl: "/categories" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/categories"] as any });
                 }
             }),
         }

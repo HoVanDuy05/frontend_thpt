@@ -1,3 +1,5 @@
+import { TLopHoc } from "./academic.type";
+
 export type UserRole = "ADMIN" | "GIAO_VIEN" | "HOC_SINH" | "PHU_HUYNH";
 
 export interface TUser {
@@ -6,6 +8,11 @@ export interface TUser {
     email?: string;
     vaiTro: UserRole;
     ngayTao: string;
+    hoTen?: string; // Derived or direct
+    maSo?: string;  // Derived or direct
+    ngaySinh?: string | Date;
+    gioiTinh?: string;
+    isBlocked?: boolean;
 
     hoSoGiaoVien?: THoSoGiaoVien;
     hoSoHocSinh?: THoSoHocSinh;
@@ -28,4 +35,5 @@ export interface THoSoHocSinh {
     ngaySinh?: string;
     lopId?: number;
     avatar?: string;
+    lopHoc?: TLopHoc;
 }

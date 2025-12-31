@@ -1,6 +1,6 @@
 "use client";
 
-import { TextInput, PasswordInput, Button, Title, Text, Stack, Anchor, Group, Divider, Alert, Box } from "@mantine/core";
+import { TextInput, PasswordInput, Button, Title, Text, Stack, Anchor, Group, Checkbox, Box, Divider } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/routing";
@@ -9,8 +9,7 @@ import { AppMutation } from "@/api/AppMutation";
 import { useAppStore } from "@/providers/store/useAppStore";
 import { notifications } from "@mantine/notifications";
 import { useEffect, useState } from "react";
-import { IconCheck, IconX, IconInfoCircle } from "@tabler/icons-react";
-
+import { IconCheck, IconX, IconMail, IconLock, IconBrandGoogle } from "@tabler/icons-react";
 import { useValidation } from "@/shared/common/useValidation";
 import { useTranslationError } from "@/shared/common/useTranslationError";
 
@@ -68,7 +67,7 @@ export default function LoginPage() {
 
                     notifications.show({
                         title: t("success"),
-                        message: `Welcome back, ${payload.username}!`,
+                        message: t("welcome_back", { name: data.user.hoTen || payload.username }),
                         color: "teal",
                         icon: <IconCheck size={16} />,
                     });
@@ -87,7 +86,7 @@ export default function LoginPage() {
                 } catch (e) {
                     notifications.show({
                         title: t("error"),
-                        message: "Authentication failed",
+                        message: t("auth_failed"),
                         color: "red",
                         icon: <IconX size={16} />,
                     });
@@ -104,33 +103,53 @@ export default function LoginPage() {
         });
     };
 
+    const handleGoogleLogin = () => {
+        // Redirect to backend Google OAuth endpoint
+        window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/auth/google`;
+    };
+
     return (
-        <Stack gap="lg">
+        <Stack gap="xl">
+            {/* Header */}
             <Box>
-                <Title order={1} fz={28} fw={700} c="dark.9" mb={4}>
+                <Title order={1} size="h2" fw={900} className="text-gray-900 dark:text-white mb-2">
                     {t("title")}
                 </Title>
-                <Text c="dimmed">
+                <Text c="dimmed" size="sm">
                     {t("subtitle")}
                 </Text>
             </Box>
 
-            {/* FPT-style Info Alert for context */}
-            <Alert variant="light" color="blue" title="Lưu ý" icon={<IconInfoCircle size={16} />}>
-                Sử dụng tài khoản nhà trường cấp để đăng nhập.
-            </Alert>
+            {/* Google Login Button */}
+            <Button
+                variant="default"
+                size="md"
+                radius="md"
+                leftSection={<IconBrandGoogle size={20} />}
+                onClick={handleGoogleLogin}
+                className="border-2 border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800"
+                fw={600}
+            >
+                Đăng nhập bằng Google
+            </Button>
 
+            {/* Divider */}
+            <Divider label="hoặc đăng nhập bằng email" labelPosition="center" className="my-2" />
+
+            {/* Form */}
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack gap="md">
                     <TextInput
                         label={t("email")}
-                        placeholder="example@student.edu.vn"
+                        placeholder="student@nguyenhue.edu.vn"
                         required
                         size="md"
-                        // FPT style is boxy, default mantine input is perfect for this.
-                        // Removing 'variant="filled"' to keep it standard border.
-                        radius="sm"
+                        radius="md"
+                        leftSection={<IconMail size={18} className="text-gray-400" />}
                         {...form.getInputProps("email")}
+                        classNames={{
+                            input: "border-gray-300 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400"
+                        }}
                     />
 
                     <PasswordInput
@@ -138,33 +157,61 @@ export default function LoginPage() {
                         placeholder="••••••••"
                         required
                         size="md"
-                        radius="sm"
+                        radius="md"
+                        leftSection={<IconLock size={18} className="text-gray-400" />}
                         {...form.getInputProps("matKhau")}
+                        classNames={{
+                            input: "border-gray-300 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400"
+                        }}
                     />
+
+                    <Group justify="space-between" mt="xs">
+                        <Checkbox
+                            label="Ghi nhớ đăng nhập"
+                            checked={rememberMe}
+                            onChange={(e) => setRememberMe(e.currentTarget.checked)}
+                            size="sm"
+                            classNames={{
+                                label: "text-gray-700 dark:text-gray-300 cursor-pointer"
+                            }}
+                        />
+                        <Anchor
+                            component={Link}
+                            href="/auth/forgot-password"
+                            size="sm"
+                            fw={600}
+                            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                        >
+                            {t("forgot_password")}?
+                        </Anchor>
+                    </Group>
 
                     <Button
                         type="submit"
                         fullWidth
-                        size="md" // Standard button size
-                        radius="sm" // Boxy button
-                        color="blue"
+                        size="md"
+                        radius="md"
                         loading={loginMutation.isPending}
+                        className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 mt-4"
                         fw={600}
                     >
                         {t("submit")}
                     </Button>
-
-                    <Group justify="space-between" mt={4}>
-                        <Anchor component={Link} href="/auth/forgot-password" fz="sm" fw={500} c="blue">
-                            {t("forgot_password")}?
-                        </Anchor>
-
-                        <Anchor component={Link} href="/auth/register" fz="sm" fw={600} c="blue">
-                            {t("register_link")}
-                        </Anchor>
-                    </Group>
                 </Stack>
             </form>
+
+            {/* Register Link */}
+            <Text ta="center" size="sm" c="dimmed">
+                Chưa có tài khoản?{" "}
+                <Anchor
+                    component={Link}
+                    href="/auth/register"
+                    fw={700}
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                >
+                    {t("register_link")}
+                </Anchor>
+            </Text>
         </Stack>
     );
 }

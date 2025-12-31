@@ -10,7 +10,7 @@ export const AppQuery = {
     },
     user: {
 
-        useList: (params?: TQueryConfig, options?: AppQueryOptions<"getAllUsers">) =>
+        useList: (params?: TQueryConfig & { role?: string }, options?: AppQueryOptions<"getAllUsers">) =>
             useAppQuery({ url: { baseUrl: "/users", queryParams: params }, options }),
         useDetail: (id: number, options?: AppQueryOptions<"getUserById">) =>
             useAppQuery({ url: { baseUrl: "/users/:id", urlParams: { id } }, options }),
@@ -58,6 +58,8 @@ export const AppQuery = {
             useAppQuery({ url: { baseUrl: "/portal/comments/post/:postId", urlParams: { postId } }, options }),
     },
     approvals: {
+        useCategories: (options?: AppQueryOptions<"getCategories">) =>
+            useAppQuery({ url: { baseUrl: "/categories" }, options }),
         useFlows: (options?: AppQueryOptions<"getAllFlows">) =>
             useAppQuery({ url: { baseUrl: "/flow" }, options }),
         useFormFields: (id: number, options?: AppQueryOptions<"getFlowFormFields">) =>

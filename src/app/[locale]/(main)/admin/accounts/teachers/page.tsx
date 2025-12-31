@@ -13,7 +13,7 @@ import { Stack, Text, Box, Skeleton, Paper } from "@mantine/core";
 import { modals } from "@mantine/modals";
 
 export default function TeacherPage() {
-    const { users, isLoading, handleCreateTeacher, handleUpdate, handleDelete, isCreating } = useUserManager("GIAO_VIEN");
+    const { users, isLoading, handleCreateStudent: handleCreate, handleUpdate, handleDelete, isCreating } = useUserManager("GIAO_VIEN");
     const [opened, { open, close }] = useDisclosure(false);
     const [editingUser, setEditingUser] = useState<TUser | null>(null);
 
@@ -37,13 +37,25 @@ export default function TeacherPage() {
         });
     };
 
+    // ... (keep middle same)
+
     const handleSubmit = async (data: any) => {
-        if (editingUser) {
-            await handleUpdate(editingUser.id, data);
-        } else {
-            await handleCreateTeacher(data);
+        try {
+            if (editingUser) {
+                await handleUpdate(editingUser.id, data);
+            } else {
+                // Map generic form data to Teacher Account DTO
+                const payload = {
+                    ...data,
+                    maSoGv: data.maSo,
+                    // chuyenMon is already in data
+                };
+                await handleCreate(payload);
+            }
+            close();
+        } catch (error) {
+            // Handled in hook
         }
-        close();
     };
 
     return (
@@ -88,7 +100,7 @@ export default function TeacherPage() {
                 onClose={close}
                 onSubmit={handleSubmit}
                 initialData={editingUser}
-                role="GIAO_VIEN"
+                role="Giáo viên"
                 loading={isCreating}
             />
         </LayoutList>

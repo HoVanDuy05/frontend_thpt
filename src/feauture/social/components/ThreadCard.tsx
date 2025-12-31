@@ -31,7 +31,7 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({ thread, onLike }) => {
                     <Text size="sm">{thread.noiDung}</Text>
 
                     {thread.hinhAnh && (
-                        <Box mt="xs" radius="md" style={{ overflow: 'hidden', border: '1px solid var(--mantine-color-gray-2)' }}>
+                        <Box mt="xs" style={{ overflow: 'hidden', border: '1px solid var(--mantine-color-gray-2)', borderRadius: 'var(--mantine-radius-md)' }}>
                             <Image src={thread.hinhAnh} alt="Thread image" />
                         </Box>
                     )}

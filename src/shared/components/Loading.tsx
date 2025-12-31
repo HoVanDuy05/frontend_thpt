@@ -1,71 +1,64 @@
 "use client";
 
-import { Stack, Text, Loader, Box } from "@mantine/core";
-import { IconSchool } from "@tabler/icons-react";
+import { Box, Loader, Text, Stack } from "@mantine/core";
+import { useEffect, useState } from "react";
 
 interface LoadingProps {
-    message?: string;
-    subMessage?: string;
     fullScreen?: boolean;
-    size?: "xs" | "sm" | "md" | "lg" | "xl";
+    message?: string;
 }
 
-export function Loading({
-    message = "Đang tải...",
-    subMessage = "Vui lòng đợi trong giây lát",
-    fullScreen = false,
-    size = "md"
-}: LoadingProps) {
+export function Loading({ fullScreen = false, message }: LoadingProps) {
+    const [dots, setDots] = useState("");
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
+        }, 500);
+        return () => clearInterval(interval);
+    }, []);
+
     const content = (
         <Stack align="center" gap="xl">
-            {/* Animated School Icon with Loader */}
-            <Box className="relative w-32 h-32">
-                {/* Outer ping animation */}
-                <div className="absolute inset-0 border-4 border-blue-200 dark:border-blue-900 rounded-full animate-ping opacity-75" />
+            {/* Modern animated loader */}
+            <Box className="relative">
+                {/* Outer ring */}
+                <Box className="absolute inset-0 w-24 h-24 border-4 border-blue-200 dark:border-blue-900 rounded-full animate-ping opacity-20" />
 
-                {/* Rotating loader */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <Loader size="xl" color="blue" />
-                </div>
+                {/* Middle ring */}
+                <Box className="absolute inset-2 w-20 h-20 border-4 border-blue-300 dark:border-blue-800 rounded-full animate-spin"
+                    style={{ animationDuration: "1.5s" }} />
 
-                {/* Center icon */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-gradient-to-br from-blue-600 to-indigo-600 p-4 rounded-full shadow-2xl animate-pulse">
-                        <IconSchool size={32} className="text-white" stroke={2.5} />
-                    </div>
-                </div>
+                {/* Inner loader */}
+                <Box className="relative w-24 h-24 flex items-center justify-center">
+                    <Loader size="lg" color="blue" />
+                </Box>
             </Box>
 
-            {/* Loading Text */}
+            {/* Loading text */}
             <Stack align="center" gap="xs">
-                {message && (
-                    <Text size="xl" fw={700} className="text-gray-800 dark:text-gray-100 animate-pulse">
-                        {message}
-                    </Text>
-                )}
-                {subMessage && (
-                    <Text size="sm" c="dimmed">
-                        {subMessage}
-                    </Text>
-                )}
+                <Text size="lg" fw={600} className="text-gray-700 dark:text-gray-300">
+                    {message || "Đang tải"}
+                    <span className="inline-block w-8 text-left">{dots}</span>
+                </Text>
+                <Text size="sm" c="dimmed">
+                    Vui lòng đợi trong giây lát
+                </Text>
             </Stack>
-
-            {/* Animated Dots */}
-            <div className="flex gap-2">
-                <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-            </div>
         </Stack>
     );
 
     if (fullScreen) {
         return (
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white/90 dark:bg-zinc-950/90 backdrop-blur-md">
+            <Box className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/50 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950 z-50">
                 {content}
-            </div>
+            </Box>
         );
     }
 
-    return content;
+    return (
+        <Box className="flex items-center justify-center p-12">
+            {content}
+        </Box>
+    );
 }

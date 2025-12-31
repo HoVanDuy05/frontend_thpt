@@ -13,11 +13,15 @@ import { Stack, Text, Box, Skeleton, Paper } from "@mantine/core";
 import { modals } from "@mantine/modals";
 
 export default function StaffPage() {
-    const { users, isLoading, handleUpdate, handleDelete } = useUserManager("ADMIN");
-    // ADMIN can only edit other admins or view them mostly. Creation might be manual or same as teacher?
-    // For now, I'll reuse the drawer but be careful about specific fields.
+    // NHAN_VIEN usually refers to staff/officials in school context
+    const { users, isLoading, handleCreateStudent: handleCreate, handleUpdate, handleDelete, isCreating } = useUserManager("NHAN_VIEN");
     const [opened, { open, close }] = useDisclosure(false);
     const [editingUser, setEditingUser] = useState<TUser | null>(null);
+
+    const handleOpenCreate = () => {
+        setEditingUser(null);
+        open();
+    };
 
     const handleOpenEdit = (user: TUser) => {
         setEditingUser(user);
@@ -27,26 +31,39 @@ export default function StaffPage() {
     const confirmDelete = (id: number) => {
         modals.openConfirmModal({
             title: "Xác nhận xóa",
-            children: <Text size="sm">Bạn có chắc chắn muốn xóa quản trị viên này?</Text>,
+            children: <Text size="sm">Bạn có chắc chắn muốn xóa nhân viên này?</Text>,
             confirmProps: { color: "red" },
             labels: { confirm: "Xóa", cancel: "Hủy" },
             onConfirm: () => handleDelete(id),
         });
     };
 
+    // ... (keep middle same)
+
     const handleSubmit = async (data: any) => {
-        if (editingUser) {
-            await handleUpdate(editingUser.id, data);
+        try {
+            if (editingUser) {
+                await handleUpdate(editingUser.id, data);
+            } else {
+                // For Staff, we currently just create a basic user. 
+                // Note: 'maSo' from form will be ignored by backend unless we add HoSoNhanVien
+                await handleCreate(data);
+            }
+            close();
+        } catch (error) {
+            // Handled in hook
         }
-        // Creating Admin might not be exposed here directly or needs a separate mutation.
-        close();
     };
 
     return (
         <LayoutList
             title="Quản lý Nhân viên"
-            description="Danh sách nhân viên/quản trị viên"
-        // No Create button for now as it's sensitive
+            description="Danh sách nhân viên / cán bộ trong hệ thống"
+            actions={
+                <AppButton leftSection={<IconPlus size={18} />} onClick={handleOpenCreate}>
+                    Thêm Nhân viên
+                </AppButton>
+            }
         >
             <Paper radius="md" withBorder shadow="sm" className="overflow-hidden">
                 {isLoading ? (
@@ -60,7 +77,7 @@ export default function StaffPage() {
                         users={users}
                         onEdit={handleOpenEdit}
                         onDelete={confirmDelete}
-                        role="ADMIN"
+                        role="NHAN_VIEN"
                     />
                 ) : (
                     <Stack align="center" py={60} gap="md">
@@ -80,8 +97,8 @@ export default function StaffPage() {
                 onClose={close}
                 onSubmit={handleSubmit}
                 initialData={editingUser}
-                role="GIAO_VIEN" // Fallback to a layout that accepts HoTen/Email (Teacher layout is closest)
-                loading={false}
+                role="Nhân viên"
+                loading={isCreating}
             />
         </LayoutList>
     );

@@ -8,9 +8,10 @@ import { useMenu, MenuItem } from "@/shared/hooks/useMenu";
 interface AdminSidebarProps {
     collapsed?: boolean;
     onToggle?: () => void;
+    onNavigate?: () => void;
 }
 
-export function AdminSidebar({ collapsed = false, onToggle }: AdminSidebarProps) {
+export function AdminSidebar({ collapsed = false, onToggle, onNavigate }: AdminSidebarProps) {
     const pathname = usePathname();
     const { menu } = useMenu();
 
@@ -29,6 +30,11 @@ export function AdminSidebar({ collapsed = false, onToggle }: AdminSidebarProps)
                     rightSection={!collapsed && hasChildren ? <IconChevronRight size={14} className="opacity-50" /> : null}
                     component={hasChildren && !collapsed ? "div" : (Link as any)}
                     href={hasChildren && !collapsed ? undefined : item.path}
+                    onClick={() => {
+                        if (!hasChildren && onNavigate) {
+                            onNavigate();
+                        }
+                    }}
                     variant="light"
                     color="indigo"
                     className={`rounded-md transition-all duration-200 mb-0.5 ${collapsed && !isChild ? "px-0 justify-center h-10" : "py-2.5"}`}

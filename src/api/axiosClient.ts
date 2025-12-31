@@ -8,18 +8,28 @@ const axiosClient = axios.create({
 // Add a request interceptor
 axiosClient.interceptors.request.use(
     (config) => {
-        // Retrieve token fromzustand store
-        // We assume the token is stored in the user object or a separate state
-        // For now, let's assume it's in a cookie or we might need to add it to the state
+        // Try to get token from Zustand store first
         const state = useAppStore.getState();
-        // If we decide to store token in the state, we should access it here
-        // For now, let's look for 'token' in the user object IF we add it there
-        // Or if the user wants token handled separately.
-        // Let's assume we store it as 'token' in the store for convenience.
-        const token = (state as any).token;
+        let token = state.token;
+
+        // Fallback: Try to get token from localStorage (persisted state)
+        if (!token) {
+            try {
+                const persistedState = localStorage.getItem('auth_store');
+                if (persistedState) {
+                    const parsed = JSON.parse(persistedState);
+                    token = parsed?.state?.token;
+                }
+            } catch (e) {
+                console.error('Failed to parse persisted auth state:', e);
+            }
+        }
+
+        // Add token to request headers if available
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
+
         return config;
     },
     (error) => {

@@ -1,13 +1,12 @@
 "use client";
 
-import { TextInput, Button, Title, Text, Stack, Anchor, Group, Box } from "@mantine/core";
+import { TextInput, PasswordInput, Button, Title, Text, Stack, Anchor, Box, Divider, SimpleGrid } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/routing";
 import { AppMutation } from "@/api/AppMutation";
 import { notifications } from "@mantine/notifications";
-import { IconCheck, IconX } from "@tabler/icons-react";
-
+import { IconCheck, IconX, IconMail, IconLock, IconUser } from "@tabler/icons-react";
 import { useValidation } from "@/shared/common/useValidation";
 import { useTranslationError } from "@/shared/common/useTranslationError";
 
@@ -20,13 +19,11 @@ export default function RegisterPage() {
 
     const form = useForm({
         initialValues: {
-            taiKhoan: "",
             email: "",
             matKhau: "",
             confirmPassword: "",
         },
         validate: {
-            taiKhoan: validate.username,
             email: validate.email,
             matKhau: validate.password,
             confirmPassword: (value, values) => validate.confirmPassword(values.matKhau)(value),
@@ -35,12 +32,12 @@ export default function RegisterPage() {
 
     const handleSubmit = (values: typeof form.values) => {
         registerMutation.mutate(
-            { taiKhoan: values.taiKhoan, email: values.email, matKhau: values.matKhau },
+            { email: values.email, matKhau: values.matKhau },
             {
                 onSuccess: () => {
                     notifications.show({
                         title: t("success"),
-                        message: "Tài khoản của bạn đã được tạo thành công! Hãy đăng nhập ngay.",
+                        message: t("success_message"),
                         color: "teal",
                         icon: <IconCheck size={16} />,
                     });
@@ -59,76 +56,88 @@ export default function RegisterPage() {
     };
 
     return (
-        <Stack gap="lg">
+        <Stack gap="xl">
+            {/* Header */}
             <Box>
-                <Title order={1} fz={28} fw={700} c="dark.9" mb={4}>
+                <Title order={1} size="h2" fw={900} className="text-gray-900 dark:text-white mb-2">
                     {t("title")}
                 </Title>
-                <Text c="dimmed">
+                <Text c="dimmed" size="sm">
                     {t("subtitle")}
                 </Text>
             </Box>
 
+            {/* Form */}
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack gap="md">
                     <TextInput
-                        label={t("username")}
-                        placeholder="johndoe"
-                        required
-                        size="md"
-                        radius="sm"
-                        {...form.getInputProps("taiKhoan")}
-                    />
-
-                    <TextInput
                         label={t("email")}
-                        placeholder="example@student.edu.vn"
+                        placeholder="student@nguyenhue.edu.vn"
                         required
                         size="md"
-                        radius="sm"
+                        radius="md"
+                        leftSection={<IconMail size={18} className="text-gray-400" />}
                         {...form.getInputProps("email")}
+                        classNames={{
+                            input: "border-gray-300 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400"
+                        }}
                     />
 
-                    <TextInput
-                        type="password"
+                    <PasswordInput
                         label={t("password")}
                         placeholder="••••••••"
                         required
                         size="md"
-                        radius="sm"
+                        radius="md"
+                        leftSection={<IconLock size={18} className="text-gray-400" />}
                         {...form.getInputProps("matKhau")}
+                        classNames={{
+                            input: "border-gray-300 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400"
+                        }}
                     />
 
-                    <TextInput
-                        type="password"
+                    <PasswordInput
                         label={t("confirm_password")}
                         placeholder="••••••••"
                         required
                         size="md"
-                        radius="sm"
+                        radius="md"
+                        leftSection={<IconLock size={18} className="text-gray-400" />}
                         {...form.getInputProps("confirmPassword")}
+                        classNames={{
+                            input: "border-gray-300 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400"
+                        }}
                     />
 
                     <Button
                         type="submit"
                         fullWidth
                         size="md"
-                        radius="sm"
-                        color="blue"
+                        radius="md"
                         loading={registerMutation.isPending}
+                        className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 mt-4"
                         fw={600}
                     >
                         {t("submit")}
                     </Button>
-
-                    <Text ta="center" size="sm" c="dimmed">
-                        {t("have_account")}{" "}
-                        <Anchor component={Link} href="/auth/login" fw={600} c="blue.6">
-                            {t("login_link")}
-                        </Anchor>
-                    </Text>
                 </Stack>
             </form>
+
+            {/* Divider */}
+            <Divider label="hoặc" labelPosition="center" className="my-2" />
+
+            {/* Login Link */}
+            <Text ta="center" size="sm" c="dimmed">
+                {t("have_account")}{" "}
+                <Anchor
+                    component={Link}
+                    href="/auth/login"
+                    fw={700}
+                    className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                >
+                    {t("login_link")}
+                </Anchor>
+            </Text>
         </Stack>
     );
 }

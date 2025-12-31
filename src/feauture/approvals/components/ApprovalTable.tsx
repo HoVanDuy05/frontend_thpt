@@ -89,18 +89,20 @@ export const ApprovalTable: React.FC<ApprovalTableProps> = ({ requests, onAction
     ));
 
     return (
-        <Table verticalSpacing="md" horizontalSpacing="md">
-            <Table.Thead bg="var(--mantine-color-default-hover)" className="border-b border-zinc-200 dark:border-zinc-800">
-                <Table.Tr>
-                    <Table.Th py="md" style={{ borderTopLeftRadius: rem(12) }}>Thông tin Quy trình</Table.Th>
-                    <Table.Th py="md">Người yêu cầu</Table.Th>
-                    <Table.Th py="md">Trạng thái</Table.Th>
-                    <Table.Th py="md">Tiến độ</Table.Th>
-                    <Table.Th py="md">Thời gian</Table.Th>
-                    <Table.Th py="md" style={{ borderTopRightRadius: rem(12), textAlign: 'right' }}>Quyền hạn</Table.Th>
-                </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
+        <Table.ScrollContainer minWidth={800}>
+            <Table verticalSpacing="md" horizontalSpacing="md">
+                <Table.Thead bg="var(--mantine-color-default-hover)" className="border-b border-zinc-200 dark:border-zinc-800">
+                    <Table.Tr>
+                        <Table.Th py="md" style={{ borderTopLeftRadius: rem(12) }}>Thông tin Quy trình</Table.Th>
+                        <Table.Th py="md">Người yêu cầu</Table.Th>
+                        <Table.Th py="md">Trạng thái</Table.Th>
+                        <Table.Th py="md">Tiến độ</Table.Th>
+                        <Table.Th py="md">Thời gian</Table.Th>
+                        <Table.Th py="md" style={{ borderTopRightRadius: rem(12), textAlign: 'right' }}>Quyền hạn</Table.Th>
+                    </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+        </Table.ScrollContainer>
     );
 };

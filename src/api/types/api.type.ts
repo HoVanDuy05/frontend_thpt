@@ -20,7 +20,7 @@ import {
 export type ApiQueryType = {
     // ... (rest remains same)
     getAllUsers: {
-        url: { baseUrl: "/users"; queryParams?: TQueryConfig };
+        url: { baseUrl: "/users"; queryParams?: TQueryConfig & { role?: string } };
         response: TUser[];
     };
     getProfile: {
@@ -146,6 +146,10 @@ export type ApiQueryType = {
         url: { baseUrl: "/flow-instance/:id/logs", urlParams: { id: number } };
         response: TNhatKyPheDuyetQuyTrinh[];
     };
+    getCategories: {
+        url: { baseUrl: "/categories" };
+        response: any[]; // Or specific category type if available
+    };
 };
 
 export type ApiMutationType = {
@@ -157,8 +161,8 @@ export type ApiMutationType = {
     };
     register: {
         url: { baseUrl: "/auth/register" };
-        payload: { taiKhoan: string; matKhau: string; email: string };
-        response: TUser;
+        payload: { email: string; matKhau: string };
+        response: { message: string };
     };
     forgotPassword: {
         url: { baseUrl: "/auth/forgot-password" };
@@ -185,6 +189,11 @@ export type ApiMutationType = {
     updateUser: {
         url: { baseUrl: "/users/:id"; urlParams: { id: number } };
         payload: Partial<TCreateUserDto>;
+        response: TUser;
+    };
+    createUser: {
+        url: { baseUrl: "/users" };
+        payload: TCreateUserDto; // Ensure this DTO exists or use Partial<TCreateUserDto>
         response: TUser;
     };
     deleteUser: {
@@ -413,6 +422,11 @@ export type ApiMutationType = {
     rejectStep: {
         url: { baseUrl: "/flow-instance/:id/reject", urlParams: { id: number } };
         payload: TApproveStepDto;
+        response: any;
+    };
+    createCategory: {
+        url: { baseUrl: "/categories" };
+        payload: { ten: string; moTa?: string };
         response: any;
     };
 };

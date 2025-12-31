@@ -40,6 +40,63 @@
         "approvals": "Phê duyệt",
         "social": "Mạng xã hội"
     },
+    "approvals": {
+        "page_title": "Quản lý Quy trình",
+        "page_subtitle": "Thiết lập và quản lý các quy trình phê duyệt",
+        "create_new": "Tạo quy trình mới",
+        "create_new_short": "Tạo mới",
+        "close_categories": "Đóng danh mục",
+        "all_flows": "Tất cả Quy trình",
+        "stats": {
+            "total_flows": "Tổng quy trình",
+            "pending": "Chờ duyệt",
+            "approved": "Đã duyệt",
+            "rejected": "Từ chối"
+        },
+        "table": {
+            "title": "Danh sách yêu cầu",
+            "count": "yêu cầu"
+        },
+        "builder": {
+            "title": "Thiết lập Quy trình mới",
+            "subtitle": "Cấu hình luồng duyệt & biểu mẫu",
+            "basic_info": "Thông tin cơ bản",
+            "flow_steps": "Luồng phê duyệt",
+            "form_builder": "Cấu hình Form nộp",
+            "add_step": "Thêm bước",
+            "add_field": "Thêm trường",
+            "step_count": "{count} bước duyệt",
+            "submitter": "Người nộp",
+            "submitter_role": "Nhân viên khởi tạo",
+            "step": "BƯỚC {index}",
+            "field": "Trường {index}",
+            "required": "Bắt buộc",
+            "empty_fields": "Chưa có trường dữ liệu nào",
+            "cancel": "Hủy bỏ",
+            "submit": "Hoàn tất & Khởi tạo",
+            "name_label": "Tên quy trình",
+            "desc_label": "Bản tóm tắt",
+            "approver_role_placeholder": "Chọn vai trò duyệt..."
+        },
+        "roles": {
+            "gvcn": "Giáo viên chủ nhiệm",
+            "dept_head": "Trưởng bộ môn",
+            "dean": "Trưởng khoa",
+            "admin": "Quản trị viên",
+            "specific": "Người dùng cụ thể"
+        },
+        "fields": {
+            "text": "Văn bản (ngắn)",
+            "long_text": "Văn bản (dài)",
+            "number": "Số",
+            "date": "Ngày tháng",
+            "time": "Giờ",
+            "select": "Chọn 1 (Dropdown)",
+            "checkbox": "Chọn nhiều (Checkbox)",
+            "radio": "Chọn 1 (Radio)",
+            "file": "Tệp đính kèm"
+        }
+    },
     "academic": {
         "schedule": {
             "title": "Quản lý Lịch học",
@@ -142,17 +199,17 @@
             "email": "Email",
             "username": "Tên đăng nhập",
             "password": "Mật khẩu",
+            "forgot_password": "Quên mật khẩu",
             "submit": "Đăng nhập",
-            "forgot_password": "Quên mật khẩu?",
-            "error": "Thông tin đăng nhập không chính xác",
-            "success": "Đăng nhập thành công",
-            "no_account": "Chưa có tài khoản?",
             "register_link": "Đăng ký ngay",
-            "or": "hoặc"
+            "success": "Đăng nhập thành công",
+            "error": "Đăng nhập thất bại",
+            "welcome_back": "Chào mừng trở lại, {name}!",
+            "auth_failed": "Xác thực thất bại"
         },
         "register": {
             "title": "Tạo tài khoản mới",
-            "subtitle": "Vào ngay để bắt đầu học tập",
+            "subtitle": "Đăng ký để bắt đầu sử dụng hệ thống",
             "username": "Tên đăng nhập",
             "email": "Email",
             "password": "Mật khẩu",
@@ -162,25 +219,32 @@
             "success": "Đăng ký thành công!",
             "have_account": "Đã có tài khoản?",
             "login_link": "Đăng nhập",
-            "or": "hoặc"
+            "or": "hoặc",
+            "success_message": "Tài khoản của bạn đã được tạo thành công! Hãy đăng nhập ngay.",
+            "error_message": "Không thể tạo tài khoản. Vui lòng thử lại."
         },
         "forgot": {
-            "title": "Quên mật khẩu?",
-            "subtitle": "Nhập email để nhận link khôi phục",
+            "title": "Quên mật khẩu",
+            "subtitle": "Nhập email để nhận hướng dẫn khôi phục",
             "email": "Email",
-            "submit": "Gửi link khôi phục",
+            "submit": "Gửi yêu cầu",
             "back_to_login": "Quay lại đăng nhập",
-            "success": "Nếu email tồn tại, link khôi phục đã được gửi",
-            "error": "Có lỗi xảy ra"
+            "success": "Yêu cầu thành công",
+            "error": "Yêu cầu thất bại",
+            "success_message": "Vui lòng kiểm tra email của bạn để nhận hướng dẫn khôi phục mật khẩu.",
+            "error_message": "Không thể gửi email. Vui lòng thử lại."
         },
         "reset": {
-            "title": "Khôi phục mật khẩu",
+            "title": "Đặt lại mật khẩu",
             "subtitle": "Nhập mật khẩu mới của bạn",
             "password": "Mật khẩu mới",
             "confirm_password": "Xác nhận mật khẩu",
-            "submit": "Cập nhật mật khẩu",
-            "success": "Mật khẩu đã được cập nhật",
-            "error": "Token không hợp lệ hoặc đã hết hạn"
+            "submit": "Đặt lại mật khẩu",
+            "success": "Đặt lại thành công",
+            "error": "Đặt lại thất bại",
+            "success_message": "Mật khẩu của bạn đã được cập nhật thành công! Đăng nhập ngay.",
+            "error_message": "Không thể đặt lại mật khẩu. Vui lòng thử lại.",
+            "invalid_token": "Token không hợp lệ hoặc đã hết hạn."
         }
     },
     "validation": {

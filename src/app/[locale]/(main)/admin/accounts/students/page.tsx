@@ -38,12 +38,23 @@ export default function StudentPage() {
     };
 
     const handleSubmit = async (data: any) => {
-        if (editingUser) {
-            await handleUpdate(editingUser.id, data);
-        } else {
-            await handleCreateStudent(data);
+        try {
+            if (editingUser) {
+                await handleUpdate(editingUser.id, data);
+            } else {
+                // Map generic form data to Student Account DTO
+                const payload = {
+                    ...data,
+                    maSoHs: data.maSo,
+                    lopId: Number(data.lopId),
+                    namHocId: undefined // Remove helper field
+                };
+                await handleCreateStudent(payload);
+            }
+            close();
+        } catch (error) {
+            // Error handling is done in hook
         }
-        close();
     };
 
     return (
@@ -88,7 +99,7 @@ export default function StudentPage() {
                 onClose={close}
                 onSubmit={handleSubmit}
                 initialData={editingUser}
-                role="HOC_SINH"
+                role="Học sinh"
                 loading={isCreating}
             />
         </LayoutList>

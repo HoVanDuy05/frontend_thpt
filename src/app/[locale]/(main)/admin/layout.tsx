@@ -175,7 +175,11 @@ const AdminLayout = ({
             </AppShell.Header>
 
             <AppShell.Navbar p={0}>
-                <AdminSidebar collapsed={desktopCollapsed} onToggle={toggleDesktop} />
+                <AdminSidebar
+                    collapsed={desktopCollapsed}
+                    onToggle={toggleDesktop}
+                    onNavigate={() => mobileOpened && toggleMobile()}
+                />
             </AppShell.Navbar>
 
             <AppShell.Main

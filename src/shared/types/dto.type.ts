@@ -81,7 +81,20 @@ export interface TCreateGradingDto {
 export interface TCreateFlowDto {
     name: string;
     description?: string;
+    category_id?: number | null;
     status?: string;
+    steps?: {
+        name: string;
+        rule: 'all' | 'any';
+        approverType: string;
+        specificUser?: number;
+    }[];
+    fields?: {
+        label: string;
+        type: string;
+        required: boolean;
+        options?: string[];
+    }[];
 }
 
 export interface TAddFlowStepDto {
