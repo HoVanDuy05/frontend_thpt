@@ -1,10 +1,12 @@
 @import "tailwindcss";
+@variant dark (&:where([data-mantine-color-scheme="dark"], [data-mantine-color-scheme="dark"] *));
 @import "@mantine/core/styles.css";
 @import "@mantine/notifications/styles.css";
 @import "@mantine/dates/styles.css";
 /* nprogress styles handled in AppProvider */
 
 :root {
+  color-scheme: dark light;
   --background: #ffffff;
   --foreground: #09090b;
   --brand-50: #eef2ff;
@@ -18,6 +20,9 @@
   --brand-800: #3730a3;
   --brand-900: #312e81;
   --brand-950: #1e1b4b;
+
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
 @theme inline {
@@ -43,22 +48,31 @@
   --foreground: #fafafa;
 }
 
+html,
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-be-vietnam-pro), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-  overflow-x: hidden;
 
-  /* Native App Feel */
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  /* Prevent body scrolling to fix status bar bounce */
   overscroll-behavior-y: none;
-  /* Disable pull-to-refresh */
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-  /* Prevent selection as default, enable on content */
 
   /* Support for notch/safe areas */
   padding-bottom: env(safe-area-inset-bottom);
   padding-top: env(safe-area-inset-top);
+
+  user-select: none;
+}
+
+/* Main scrollable area */
+.app-content {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  height: 100%;
+  scrollbar-width: thin;
 }
 
 /* Enable selection for specific content types */
@@ -69,10 +83,26 @@ h2,
 h3,
 h4,
 h5,
-h6,
-input,
-textarea {
+h6 {
   user-select: text;
+}
+
+/* Prevent auto-zoom on iOS inputs */
+input,
+textarea,
+select {
+  font-size: 16px !important;
+  user-select: text !important;
+}
+
+/* Optimized scrollbar for native feel */
+.app-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.app-content::-webkit-scrollbar-thumb {
+  background: var(--mantine-color-gray-4);
+  border-radius: 10px;
 }
 
 /* Custom System Loading Animation */

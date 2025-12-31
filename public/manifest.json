@@ -4,13 +4,9 @@
     "short_name": "NHers",
     "description": "Hệ thống Quản lý Trường THPT Nguyễn Huệ",
     "start_url": "/vi",
-    "display": "standalone",
-    "display_override": [
-        "window-controls-overlay",
-        "minimal-ui"
-    ],
-    "background_color": "#ffffff",
-    "theme_color": "#4f46e5",
+    "display": "fullscreen",
+    "background_color": "#18181b",
+    "theme_color": "#312e81",
     "orientation": "portrait",
     "categories": [
         "education",

@@ -13,10 +13,11 @@ import { AppProvider } from "@/providers/AppProvider";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
+import { ThemeSync } from "@/shared/components/ThemeSync";
 
 export const metadata: Metadata = {
-  title: "Nguyễn Huệ - Hệ thống Quản lý Trường học",
-  description: "Modern Project Management System built with Next.js 15",
+  title: "NHers - Nguyễn Huệ Academy",
+  description: "Hệ thống Quản lý Trường học Thông minh THPT Nguyễn Huệ",
 };
 
 export default async function RootLayout({
@@ -28,14 +29,11 @@ export default async function RootLayout({
 }) {
   const { locale } = await params;
 
-  // Ensure that the incoming `locale` is valid
   if (!routing.locales.includes(locale as any)) {
     notFound();
   }
 
-  // Enable static rendering
   setRequestLocale(locale);
-
   const messages = await getMessages();
 
   return (
@@ -48,8 +46,9 @@ export default async function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="School Portal" />
+        <meta name="apple-mobile-web-app-title" content="NHers" />
         <link rel="icon" href="/favicon.png" />
+        <link rel="shortcut icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <script
           dangerouslySetInnerHTML={{
@@ -67,7 +66,10 @@ export default async function RootLayout({
         className={`${beVietnamPro.variable} antialiased`}
       >
         <AppProvider locale={locale} messages={messages}>
-          {children}
+          <ThemeSync />
+          <div className="app-content">
+            {children}
+          </div>
         </AppProvider>
       </body>
     </html>

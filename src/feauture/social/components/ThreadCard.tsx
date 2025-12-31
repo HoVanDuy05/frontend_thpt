@@ -15,45 +15,51 @@ interface ThreadCardProps {
 
 export const ThreadCard: React.FC<ThreadCardProps> = ({ thread, onLike }) => {
     return (
-        <Card withBorder={false} p="md" mb="xs" bg="transparent" styles={{ root: { borderBottom: '1px solid var(--mantine-color-gray-2)' } }}>
-            <Group align="flex-start" wrap="nowrap">
-                <Stack align="center" gap={4}>
+        <Card withBorder={false} p="md" mb={0} bg="transparent" styles={{ root: { borderBottom: '1px solid var(--mantine-color-default-border)', borderRadius: 0 } }}>
+            <Group align="flex-start" wrap="nowrap" gap="md">
+                <Stack align="center" gap={4} h="100%">
                     <Avatar src={thread.tacGia.anhDaiDien} radius="xl" size="md" />
-                    <Box style={{ flex: 1, width: '2px', backgroundColor: 'var(--mantine-color-gray-2)', minHeight: '20px' }} />
+                    <Box style={{ flex: 1, width: '2px', backgroundColor: 'var(--mantine-color-default-border)', minHeight: '40px' }} />
                 </Stack>
 
                 <Stack gap={4} style={{ flex: 1 }}>
                     <Group justify="space-between" align="center">
-                        <Text fw={600} size="sm">{thread.tacGia.taiKhoan}</Text>
-                        <Text size="xs" c="dimmed">{dayjs(thread.ngayTao).fromNow()}</Text>
+                        <Text fw={700} size="sm" className="text-gray-900 dark:text-zinc-100">{thread.tacGia.taiKhoan}</Text>
+                        <Text size="xs" c="dimmed" fw={500}>{dayjs(thread.ngayTao).fromNow()}</Text>
                     </Group>
 
-                    <Text size="sm">{thread.noiDung}</Text>
+                    <Text size="sm" className="text-gray-800 dark:text-zinc-300 leading-relaxed">{thread.noiDung}</Text>
 
                     {thread.hinhAnh && (
-                        <Box mt="xs" style={{ overflow: 'hidden', border: '1px solid var(--mantine-color-gray-2)', borderRadius: 'var(--mantine-radius-md)' }}>
-                            <Image src={thread.hinhAnh} alt="Thread image" />
+                        <Box mt="xs" style={{ overflow: 'hidden', border: '1px solid var(--mantine-color-default-border)', borderRadius: 'var(--mantine-radius-lg)' }}>
+                            <Image src={thread.hinhAnh} alt="Thread image" radius="md" />
                         </Box>
                     )}
 
-                    <Group gap="xs" mt="sm">
-                        <ActionIcon variant="subtile" color={thread.liked ? 'red' : 'gray'} onClick={onLike} size="sm">
-                            {thread.liked ? <IconHeartFilled size={18} /> : <IconHeart size={18} />}
-                        </ActionIcon>
-                        <Text size="xs" c="dimmed">{thread._count.likes}</Text>
+                    <Group gap="xs" mt="sm" ml={-8}>
+                        <Group gap={4}>
+                            <ActionIcon variant="subtile" color={thread.liked ? 'red' : 'gray'} onClick={onLike} size="md" radius="xl">
+                                {thread.liked ? <IconHeartFilled size={20} /> : <IconHeart size={20} />}
+                            </ActionIcon>
+                            <Text size="xs" fw={600} c={thread.liked ? 'red' : 'dimmed'}>{thread._count.likes}</Text>
+                        </Group>
 
-                        <ActionIcon variant="subtile" color="gray" size="sm">
-                            <IconMessageCircle size={18} />
-                        </ActionIcon>
-                        <Text size="xs" c="dimmed">{thread._count.replies}</Text>
+                        <Group gap={4}>
+                            <ActionIcon variant="subtile" color="gray" size="md" radius="xl">
+                                <IconMessageCircle size={20} />
+                            </ActionIcon>
+                            <Text size="xs" fw={600} c="dimmed">{thread._count.replies}</Text>
+                        </Group>
 
-                        <ActionIcon variant="subtile" color="gray" size="sm">
-                            <IconRepeat size={18} />
-                        </ActionIcon>
-                        <Text size="xs" c="dimmed">{thread._count.reposts}</Text>
+                        <Group gap={4}>
+                            <ActionIcon variant="subtile" color="gray" size="md" radius="xl">
+                                <IconRepeat size={20} />
+                            </ActionIcon>
+                            <Text size="xs" fw={600} c="dimmed">{thread._count.reposts}</Text>
+                        </Group>
 
-                        <ActionIcon variant="subtile" color="gray" size="sm" ml="auto">
-                            <IconShare size={18} />
+                        <ActionIcon variant="subtile" color="gray" size="md" radius="xl" ml="auto">
+                            <IconShare size={20} />
                         </ActionIcon>
                     </Group>
                 </Stack>

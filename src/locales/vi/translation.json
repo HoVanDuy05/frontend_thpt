@@ -248,6 +248,7 @@
         }
     },
     "validation": {
+        "thông_tin_đăng_nhập_không_chính_xác": "Thông tin đăng nhập không chính xác",
         "required": "Trường này là bắt buộc",
         "minLength": "Tối thiểu {{min}} ký tự",
         "maxLength": "Tối đa {{max}} ký tự",

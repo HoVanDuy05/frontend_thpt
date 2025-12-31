@@ -105,7 +105,7 @@ export default function LoginPage() {
 
     const handleGoogleLogin = () => {
         // Redirect to backend Google OAuth endpoint
-        window.location.href = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/auth/google`;
+        window.location.href = `${process.env.NEXT_PUBLIC_API_URL}`;
     };
 
     return (
@@ -123,22 +123,23 @@ export default function LoginPage() {
             {/* Google Login Button */}
             <Button
                 variant="default"
-                size="md"
-                radius="md"
-                leftSection={<IconBrandGoogle size={20} />}
+                size="lg"
+                radius="xl"
+                leftSection={<IconBrandGoogle size={22} />}
                 onClick={handleGoogleLogin}
-                className="border-2 border-gray-300 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800"
-                fw={600}
+                className="border-[1.5px] border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-900/50 shadow-sm transition-all active:scale-[0.98]"
+                fw={700}
+                h={54}
             >
                 Đăng nhập bằng Google
             </Button>
 
             {/* Divider */}
-            <Divider label="hoặc đăng nhập bằng email" labelPosition="center" className="my-2" />
+            <Divider label={<Text size="xs" fw={600} c="dimmed">hoặc đăng nhập bằng email</Text>} labelPosition="center" className="my-2" />
 
             {/* Form */}
             <form onSubmit={form.onSubmit(handleSubmit)}>
-                <Stack gap="md">
+                <Stack gap="lg">
                     <TextInput
                         label={t("email")}
                         placeholder="student@nguyenhue.edu.vn"
@@ -148,7 +149,7 @@ export default function LoginPage() {
                         leftSection={<IconMail size={18} className="text-gray-400" />}
                         {...form.getInputProps("email")}
                         classNames={{
-                            input: "border-gray-300 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400"
+                            input: "border-gray-200 dark:border-zinc-800 focus:border-indigo-500 dark:focus:border-indigo-400 h-[50px] transition-all bg-gray-50/50 dark:bg-zinc-900/30"
                         }}
                     />
 
@@ -161,7 +162,7 @@ export default function LoginPage() {
                         leftSection={<IconLock size={18} className="text-gray-400" />}
                         {...form.getInputProps("matKhau")}
                         classNames={{
-                            input: "border-gray-300 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400"
+                            input: "border-gray-200 dark:border-zinc-800 focus:border-indigo-500 dark:focus:border-indigo-400 h-[50px] transition-all bg-gray-50/50 dark:bg-zinc-900/30"
                         }}
                     />
 
@@ -171,16 +172,17 @@ export default function LoginPage() {
                             checked={rememberMe}
                             onChange={(e) => setRememberMe(e.currentTarget.checked)}
                             size="sm"
+                            color="indigo"
                             classNames={{
-                                label: "text-gray-700 dark:text-gray-300 cursor-pointer"
+                                label: "text-gray-600 dark:text-gray-400 font-medium cursor-pointer"
                             }}
                         />
                         <Anchor
                             component={Link}
                             href="/auth/forgot-password"
                             size="sm"
-                            fw={600}
-                            className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
+                            fw={700}
+                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
                         >
                             {t("forgot_password")}?
                         </Anchor>
@@ -189,11 +191,12 @@ export default function LoginPage() {
                     <Button
                         type="submit"
                         fullWidth
-                        size="md"
-                        radius="md"
+                        size="lg"
+                        radius="xl"
                         loading={loginMutation.isPending}
-                        className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 mt-4"
-                        fw={600}
+                        className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 mt-6 shadow-md shadow-indigo-500/20 active:scale-[0.99] transition-all"
+                        fw={700}
+                        h={54}
                     >
                         {t("submit")}
                     </Button>
