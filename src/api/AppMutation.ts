@@ -249,6 +249,65 @@ export const AppMutation = () => {
                     queryClient.invalidateQueries({ queryKey: ["/categories"] as any });
                 }
             }),
+        },
+        social: {
+            useCreateThread: () => useAppMutation<"createThread">({
+                url: { baseUrl: "/social/threads" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/social/feed"] as any });
+                }
+            }),
+            useLikeThread: (id: number) => useAppMutation<"likeThread">({
+                url: { baseUrl: "/social/threads/:id/like", urlParams: { id } },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/social/feed"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/social/threads", id] as any });
+                }
+            }),
+            useFollowUser: (id: number) => useAppMutation<"followUser">({
+                url: { baseUrl: "/social/users/:id/follow", urlParams: { id } },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/social/feed"] as any });
+                }
+            }),
+        },
+        friends: {
+            useSendRequest: (id: number) => useAppMutation<"sendFriendRequest">({
+                url: { baseUrl: "/friends/request/:id", urlParams: { id } },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/friends"] as any });
+                }
+            }),
+            useHandleRequest: (id: number) => useAppMutation<"handleFriendRequest">({
+                url: { baseUrl: "/friends/request/:id", urlParams: { id } },
+                method: "PUT",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/friends"] as any });
+                }
+            }),
+            useUnfriend: (id: number) => useAppMutation<"unfriend">({
+                url: { baseUrl: "/friends/:id", urlParams: { id } },
+                method: "DELETE",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/friends"] as any });
+                }
+            }),
+        },
+        chat: {
+            useCreateChannel: () => useAppMutation<"createChannel">({
+                url: { baseUrl: "/communication/chat/channels" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/communication/chat/channels"] as any });
+                }
+            }),
+            useSendMessage: () => useAppMutation<"sendMessage">({
+                url: { baseUrl: "/communication/chat/messages" },
+                onSuccess: (data) => {
+                    const channelId = data.kenhChatId;
+                    queryClient.invalidateQueries({ queryKey: [`/communication/chat/channels/${channelId}/messages`] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/communication/chat/channels"] as any });
+                }
+            })
         }
     };
 };

@@ -7,59 +7,126 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 
 dayjs.extend(relativeTime);
 
+import { AppMutation } from '@/api/AppMutation';
+import { notifications } from '@mantine/notifications';
+
 interface ThreadCardProps {
     thread: Thread;
-    onLike?: () => void;
-    onComment?: () => void;
 }
 
-export const ThreadCard: React.FC<ThreadCardProps> = ({ thread, onLike }) => {
+export const ThreadCard: React.FC<ThreadCardProps> = ({ thread: initialThread }) => {
+    const likeMutation = AppMutation().social.useLikeThread(initialThread.id);
+    const [thread, setThread] = React.useState(initialThread);
+
+    const handleLike = () => {
+        likeMutation.mutate(undefined, {
+            onSuccess: (data) => {
+                setThread(prev => ({
+                    ...prev,
+                    liked: data.liked,
+                    _count: {
+                        ...prev._count,
+                        likes: data.liked ? prev._count.likes + 1 : prev._count.likes - 1
+                    }
+                }));
+            }
+        });
+    };
+
     return (
-        <Card withBorder={false} p="md" mb={0} bg="transparent" styles={{ root: { borderBottom: '1px solid var(--mantine-color-default-border)', borderRadius: 0 } }}>
+        <Card
+            withBorder={false}
+            p="md"
+            mb={0}
+            bg="transparent"
+            className="border-b border-gray-100 dark:border-zinc-900 last:border-0 hover:bg-gray-50/30 dark:hover:bg-zinc-900/10 transition-colors"
+            radius={0}
+        >
             <Group align="flex-start" wrap="nowrap" gap="md">
-                <Stack align="center" gap={4} h="100%">
-                    <Avatar src={thread.tacGia.anhDaiDien} radius="xl" size="md" />
-                    <Box style={{ flex: 1, width: '2px', backgroundColor: 'var(--mantine-color-default-border)', minHeight: '40px' }} />
+                <Stack align="center" gap={4} className="h-full">
+                    <Avatar
+                        src={thread.tacGia.avatar}
+                        radius="xl"
+                        size="md"
+                        className="shadow-sm border border-zinc-100 dark:border-zinc-800"
+                    />
+                    <Box className="w-[1.5px] flex-1 bg-zinc-100 dark:bg-zinc-900 min-h-[40px] rounded-full" />
                 </Stack>
 
-                <Stack gap={4} style={{ flex: 1 }}>
+                <Stack gap={4} className="flex-1">
                     <Group justify="space-between" align="center">
-                        <Text fw={700} size="sm" className="text-gray-900 dark:text-zinc-100">{thread.tacGia.taiKhoan}</Text>
-                        <Text size="xs" c="dimmed" fw={500}>{dayjs(thread.ngayTao).fromNow()}</Text>
+                        <Text fw={800} size="sm" className="text-zinc-900 dark:text-zinc-100 tracking-tight hover:underline cursor-pointer">
+                            {thread.tacGia.taiKhoan}
+                        </Text>
+                        <Text size="xs" c="dimmed" fw={600} className="tracking-tighter">
+                            {dayjs(thread.ngayTao).fromNow()}
+                        </Text>
                     </Group>
 
-                    <Text size="sm" className="text-gray-800 dark:text-zinc-300 leading-relaxed">{thread.noiDung}</Text>
+                    <Text size="sm" className="text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
+                        {thread.noiDung}
+                    </Text>
 
                     {thread.hinhAnh && (
-                        <Box mt="xs" style={{ overflow: 'hidden', border: '1px solid var(--mantine-color-default-border)', borderRadius: 'var(--mantine-radius-lg)' }}>
+                        <Box mt="xs" className="overflow-hidden border border-zinc-100 dark:border-zinc-900 rounded-2xl shadow-sm">
                             <Image src={thread.hinhAnh} alt="Thread image" radius="md" />
                         </Box>
                     )}
 
-                    <Group gap="xs" mt="sm" ml={-8}>
-                        <Group gap={4}>
-                            <ActionIcon variant="subtile" color={thread.liked ? 'red' : 'gray'} onClick={onLike} size="md" radius="xl">
-                                {thread.liked ? <IconHeartFilled size={20} /> : <IconHeart size={20} />}
+                    <Group gap="sm" mt="md">
+                        <Group gap={4} className="group/action cursor-pointer" onClick={handleLike}>
+                            <ActionIcon
+                                variant="subtle"
+                                color={thread.liked ? 'rose' : 'gray'}
+                                size="lg"
+                                radius="xl"
+                                className={`transition-all ${thread.liked ? 'text-rose-500 bg-rose-50/50 dark:bg-rose-500/10' : 'group-hover/action:bg-rose-50 group-hover/action:text-rose-500'}`}
+                            >
+                                {thread.liked ? <IconHeartFilled size={18} stroke={2} /> : <IconHeart size={18} stroke={2} />}
                             </ActionIcon>
-                            <Text size="xs" fw={600} c={thread.liked ? 'red' : 'dimmed'}>{thread._count.likes}</Text>
+                            <Text size="xs" fw={800} className={`tracking-tighter ${thread.liked ? 'text-rose-600' : 'text-zinc-400 group-hover/action:text-rose-500'}`}>
+                                {thread._count.likes > 0 && thread._count.likes}
+                            </Text>
                         </Group>
 
-                        <Group gap={4}>
-                            <ActionIcon variant="subtile" color="gray" size="md" radius="xl">
-                                <IconMessageCircle size={20} />
+                        <Group gap={4} className="group/action cursor-pointer">
+                            <ActionIcon
+                                variant="subtle"
+                                color="gray"
+                                size="lg"
+                                radius="xl"
+                                className="group-hover/action:bg-indigo-50 group-hover/action:text-indigo-500"
+                            >
+                                <IconMessageCircle size={18} stroke={2} />
                             </ActionIcon>
-                            <Text size="xs" fw={600} c="dimmed">{thread._count.replies}</Text>
+                            <Text size="xs" fw={800} className="text-zinc-400 group-hover/action:text-indigo-500 tracking-tighter">
+                                {thread._count.replies > 0 && thread._count.replies}
+                            </Text>
                         </Group>
 
-                        <Group gap={4}>
-                            <ActionIcon variant="subtile" color="gray" size="md" radius="xl">
-                                <IconRepeat size={20} />
+                        <Group gap={4} className="group/action cursor-pointer">
+                            <ActionIcon
+                                variant="subtle"
+                                color="gray"
+                                size="lg"
+                                radius="xl"
+                                className="group-hover/action:bg-teal-50 group-hover/action:text-teal-500"
+                            >
+                                <IconRepeat size={18} stroke={2} />
                             </ActionIcon>
-                            <Text size="xs" fw={600} c="dimmed">{thread._count.reposts}</Text>
+                            <Text size="xs" fw={800} className="text-zinc-400 group-hover/action:text-teal-500 tracking-tighter">
+                                {thread._count.reposts > 0 && thread._count.reposts}
+                            </Text>
                         </Group>
 
-                        <ActionIcon variant="subtile" color="gray" size="md" radius="xl" ml="auto">
-                            <IconShare size={20} />
+                        <ActionIcon
+                            variant="subtle"
+                            color="gray"
+                            size="lg"
+                            radius="xl"
+                            className="ml-auto hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                        >
+                            <IconShare size={18} stroke={2} />
                         </ActionIcon>
                     </Group>
                 </Stack>

@@ -70,5 +70,39 @@ export const AppQuery = {
             useAppQuery({ url: { baseUrl: "/flow-instance/:id", urlParams: { id } }, options }),
         useLogs: (id: number, options?: AppQueryOptions<"getFlowLogs">) =>
             useAppQuery({ url: { baseUrl: "/flow-instance/:id/logs", urlParams: { id } }, options }),
-    }
+    },
+    social: {
+        useFeed: (params?: { limit?: number; cursor?: number }, options?: AppQueryOptions<"getSocialFeed">) =>
+            useAppQuery({ url: { baseUrl: "/social/feed", queryParams: params }, options }),
+        useUserThreads: (userId: number, params?: { limit?: number; cursor?: number }, options?: AppQueryOptions<"getSocialUserThreads">) =>
+            useAppQuery({ url: { baseUrl: "/social/users/:id/threads", urlParams: { id: userId }, queryParams: params }, options }),
+        useSearch: (q: string, params?: { limit?: number }, options?: AppQueryOptions<"getSocialSearch">) =>
+            useAppQuery({ url: { baseUrl: "/social/search", queryParams: { q, ...params } }, options }),
+        useSocialProfile: (id: number, options?: AppQueryOptions<"getSocialProfile">) =>
+            useAppQuery({ url: { baseUrl: "/social/users/profile/:id", urlParams: { id } }, options }),
+        useActivity: (params?: { limit?: number }, options?: AppQueryOptions<"getSocialActivity">) =>
+            useAppQuery({ url: { baseUrl: "/social/activity", queryParams: params }, options }),
+        useThreadDetail: (id: number, options?: AppQueryOptions<"getThreadDetail">) =>
+            useAppQuery({ url: { baseUrl: "/social/threads/:id", urlParams: { id } }, options }),
+    },
+    friends: {
+        useSearch: (q: string, options?: AppQueryOptions<"searchFriends">) =>
+            useAppQuery({ url: { baseUrl: "/friends/search", queryParams: { q } }, options }),
+        useList: (options?: AppQueryOptions<"getFriends">) =>
+            useAppQuery({ url: { baseUrl: "/friends" }, options }),
+        usePending: (options?: AppQueryOptions<"getPendingFriends">) =>
+            useAppQuery({ url: { baseUrl: "/friends/pending" }, options }),
+        useStatus: (id: number, options?: AppQueryOptions<"getFriendStatus">) =>
+            useAppQuery({ url: { baseUrl: "/friends/status/:id", urlParams: { id } }, options }),
+    },
+    chat: {
+        useChannels: (options?: AppQueryOptions<"getChannels">) =>
+            useAppQuery({ url: { baseUrl: "/communication/chat/channels" }, options }),
+        useMessages: (channelId: number, params?: { page?: number }, options?: AppQueryOptions<"getMessages">) =>
+            useAppQuery({
+                url: { baseUrl: "/communication/chat/channels/:id/messages", urlParams: { id: channelId }, queryParams: params },
+                options,
+                refetchInterval: options?.refetchInterval
+            }),
+    },
 };

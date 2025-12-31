@@ -56,88 +56,87 @@ export default function RegisterPage() {
     };
 
     return (
-        <Stack gap="xl">
-            {/* Header */}
-            <Box>
-                <Title order={1} size="h2" fw={900} className="text-gray-900 dark:text-white mb-2">
+        <Stack gap={50}>
+            {/* Context Header */}
+            <Stack gap={10}>
+                <Title order={1} className="text-5xl font-extrabold tracking-tight leading-[1.1] text-black dark:text-white">
                     {t("title")}
                 </Title>
-                <Text c="dimmed" size="sm">
+                <Text size="lg" className="text-zinc-400 dark:text-zinc-500 font-medium">
                     {t("subtitle")}
                 </Text>
-            </Box>
+            </Stack>
 
-            {/* Form */}
+            {/* Logical Form */}
             <form onSubmit={form.onSubmit(handleSubmit)}>
-                <Stack gap="md">
-                    <TextInput
-                        label={t("email")}
-                        placeholder="student@nguyenhue.edu.vn"
-                        required
-                        size="md"
-                        radius="md"
-                        leftSection={<IconMail size={18} className="text-gray-400" />}
-                        {...form.getInputProps("email")}
-                        classNames={{
-                            input: "border-gray-300 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400"
-                        }}
-                    />
+                <Stack gap={32}>
+                    <Stack gap={20}>
+                        <TextInput
+                            label={t("email")}
+                            placeholder="mail@example.com"
+                            required
+                            size="md"
+                            {...form.getInputProps("email")}
+                            classNames={{
+                                label: "text-[11px] uppercase tracking-[0.2em] font-black text-zinc-400 dark:text-zinc-600 mb-2 px-1",
+                                input: "h-[60px] bg-transparent border-0 border-b-2 border-zinc-100 dark:border-zinc-800 focus:border-black dark:focus:border-white rounded-none px-1 text-lg font-semibold transition-all duration-300 placeholder:text-zinc-300 dark:placeholder:text-zinc-700"
+                            }}
+                        />
 
-                    <PasswordInput
-                        label={t("password")}
-                        placeholder="••••••••"
-                        required
-                        size="md"
-                        radius="md"
-                        leftSection={<IconLock size={18} className="text-gray-400" />}
-                        {...form.getInputProps("matKhau")}
-                        classNames={{
-                            input: "border-gray-300 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400"
-                        }}
-                    />
+                        <PasswordInput
+                            label={t("password")}
+                            placeholder="••••••••"
+                            required
+                            size="md"
+                            {...form.getInputProps("matKhau")}
+                            classNames={{
+                                label: "text-[11px] uppercase tracking-[0.2em] font-black text-zinc-400 dark:text-zinc-600 mb-2 px-1",
+                                input: "h-[60px] bg-transparent border-0 border-b-2 border-zinc-100 dark:border-zinc-800 focus:border-black dark:focus:border-white rounded-none px-1 text-lg font-semibold transition-all duration-300 placeholder:text-zinc-300 dark:placeholder:text-zinc-700",
+                                innerInput: "h-full"
+                            }}
+                        />
 
-                    <PasswordInput
-                        label={t("confirm_password")}
-                        placeholder="••••••••"
-                        required
-                        size="md"
-                        radius="md"
-                        leftSection={<IconLock size={18} className="text-gray-400" />}
-                        {...form.getInputProps("confirmPassword")}
-                        classNames={{
-                            input: "border-gray-300 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400"
-                        }}
-                    />
+                        <PasswordInput
+                            label={t("confirm_password")}
+                            placeholder="••••••••"
+                            required
+                            size="md"
+                            {...form.getInputProps("confirmPassword")}
+                            classNames={{
+                                label: "text-[11px] uppercase tracking-[0.2em] font-black text-zinc-400 dark:text-zinc-600 mb-2 px-1",
+                                input: "h-[60px] bg-transparent border-0 border-b-2 border-zinc-100 dark:border-zinc-800 focus:border-black dark:focus:border-white rounded-none px-1 text-lg font-semibold transition-all duration-300 placeholder:text-zinc-300 dark:placeholder:text-zinc-700",
+                                innerInput: "h-full"
+                            }}
+                        />
+                    </Stack>
 
                     <Button
                         type="submit"
                         fullWidth
-                        size="md"
-                        radius="md"
+                        h={64}
+                        radius="xl"
                         loading={registerMutation.isPending}
-                        className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 mt-4"
-                        fw={600}
+                        className="bg-black hover:bg-zinc-800 dark:bg-white dark:hover:bg-zinc-200 dark:text-black text-white text-base tracking-widest font-black uppercase transition-all duration-500 active:scale-[0.97] shadow-2xl shadow-black/10 dark:shadow-white/5"
                     >
                         {t("submit")}
                     </Button>
                 </Stack>
             </form>
 
-            {/* Divider */}
-            <Divider label="hoặc" labelPosition="center" className="my-2" />
-
-            {/* Login Link */}
-            <Text ta="center" size="sm" c="dimmed">
-                {t("have_account")}{" "}
-                <Anchor
-                    component={Link}
-                    href="/auth/login"
-                    fw={700}
-                    className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
-                >
-                    {t("login_link")}
-                </Anchor>
-            </Text>
+            {/* Footer Navigation */}
+            <Box className="pt-10 border-t border-zinc-50 dark:border-zinc-900/50 text-center">
+                <Text size="sm" fw={600} className="text-zinc-400 dark:text-zinc-600">
+                    {t("have_account")}{" "}
+                    <Anchor
+                        component={Link}
+                        href="/auth/login"
+                        className="text-black dark:text-white font-black underline underline-offset-8 hover:underline-offset-4 transition-all"
+                    >
+                        {t("login_link")}
+                    </Anchor>
+                </Text>
+            </Box>
         </Stack>
+
     );
 }

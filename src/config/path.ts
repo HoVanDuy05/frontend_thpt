@@ -38,5 +38,5 @@ export const PMS_PATH = {
     },
     SETTINGS: "/admin/settings",
     APPROVALS: "/admin/approvals",
-    SOCIAL: "/admin/social",
+    SOCIAL: "/social",
 };

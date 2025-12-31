@@ -16,6 +16,7 @@ import {
     TSubmitFlowInstanceDto,
     TApproveStepDto
 } from "@/shared/types/dto.type";
+import { Thread, UserBasic } from "@/feauture/social/types";
 
 export type ApiQueryType = {
     // ... (rest remains same)
@@ -149,6 +150,60 @@ export type ApiQueryType = {
     getCategories: {
         url: { baseUrl: "/categories" };
         response: any[]; // Or specific category type if available
+    };
+
+    // Social
+    getSocialFeed: {
+        url: { baseUrl: "/social/feed"; queryParams?: { limit?: number; cursor?: number } };
+        response: Thread[];
+    };
+    getSocialUserThreads: {
+        url: { baseUrl: "/social/users/:id/threads"; urlParams: { id: number }; queryParams?: { limit?: number; cursor?: number } };
+        response: Thread[];
+    };
+    getSocialSearch: {
+        url: { baseUrl: "/social/search"; queryParams?: { q: string; limit?: number } };
+        response: Thread[];
+    };
+    getSocialProfile: {
+        url: { baseUrl: "/social/users/profile/:id"; urlParams: { id: number } };
+        response: TUser & { _count: { threads: number; followers: number; following: number } };
+    };
+    getSocialActivity: {
+        url: { baseUrl: "/social/activity"; queryParams?: { limit?: number } };
+        response: any[];
+    };
+    getThreadDetail: {
+        url: { baseUrl: "/social/threads/:id"; urlParams: { id: number } };
+        response: Thread & { replies: Thread[] };
+    };
+
+    // Friends
+    searchFriends: {
+        url: { baseUrl: "/friends/search"; queryParams: { q: string } };
+        response: TUser[];
+    };
+    getFriends: {
+        url: { baseUrl: "/friends" };
+        response: TUser[];
+    };
+    getPendingFriends: {
+        url: { baseUrl: "/friends/pending" };
+        response: any[];
+    };
+    getFriendStatus: {
+        url: { baseUrl: "/friends/status/:id"; urlParams: { id: number } };
+        response: { status: 'NONE' | 'FRIEND' | 'SENT' | 'RECEIVED' | 'BLOCKED' };
+    };
+
+    // --- Chat ---
+    getChannels: {
+        url: { baseUrl: "/communication/chat/channels" };
+        response: TChannel[];
+    };
+    getMessages: {
+        url: { baseUrl: "/communication/chat/channels/:id/messages"; urlParams: { id: number }; queryParams?: { page?: number } };
+        response: TMessage[];
     };
 };
 
@@ -428,5 +483,88 @@ export type ApiMutationType = {
         url: { baseUrl: "/categories" };
         payload: { ten: string; moTa?: string };
         response: any;
+    };
+
+    // Social
+    createThread: {
+        url: { baseUrl: "/social/threads" };
+        payload: { noiDung: string; hinhAnh?: string; threadChaId?: number };
+        response: Thread;
+    };
+    likeThread: {
+        url: { baseUrl: "/social/threads/:id/like"; urlParams: { id: number } };
+        payload: undefined;
+        response: { liked: boolean };
+    };
+    followUser: {
+        url: { baseUrl: "/social/users/:id/follow"; urlParams: { id: number } };
+        payload: undefined;
+        response: { following: boolean };
+    };
+
+    // Friends
+    sendFriendRequest: {
+        url: { baseUrl: "/friends/request/:id"; urlParams: { id: number } };
+        payload: undefined;
+        response: any;
+    };
+    handleFriendRequest: {
+        url: { baseUrl: "/friends/request/:id"; urlParams: { id: number } };
+        payload: { action: 'ACCEPT' | 'DECLINE' | 'CANCEL' };
+        response: any;
+    };
+    unfriend: {
+        url: { baseUrl: "/friends/:id"; urlParams: { id: number } };
+        payload: undefined;
+        response: any;
+    };
+    // --- Chat ---
+    createChannel: {
+        url: { baseUrl: "/communication/chat/channels" };
+        payload: { tenKenh?: string; loaiKenh: 'CA_NHAN' | 'NHOM'; thanhVienIds?: number[] };
+        response: TChannel;
+    };
+    sendMessage: {
+        url: { baseUrl: "/communication/chat/messages" };
+        payload: { kenhChatId: number; noiDung?: string; loai?: 'VAN_BAN' | 'HINH_ANH' | 'TEP'; duongDanTep?: string };
+        response: TMessage;
+    };
+};
+
+export type TChannel = {
+    id: number;
+    tenKenh?: string;
+    loaiKenh: 'CA_NHAN' | 'NHOM';
+    thanhViens: {
+        nguoiDungId: number;
+        vaiTro: 'QUAN_TRI' | 'THANH_VIEN';
+        nguoiDung: {
+            id: number;
+            taiKhoan: string;
+            avatar?: string;
+            hoTen?: string;
+            hoSoHocSinh?: { hoTen: string };
+            hoSoGiaoVien?: { hoTen: string };
+        }
+    }[];
+    tinNhans: TMessage[];
+    updatedAt: string;
+};
+
+export type TMessage = {
+    id: number;
+    kenhChatId: number;
+    nguoiGuiId: number;
+    noiDung?: string;
+    loai: 'VAN_BAN' | 'HINH_ANH' | 'TEP';
+    duongDanTep?: string;
+    ngayGui: string;
+    nguoiGui: {
+        id: number;
+        taiKhoan: string;
+        avatar?: string;
+        hoTen?: string;
+        hoSoHocSinh?: { hoTen: string };
+        hoSoGiaoVien?: { hoTen: string };
     };
 };

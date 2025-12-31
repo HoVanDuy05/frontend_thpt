@@ -1,6 +1,6 @@
 "use client";
 
-import { TextInput, PasswordInput, Button, Title, Text, Stack, Anchor, Group, Checkbox, Box, Divider } from "@mantine/core";
+import { TextInput, PasswordInput, Button, Title, Text, Stack, Anchor, Group, Checkbox, Box, Divider, } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/routing";
@@ -9,7 +9,7 @@ import { AppMutation } from "@/api/AppMutation";
 import { useAppStore } from "@/providers/store/useAppStore";
 import { notifications } from "@mantine/notifications";
 import { useEffect, useState } from "react";
-import { IconCheck, IconX, IconMail, IconLock, IconBrandGoogle } from "@tabler/icons-react";
+import { IconCheck, IconX, IconMail, IconLock, IconBrandGoogle, IconSchool } from "@tabler/icons-react";
 import { useValidation } from "@/shared/common/useValidation";
 import { useTranslationError } from "@/shared/common/useTranslationError";
 
@@ -109,112 +109,125 @@ export default function LoginPage() {
     };
 
     return (
-        <Stack gap="xl">
-            {/* Header */}
-            <Box>
-                <Title order={1} size="h2" fw={900} className="text-gray-900 dark:text-white mb-2">
+        <Stack gap={32} className="py-8">
+            {/* Logo & Branding */}
+            <Stack align="center" gap="xs">
+                <Box p={12} className="bg-indigo-600 rounded-2xl shadow-lg shadow-indigo-600/20">
+                    <IconSchool size={32} color="white" stroke={2} />
+                </Box>
+                <Text fw={900} size="xl" className="tracking-tighter uppercase text-indigo-600">
+                    NGUYEN HUE
+                </Text>
+            </Stack>
+
+            <Stack gap={8} align="center">
+                <Title order={1} className="text-3xl font-black tracking-tight text-zinc-900 dark:text-white">
                     {t("title")}
                 </Title>
-                <Text c="dimmed" size="sm">
+                <Text size="sm" className="text-zinc-500 font-medium text-center max-w-[280px]">
                     {t("subtitle")}
                 </Text>
-            </Box>
+            </Stack>
 
-            {/* Google Login Button */}
-            <Button
-                variant="default"
-                size="lg"
-                radius="xl"
-                leftSection={<IconBrandGoogle size={22} />}
-                onClick={handleGoogleLogin}
-                className="border-[1.5px] border-gray-200 dark:border-zinc-800 hover:bg-gray-50 dark:hover:bg-zinc-900/50 shadow-sm transition-all active:scale-[0.98]"
-                fw={700}
-                h={54}
-            >
-                Đăng nhập bằng Google
-            </Button>
-
-            {/* Divider */}
-            <Divider label={<Text size="xs" fw={600} c="dimmed">hoặc đăng nhập bằng email</Text>} labelPosition="center" className="my-2" />
-
-            {/* Form */}
+            {/* Logical Form */}
             <form onSubmit={form.onSubmit(handleSubmit)}>
-                <Stack gap="lg">
-                    <TextInput
-                        label={t("email")}
-                        placeholder="student@nguyenhue.edu.vn"
-                        required
-                        size="md"
-                        radius="md"
-                        leftSection={<IconMail size={18} className="text-gray-400" />}
-                        {...form.getInputProps("email")}
-                        classNames={{
-                            input: "border-gray-200 dark:border-zinc-800 focus:border-indigo-500 dark:focus:border-indigo-400 h-[50px] transition-all bg-gray-50/50 dark:bg-zinc-900/30"
-                        }}
-                    />
-
-                    <PasswordInput
-                        label={t("password")}
-                        placeholder="••••••••"
-                        required
-                        size="md"
-                        radius="md"
-                        leftSection={<IconLock size={18} className="text-gray-400" />}
-                        {...form.getInputProps("matKhau")}
-                        classNames={{
-                            input: "border-gray-200 dark:border-zinc-800 focus:border-indigo-500 dark:focus:border-indigo-400 h-[50px] transition-all bg-gray-50/50 dark:bg-zinc-900/30"
-                        }}
-                    />
-
-                    <Group justify="space-between" mt="xs">
-                        <Checkbox
-                            label="Ghi nhớ đăng nhập"
-                            checked={rememberMe}
-                            onChange={(e) => setRememberMe(e.currentTarget.checked)}
-                            size="sm"
-                            color="indigo"
+                <Stack gap="xl">
+                    <Stack gap="md">
+                        <TextInput
+                            label={t("email")}
+                            placeholder="mail@example.com"
+                            required
+                            size="md"
+                            radius="md"
+                            {...form.getInputProps("email")}
                             classNames={{
-                                label: "text-gray-600 dark:text-gray-400 font-medium cursor-pointer"
+                                label: "font-bold mb-1 text-zinc-700 dark:text-zinc-300",
+                                input: "h-[50px] border-zinc-200 dark:border-zinc-800 focus:border-indigo-500 bg-white dark:bg-zinc-900 shadow-sm"
                             }}
                         />
-                        <Anchor
-                            component={Link}
-                            href="/auth/forgot-password"
-                            size="sm"
-                            fw={700}
-                            className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
-                        >
-                            {t("forgot_password")}?
-                        </Anchor>
-                    </Group>
 
-                    <Button
-                        type="submit"
-                        fullWidth
-                        size="lg"
-                        radius="xl"
-                        loading={loginMutation.isPending}
-                        className="bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 mt-6 shadow-md shadow-indigo-500/20 active:scale-[0.99] transition-all"
-                        fw={700}
-                        h={54}
-                    >
-                        {t("submit")}
-                    </Button>
+                        <PasswordInput
+                            label={t("password")}
+                            placeholder="••••••••"
+                            required
+                            size="md"
+                            radius="md"
+                            {...form.getInputProps("matKhau")}
+                            classNames={{
+                                label: "font-bold mb-1 text-zinc-700 dark:text-zinc-300",
+                                input: "h-[50px] border-zinc-200 dark:border-zinc-800 focus:border-indigo-500 bg-white dark:bg-zinc-900 shadow-sm"
+                            }}
+                        />
+
+                        <Group justify="space-between" align="center">
+                            <Checkbox
+                                label="Ghi nhớ đăng nhập"
+                                checked={rememberMe}
+                                onChange={(e) => setRememberMe(e.currentTarget.checked)}
+                                size="xs"
+                                color="indigo"
+                                className="font-bold text-zinc-600"
+                            />
+                            <Anchor
+                                component={Link}
+                                href="/auth/forgot-password"
+                                size="xs"
+                                fw={800}
+                                className="text-indigo-600 hover:text-indigo-700 uppercase tracking-tighter"
+                            >
+                                {t("forgot_password")}?
+                            </Anchor>
+                        </Group>
+                    </Stack>
+
+                    <Stack gap="md">
+                        <Button
+                            type="submit"
+                            fullWidth
+                            h={54}
+                            radius="md"
+                            loading={loginMutation.isPending}
+                            color="indigo"
+                            className="shadow-lg shadow-indigo-600/20 active:scale-[0.98] transition-transform"
+                            fw={800}
+                            size="md"
+                        >
+                            {t("submit")}
+                        </Button>
+
+                        <Divider label={<Text size="xs" fw={700} c="dimmed">Hoặc</Text>} labelPosition="center" />
+
+                        <Button
+                            variant="default"
+                            fullWidth
+                            h={54}
+                            radius="md"
+                            leftSection={<IconBrandGoogle size={20} />}
+                            onClick={handleGoogleLogin}
+                            className="border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 font-bold transition-all"
+                        >
+                            Tiếp tục với Google
+                        </Button>
+                    </Stack>
                 </Stack>
             </form>
 
-            {/* Register Link */}
-            <Text ta="center" size="sm" c="dimmed">
-                Chưa có tài khoản?{" "}
-                <Anchor
-                    component={Link}
-                    href="/auth/register"
-                    fw={700}
-                    className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
-                >
-                    {t("register_link")}
-                </Anchor>
-            </Text>
+            {/* Footer Navigation */}
+            <Box className="pt-4 text-center">
+                <Text size="sm" fw={600} className="text-zinc-500">
+                    Chưa có tài khoản?{" "}
+                    <Anchor
+                        component={Link}
+                        href="/auth/register"
+                        className="text-indigo-600 font-bold underline underline-offset-4"
+                    >
+                        {t("register_link")}
+                    </Anchor>
+                </Text>
+            </Box>
         </Stack>
+
+
+
     );
 }

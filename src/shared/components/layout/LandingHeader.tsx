@@ -1,7 +1,7 @@
 "use client";
 
 import { Container, Group, Button, Title, ActionIcon, useMantineColorScheme, Box, Burger, Text, Drawer, Stack, Divider, rem } from "@mantine/core";
-import { IconSun, IconMoon, IconDeviceMobile, IconLogin, IconLayoutDashboard, IconHome, IconNews, IconCalendarEvent, IconSchool, IconInfoCircle, IconX } from "@tabler/icons-react";
+import { IconSun, IconMoon, IconDeviceMobile, IconLogin, IconLayoutDashboard, IconHome, IconNews, IconCalendarEvent, IconSchool, IconInfoCircle, IconX, IconUsers, IconMessageCircle } from "@tabler/icons-react";
 import { Link } from "@/i18n/routing";
 import { useTranslations } from "next-intl";
 import { LanguagePicker } from "../LanguagePicker";
@@ -110,17 +110,43 @@ export function LandingHeader() {
                                             {t("sign_in")}
                                         </Button>
                                     ) : (
-                                        <Button
-                                            variant="gradient"
-                                            gradient={{ from: 'blue', to: 'indigo' }}
-                                            radius="xl"
-                                            onClick={handleAccessPortal}
-                                            leftSection={<IconLayoutDashboard size={18} stroke={2.5} />}
-                                            className="shadow-lg shadow-blue-500/25 px-8 font-bold h-9"
-                                            size="sm"
-                                        >
-                                            Hệ thống
-                                        </Button>
+                                        <Group gap="xs">
+                                            <ActionIcon
+                                                variant="light"
+                                                color="blue"
+                                                size="lg"
+                                                radius="xl"
+                                                component={Link as any}
+                                                href="/social"
+                                                className="hidden md:flex"
+                                                title="Mạng xã hội"
+                                            >
+                                                <IconUsers size={20} />
+                                            </ActionIcon>
+                                            <ActionIcon
+                                                variant="light"
+                                                color="indigo"
+                                                size="lg"
+                                                radius="xl"
+                                                component={Link as any}
+                                                href="/chat"
+                                                className="hidden md:flex mr-2"
+                                                title="Tin nhắn"
+                                            >
+                                                <IconMessageCircle size={20} />
+                                            </ActionIcon>
+                                            <Button
+                                                variant="gradient"
+                                                gradient={{ from: 'blue', to: 'indigo' }}
+                                                radius="xl"
+                                                onClick={handleAccessPortal}
+                                                leftSection={<IconLayoutDashboard size={18} stroke={2.5} />}
+                                                className="shadow-lg shadow-blue-500/25 px-8 font-bold h-9"
+                                                size="sm"
+                                            >
+                                                Hệ thống
+                                            </Button>
+                                        </Group>
                                     )}
                                 </Group>
 

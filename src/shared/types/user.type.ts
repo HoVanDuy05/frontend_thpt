@@ -13,6 +13,7 @@ export interface TUser {
     ngaySinh?: string | Date;
     gioiTinh?: string;
     isBlocked?: boolean;
+    avatar?: string;
 
     hoSoGiaoVien?: THoSoGiaoVien;
     hoSoHocSinh?: THoSoHocSinh;

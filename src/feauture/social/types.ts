@@ -3,7 +3,7 @@ export interface UserBasic {
     taiKhoan: string;
     email: string;
     hoTen?: string;
-    anhDaiDien?: string;
+    avatar?: string;
 }
 
 export interface Thread {

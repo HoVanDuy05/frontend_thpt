@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Text, Stack, Group } from "@mantine/core";
+import { Box, Text, Stack, Group, Title } from "@mantine/core";
 import { useEffect, useState } from "react";
 
 export function SplashScreen() {
@@ -15,13 +15,13 @@ export function SplashScreen() {
                 const diff = Math.random() * 10;
                 return Math.min(oldProgress + diff, 90);
             });
-        }, 200);
+        }, 150);
 
         const fadeTimeout = setTimeout(() => {
             setProgress(100);
             setFadeOut(true);
-            setTimeout(() => setVisible(false), 800);
-        }, 3200);
+            setTimeout(() => setVisible(false), 700);
+        }, 2500);
 
         return () => {
             clearInterval(timer);
@@ -33,91 +33,56 @@ export function SplashScreen() {
 
     return (
         <Box
-            className={`fixed inset-0 flex items-center justify-center z-[9999] transition-all duration-700 ${fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
-            style={{
-                backgroundColor: "#ffffff",
-            }}
+            className={`fixed inset-0 flex items-center justify-center z-[9999] transition-opacity duration-700 bg-white dark:bg-black ${fadeOut ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
         >
-            {/* Subtle Gradient Background */}
-            <Box
-                className="absolute inset-0 opacity-40"
-                style={{
-                    background: 'radial-gradient(circle at 50% 50%, #f0f7ff 0%, #ffffff 100%)'
-                }}
-            />
-
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                @keyframes fade-up {
-                    0% { transform: translateY(20px); opacity: 0; }
-                    100% { transform: translateY(0); opacity: 1; }
-                }
-                @keyframes pulse-subtle {
-                    0%, 100% { transform: scale(1); opacity: 1; }
-                    50% { transform: scale(1.02); opacity: 0.95; }
-                }
-            `}} />
-
-            <Stack align="center" gap={40} className="relative z-10">
+            <Stack align="center" gap="xl" className="relative z-10 p-4">
                 {/* Logo Section */}
-                <Box
-                    style={{
-                        animation: 'fade-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards',
-                    }}
-                >
-                    <Box
-                        className="w-32 h-32 p-4 bg-white rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center justify-center"
-                        style={{ animation: 'pulse-subtle 3s infinite ease-in-out' }}
-                    >
+                <Box className="animate-bounce duration-[2000ms]">
+                    <Box className="w-24 h-24 sm:w-32 sm:h-32 bg-white rounded-2xl sm:rounded-3xl flex items-center justify-center shadow-lg shadow-blue-500/10 p-4">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                             src="/favicon.png"
-                            alt="Academy Logo"
+                            alt="Logo"
                             className="w-full h-full object-contain"
                         />
                     </Box>
                 </Box>
 
                 {/* Typography Section */}
-                <Stack align="center" gap={8} style={{ animation: 'fade-up 1.2s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards', opacity: 0 }}>
-                    <Text
-                        fw={800}
-                        className="text-slate-900 tracking-[0.15em] uppercase text-center"
-                        style={{ fontSize: '2.2rem', letterSpacing: '0.25em' }}
+                <Stack align="center" gap={4}>
+                    <Title
+                        order={1}
+                        className="text-3xl sm:text-4xl font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 text-center"
                     >
                         Nguyễn Huệ
+                    </Title>
+                    <Text
+                        size="sm"
+                        fw={600}
+                        className="text-blue-600 dark:text-blue-400 uppercase tracking-[0.4em] text-center"
+                    >
+                        Trường THPT Nguyễn Huệ
                     </Text>
-                    <Group gap="md" align="center">
-                        <Box className="h-px w-8 bg-slate-200" />
-                        <Text
-                            fw={500}
-                            className="text-indigo-600 tracking-[0.6em] uppercase"
-                            style={{ fontSize: '0.85rem' }}
-                        >
-                            Trường THPT Nguyễn Huệ
-                        </Text>
-                        <Box className="h-px w-8 bg-slate-200" />
-                    </Group>
                 </Stack>
 
                 {/* Progress Indicators */}
-                <Stack align="center" gap="md" className="w-80" style={{ animation: 'fade-up 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards', opacity: 0 }}>
-                    <Box className="relative w-full h-[3px] bg-slate-100 rounded-full overflow-hidden">
+                <Stack align="center" gap="xs" className="w-64 sm:w-80 mt-8">
+                    <Box className="relative w-full h-1 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                         <Box
-                            className="h-full bg-indigo-600 transition-all duration-300 ease-out"
+                            className="h-full bg-blue-600 dark:bg-blue-500 transition-all duration-200 ease-linear rounded-full"
                             style={{ width: `${progress}%` }}
                         />
                     </Box>
-                    <Text className="text-[10px] text-slate-400 font-bold uppercase tracking-[0.2em]">
+                    <Text size="xs" c="dimmed" className="font-bold uppercase tracking-wider">
                         Đang khởi động hệ thống
                     </Text>
                 </Stack>
             </Stack>
 
-            {/* Elegant Footer Overlay */}
-            <Box className="absolute bottom-12 w-full text-center opacity-30">
-                <Text size="xs" fw={600} className="text-slate-500 tracking-[0.4em] uppercase">
-                    Hệ thống quản lý giáo dục hiện đại
+            {/* Footer */}
+            <Box className="absolute bottom-8 w-full text-center">
+                <Text size="xs" fw={700} c="dimmed" className="uppercase tracking-[0.2em] opacity-50">
+                    Smart Education System
                 </Text>
             </Box>
         </Box>
