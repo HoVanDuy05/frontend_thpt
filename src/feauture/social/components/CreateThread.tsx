@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
-import { Paper, Group, Avatar, Textarea, Button, Stack, ActionIcon, FileButton, Image, Box, CloseButton, Loader, Text, Divider, Badge } from '@mantine/core';
-import { IconPhoto, IconGif, IconList, IconAt, IconX, IconFaceSmile, IconCalendar, IconLocation } from '@tabler/icons-react';
-import { AppMutation } from '@/api/AppQuery';
-import { AppQuery } from '@/api/AppQuery';
+import { Paper, Group, Avatar, Textarea, Button, Stack, ActionIcon, FileButton, Image, Box, Text, Divider } from '@mantine/core';
+import { IconPhoto, IconGif, IconList, IconAt, IconX, IconFaceSmile } from '@tabler/icons-react';
+import { AppQuery, AppMutation } from '@/api/AppQuery';
 import { notifications } from '@mantine/notifications';
 import { useTranslations } from 'next-intl';
 
