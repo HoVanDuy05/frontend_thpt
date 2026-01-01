@@ -226,7 +226,7 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                                 withBorder
                                 p="md"
                                 radius="md"
-                                className="bg-white dark:bg-zinc-800 hover:shadow-md transition-all group border-gray-200 hover:border-indigo-300"
+                                className="bg-white dark:bg-zinc-800 hover:shadow-md transition-all border-gray-200 dark:border-zinc-700"
                             >
                                 <Stack gap="sm">
                                     <Group justify="space-between" wrap="nowrap">
@@ -251,9 +251,8 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                                             variant="subtle"
                                             size="sm"
                                             onClick={() => removeField(field.id)}
-                                            className="opacity-0 group-hover:opacity-100 transition-opacity"
                                         >
-                                            <IconX size={16} />
+                                            <IconTrash size={16} />
                                         </ActionIcon>
                                     </Group>
 
@@ -283,7 +282,7 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                         ))}
 
                         {formFields.length === 0 && (
-                            <Paper p="xl" radius="md" className="border-2 border-dashed border-gray-300 bg-gray-50 dark:bg-zinc-900">
+                            <Paper p="xl" radius="md" className="border-2 border-dashed border-gray-300 dark:border-zinc-700 bg-gray-50 dark:bg-zinc-900">
                                 <Stack align="center" gap="xs">
                                     <ThemeIcon size="xl" radius="xl" variant="light" color="gray">
                                         <IconFileDescription size={24} />
@@ -314,13 +313,13 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                 <Button size="xs" variant="light" leftSection={<IconPlus size={14} />} onClick={addStep}>Thêm bước</Button>
             </Box>
 
-            <ScrollArea.Autosize mah="calc(100vh - 300px)" type="scroll" offsetScrollbars scrollbarSize={6} className="flex-1">
-                <Box className="min-h-full relative bg-gray-50/50 dark:bg-zinc-900/50">
+            <Box className="flex-1 overflow-auto">
+                <Box className="min-w-[800px] min-h-full relative bg-gray-50/50 dark:bg-zinc-900/50">
                     {/* Grid Pattern Background */}
                     <Box className="absolute inset-0 opacity-5 pointer-events-none z-0" style={{ backgroundImage: 'radial-gradient(circle, #6366f1 1px, transparent 1px)', backgroundSize: '20px 20px', width: '200%', height: '200%' }} />
 
                     <Box p="xl" className="min-w-fit min-h-full flex items-center md:items-start z-10 relative">
-                        <Box className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-0 pl-10 pr-20 py-20">
+                        <Box className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-0 pl-10 pr-20 py-20 min-w-[600px]">
 
                             {/* START NODE */}
                             <Box className="flex flex-col md:flex-row items-center relative z-10">
@@ -429,7 +428,7 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                         </Box>
                     </Box>
                 </Box>
-            </ScrollArea.Autosize>
+            </Box>
         </Box>
     );
 

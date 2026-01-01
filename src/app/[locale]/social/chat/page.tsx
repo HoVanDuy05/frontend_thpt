@@ -22,6 +22,12 @@ export default function ChatPage() {
     const createChannelMutation = AppMutation().chat.useCreateChannel();
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Normalize API response: some endpoints may return an array of membership objects
+    // with a `kenhChat` property instead of plain channel objects.
+    const normalizedChannels: TChannel[] | undefined = channels && channels.length > 0
+        ? ('kenhChat' in (channels as any)[0] ? (channels as any).map((m: any) => m.kenhChat) : channels as TChannel[])
+        : (channels as any);
+
     const q = searchTerm.trim().toLowerCase();
     const filteredChannels = q && normalizedChannels
         ? normalizedChannels.filter(ch => {
@@ -29,12 +35,6 @@ export default function ChatPage() {
             return name.includes(q);
         })
         : [];
-
-    // Normalize API response: some endpoints may return an array of membership objects
-    // with a `kenhChat` property instead of plain channel objects.
-    const normalizedChannels: TChannel[] | undefined = channels && channels.length > 0
-        ? ('kenhChat' in (channels as any)[0] ? (channels as any).map((m: any) => m.kenhChat) : channels as TChannel[])
-        : (channels as any);
 
     // Get channel ID from URL or null
     const channelIdParam = searchParams.get('id');
