@@ -33,6 +33,7 @@ import {
     IconCheck,
     IconBuildingSkyscraper
 } from "@tabler/icons-react";
+import { useAppStore } from "@/providers/store/useAppStore";
 import { AppMutation } from "@/api/AppMutation";
 import { notifications } from "@mantine/notifications";
 import { useMediaQuery } from "@mantine/hooks";
@@ -117,13 +118,15 @@ export function EditProfileModal({ opened, onClose, profile }: EditProfileModalP
         };
     };
 
+    const { user } = useAppStore();
+
     const initializeForm = () => {
         const addr = splitAddress(profile?.diaChi);
         const date = splitDate(profile?.ngaySinh);
 
         return {
             hoTen: profile?.hoTen || '',
-            email: profile?.email || '',
+            email: profile?.email || user?.email || '',
 
             dobDay: date.day,
             dobMonth: date.month,
