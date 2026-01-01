@@ -33,13 +33,27 @@ export function FileUpload({ value, onChange, label, type = "image" }: FileUploa
         try {
             const result = await uploadMutation.mutateAsync(formData as any);
 
-            onChange(result.url);
-            notifications.show({
-                title: "Thành công",
-                message: "Tải lên hình ảnh thành công",
-                color: "teal",
-                icon: <IconCheck size={16} />,
-            });
+            let imageUrl = "";
+            if (result && typeof result === "object") {
+                if ("url" in result && (result as any).url) imageUrl = (result as any).url;
+                else if ("avatar" in result && (result as any).avatar) imageUrl = (result as any).avatar;
+            }
+
+            if (imageUrl) {
+                onChange(imageUrl);
+                notifications.show({
+                    title: "Thành công",
+                    message: "Tải lên hình ảnh thành công",
+                    color: "teal",
+                    icon: <IconCheck size={16} />,
+                });
+            } else {
+                notifications.show({
+                    title: "Lỗi",
+                    message: "Không nhận được đường dẫn ảnh từ server.",
+                    color: "red",
+                });
+            }
         } catch (error) {
             notifications.show({
                 title: "Lỗi",
