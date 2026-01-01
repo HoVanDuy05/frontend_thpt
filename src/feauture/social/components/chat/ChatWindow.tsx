@@ -1,4 +1,4 @@
-import { Paper, Group, ActionIcon, Avatar, Text, Stack, ScrollArea, Box, Loader, Center } from "@mantine/core";
+import { Paper, Group, ActionIcon, Avatar, Text, Stack, ScrollArea, Box, Loader, Center, Image } from "@mantine/core";
 import { IconArrowLeft, IconDotsVertical, IconPhone, IconVideo } from "@tabler/icons-react";
 import { TChannel } from "@/api/types/api.type";
 import { AppQuery } from "@/api/AppQuery";
@@ -36,6 +36,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
 
     // Listen for new messages
     useEffect(() => {
+        if (!isConnected) return;
+
         const handleNewMessage = (message: any) => {
             if (message.kenhId === channel.id) {
                 queryClient.invalidateQueries({ queryKey: ['chat', 'messages', channel.id] });
@@ -50,16 +52,24 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
             setTypingUsers(prev => prev.filter(name => name !== userId.toString()));
         };
 
-        on('message:new', handleNewMessage);
-        on('typing:start', handleTypingStart);
-        on('typing:stop', handleTypingStop);
+        try {
+            on('message:new', handleNewMessage);
+            on('typing:start', handleTypingStart);
+            on('typing:stop', handleTypingStop);
+        } catch (error) {
+            console.warn('Socket event listener setup failed:', error);
+        }
 
         return () => {
-            off('message:new', handleNewMessage);
-            off('typing:start', handleTypingStart);
-            off('typing:stop', handleTypingStop);
+            try {
+                off('message:new', handleNewMessage);
+                off('typing:start', handleTypingStart);
+                off('typing:stop', handleTypingStop);
+            } catch (error) {
+                console.warn('Socket event listener cleanup failed:', error);
+            }
         };
-    }, [channel.id, on, off, queryClient]);
+    }, [isConnected === true, channel.id, on, off, queryClient]);
 
     // Scroll to bottom on new messages
     useEffect(() => {
@@ -82,7 +92,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
     };
 
     const getOtherMember = () => {
-        return channel.thanhViens.find(m => m.nguoiDungId !== user?.id)?.nguoiDung;
+        return channel.thanhViens?.find(m => m.nguoiDungId !== user?.id)?.nguoiDung;
     };
 
     const targetUser = getOtherMember();
@@ -154,6 +164,18 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
                                 >
                                     {msg.loai === 'VAN_BAN' && (
                                         <Text size="sm" className="leading-snug">{msg.noiDung}</Text>
+                                    )}
+
+                                    {msg.loai === 'HINH_ANH' && (
+                                        <Box style={{ maxWidth: 360 }}>
+                                            <Image src={msg.duongDanTep || msg.noiDung} alt="Image" radius="md" />
+                                        </Box>
+                                    )}
+
+                                    {msg.loai === 'TEP' && (
+                                        <Box>
+                                            <a href={msg.duongDanTep} target="_blank" rel="noopener noreferrer" className="text-sm underline text-blue-600">Tải tệp đính kèm</a>
+                                        </Box>
                                     )}
                                 </Paper>
                             </Group>

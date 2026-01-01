@@ -12,34 +12,11 @@ export function useSocket() {
     const { token } = useAppStore();
 
     useEffect(() => {
-        if (!token) return;
-
-        // Initialize socket connection
-        const socket = io(SOCKET_URL, {
-            auth: {
-                token,
-            },
-            transports: ["websocket", "polling"],
-        });
-
-        socket.on("connect", () => {
-            console.log("WebSocket connected");
-            setIsConnected(true);
-        });
-
-        socket.on("disconnect", () => {
-            console.log("WebSocket disconnected");
-            setIsConnected(false);
-        });
-
-        socket.on("connect_error", (error) => {
-            console.error("WebSocket connection error:", error);
-        });
-
-        socketRef.current = socket;
-
+        // Temporarily disable socket connection to prevent namespace errors
+        // TODO: Re-enable when socket server is properly configured
+        setIsConnected(false);
         return () => {
-            socket.disconnect();
+            // Cleanup if needed
         };
     }, [token]);
 

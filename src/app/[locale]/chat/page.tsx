@@ -1,26 +1,77 @@
 "use client";
 
-import { Box, Paper, Stack, Text, Avatar, Group, ScrollArea, TextInput, ActionIcon, Loader, Center, UnstyledButton, Badge, Accordion, ThemeIcon } from "@mantine/core";
-import { IconSearch, IconMessagePlus, IconDots, IconEdit, IconVideo, IconPhone, IconInfoCircle, IconBell, IconPhoto, IconFile, IconLink } from "@tabler/icons-react";
+import { Box, Paper, Stack, Text, Avatar, Group, ScrollArea, TextInput, ActionIcon, Loader, Center, UnstyledButton, Badge, Accordion, ThemeIcon, Modal, Button, Divider } from "@mantine/core";
+import { IconSearch, IconMessagePlus, IconDots, IconEdit, IconVideo, IconPhone, IconInfoCircle, IconBell, IconPhoto, IconFile, IconLink, IconX, IconUserPlus } from "@tabler/icons-react";
 import { AppQuery } from "@/api/AppQuery";
 import { TChannel } from "@/api/types/api.type";
+import { TUser } from "@/shared/types/user.type";
 import { ChatWindow } from "@/feauture/social/components/chat/ChatWindow";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useAppStore } from "@/providers/store/useAppStore";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useAppMutation } from "@/api/hooks/useAppMutation";
 
 export default function ChatPage() {
-    const { data: channels, isLoading: isLoadingChannels } = AppQuery.chat.useChannels();
+    const { data: channels, isLoading: isLoadingChannels, refetch: refetchChannels } = AppQuery.chat.useChannels();
     const { user } = useAppStore();
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
+
+    // State for search functionality
+    const [searchQuery, setSearchQuery] = useState("");
+    const [showUserSearch, setShowUserSearch] = useState(false);
+    const [searchResults, setSearchResults] = useState<TUser[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
+
+    // Use the friends search query
+    const { data: searchQueryData, isLoading: searchQueryLoading } = AppQuery.friends.useSearch(
+        searchQuery,
+        { enabled: searchQuery.length > 0 }
+    );
+
+    // Mutation for creating new channel
+    const createChannelMutation = useAppMutation<"createChannel">({
+        url: { baseUrl: "/communication/chat/channels" }
+    });
 
     // Get channel ID from URL or null
     const channelIdParam = searchParams.get('id');
     const selectedChannelId = channelIdParam ? Number(channelIdParam) : null;
 
     const selectedChannel = channels?.find(c => c.id === selectedChannelId);
+
+    // Update search results when API query data changes
+    useEffect(() => {
+        if (searchQueryData) {
+            setSearchResults(searchQueryData);
+        } else {
+            setSearchResults([]);
+        }
+        setIsSearching(searchQueryLoading);
+    }, [searchQueryData, searchQueryLoading]);
+
+    // Handle creating new chat with user
+    const handleStartChat = async (targetUser: TUser) => {
+        try {
+            const result = await createChannelMutation.mutateAsync({
+                loaiKenh: 'CA_NHAN',
+                thanhVienIds: [targetUser.id]
+            });
+
+            if (result) {
+                // Refresh channels list
+                refetchChannels();
+                // Close modal and select the new channel
+                setShowUserSearch(false);
+                setSearchQuery("");
+                setSearchResults([]);
+                handleSelectChannel(result.id);
+            }
+        } catch (error) {
+            console.error('Error creating channel:', error);
+        }
+    };
 
     const handleSelectChannel = (id: number) => {
         const params = new URLSearchParams(searchParams);
@@ -46,6 +97,16 @@ export default function ChatPage() {
                     <Group justify="space-between" mb="md">
                         <Text fw={900} size="24px" className="tracking-tight" style={{ fontFamily: 'Georgia, serif' }}>NHers Chat</Text>
                         <Group gap="xs">
+                            <ActionIcon
+                                variant="subtle"
+                                color="gray"
+                                radius="xl"
+                                size="lg"
+                                className="bg-gray-100 dark:bg-zinc-800 text-black dark:text-white hover:bg-gray-200 dark:hover:bg-zinc-700"
+                                onClick={() => setShowUserSearch(true)}
+                            >
+                                <IconUserPlus size={20} />
+                            </ActionIcon>
                             <ActionIcon variant="subtle" color="gray" radius="xl" size="lg" className="bg-gray-100 dark:bg-zinc-800 text-black dark:text-white hover:bg-gray-200 dark:hover:bg-zinc-700">
                                 <IconDots size={20} />
                             </ActionIcon>
@@ -60,6 +121,8 @@ export default function ChatPage() {
                         leftSection={<IconSearch size={16} className="text-gray-500" />}
                         radius="xl"
                         size="md"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         classNames={{ input: "bg-gray-100 dark:bg-zinc-800/50 border-transparent focus:bg-gray-100 dark:focus:bg-zinc-800 transition-all text-gray-900 dark:text-white placeholder:text-gray-500" }}
                     />
 
@@ -74,55 +137,103 @@ export default function ChatPage() {
 
                 <ScrollArea className="flex-1">
                     <Stack gap={0} px="xs">
+                        {/* Search Results */}
+                        {searchQuery && (
+                            <>
+                                {isSearching ? (
+                                    <Center py="md"><Loader size="sm" color="indigo" /></Center>
+                                ) : searchResults.length > 0 ? (
+                                    <>
+                                        <Text size="xs" c="dimmed" px="md" py="xs" fw={500}>Kết quả tìm kiếm</Text>
+                                        {searchResults.map((searchUser) => (
+                                            <Group
+                                                key={searchUser.id}
+                                                wrap="nowrap"
+                                                className="p-3 rounded-xl cursor-pointer transition-all duration-200 group hover:bg-gray-50 dark:hover:bg-zinc-900"
+                                                onClick={() => handleStartChat(searchUser)}
+                                            >
+                                                <Avatar
+                                                    src={searchUser.avatar}
+                                                    size={48}
+                                                    radius="xl"
+                                                />
+                                                <Stack gap={1} style={{ flex: 1, overflow: 'hidden' }}>
+                                                    <Text size="md" fw={500} className="text-gray-900 dark:text-gray-200">
+                                                        {searchUser.hoTen || searchUser.taiKhoan}
+                                                    </Text>
+                                                    <Text size="sm" c="dimmed" truncate>
+                                                        {searchUser.email}
+                                                    </Text>
+                                                </Stack>
+                                                <ActionIcon variant="subtle" color="blue" radius="xl" size="sm">
+                                                    <IconMessagePlus size={16} />
+                                                </ActionIcon>
+                                            </Group>
+                                        ))}
+                                        <Divider my="sm" />
+                                    </>
+                                ) : searchQuery ? (
+                                    <Center py="md" className="flex-col gap-2 text-center text-gray-400">
+                                        <Text size="sm">Không tìm thấy người dùng</Text>
+                                    </Center>
+                                ) : null}
+                            </>
+                        )}
+
+                        {/* Channel List */}
                         {isLoadingChannels ? (
                             <Center py="xl"><Loader size="sm" color="indigo" /></Center>
                         ) : channels && channels.length > 0 ? (
-                            channels.map((channel: TChannel) => {
-                                // Skip channels without members to prevent errors
-                                if (!channel || !channel.thanhViens) return null;
+                            <>
+                                {searchQuery && <Text size="xs" c="dimmed" px="md" py="xs" fw={500}>Đoạn chat gần đây</Text>}
+                                {channels.map((channel: TChannel) => {
+                                    // Skip channels without members to prevent errors
+                                    if (!channel || !channel.thanhViens) return null;
 
-                                return (
-                                    <Group
-                                        key={channel.id}
-                                        wrap="nowrap"
-                                        className={`p-3 rounded-xl cursor-pointer transition-all duration-200 group ${selectedChannelId === channel.id
-                                            ? 'bg-blue-50/50 dark:bg-blue-500/10'
-                                            : 'hover:bg-gray-50 dark:hover:bg-zinc-900'
-                                            }`}
-                                        onClick={() => handleSelectChannel(channel.id)}
-                                    >
-                                        <Box className="relative">
-                                            <Avatar
-                                                src={getChannelAvatar(channel, user?.id)}
-                                                size={56}
-                                                radius="xl"
-                                            />
-                                            <Box className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-black rounded-full" />
-                                        </Box>
-                                        <Stack gap={1} style={{ flex: 1, overflow: 'hidden' }}>
-                                            <Text size="md" fw={500} c={selectedChannelId === channel.id ? undefined : "dimmed"} className={selectedChannelId === channel.id ? "text-gray-900 dark:text-white font-semibold" : "text-gray-900 dark:text-gray-200"}>
-                                                {getChannelName(channel, user?.id)}
-                                            </Text>
-                                            <Group gap="xs" wrap="nowrap">
-                                                <Text size="sm" c="dimmed" truncate style={{ flex: 1 }} fw={channelIdParam ? 400 : 500}>
-                                                    {channel.tinNhans?.[0]
-                                                        ? (channel.tinNhans[0].nguoiGuiId === user?.id ? "Bạn: " : "") +
-                                                        (channel.tinNhans[0].loai === 'HINH_ANH' ? 'Đã gửi một ảnh' : channel.tinNhans[0].noiDung)
-                                                        : "Chưa có tin nhắn"}
+                                    return (
+                                        <Group
+                                            key={channel.id}
+                                            wrap="nowrap"
+                                            className={`p-3 rounded-xl cursor-pointer transition-all duration-200 group ${selectedChannelId === channel.id
+                                                ? 'bg-blue-50/50 dark:bg-blue-500/10'
+                                                : 'hover:bg-gray-50 dark:hover:bg-zinc-900'
+                                                }`}
+                                            onClick={() => handleSelectChannel(channel.id)}
+                                        >
+                                            <Box className="relative">
+                                                <Avatar
+                                                    src={getChannelAvatar(channel, user?.id)}
+                                                    size={56}
+                                                    radius="xl"
+                                                />
+                                                <Box className="absolute bottom-0.5 right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-white dark:border-black rounded-full" />
+                                            </Box>
+                                            <Stack gap={1} style={{ flex: 1, overflow: 'hidden' }}>
+                                                <Text size="md" fw={500} c={selectedChannelId === channel.id ? undefined : "dimmed"} className={selectedChannelId === channel.id ? "text-gray-900 dark:text-white font-semibold" : "text-gray-900 dark:text-gray-200"}>
+                                                    {getChannelName(channel, user?.id)}
                                                 </Text>
-                                                <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
-                                                    · {formatTime(channel.updatedAt)}
-                                                </Text>
-                                            </Group>
-                                        </Stack>
-                                        {/* Unread indicator mock - would be conditional */}
-                                        {/* <Box className="w-3 h-3 bg-blue-500 rounded-full" /> */}
-                                    </Group>
-                                );
-                            })
+                                                <Group gap="xs" wrap="nowrap">
+                                                    <Text size="sm" c="dimmed" truncate style={{ flex: 1 }} fw={channelIdParam ? 400 : 500}>
+                                                        {channel.tinNhans?.[0]
+                                                            ? (channel.tinNhans[0].nguoiGuiId === user?.id ? "Bạn: " : "") +
+                                                            (channel.tinNhans[0].loai === 'HINH_ANH' ? 'Đã gửi một ảnh' : channel.tinNhans[0].noiDung)
+                                                            : "Chưa có tin nhắn"}
+                                                    </Text>
+                                                    <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
+                                                        · {formatTime(channel.updatedAt)}
+                                                    </Text>
+                                                </Group>
+                                            </Stack>
+                                            {/* Unread indicator mock - would be conditional */}
+                                            {/* <Box className="w-3 h-3 bg-blue-500 rounded-full" /> */}
+                                        </Group>
+                                    );
+                                })}
+                            </>
                         ) : (
                             <Center py="xl" className="flex-col gap-2 text-center text-gray-400">
                                 <Text size="sm">Chưa có cuộc trò chuyện nào</Text>
+                                <Text size="xs" c="dimmed">Bấm nút + để bắt đầu trò chuyện mới</Text>
                             </Center>
                         )}
                     </Stack>
@@ -153,6 +264,73 @@ export default function ChatPage() {
                     </Center>
                 )}
             </Box>
+
+            {/* User Search Modal */}
+            <Modal
+                opened={showUserSearch}
+                onClose={() => {
+                    setShowUserSearch(false);
+                    setSearchQuery("");
+                    setSearchResults([]);
+                }}
+                title="Tìm kiếm người dùng để nhắn tin"
+                size="md"
+                radius="lg"
+            >
+                <Stack gap="md">
+                    <TextInput
+                        placeholder="Nhập tên người dùng..."
+                        leftSection={<IconSearch size={16} className="text-gray-500" />}
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        autoFocus
+                    />
+
+                    <ScrollArea h={300}>
+                        <Stack gap="xs">
+                            {isSearching ? (
+                                <Center py="xl"><Loader size="sm" color="indigo" /></Center>
+                            ) : searchResults.length > 0 ? (
+                                searchResults.map((searchUser) => (
+                                    <Group
+                                        key={searchUser.id}
+                                        wrap="nowrap"
+                                        p="sm"
+                                        className="cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-900 rounded-lg"
+                                        onClick={() => handleStartChat(searchUser)}
+                                    >
+                                        <Avatar
+                                            src={searchUser.avatar}
+                                            size={48}
+                                            radius="xl"
+                                        />
+                                        <Stack gap={2} style={{ flex: 1, overflow: 'hidden' }}>
+                                            <Text size="sm" fw={500} className="text-gray-900 dark:text-gray-200">
+                                                {searchUser.hoTen || searchUser.taiKhoan}
+                                            </Text>
+                                            <Text size="xs" c="dimmed" truncate>
+                                                {searchUser.email}
+                                            </Text>
+                                        </Stack>
+                                        <ActionIcon variant="subtle" color="blue" radius="xl" size="sm">
+                                            <IconMessagePlus size={16} />
+                                        </ActionIcon>
+                                    </Group>
+                                ))
+                            ) : searchQuery ? (
+                                <Center py="xl" className="flex-col gap-2 text-center text-gray-400">
+                                    <Text size="sm">Không tìm thấy người dùng</Text>
+                                    <Text size="xs" c="dimmed">Thử tìm kiếm với từ khóa khác</Text>
+                                </Center>
+                            ) : (
+                                <Center py="xl" className="flex-col gap-2 text-center text-gray-400">
+                                    <Text size="sm">Nhập tên để tìm kiếm người dùng</Text>
+                                </Center>
+                            )}
+                        </Stack>
+                    </ScrollArea>
+                </Stack>
+            </Modal>
         </Box>
     );
 }
@@ -169,7 +347,7 @@ const Pill = ({ label, active }: { label: string, active?: boolean }) => (
 );
 
 const ChannelInfoSidebar = ({ channel, currentUserId }: { channel: TChannel, currentUserId?: number }) => {
-    const targetUser = channel.loaiKenh === 'NHOM' ? null : channel.thanhViens.find(m => m.nguoiDungId !== currentUserId)?.nguoiDung;
+    const targetUser = channel.loaiKenh === 'NHOM' ? null : channel.thanhViens?.find(m => m.nguoiDungId !== currentUserId)?.nguoiDung;
     const name = getChannelName(channel, currentUserId);
     const avatar = getChannelAvatar(channel, currentUserId);
 
