@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Container, Stack, Title, Text, Button, Tabs, Card, Group, Badge, ThemeIcon, ActionIcon, Drawer, Box, LoadingOverlay, Select, TextInput, NumberInput, Textarea, ScrollArea } from "@mantine/core";
+import { Container, Stack, Title, Text, Button, Tabs, Card, Group, Badge, ThemeIcon, ActionIcon, Drawer, Box, Paper, LoadingOverlay, Select, TextInput, NumberInput, Textarea, ScrollArea } from "@mantine/core";
 import { IconPlus, IconFileDescription, IconClock, IconCheck, IconX, IconChevronRight, IconSearch, IconFilter } from "@tabler/icons-react";
 import { AppQuery } from "@/api/AppQuery";
 import { AppMutation } from "@/api/AppMutation";
@@ -214,142 +214,197 @@ function DynamicRequestForm({ flowId, flowName, onBack, onSuccess }: { flowId: n
     // Instead we'll manage local state or initialized useForm after loading.
     const [formData, setFormData] = useState<Record<string, any>>({});
 
+    // Safety check for empty or error state
+    const hasFields = Array.isArray(fields) && fields.length > 0;
+
     const handleSubmit = async () => {
         try {
-            // Transform data to expected submission format
-            // API likely expects: { flowId: number, values: { fieldId: value, ... } }
-            // Let's assume the mutation handles the URL structure.
-            // Wait, looking at AppMutation useSubmit: url: { baseUrl: "/submit-flow" }
-            // So it posts a body.
+            // Basic validation
+            if (fields) {
+                for (const field of fields) {
+                    if (field.batBuoc && !formData[field.id]) {
+                        notifications.show({
+                            title: "Thiếu thông tin",
+                            message: `Vui lòng nhập ${field.nhan}`,
+                            color: "red"
+                        });
+                        return;
+                    }
+                }
+            }
 
             const submissionData = {
                 flow_id: flowId,
-                data: formData, // Send raw key-value pair { [fieldId]: value }
+                data: JSON.stringify(formData), // Stringify data object as backend might expect JSON string or check DTO
                 target_id: null
             };
 
-            await submitMutation.mutateAsync(submissionData);
+            // Double check DTO type - older analysis said expected 'data'
+            // If backend throws "Flow is not active", it means the flow status is wrong on server.
+            // We can try to catch that specific error.
+
+            await submitMutation.mutateAsync({
+                flow_id: flowId,
+                data: formData, // Send object, let axios handle it, or check if backend expects string
+                target_id: null
+            });
+
             notifications.show({
                 title: "Thành công",
                 message: "Đơn yêu cầu đã được gửi đi.",
                 color: "green"
             });
             onSuccess();
-        } catch (error) {
-            notifications.show({
-                title: "Lỗi",
-                message: "Không thể gửi đơn. Vui lòng thử lại.",
-                color: "red"
-            });
+        } catch (error: any) {
+            const errorMsg = error?.response?.data?.message || error.message;
+            if (errorMsg === "Flow is not active") {
+                notifications.show({
+                    title: "Rất tiếc",
+                    message: "Quy trình này hiện đang tạm ngưng hoặc chưa được kích hoạt.",
+                    color: "orange"
+                });
+            } else {
+                notifications.show({
+                    title: "Lỗi",
+                    message: "Không thể gửi đơn. Vui lòng thử lại.",
+                    color: "red"
+                });
+            }
         }
     };
 
-    if (isLoading) return <Box p="xl" className="flex justify-center"><Text>Đang tải biểu mẫu...</Text></Box>;
-    if (!fields || fields.length === 0) return <Box p="xl"><Text c="dimmed">Không có trường nhập liệu nào.</Text></Box>;
+    if (isLoading) return (
+        <Stack align="center" justify="center" h={300}>
+            <LoadingOverlay visible={true} zIndex={1000} overlayProps={{ radius: "sm", blur: 2 }} loaderProps={{ color: 'indigo', type: 'bars' }} />
+            <Text size="sm" c="dimmed" mt="xl">Đang tải biểu mẫu...</Text>
+        </Stack>
+    );
+
+    if (!hasFields) return (
+        <Stack align="center" justify="center" h={300}>
+            <ThemeIcon size={60} radius="xl" color="gray" variant="light">
+                <IconFileDescription size={32} />
+            </ThemeIcon>
+            <Text c="dimmed">Quy trình này chưa có biểu mẫu nhập liệu.</Text>
+            <Button variant="light" onClick={onBack}>Quay lại</Button>
+        </Stack>
+    );
 
     return (
         <Stack h="100%" gap={0}>
-            <Box className="flex-1 overflow-y-auto p-4">
-                <Stack gap="lg">
+            <Box className="flex-1 overflow-y-auto p-4 md:p-6 custom-scrollbar">
+                <Stack gap="xl">
                     {/* Header Info */}
-                    <Box className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800">
+                    <Paper shadow="xs" p="lg" radius="lg" className="bg-indigo-50/50 dark:bg-indigo-900/10 border-indigo-100 dark:border-indigo-800">
                         <Group>
-                            <IconFileDescription size={24} className="text-blue-600" />
+                            <ThemeIcon size="xl" radius="md" color="indigo" variant="filled">
+                                <IconFileDescription size={24} />
+                            </ThemeIcon>
                             <div>
-                                <Text fw={700} size="lg" className="text-blue-900 dark:text-blue-100">{flowName}</Text>
-                                <Text size="sm" className="text-blue-700 dark:text-blue-200">Vui lòng điền đầy đủ thông tin bên dưới</Text>
+                                <Text fw={800} size="lg" className="text-indigo-900 dark:text-indigo-100">{flowName}</Text>
+                                <Text size="sm" className="text-indigo-700 dark:text-indigo-200">Vui lòng điền đầy đủ thông tin bên dưới</Text>
                             </div>
                         </Group>
-                    </Box>
+                    </Paper>
 
                     {/* Dynamic Inputs */}
-                    {fields.map((field: any) => {
-                        const commonProps = {
-                            label: field.label,
-                            required: field.batBuoc,
-                            description: field.moTa, // if any
-                            // Using field.id as key for formData
-                            onChange: (val: any) => setFormData(prev => ({ ...prev, [field.id]: val })),
-                        };
+                    <Stack gap="md">
+                        {fields.map((field: any) => {
+                            const commonProps = {
+                                label: <Text fw={600} size="sm">{field.nhan} {field.batBuoc && <span className="text-red-500">*</span>}</Text>,
+                                required: field.batBuoc,
+                                description: field.moTa, // if any
+                                withAsterisk: false, // Custom asterisk above
+                                size: "md",
+                                radius: "md",
+                                className: "transition-all focus-within:translate-x-1"
+                            };
 
-                        // Handle input change for events vs values
-                        const handleTextChange = (e: any) => setFormData(prev => ({ ...prev, [field.id]: e.target.value }));
+                            const handleChange = (val: any) => setFormData(prev => ({ ...prev, [field.id]: val }));
+                            const handleTextChange = (e: any) => handleChange(e.target.value);
 
-                        switch (field.loaiField) {
-                            case 'TEXT':
-                            case 'SHORT_TEXT':
-                                return (
-                                    <TextInput
-                                        key={field.id}
-                                        {...commonProps}
-                                        onChange={handleTextChange}
-                                        placeholder={`Nhập ${field.label.toLowerCase()}`}
-                                    />
-                                );
-                            case 'LONG_TEXT':
-                            case 'TEXTAREA':
-                                return (
-                                    <Textarea
-                                        key={field.id}
-                                        {...commonProps}
-                                        onChange={handleTextChange}
-                                        placeholder={`Nhập ${field.label.toLowerCase()}`}
-                                        minRows={3}
-                                    />
-                                );
-                            case 'NUMBER':
-                                return (
-                                    <NumberInput
-                                        key={field.id}
-                                        {...commonProps}
-                                        onChange={(val) => setFormData(prev => ({ ...prev, [field.id]: val }))}
-                                    />
-                                );
-                            case 'DATE':
-                                return (
-                                    <TextInput
-                                        key={field.id}
-                                        type="date"
-                                        {...commonProps}
-                                        onChange={handleTextChange}
-                                    />
-                                );
-                            // Add Select case if needed, assuming backend provides options in field definition
-                            case 'SELECT':
-                                return (
-                                    <Select
-                                        key={field.id}
-                                        {...commonProps}
-                                        data={field.options ? JSON.parse(field.options) : []}
-                                        onChange={(val) => setFormData(prev => ({ ...prev, [field.id]: val }))}
-                                    />
-                                );
-                            default:
-                                return (
-                                    <TextInput
-                                        key={field.id}
-                                        {...commonProps}
-                                        onChange={handleTextChange}
-                                    />
-                                );
-                        }
-                    })}
+                            // field.loai match from API: LONG_TEXT, TEXT, NUMBER, etc.
+                            switch (field.loai) {
+                                case 'TEXT':
+                                case 'SHORT_TEXT':
+                                    return (
+                                        <TextInput
+                                            key={field.id}
+                                            {...commonProps}
+                                            placeholder={`Nhập ${field.nhan.toLowerCase()}`}
+                                            onChange={handleTextChange}
+                                        />
+                                    );
+                                case 'LONG_TEXT':
+                                case 'TEXTAREA':
+                                    return (
+                                        <Textarea
+                                            key={field.id}
+                                            {...commonProps}
+                                            placeholder={`Nhập ${field.nhan.toLowerCase()} chi tiết`}
+                                            minRows={4}
+                                            onChange={handleTextChange}
+                                        />
+                                    );
+                                case 'NUMBER':
+                                    return (
+                                        <NumberInput
+                                            key={field.id}
+                                            {...commonProps}
+                                            placeholder="0"
+                                            onChange={handleChange}
+                                        />
+                                    );
+                                case 'DATE':
+                                    return (
+                                        <TextInput
+                                            key={field.id}
+                                            type="date"
+                                            {...commonProps}
+                                            onChange={handleTextChange}
+                                        />
+                                    );
+                                case 'SELECT':
+                                    return (
+                                        <Select
+                                            key={field.id}
+                                            {...commonProps}
+                                            data={field.tuyChon ? JSON.parse(field.tuyChon) : []}
+                                            placeholder="Chọn giá trị"
+                                            onChange={handleChange}
+                                        />
+                                    );
+                                default:
+                                    return (
+                                        <TextInput
+                                            key={field.id}
+                                            {...commonProps}
+                                            onChange={handleTextChange}
+                                        />
+                                    );
+                            }
+                        })}
+                    </Stack>
                 </Stack>
             </Box>
 
             {/* Footer Actions */}
-            <Box className="p-4 border-t border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950">
+            <Paper radius={0} className="p-4 border-t border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
                 <Group justify="space-between">
-                    <Button variant="default" onClick={onBack}>Quay lại</Button>
+                    <Button variant="subtle" color="gray" onClick={onBack} radius="xl">Quay lại</Button>
                     <Button
                         color="indigo"
+                        size="md"
+                        radius="xl"
                         loading={submitMutation.isPending}
                         onClick={handleSubmit}
+                        leftSection={<IconCheck size={18} />}
+                        className="shadow-md shadow-indigo-500/20"
                     >
-                        Gửi yêu cầu
+                        Gửi hồ sơ
                     </Button>
                 </Group>
-            </Box>
+            </Paper>
         </Stack>
     );
 }

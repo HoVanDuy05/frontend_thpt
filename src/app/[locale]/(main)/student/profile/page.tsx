@@ -92,7 +92,7 @@ export default function StudentProfilePage() {
                                 <Stack gap={0}>
                                     <InfoRow icon={IconId} label={t('identity_id')} value={studentInfo?.maSoHs || t('not_updated')} />
                                     <Divider className="border-gray-100 dark:border-zinc-800" />
-                                    <InfoRow icon={IconUser} label={t('full_name')} value={profile?.hoTen} highlight />
+                                    <InfoRow icon={IconUser} label={t('full_name')} value={profile?.hoTen || studentInfo?.hoTen || user?.taiKhoan || t('not_updated')} highlight />
                                     <Divider className="border-gray-100 dark:border-zinc-800" />
                                     <InfoRow icon={IconCalendar} label={t('dob')} value={profile?.ngaySinh ? dayjs(profile.ngaySinh).format('DD/MM/YYYY') : t('not_updated')} />
                                     <Divider className="border-gray-100 dark:border-zinc-800" />
@@ -100,7 +100,7 @@ export default function StudentProfilePage() {
                                     <Divider className="border-gray-100 dark:border-zinc-800" />
                                     <InfoRow icon={IconPhone} label={t('phone')} value={profile?.soDienThoai || t('not_updated')} />
                                     <Divider className="border-gray-100 dark:border-zinc-800" />
-                                    <InfoRow icon={IconMail} label={t('email')} value={profile?.email} />
+                                    <InfoRow icon={IconMail} label={t('email')} value={profile?.email || user?.email} />
                                     <Divider className="border-gray-100 dark:border-zinc-800" />
                                     <InfoRow icon={IconMapPin} label={t('address')} value={profile?.diaChi || t('not_updated')} isLast />
                                 </Stack>
@@ -263,7 +263,9 @@ function StudentCard({ user, profile, studentInfo, qrUrl, t }: { user: any, prof
                             </Box>
                             <div className="flex-1">
                                 <Text size="xs" className="opacity-60 mb-1">{t('full_name')}</Text>
-                                <Title order={3} className="text-white uppercase leading-none mb-3 text-shadow-sm">{profile?.hoTen}</Title>
+                                <Title order={3} className="text-white uppercase leading-none mb-3 text-shadow-sm">
+                                    {profile?.hoTen || studentInfo?.hoTen || user?.username || user?.email?.split('@')[0]}
+                                </Title>
 
                                 <Group gap="xl">
                                     <div>
