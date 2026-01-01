@@ -61,6 +61,7 @@
             "title": "Create New Workflow",
             "subtitle": "Configure approval steps & submission form",
             "basic_info": "Basic Information",
+            "info_tab": "Basic Info",
             "flow_steps": "Approval Flow",
             "form_builder": "Form Configuration",
             "add_step": "Add Step",

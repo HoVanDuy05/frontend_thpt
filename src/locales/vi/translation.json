@@ -61,6 +61,7 @@
             "title": "Thiết lập Quy trình mới",
             "subtitle": "Cấu hình luồng duyệt & biểu mẫu",
             "basic_info": "Thông tin cơ bản",
+            "info_tab": "Thông tin cơ bản",
             "flow_steps": "Luồng phê duyệt",
             "form_builder": "Cấu hình Form nộp",
             "add_step": "Thêm bước",

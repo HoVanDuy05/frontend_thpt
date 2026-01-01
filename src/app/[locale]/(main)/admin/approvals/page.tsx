@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Container, Stack, Title, Paper, Group, Button, Text, LoadingOverlay, Box, Badge, ActionIcon, Tooltip, Flex, Card, ThemeIcon, SimpleGrid, rem, RingProgress } from '@mantine/core';
+import { Container, Stack, Title, Paper, Group, Button, Text, LoadingOverlay, Box, Badge, ActionIcon, Tooltip, Flex, Card, ThemeIcon, SimpleGrid, rem, RingProgress, Tabs } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { ApprovalTable } from '@/feauture/approvals/components/ApprovalTable';
 import { FlowCategorySidebar } from '@/feauture/approvals/components/FlowCategorySidebar';
@@ -9,8 +9,9 @@ import { FlowBuilderDrawer } from '@/feauture/approvals/components/FlowBuilderDr
 import { AppQuery } from '@/api/AppQuery';
 import { AppMutation } from '@/api/AppMutation';
 import { notifications } from '@mantine/notifications';
-import { IconPlus, IconStack, IconSchool, IconSettings, IconClipboardList, IconClock, IconCheckbox, IconX, IconTrendingUp, IconFilter } from '@tabler/icons-react';
+import { IconPlus, IconStack, IconSchool, IconSettings, IconClipboardList, IconClock, IconCheckbox, IconX, IconTrendingUp, IconFilter, IconFileDescription, IconTrash } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
+import { dayjs } from "@/shared/utils/date.util";
 
 export default function ApprovalsPage() {
     const t = useTranslations('approvals');
@@ -24,6 +25,10 @@ export default function ApprovalsPage() {
     const { data: flows, isLoading: loadingFlows } = AppQuery.approvals.useFlows();
     const { data: categoriesData } = AppQuery.approvals.useCategories();
     const { data: myRequests, isLoading: loadingMy } = AppQuery.approvals.useMyFlows();
+    const [activeTab, setActiveTab] = useState<string | null>('flows');
+
+    // Filter flows based on activeCategory
+    const filteredFlows = flows?.filter((f: any) => activeCategory === 'all' || f.danhMucId?.toString() === activeCategory) || [];
 
     // Compute categories for sidebar
     const categories = [
@@ -185,39 +190,79 @@ export default function ApprovalsPage() {
                             ))}
                         </SimpleGrid>
 
-                        {/* Recent Requests Table */}
+                        {/* Management Section: Created Flows & Requests */}
                         <Stack gap="md">
                             <Group justify="space-between" align="center">
-                                <Title order={3} className="text-gray-800 dark:text-gray-100 flex items-center gap-2">
-                                    <IconClipboardList size={24} className="text-indigo-600" />
-                                    {t('table.title')}
-                                </Title>
+                                <Tabs value={activeTab} onChange={setActiveTab} variant="pills" radius="xl">
+                                    <Tabs.List>
+                                        <Tabs.Tab value="flows">Quy trình ({filteredFlows.length})</Tabs.Tab>
+                                        <Tabs.Tab value="requests">Yêu cầu cần duyệt ({myRequests?.length || 0})</Tabs.Tab>
+                                    </Tabs.List>
+                                </Tabs>
                                 <Button variant="subtle" size="sm" rightSection={<IconFilter size={16} />}>Bộ lọc</Button>
                             </Group>
 
-                            <Paper
-                                radius="lg"
-                                className="overflow-hidden shadow-sm border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"
-                            >
-                                <LoadingOverlay visible={loadingMy || loadingFlows} overlayProps={{ blur: 1 }} />
-                                <Box className="min-h-[400px]">
-                                    {myRequests && myRequests.length > 0 ? (
-                                        <ApprovalTable
-                                            requests={myRequests || []}
-                                            isAdmin
-                                            onView={(req) => console.log('View:', req)}
-                                            onAction={(id, action) => action === 'APPROVE' ? handleApprove(id) : handleReject(id)}
-                                        />
-                                    ) : (
-                                        <Stack align="center" justify="center" h={400} gap="md">
-                                            <ThemeIcon size={64} radius="full" variant="light" color="gray">
-                                                <IconClipboardList size={32} />
-                                            </ThemeIcon>
-                                            <Text size="lg" fw={500} c="dimmed">Chưa có yêu cầu nào</Text>
-                                        </Stack>
-                                    )}
-                                </Box>
-                            </Paper>
+                            <Box>
+                                {activeTab === 'flows' ? (
+                                    <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="lg">
+                                        {filteredFlows.map((flow: any) => (
+                                            <Card key={flow.id} withBorder radius="lg" padding="md" className="hover:shadow-md transition-shadow">
+                                                <Group justify="space-between" mb="xs">
+                                                    <ThemeIcon size="lg" radius="md" variant="light" color="blue">
+                                                        <IconFileDescription size={20} />
+                                                    </ThemeIcon>
+                                                    <Badge variant="light" color={flow.trangThai === 'HOAT_DONG' ? 'green' : 'gray'}>
+                                                        {flow.trangThai === 'HOAT_DONG' ? 'Hoạt động' : 'Nháp'}
+                                                    </Badge>
+                                                </Group>
+                                                <Text fw={700} size="lg" lineClamp={1} title={flow.ten}>{flow.ten}</Text>
+                                                <Text size="sm" c="dimmed" lineClamp={2} h={40} mt={4}>
+                                                    {flow.moTa || "Chưa có mô tả"}
+                                                </Text>
+
+                                                <Group mt="md" justify="space-between">
+                                                    <Text size="xs" c="dimmed">{dayjs(flow.createdAt).format('DD/MM/YYYY')}</Text>
+                                                    <Group gap={4}>
+                                                        <ActionIcon variant="subtle" color="blue" aria-label="Sửa">
+                                                            <IconSettings size={16} />
+                                                        </ActionIcon>
+                                                        <ActionIcon variant="subtle" color="red" aria-label="Xóa">
+                                                            <IconTrash size={16} />
+                                                        </ActionIcon>
+                                                    </Group>
+                                                </Group>
+                                            </Card>
+                                        ))}
+                                        {filteredFlows.length === 0 && (
+                                            <Text c="dimmed" fs="italic">Chưa có quy trình nào trong danh mục này.</Text>
+                                        )}
+                                    </SimpleGrid>
+                                ) : (
+                                    <Paper
+                                        radius="lg"
+                                        className="overflow-hidden shadow-sm border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"
+                                    >
+                                        <LoadingOverlay visible={loadingMy} overlayProps={{ blur: 1 }} />
+                                        <Box className="min-h-[400px]">
+                                            {myRequests && myRequests.length > 0 ? (
+                                                <ApprovalTable
+                                                    requests={myRequests || []}
+                                                    isAdmin
+                                                    onView={(req) => console.log('View:', req)}
+                                                    onAction={(id, action) => action === 'APPROVE' ? handleApprove(id) : handleReject(id)}
+                                                />
+                                            ) : (
+                                                <Stack align="center" justify="center" h={400} gap="md">
+                                                    <ThemeIcon size={64} radius="full" variant="light" color="gray">
+                                                        <IconClipboardList size={32} />
+                                                    </ThemeIcon>
+                                                    <Text size="lg" fw={500} c="dimmed">Chưa có yêu cầu nào cần duyệt</Text>
+                                                </Stack>
+                                            )}
+                                        </Box>
+                                    </Paper>
+                                )}
+                            </Box>
                         </Stack>
                     </Stack>
                 </Box>

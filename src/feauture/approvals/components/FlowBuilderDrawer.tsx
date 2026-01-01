@@ -148,15 +148,19 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
         return filtered;
     };
 
-    const InfoPanel = () => (
-        <ScrollArea.Autosize mah="calc(100vh - 200px)" type="scroll" offsetScrollbars scrollbarSize={6}>
-            <Stack p="xl" gap="xl" className="min-h-full">
+    // Render Helpers (Moved inside render to avoid recreation if they were components, or just use direct JSX)
+    // To avoid focus loss, we simply render them directly in the main return or useMemo if strictly needed. 
+    // But since they depend on state, direct JSX is best for this complexity.
+
+    const renderInfoPanel = () => (
+        <ScrollArea.Autosize mah="100%" type="scroll" offsetScrollbars scrollbarSize={6} className="h-full">
+            <Stack p="xl" gap="xl" className="min-h-full pb-24">
                 <Box>
                     <Group gap="xs" mb="lg">
                         <ThemeIcon color="indigo" variant="light" radius="md">
                             <IconInfoCircle size={18} />
                         </ThemeIcon>
-                        <Text fw={700} size="sm" tt="uppercase" c="dimmed">Thông tin cơ bản</Text>
+                        <Text fw={700} size="sm" tt="uppercase" c="dimmed">{t('info_tab') || "Thông tin cơ bản"}</Text>
                     </Group>
                     <Stack gap="md">
                         <TextInput
@@ -344,7 +348,7 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
         </ScrollArea.Autosize>
     );
 
-    const DesignPanel = () => (
+    const renderDesignPanel = () => (
         <Box className="h-full flex flex-col relative overflow-hidden bg-gray-50/50 dark:bg-zinc-900/50">
             <Box className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #6366f1 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
 
@@ -366,7 +370,7 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                     {/* Infinite Grid Background */}
                     <Box className="absolute inset-0 opacity-[0.03] pointer-events-none z-0" style={{ backgroundImage: 'linear-gradient(#4f46e5 1px, transparent 1px), linear-gradient(90deg, #4f46e5 1px, transparent 1px)', backgroundSize: '20px 20px', width: '200%', height: '200%' }} />
 
-                    <Box p="xl" className="min-w-fit min-h-full flex items-center md:items-start z-10 relative">
+                    <Box p="xl" className="min-w-fit min-h-full flex items-center md:items-start z-10 relative pb-32">
                         <Box className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-0 pl-10 pr-20 py-20 min-w-[600px]">
 
                             {/* START NODE */}
@@ -421,7 +425,7 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                                                         data={approverOptions}
                                                         placeholder="Chọn người duyệt..."
                                                         searchable
-                                                        nothingFoundMessage="Khong tìm thấy"
+                                                        nothingFoundMessage="Không tìm thấy"
                                                         value={step.approverType}
                                                         onChange={(val) => {
                                                             if (val) {
@@ -501,7 +505,7 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
             overlayProps={{ backgroundOpacity: 0.5, blur: 4 }}
             styles={{
                 content: { display: 'flex', flexDirection: 'column', backgroundColor: 'var(--mantine-color-body)' },
-                body: { padding: 0, flex: 1, overflow: 'hidden', height: '100%' }
+                body: { padding: 0, flex: 1, overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column' }
             }}
         >
             {/* Custom Header */}
@@ -512,8 +516,8 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                             <IconTemplate size={24} stroke={2} color="white" />
                         </ThemeIcon>
                         <Stack gap={0}>
-                            <Text fw={800} size="lg" className="text-gray-900 dark:text-gray-100">{t('title')}</Text>
-                            <Text size="xs" c="dimmed" fw={600} tt="uppercase" lts={1}>{t('subtitle')}</Text>
+                            <Text fw={800} size="lg" className="text-gray-900 dark:text-gray-100">{t('title') || "Trình tạo quy trình"}</Text>
+                            <Text size="xs" c="dimmed" fw={600} tt="uppercase" lts={1}>{t('subtitle') || "Thiết kế luồng & biểu mẫu"}</Text>
                         </Stack>
                     </Group>
                     <ActionIcon variant="subtle" color="gray" onClick={onClose} size="lg" radius="xl">
@@ -522,7 +526,7 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                 </Group>
             </Box>
 
-            <form className="h-full flex flex-col overflow-hidden" onSubmit={handleSubmit}>
+            <form className="flex flex-col flex-1 overflow-hidden" onSubmit={handleSubmit}>
 
                 {isMobile ? (
                     <Tabs value={activeTab} onChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden" styles={{ panel: { flex: 1, overflow: 'hidden' } }}>
@@ -531,28 +535,28 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                             <Tabs.Tab value="design" leftSection={<IconGitPullRequest size={16} />}>Quy trình</Tabs.Tab>
                         </Tabs.List>
 
-                        <Tabs.Panel value="info">
-                            <InfoPanel />
+                        <Tabs.Panel value="info" className="flex-1 overflow-hidden relative">
+                            {renderInfoPanel()}
                         </Tabs.Panel>
 
-                        <Tabs.Panel value="design">
-                            <DesignPanel />
+                        <Tabs.Panel value="design" className="flex-1 overflow-hidden relative">
+                            {renderDesignPanel()}
                         </Tabs.Panel>
                     </Tabs>
                 ) : (
-                    <Box className="flex-1 flex flex-row overflow-hidden">
-                        <Box className="w-[420px] border-r border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 flex flex-col overflow-hidden">
-                            <InfoPanel />
+                    <Box className="flex-1 flex flex-row overflow-hidden h-full">
+                        <Box className="w-[420px] border-r border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0 flex flex-col overflow-hidden h-full">
+                            {renderInfoPanel()}
                         </Box>
-                        <Box className="flex-1 flex flex-col overflow-hidden bg-gray-50/50">
-                            <DesignPanel />
+                        <Box className="flex-1 flex flex-col overflow-hidden bg-gray-50/50 h-full">
+                            {renderDesignPanel()}
                         </Box>
                     </Box>
                 )}
 
-                <Box p="md" className="border-t border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 z-20 shrink-0">
+                <Box p="md" className="border-t border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 z-50 shrink-0">
                     <Group justify="flex-end">
-                        <Button variant="default" onClick={onClose} disabled={loading} radius="md">{t('cancel')}</Button>
+                        <Button variant="default" onClick={onClose} disabled={loading} radius="md">{t('cancel') || "Hủy"}</Button>
                         <Button
                             color="indigo"
                             loading={loading}
@@ -562,7 +566,7 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                             leftSection={<IconDeviceFloppy size={18} />}
                             className="bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-100 dark:shadow-none transition-all"
                         >
-                            {t('submit')}
+                            {t('submit') || "Lưu quy trình"}
                         </Button>
                     </Group>
                 </Box>
