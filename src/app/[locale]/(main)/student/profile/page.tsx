@@ -1,13 +1,13 @@
 "use client";
 
 import { Box, Group, Stack, Text, Avatar, Badge, Grid, Button, ThemeIcon, Divider, Title, Paper, Image } from "@mantine/core";
-import { IconUser, IconEdit, IconSchool, IconId, IconPhone, IconMapPin, IconCalendar, IconMail, IconLogout, IconSettings, IconChevronRight } from "@tabler/icons-react";
+import { IconUser, IconEdit, IconSchool, IconId, IconPhone, IconMapPin, IconCalendar, IconMail, IconLogout, IconSettings, IconChevronRight, IconGitPullRequest } from "@tabler/icons-react";
 import { AppQuery } from "@/api/AppQuery";
 import { useState } from "react";
 import { useAppStore } from "@/providers/store/useAppStore";
 import { EditProfileModal } from "@/feauture/social/components/EditProfileModal";
 import { dayjs } from "@/shared/utils/date.util";
-import { useRouter } from "@/i18n/routing";
+import { useRouter, Link } from "@/i18n/routing";
 import { notifications } from "@mantine/notifications";
 import { useTranslations } from "next-intl";
 
@@ -130,6 +130,21 @@ export default function StudentProfilePage() {
                                 <Text fw={700} mb="md" size="sm" c="dimmed" tt="uppercase">{t('settings_section')}</Text>
                                 <Stack gap="xs">
                                     <Button
+                                        component={Link}
+                                        href="/student/my-flow"
+                                        variant="light"
+                                        color="violet"
+                                        fullWidth
+                                        justify="space-between"
+                                        h={50}
+                                        radius="lg"
+                                        leftSection={<IconGitPullRequest size={20} />}
+                                        rightSection={<IconChevronRight size={16} />}
+                                        className="bg-violet-50 hover:bg-violet-100 dark:bg-zinc-800/50 dark:hover:bg-zinc-800 text-violet-600 dark:text-violet-400"
+                                    >
+                                        <Text fw={600}>{t('my_flows')}</Text>
+                                    </Button>
+                                    <Button
                                         variant="light"
                                         color="gray"
                                         fullWidth
@@ -222,10 +237,9 @@ function StudentCard({ user, profile, studentInfo, qrUrl, t }: { user: any, prof
                                 </div>
                             </Group>
                             <Image
-                                src="/logo-white.svg" // Fallback or transparent logo often looks best
+                                src="/favicon.png"
                                 w={40}
-                                className="opacity-80"
-                                fallbackSrc="https://placehold.co/40x40/transparent/white?text=LOGO"
+                                className="opacity-90"
                             />
                         </Group>
 
@@ -268,7 +282,11 @@ function StudentCard({ user, profile, studentInfo, qrUrl, t }: { user: any, prof
                         <Group justify="space-between" align="end" className="mt-4 pt-4 border-t border-white/10">
                             <Group gap={4}>
                                 <Text size="xs" className="opacity-50">{t('card_year_label')}</Text>
-                                <Text size="xs" fw={600} className="opacity-80">2023 - 2026</Text>
+                                <Text size="xs" fw={600} className="opacity-80">
+                                    {studentInfo?.ngayNhapHoc
+                                        ? `${new Date(studentInfo.ngayNhapHoc).getFullYear()} - ${new Date(studentInfo.ngayNhapHoc).getFullYear() + 3}`
+                                        : "2023 - 2026"}
+                                </Text>
                             </Group>
 
                             <Box className="bg-white p-1 rounded-lg shadow-lg">
