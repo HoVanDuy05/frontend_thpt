@@ -1,4 +1,4 @@
-import { Paper, Group, ActionIcon, Avatar, Text, Stack, ScrollArea, Box, Loader, Center, Image, Drawer, Divider, Badge, Accordion, ThemeIcon, UnstyledButton } from "@mantine/core";
+import { Paper, Group, ActionIcon, Avatar, Text, Stack, ScrollArea, Box, Loader, Center, Image, Drawer, Divider, Badge, Accordion, ThemeIcon, UnstyledButton, Modal } from "@mantine/core";
 import { IconArrowLeft, IconPhone, IconVideo, IconInfoCircle, IconPhoto, IconFile, IconBell, IconSearch } from "@tabler/icons-react";
 import { TChannel } from "@/api/types/api.type";
 import { AppQuery } from "@/api/AppQuery";
@@ -25,6 +25,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
     const [presence, setPresence] = useState<{ online: boolean; lastSeen: string | null } | null>(null);
     const [receiptByMessageId, setReceiptByMessageId] = useState<Record<number, 'sent' | 'delivered' | 'seen'>>({});
     const [infoOpened, setInfoOpened] = useState(false);
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
     const viewport = useRef<HTMLDivElement>(null);
     const isMobile = useMediaQuery('(max-width: 48em)');
@@ -344,8 +345,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
                                                         )}
 
                                                         {msg.loai === 'HINH_ANH' && (
-                                                            <Box style={{ maxWidth: 360 }}>
-                                                                <Image src={msg.duongDanTep || msg.noiDung} alt="Image" radius="md" />
+                                                            <Box style={{ maxWidth: 360 }} className="cursor-pointer overflow-hidden rounded-md" onClick={() => setPreviewImage(msg.duongDanTep || msg.noiDung || null)}>
+                                                                <Image
+                                                                    src={msg.duongDanTep || msg.noiDung}
+                                                                    alt="Image"
+                                                                    radius="md"
+                                                                    className="transition-transform hover:scale-105 duration-300"
+                                                                />
                                                             </Box>
                                                         )}
 
@@ -368,8 +374,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
                                                     )}
 
                                                     {msg.loai === 'HINH_ANH' && (
-                                                        <Box style={{ maxWidth: 360 }}>
-                                                            <Image src={msg.duongDanTep || msg.noiDung} alt="Image" radius="md" />
+                                                        <Box style={{ maxWidth: 360 }} className="cursor-pointer overflow-hidden rounded-md" onClick={() => setPreviewImage(msg.duongDanTep || msg.noiDung || null)}>
+                                                            <Image
+                                                                src={msg.duongDanTep || msg.noiDung}
+                                                                alt="Image"
+                                                                radius="md"
+                                                                className="transition-transform hover:scale-105 duration-300"
+                                                            />
                                                         </Box>
                                                     )}
 
@@ -394,6 +405,29 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
                     </Stack>
                 </div>
             </ScrollArea>
+
+            {/* Image Preview Modal */}
+            <Modal
+                opened={!!previewImage}
+                onClose={() => setPreviewImage(null)}
+                size="xl"
+                centered
+                withCloseButton={false}
+                padding={0}
+                styles={{
+                    content: { backgroundColor: 'transparent', boxShadow: 'none' },
+                    body: { display: 'flex', justifyContent: 'center' }
+                }}
+            >
+                {previewImage && (
+                    <Image
+                        src={previewImage}
+                        alt="Full preview"
+                        radius="md"
+                        style={{ maxHeight: '90vh', maxWidth: '100vw', objectFit: 'contain' }}
+                    />
+                )}
+            </Modal>
 
             <div className="shrink-0 border-t border-gray-200/70 dark:border-zinc-900 bg-white/90 dark:bg-black/80 backdrop-blur">
                 <ChatInput channelId={channel.id} onTyping={handleTyping} />

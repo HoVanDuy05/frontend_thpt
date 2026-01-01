@@ -2,8 +2,9 @@
 
 import React, { useState, useRef } from 'react';
 import { Paper, Group, Avatar, Textarea, Button, Stack, ActionIcon, FileButton, Image, Box, Text, Divider } from '@mantine/core';
-import { IconPhoto, IconGif, IconList, IconAt, IconX, IconFaceSmile } from '@tabler/icons-react';
-import { AppQuery, AppMutation } from '@/api/AppQuery';
+import { IconPhoto, IconGif, IconList, IconAt, IconX, IconFileSmile } from '@tabler/icons-react';
+import { AppQuery } from '@/api/AppQuery';
+import { AppMutation } from '@/api/AppMutation';
 import { notifications } from '@mantine/notifications';
 import { useTranslations } from 'next-intl';
 
@@ -86,8 +87,7 @@ export const CreateThread: React.FC<CreateThreadProps> = ({
         <Paper
             p={compact ? "md" : "lg"}
             bg="white"
-            darkBg="zinc-900"
-            className={`border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md transition-all ${isFocused ? 'ring-2 ring-indigo-500/20 dark:ring-indigo-400/20' : ''}`}
+            className={`border border-gray-200 dark:border-zinc-800 dark:bg-zinc-900 rounded-2xl shadow-sm hover:shadow-md transition-all ${isFocused ? 'ring-2 ring-indigo-500/20 dark:ring-indigo-400/20' : ''}`}
         >
             <Group align="flex-start" wrap="nowrap" gap="md">
                 {showAvatar && (
@@ -210,7 +210,7 @@ export const CreateThread: React.FC<CreateThreadProps> = ({
                                         className="opacity-40 cursor-not-allowed"
                                         title="Emoji (Sắp có)"
                                     >
-                                        <IconFaceSmile size={20} />
+                                        <IconFileSmile size={20} />
                                     </ActionIcon>
                                 </Group>
 
