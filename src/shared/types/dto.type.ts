@@ -121,7 +121,8 @@ export interface TCreateFlowFieldsDto {
 
 export interface TSubmitFlowInstanceDto {
     flow_id: number;
-    target_id: any;
+    target_id?: any;
+    data: Record<string, any>; // Key-value answers
 }
 
 export interface TApproveStepDto {

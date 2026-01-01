@@ -84,9 +84,9 @@ export default function ApprovalsPage() {
         <Box h="calc(100vh - 60px)" className="overflow-hidden flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-900 dark:to-zinc-800">
             {/* Page Header */}
             <Box px={{ base: "md", md: "xl" }} py="lg" className="border-b border-gray-200/50 dark:border-zinc-700/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm shrink-0">
-                <Group justify="space-between">
+                <Group justify="space-between" align="center">
                     <Stack gap={6}>
-                        <Group gap="sm">
+                        <Group gap="sm" align="center">
                             {isMobile && (
                                 <ActionIcon variant="subtle" onClick={toggleSidebar} color="gray" size="lg" className="hover:bg-gray-100 dark:hover:bg-zinc-800">
                                     <IconSettings size={20} />
@@ -119,7 +119,12 @@ export default function ApprovalsPage() {
                     >
                         {isMobile && (
                             <Box p="md" className="border-b border-gray-200/50 dark:border-zinc-700/50 bg-white/80 dark:bg-zinc-900/80">
-                                <Button variant="subtle" fullWidth onClick={toggleSidebar} className="hover:bg-gray-100 dark:hover:bg-zinc-800">
+                                <Button
+                                    variant="subtle"
+                                    fullWidth
+                                    onClick={toggleSidebar}
+                                    className="hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300"
+                                >
                                     {t('close_categories')}
                                 </Button>
                             </Box>
@@ -142,7 +147,7 @@ export default function ApprovalsPage() {
                         <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="lg">
                             {stats.map((stat) => (
                                 <Card key={stat.label} withBorder radius="xl" className="bg-white dark:bg-zinc-800 hover:shadow-lg transition-all border-gray-200/50 dark:border-zinc-700/50">
-                                    <Group justify="space-between">
+                                    <Group justify="space-between" align="center">
                                         <Stack gap={2}>
                                             <Text size="xs" c="dimmed" fw={700} tt="uppercase" className="text-gray-500 dark:text-gray-400">
                                                 {stat.label}
@@ -162,7 +167,7 @@ export default function ApprovalsPage() {
                         {/* Approvals Table */}
                         <Paper withBorder radius="xl" className="overflow-hidden shadow-xl bg-white dark:bg-zinc-800 border-gray-200/50 dark:border-zinc-700/50">
                             <Box p="lg" className="border-b border-gray-200/50 dark:border-zinc-700/50 bg-gradient-to-r from-gray-50 to-white dark:from-zinc-800 dark:to-zinc-800">
-                                <Group justify="space-between">
+                                <Group justify="space-between" align="center">
                                     <Stack gap={2}>
                                         <Text fw={800} size="lg" className="text-gray-900 dark:text-white">{t('table.title')}</Text>
                                         <Text size="sm" c="dimmed" className="text-gray-600 dark:text-gray-400">
@@ -172,12 +177,14 @@ export default function ApprovalsPage() {
                                 </Group>
                             </Box>
                             <LoadingOverlay visible={loadingMy || loadingFlows} overlayProps={{ blur: 2 }} />
-                            <ApprovalTable
-                                requests={myRequests || []}
-                                isAdmin
-                                onView={(req) => console.log('View:', req)}
-                                onAction={(id, action) => action === 'APPROVE' ? handleApprove(id) : handleReject(id)}
-                            />
+                            <Box className="min-h-[400px]">
+                                <ApprovalTable
+                                    requests={myRequests || []}
+                                    isAdmin
+                                    onView={(req) => console.log('View:', req)}
+                                    onAction={(id, action) => action === 'APPROVE' ? handleApprove(id) : handleReject(id)}
+                                />
+                            </Box>
                         </Paper>
                     </Stack>
                 </Box>

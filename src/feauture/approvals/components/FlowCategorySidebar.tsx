@@ -27,12 +27,15 @@ const DEFAULT_CATEGORIES: Category[] = [
     { id: 'academic', label: 'Học vụ & Đào tạo', icon: IconSchool, count: 0 },
 ];
 
-export function FlowCategorySidebar({ activeCategory, onCategoryChange, categories = DEFAULT_CATEGORIES }: FlowCategorySidebarProps) {
+export function FlowCategorySidebar({ activeCategory, onCategoryChange, categories }: FlowCategorySidebarProps) {
     const [popoverOpened, setPopoverOpened] = useState(false);
     const [newCategoryName, setNewCategoryName] = useState('');
 
     const mutation = AppMutation();
     const createCategoryMutation = mutation.approvals.useCreateCategory();
+
+    // Use provided categories or default categories
+    const displayCategories = categories && categories.length > 0 ? categories : DEFAULT_CATEGORIES;
 
     const handleCreateCategory = () => {
         if (!newCategoryName.trim()) {
@@ -113,7 +116,7 @@ export function FlowCategorySidebar({ activeCategory, onCategoryChange, categori
                         </Popover.Dropdown>
                     </Popover>
                 </Group>
-                {categories.map((cat) => {
+                {displayCategories.map((cat) => {
                     const isActive = activeCategory === cat.id;
                     const Icon = cat.icon;
                     return (
