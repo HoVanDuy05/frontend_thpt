@@ -238,6 +238,7 @@ export default function UserProfilePage() {
                         <Tabs.Tab value="threads">{t('posts')}</Tabs.Tab>
                         <Tabs.Tab value="replies">{t('replies')}</Tabs.Tab>
                         <Tabs.Tab value="reposts">{t('reposts')}</Tabs.Tab>
+                        <Tabs.Tab value="about">{t('about')}</Tabs.Tab>
                     </Tabs.List>
 
                     <Tabs.Panel value="threads" px={0}>
@@ -263,6 +264,39 @@ export default function UserProfilePage() {
                             <Text c="dimmed" size="sm" className="font-light">{t('no_reposts')}</Text>
                         </Center>
                     </Tabs.Panel>
+
+                    <Tabs.Panel value="about" pt="md">
+                        <Stack gap="xl">
+                            <Box>
+                                <Title order={4} mb="md" className="text-gray-900 dark:text-white font-bold">{t('personalInfo')}</Title>
+                                <Stack gap="xs">
+                                    <InfoRow label={t('email')} value={profile.email} icon={null} />
+                                    <InfoRow label={t('phone')} value={profile.soDienThoai} icon={null} />
+                                    <InfoRow label={t('gender')} value={profile.gioiTinh === 'NAM' ? t('male') : t('female')} icon={null} />
+                                    <InfoRow label={t('dateOfBirth')} value={profile.ngaySinh ? new Date(profile.ngaySinh).toLocaleDateString(locale === 'vi' ? 'vi-VN' : 'en-US') : null} icon={null} />
+                                    <InfoRow label={t('address')} value={profile.diaChi} icon={null} />
+                                </Stack>
+                            </Box>
+
+                            {(profile.hoSoHocSinh || profile.hoSoGiaoVien) && (
+                                <Box>
+                                    <Title order={4} mb="md" className="text-gray-900 dark:text-white font-bold">{t('class')}</Title>
+                                    <Stack gap="xs">
+                                        {profile.hoSoHocSinh?.lopHoc && (
+                                            <InfoRow label={t('class')} value={profile.hoSoHocSinh.lopHoc.tenLop} icon={null} />
+                                        )}
+                                        {profile.hoSoGiaoVien?.chuyenMon && (
+                                            <InfoRow label={t('specialization')} value={profile.hoSoGiaoVien.chuyenMon} icon={null} />
+                                        )}
+                                    </Stack>
+                                </Box>
+                            )}
+
+                            {!profile.email && !profile.soDienThoai && !profile.diaChi && (
+                                <Text c="dimmed" size="sm" ta="center" py="xl">{t('no_info')}</Text>
+                            )}
+                        </Stack>
+                    </Tabs.Panel>
                 </Tabs>
             </Box>
 
@@ -274,5 +308,15 @@ export default function UserProfilePage() {
                 />
             )}
         </Container>
+    );
+}
+
+function InfoRow({ label, value, icon }: { label: string, value: any, icon?: any }) {
+    if (!value) return null;
+    return (
+        <Group justify="space-between" align="center" py={8} className="border-b border-gray-100 dark:border-zinc-800 last:border-0">
+            <Text size="sm" c="dimmed">{label}</Text>
+            <Text size="sm" fw={500} className="text-gray-900 dark:text-gray-100">{value}</Text>
+        </Group>
     );
 }

@@ -2,9 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import { Link } from "@/i18n/routing";
-import { IconHome, IconCalendar, IconChartBar, IconUsers, IconUser } from "@tabler/icons-react";
+import { IconHome, IconCalendar, IconChartBar, IconUsers, IconUser, IconGitPullRequest } from "@tabler/icons-react";
 import { Box } from "@mantine/core";
-
 import { useTranslations } from "next-intl";
 
 export function BottomNav() {
@@ -14,7 +13,7 @@ export function BottomNav() {
     const navItems = [
         { href: "/student", icon: IconHome, label: t("home") },
         { href: "/student/schedule", icon: IconCalendar, label: t("schedule") },
-        { href: "/student/grades", icon: IconChartBar, label: t("grades") },
+        { href: "/student/my-flow", icon: IconGitPullRequest, label: t("flow") },
         { href: "/student/social", icon: IconUsers, label: t("social") },
         { href: "/student/profile", icon: IconUser, label: t("profile") },
     ];

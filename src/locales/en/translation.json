@@ -393,6 +393,7 @@
             "schedule": "Schedule",
             "grades": "Results",
             "social": "Social",
+            "flow": "Flows",
             "profile": "Profile"
         },
         "home": {
