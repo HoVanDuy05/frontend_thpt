@@ -6,7 +6,10 @@ import { Box } from "@mantine/core";
 export default function SocialPage() {
     return (
         <Box className="w-full">
-            <ThreadFeed />
+            <ThreadFeed
+                showCreatePost={true}
+                createPostPlaceholder="Chia sẻ suy nghĩ của bạn..."
+            />
         </Box>
     );
 }

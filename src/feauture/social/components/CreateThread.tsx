@@ -1,23 +1,36 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
-import { Paper, Group, Avatar, Textarea, Button, Stack, ActionIcon, FileButton, Image, Box, CloseButton, Loader } from '@mantine/core';
-import { IconPhoto, IconGif, IconList, IconAt, IconX } from '@tabler/icons-react';
-import { AppMutation } from '@/api/AppMutation';
+import { Paper, Group, Avatar, Textarea, Button, Stack, ActionIcon, FileButton, Image, Box, CloseButton, Loader, Text, Divider, Badge } from '@mantine/core';
+import { IconPhoto, IconGif, IconList, IconAt, IconX, IconFaceSmile, IconCalendar, IconLocation } from '@tabler/icons-react';
+import { AppMutation } from '@/api/AppQuery';
 import { AppQuery } from '@/api/AppQuery';
 import { notifications } from '@mantine/notifications';
+import { useTranslations } from 'next-intl';
 
 interface CreateThreadProps {
     onPost: (content: string, image?: string) => void;
     loading?: boolean;
+    placeholder?: string;
+    showAvatar?: boolean;
+    compact?: boolean;
 }
 
-export const CreateThread: React.FC<CreateThreadProps> = ({ onPost, loading: isPosting }) => {
+export const CreateThread: React.FC<CreateThreadProps> = ({
+    onPost,
+    loading: isPosting,
+    placeholder = "Có gì mới?",
+    showAvatar = true,
+    compact = false
+}) => {
+    const t = useTranslations('social');
     const { data: profile } = AppQuery.auth.useProfile();
     const [content, setContent] = useState('');
     const [file, setFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
+    const [isFocused, setIsFocused] = useState(false);
     const uploadImageMutation = AppMutation().upload.useUploadImage();
+    const textareaRef = useRef<HTMLTextAreaElement>(null);
 
     const handleFileChange = (payload: File | null) => {
         setFile(payload);
@@ -58,87 +71,180 @@ export const CreateThread: React.FC<CreateThreadProps> = ({ onPost, loading: isP
         setContent('');
         setFile(null);
         setPreview(null);
+        setIsFocused(false);
     };
 
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault();
+            handleSubmit();
+        }
+    };
+
+    const hasContent = content.trim() || file;
+
     return (
-        <Paper p="xl" bg="transparent" className="border-b border-gray-100 dark:border-zinc-900 rounded-none sm:rounded-3xl sm:border sm:bg-white/50 dark:sm:bg-zinc-900/10 backdrop-blur-sm">
-            <Group align="flex-start" wrap="nowrap" gap="xl">
-                <Avatar
-                    src={profile?.avatar}
-                    alt={profile?.hoTen}
-                    radius="xl"
-                    size={48}
-                    className="shadow-md ring-2 ring-zinc-50 dark:ring-zinc-800"
-                />
-                <Stack gap="md" style={{ flex: 1 }}>
+        <Paper
+            p={compact ? "md" : "lg"}
+            bg="white"
+            darkBg="zinc-900"
+            className={`border border-gray-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md transition-all ${isFocused ? 'ring-2 ring-indigo-500/20 dark:ring-indigo-400/20' : ''}`}
+        >
+            <Group align="flex-start" wrap="nowrap" gap="md">
+                {showAvatar && (
+                    <Avatar
+                        src={profile?.avatar}
+                        alt={profile?.hoTen}
+                        radius="full"
+                        size={compact ? 40 : 48}
+                        className="shadow-sm ring-2 ring-gray-100 dark:ring-zinc-800"
+                    />
+                )}
+
+                <Stack gap="sm" style={{ flex: 1 }}>
                     <Textarea
-                        placeholder="Có gì mới?"
+                        ref={textareaRef}
+                        placeholder={placeholder}
                         variant="unstyled"
                         autosize
-                        minRows={2}
+                        minRows={compact ? 1 : 2}
+                        maxRows={8}
                         value={content}
                         onChange={(event) => setContent(event.currentTarget.value)}
+                        onKeyDown={handleKeyDown}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => {
+                            if (!hasContent) {
+                                setIsFocused(false);
+                            }
+                        }}
                         classNames={{
-                            input: "text-[18px] md:text-[22px] font-medium text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-300 dark:placeholder:text-zinc-700 p-0 leading-relaxed"
+                            input: `text-[15px] md:text-[16px] font-normal text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-600 p-0 leading-relaxed resize-none ${compact ? 'py-2' : 'py-3'}`
+                        }}
+                        styles={{
+                            root: {
+                                minHeight: compact ? 'auto' : '60px'
+                            }
                         }}
                     />
 
                     {preview && (
-                        <Box className="relative mt-4 rounded-3xl overflow-hidden border border-zinc-100 dark:border-zinc-800 shadow-xl group">
-                            <Image src={preview} alt="Preview" radius="xl" className="max-h-[500px] object-cover" />
+                        <Box className="relative rounded-2xl overflow-hidden border border-gray-200 dark:border-zinc-700 shadow-sm">
+                            <Image
+                                src={preview}
+                                alt="Preview"
+                                radius="md"
+                                className="max-h-[400px] w-full object-cover"
+                            />
                             <ActionIcon
-                                color="dark"
                                 variant="filled"
-                                radius="xl"
-                                size="lg"
+                                color="dark"
+                                radius="full"
+                                size="sm"
                                 onClick={removeImage}
-                                className="absolute top-4 right-4 bg-black/40 hover:bg-black/80 backdrop-blur-xl transition-all scale-90 group-hover:scale-100"
+                                className="absolute top-2 right-2 bg-black/60 hover:bg-black/80 backdrop-blur-sm transition-all"
                             >
-                                <IconX size={18} stroke={2.5} />
+                                <IconX size={16} />
                             </ActionIcon>
                         </Box>
                     )}
 
-                    <Group justify="space-between" align="center" mt="xl">
-                        <Group gap="md">
-                            <FileButton onChange={handleFileChange} accept="image/*">
-                                {(props) => (
+                    {(hasContent || isFocused) && (
+                        <>
+                            <Divider variant="dashed" />
+                            <Group justify="space-between" align="center" py="xs">
+                                <Group gap="xs">
+                                    <FileButton onChange={handleFileChange} accept="image/*">
+                                        {(props) => (
+                                            <ActionIcon
+                                                {...props}
+                                                variant="subtle"
+                                                color="gray"
+                                                radius="full"
+                                                size="lg"
+                                                className="hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
+                                                title="Thêm ảnh"
+                                            >
+                                                <IconPhoto size={20} />
+                                            </ActionIcon>
+                                        )}
+                                    </FileButton>
+
                                     <ActionIcon
-                                        {...props}
                                         variant="subtle"
                                         color="gray"
-                                        radius="xl"
-                                        size="xl"
-                                        className="hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600 transition-colors"
+                                        radius="full"
+                                        size="lg"
+                                        className="opacity-40 cursor-not-allowed"
+                                        title="GIF (Sắp có)"
                                     >
-                                        <IconPhoto size={24} stroke={2} />
+                                        <IconGif size={20} />
                                     </ActionIcon>
-                                )}
-                            </FileButton>
 
-                            <ActionIcon variant="subtle" color="gray" radius="xl" size="xl" className="opacity-20 cursor-not-allowed">
-                                <IconGif size={24} stroke={2} />
-                            </ActionIcon>
-                            <ActionIcon variant="subtle" color="gray" radius="xl" size="xl" className="opacity-20 cursor-not-allowed">
-                                <IconList size={24} stroke={2} />
-                            </ActionIcon>
-                            <ActionIcon variant="subtle" color="gray" radius="xl" size="xl" className="opacity-20 cursor-not-allowed">
-                                <IconAt size={24} stroke={2} />
-                            </ActionIcon>
-                        </Group>
+                                    <ActionIcon
+                                        variant="subtle"
+                                        color="gray"
+                                        radius="full"
+                                        size="lg"
+                                        className="opacity-40 cursor-not-allowed"
+                                        title="Cuộc thăm dò (Sắp có)"
+                                    >
+                                        <IconList size={20} />
+                                    </ActionIcon>
 
-                        <Button
-                            radius="xl"
-                            size="md"
-                            disabled={!content.trim() && !file}
-                            loading={isPosting || uploadImageMutation.isPending}
-                            onClick={handleSubmit}
-                            color="black"
-                            className="px-8 dark:bg-white dark:text-black font-black uppercase tracking-[0.2em] text-[12px] h-[44px] shadow-lg hover:translate-y-[-2px] active:translate-y-[0] transition-transform"
-                        >
-                            Đăng bài
-                        </Button>
-                    </Group>
+                                    <ActionIcon
+                                        variant="subtle"
+                                        color="gray"
+                                        radius="full"
+                                        size="lg"
+                                        className="opacity-40 cursor-not-allowed"
+                                        title="Gắn thẻ (Sắp có)"
+                                    >
+                                        <IconAt size={20} />
+                                    </ActionIcon>
+
+                                    <ActionIcon
+                                        variant="subtle"
+                                        color="gray"
+                                        radius="full"
+                                        size="lg"
+                                        className="opacity-40 cursor-not-allowed"
+                                        title="Emoji (Sắp có)"
+                                    >
+                                        <IconFaceSmile size={20} />
+                                    </ActionIcon>
+                                </Group>
+
+                                <Group gap="sm">
+                                    <Button
+                                        variant="subtle"
+                                        color="gray"
+                                        size="sm"
+                                        onClick={() => {
+                                            setContent('');
+                                            setFile(null);
+                                            setPreview(null);
+                                            setIsFocused(false);
+                                        }}
+                                        className="font-medium"
+                                    >
+                                        Hủy
+                                    </Button>
+
+                                    <Button
+                                        radius="full"
+                                        size="sm"
+                                        disabled={!hasContent}
+                                        loading={isPosting || uploadImageMutation.isPending}
+                                        onClick={handleSubmit}
+                                        className="bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-100 font-semibold px-6 transition-all"
+                                    >
+                                        Đăng
+                                    </Button>
+                                </Group>
+                            </Group>
+                        </>
+                    )}
                 </Stack>
             </Group>
         </Paper>

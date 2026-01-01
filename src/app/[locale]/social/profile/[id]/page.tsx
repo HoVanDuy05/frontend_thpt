@@ -6,6 +6,7 @@ import { IconDots, IconBrandInstagram, IconLink, IconShare, IconUserPlus, IconUs
 import { AppQuery } from "@/api/AppQuery";
 import { AppMutation } from "@/api/AppMutation";
 import { ThreadFeed } from "@/feauture/social/components/ThreadFeed";
+import { CreateThread } from "@/feauture/social/components/CreateThread";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/providers/store/useAppStore";
@@ -242,6 +243,19 @@ export default function UserProfilePage() {
                     </Tabs.List>
 
                     <Tabs.Panel value="threads" px={0}>
+                        {isOwner && (
+                            <Box mb="md">
+                                <CreateThread
+                                    onPost={async (content, image) => {
+                                        // Handle post creation - you'll need to add this logic
+                                        console.log('Creating post:', content, image);
+                                    }}
+                                    placeholder={`Bài viết mới của ${profile.hoTen || profile.taiKhoan}...`}
+                                    compact={true}
+                                />
+                            </Box>
+                        )}
+
                         {isLoadingThreads ? (
                             <Center py={40}><Loader color="black" size="sm" /></Center>
                         ) : userThreads && userThreads.length > 0 ? (

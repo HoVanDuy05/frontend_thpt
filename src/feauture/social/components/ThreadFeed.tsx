@@ -1,19 +1,47 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Stack, Paper, Skeleton, Text, Center, Button, Group, Box } from '@mantine/core';
 import { ThreadCard } from './ThreadCard';
+import { CreateThread } from './CreateThread';
 import { Thread } from '../types';
 import { AppQuery } from '@/api/AppQuery';
+import { AppMutation } from '@/api/AppMutation';
 import { IconSparkles } from '@tabler/icons-react';
 import { Link } from '@/i18n/routing';
+import { notifications } from '@mantine/notifications';
 
 interface ThreadFeedProps {
     threads?: Thread[];
+    showCreatePost?: boolean;
+    createPostPlaceholder?: string;
 }
 
-export const ThreadFeed: React.FC<ThreadFeedProps> = ({ threads: initialThreads }) => {
+export const ThreadFeed: React.FC<ThreadFeedProps> = ({
+    threads: initialThreads,
+    showCreatePost = false,
+    createPostPlaceholder = "Có gì mới?"
+}) => {
     const { data: fetchedThreads, isLoading, refetch } = AppQuery.social.useFeed();
+    const createThreadMutation = AppMutation().social.useCreateThread();
 
     const threads = initialThreads || fetchedThreads;
+
+    const handlePost = async (content: string, image?: string) => {
+        try {
+            await createThreadMutation.mutateAsync({ noiDung: content, hinhAnh: image });
+            notifications.show({
+                title: 'Thành công',
+                message: 'Bài viết đã được đăng',
+                color: 'green'
+            });
+            refetch();
+        } catch (error) {
+            notifications.show({
+                title: 'Lỗi',
+                message: 'Không thể đăng bài. Vui lòng thử lại.',
+                color: 'red'
+            });
+        }
+    };
 
     if (isLoading && !initialThreads) {
         return (
@@ -74,6 +102,16 @@ export const ThreadFeed: React.FC<ThreadFeedProps> = ({ threads: initialThreads 
     return (
         <Box>
             <Stack gap={0}>
+                {showCreatePost && (
+                    <Box mb="md">
+                        <CreateThread
+                            onPost={handlePost}
+                            loading={createThreadMutation.isPending}
+                            placeholder={createPostPlaceholder}
+                        />
+                    </Box>
+                )}
+
                 {threads.map((thread) => (
                     <ThreadCard key={thread.id} thread={thread} />
                 ))}
