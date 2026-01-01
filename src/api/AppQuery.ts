@@ -7,6 +7,8 @@ export const AppQuery = {
     auth: {
         useProfile: (options?: AppQueryOptions<"getProfile">) =>
             useAppQuery({ url: { baseUrl: "/auth/profile" }, options }),
+        useNotifications: (options?: AppQueryOptions<"getNotifications">) =>
+            useAppQuery({ url: { baseUrl: "/communication/notifications" }, options }),
     },
     user: {
 

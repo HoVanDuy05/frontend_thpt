@@ -14,9 +14,31 @@ export interface TUser {
     gioiTinh?: string;
     isBlocked?: boolean;
     avatar?: string;
+    notifications?: TNotification[];
+    soDienThoai?: string;
+    diaChi?: string;
+    tongKetBan?: number;
 
     hoSoGiaoVien?: THoSoGiaoVien;
     hoSoHocSinh?: THoSoHocSinh;
+}
+
+export interface TNotification {
+    id: number;
+    tieuDe: string;
+    noiDung: string;
+    loaiThongBao: string;
+    nguoiGuiId: number;
+    nguoiNhanId: number;
+    lienKet?: string;
+    daDoc: boolean;
+    ngayTao: string;
+    nguoiGui?: {
+        id: number;
+        taiKhoan: string;
+        hoTen?: string;
+        avatar?: string;
+    };
 }
 
 export interface THoSoGiaoVien {

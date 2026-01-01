@@ -23,6 +23,36 @@ export const AppMutation = () => {
             useResetPassword: () => useAppMutation<"resetPassword">({
                 url: { baseUrl: "/auth/reset-password" }
             }),
+            useUpdateProfile: () => useAppMutation<"updateProfile">({
+                url: { baseUrl: "/auth/profile" },
+                method: "PATCH",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/auth/profile"] as any });
+                }
+            }),
+            useUploadAvatar: () => useAppMutation<"uploadAvatar">({
+                url: { baseUrl: "/auth/avatar" },
+                method: "POST",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/auth/profile"] as any });
+                }
+            }),
+        },
+        notifications: {
+            useMarkAsRead: (id: number) => useAppMutation<"markNotificationAsRead">({
+                url: { baseUrl: "/communication/notifications/:id/read", urlParams: { id } },
+                method: "PATCH",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/communication/notifications"] as any });
+                }
+            }),
+            useMarkAllAsRead: () => useAppMutation<"markAllNotificationsAsRead">({
+                url: { baseUrl: "/communication/notifications/read-all" },
+                method: "PATCH",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/communication/notifications"] as any });
+                }
+            }),
         },
         user: {
             useUpdate: (id: number) => useAppMutation<"updateUser">({
@@ -188,7 +218,7 @@ export const AppMutation = () => {
                 url: { baseUrl: "/upload/image" },
             }),
             useUploadAvatar: () => useAppMutation<"uploadAvatar">({
-                url: { baseUrl: "/upload/avatar" },
+                url: { baseUrl: "/auth/avatar" },
             }),
         },
         approvals: {

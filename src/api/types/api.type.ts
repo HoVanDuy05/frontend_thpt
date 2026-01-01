@@ -1,4 +1,4 @@
-import { TUser, THoSoGiaoVien, THoSoHocSinh } from "@/shared/types/user.type";
+import { TUser, THoSoGiaoVien, THoSoHocSinh, TNotification } from "@/shared/types/user.type";
 import { TNamHoc, TMonHoc, TLopHoc } from "@/shared/types/academic.type";
 import { TNganHangCauHoi, TDeKiemTra } from "@/shared/types/assessment.type";
 import { TLichSuNopBai } from "@/shared/types/submission.type";
@@ -16,7 +16,29 @@ import {
     TSubmitFlowInstanceDto,
     TApproveStepDto
 } from "@/shared/types/dto.type";
-import { Thread, UserBasic, FriendRequest } from "@/feauture/social/types";
+import { Thread, UserBasic } from "@/feauture/social/types";
+
+export type FriendRequest = {
+    id: number;
+    nguoiGuiId: number;
+    nguoiNhanId: number;
+    trangThai: string;
+    ngayTao: string;
+    nguoiGui?: {
+        id: number;
+        taiKhoan: string;
+        email: string;
+        hoTen?: string;
+        avatar?: string;
+    };
+    nguoiNhan?: {
+        id: number;
+        taiKhoan: string;
+        email: string;
+        hoTen?: string;
+        avatar?: string;
+    };
+};
 
 export type ApiQueryType = {
     // ... (rest remains same)
@@ -27,6 +49,10 @@ export type ApiQueryType = {
     getProfile: {
         url: { baseUrl: "/auth/profile"; queryParams?: { userId: number } };
         response: TUser;
+    };
+    getNotifications: {
+        url: { baseUrl: "/communication/notifications" };
+        response: TNotification[];
     };
 
     getUserById: {
@@ -237,6 +263,26 @@ export type ApiMutationType = {
         payload: { token: string; matKhau: string };
         response: { message: string };
     };
+    updateProfile: {
+        url: { baseUrl: "/auth/profile" };
+        payload: Partial<TUser>;
+        response: TUser;
+    };
+    uploadAvatar: {
+        url: { baseUrl: "/auth/avatar" };
+        payload: FormData;
+        response: { avatar: string };
+    };
+    markNotificationAsRead: {
+        url: { baseUrl: "/communication/notifications/:id/read"; urlParams: { id: number } };
+        payload: undefined;
+        response: any;
+    };
+    markAllNotificationsAsRead: {
+        url: { baseUrl: "/communication/notifications/read-all" };
+        payload: undefined;
+        response: any;
+    };
 
     // Users
     createTeacher: {
@@ -421,11 +467,6 @@ export type ApiMutationType = {
     // Upload
     uploadImage: {
         url: { baseUrl: "/upload/image" };
-        payload: FormData;
-        response: { url: string; public_id: string };
-    };
-    uploadAvatar: {
-        url: { baseUrl: "/upload/avatar" };
         payload: FormData;
         response: { url: string; public_id: string };
     };

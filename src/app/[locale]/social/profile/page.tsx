@@ -1,20 +1,38 @@
 "use client";
 
-import { Box, Title, Stack, Text, Avatar, Group, Button, Tabs, Center, Loader, ActionIcon, Badge } from "@mantine/core";
-import { IconSettings, IconShare, IconLink } from "@tabler/icons-react";
+import { useState } from "react";
+import {
+    Box,
+    Title,
+    Stack,
+    Text,
+    Avatar,
+    Group,
+    Button,
+    Tabs,
+    Center,
+    Loader,
+    ActionIcon,
+    Badge,
+    Divider
+} from "@mantine/core";
+import {
+    IconSettings,
+    IconShare,
+    IconLink,
+    IconEdit
+} from "@tabler/icons-react";
 import { AppQuery } from "@/api/AppQuery";
-import { ThreadFeed } from "@/feauture/social/components/ThreadFeed";
 import { useAppStore } from "@/providers/store/useAppStore";
-import { useRouter } from "@/i18n/routing";
+import { useRouter } from "next/navigation";
+import { EditProfileModal } from "@/feauture/social/components/EditProfileModal";
 
 export default function ProfilePage() {
     const { data: profile, isLoading: isLoadingProfile } = AppQuery.auth.useProfile();
-    const { data: userThreads, isLoading: isLoadingThreads } = AppQuery.social.useUserThreads(profile?.id || 0, {}, {
-        enabled: !!profile?.id
-    });
-
     const { setToken } = useAppStore();
     const router = useRouter();
+
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
     if (isLoadingProfile) {
         return <Center h="50vh"><Loader color="indigo" /></Center>;
@@ -23,6 +41,10 @@ export default function ProfilePage() {
     const handleLogout = () => {
         setToken("");
         router.push("/auth/login");
+    };
+
+    const handleEditProfile = () => {
+        setIsEditModalOpen(true);
     };
 
     return (
@@ -58,12 +80,12 @@ export default function ProfilePage() {
                 </Group>
 
                 <Text className="text-zinc-600 dark:text-zinc-400 font-medium max-w-[400px]">
-                    Software developer & design enthusiast. Building Nguyen Hue Academy.
+                    {profile?.hoSoGiaoVien?.chuyenMon || profile?.hoSoHocSinh?.lopHoc?.tenLop || 'Software developer & design enthusiast. Building Nguyen Hue Academy.'}
                 </Text>
 
                 <Group justify="space-between">
                     <Text size="sm" fw={600} className="text-zinc-400">
-                        12 followers · <Text component="span" className="hover:underline cursor-pointer">linkedin.com</Text>
+                        {profile?.tongKetBan || 0} followers · <Text component="span" className="hover:underline cursor-pointer">threads.net</Text>
                     </Text>
                     <Group gap="xs">
                         <ActionIcon variant="subtle" color="gray" radius="xl" size="lg" className="border border-zinc-100 dark:border-zinc-800">
@@ -76,9 +98,37 @@ export default function ProfilePage() {
                 </Group>
 
                 <Group grow gap="md">
-                    <Button variant="outline" color="gray" radius="md" fw={700} className="border-gray-200 dark:border-zinc-800">Edit profile</Button>
-                    <Button variant="outline" color="gray" radius="md" fw={700} className="border-gray-200 dark:border-zinc-800">Share profile</Button>
-                    <Button variant="filled" color="black" radius="md" fw={900} onClick={handleLogout} className="dark:bg-white dark:text-black uppercase tracking-widest text-[10px]">Logout</Button>
+                    <Button
+                        variant="outline"
+                        color="gray"
+                        radius="md"
+                        fw={700}
+                        className="border-gray-200 dark:border-zinc-800"
+                        leftSection={<IconEdit size={16} />}
+                        onClick={handleEditProfile}
+                    >
+                        Chỉnh sửa hồ sơ
+                    </Button>
+                    <Button
+                        variant="outline"
+                        color="gray"
+                        radius="md"
+                        fw={700}
+                        className="border-gray-200 dark:border-zinc-800"
+                        leftSection={<IconShare size={16} />}
+                    >
+                        Chia sẻ hồ sơ
+                    </Button>
+                    <Button
+                        variant="filled"
+                        color="black"
+                        radius="md"
+                        fw={900}
+                        onClick={handleLogout}
+                        className="dark:bg-white dark:text-black uppercase tracking-widest text-[10px]"
+                    >
+                        Đăng xuất
+                    </Button>
                 </Group>
             </Stack>
 
@@ -89,73 +139,79 @@ export default function ProfilePage() {
                 tab: "pb-4 px-0 fw-800 text-sm tracking-widest uppercase transition-all border-b-2 border-transparent data-[active=true]:border-black dark:data-[active=true]:border-white data-[active=true]:text-black dark:data-[active=true]:text-white text-zinc-400"
             }}>
                 <Tabs.List>
-                    <Tabs.Tab value="threads">Social</Tabs.Tab>
-                    <Tabs.Tab value="replies">Replies</Tabs.Tab>
-                    <Tabs.Tab value="friends">Friends</Tabs.Tab>
-                    <Tabs.Tab value="reposts">Reposts</Tabs.Tab>
+                    <Tabs.Tab value="threads">Bài viết</Tabs.Tab>
+                    <Tabs.Tab value="friends">Bạn bè</Tabs.Tab>
+                    <Tabs.Tab value="about">Giới thiệu</Tabs.Tab>
                 </Tabs.List>
 
                 <Tabs.Panel value="threads" pt="md">
-                    {isLoadingThreads ? (
-                        <Center py={40}><Loader color="indigo" size="sm" /></Center>
-                    ) : (
-                        <ThreadFeed threads={userThreads} />
-                    )}
-                </Tabs.Panel>
-
-                <Tabs.Panel value="replies">
-                    <Center py={100} className="text-zinc-400 font-medium">No replies yet</Center>
+                    <Center py={100} className="text-zinc-400 font-medium">
+                        Chưa có bài viết nào
+                    </Center>
                 </Tabs.Panel>
 
                 <Tabs.Panel value="friends" pt="md">
-                    <FriendsTab />
+                    <Center py={100} className="text-zinc-400 font-medium">
+                        Chưa có bạn bè nào
+                    </Center>
                 </Tabs.Panel>
 
-                <Tabs.Panel value="reposts">
-                    <Center py={100} className="text-zinc-400 font-medium">No reposts yet</Center>
+                <Tabs.Panel value="about" pt="md">
+                    <Stack gap="md">
+                        <Box>
+                            <Title order={4} mb="sm">Giới thiệu</Title>
+                            <Text size="md" lineClamp={5}>
+                                {profile?.hoSoGiaoVien?.chuyenMon || profile?.hoSoHocSinh?.lopHoc?.tenLop || 'Software developer & design enthusiast. Building Nguyen Hue Academy.'}
+                            </Text>
+                        </Box>
+
+                        <Divider />
+
+                        <Box>
+                            <Title order={4} mb="sm">Thông tin liên hệ</Title>
+                            <Stack gap="xs">
+                                {profile?.email && (
+                                    <Group gap="xs">
+                                        <Text size="sm" c="dimmed">Email:</Text>
+                                        <Text size="sm">{profile.email}</Text>
+                                    </Group>
+                                )}
+                                {profile?.soDienThoai && (
+                                    <Group gap="xs">
+                                        <Text size="sm" c="dimmed">Điện thoại:</Text>
+                                        <Text size="sm">{profile.soDienThoai}</Text>
+                                    </Group>
+                                )}
+                                {profile?.diaChi && (
+                                    <Group gap="xs">
+                                        <Text size="sm" c="dimmed">Địa chỉ:</Text>
+                                        <Text size="sm">{profile.diaChi}</Text>
+                                    </Group>
+                                )}
+                                {profile?.hoSoHocSinh?.lopHoc && (
+                                    <Group gap="xs">
+                                        <Text size="sm" c="dimmed">Lớp học:</Text>
+                                        <Text size="sm">{profile.hoSoHocSinh.lopHoc.tenLop}</Text>
+                                    </Group>
+                                )}
+                                {profile?.hoSoGiaoVien?.chuyenMon && (
+                                    <Group gap="xs">
+                                        <Text size="sm" c="dimmed">Chuyên môn:</Text>
+                                        <Text size="sm">{profile.hoSoGiaoVien.chuyenMon}</Text>
+                                    </Group>
+                                )}
+                            </Stack>
+                        </Box>
+                    </Stack>
                 </Tabs.Panel>
             </Tabs>
+
+            {/* Edit Profile Modal */}
+            <EditProfileModal
+                opened={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                profile={profile}
+            />
         </Stack>
     );
 }
-
-function FriendsTab() {
-    const { data: friends, isLoading: isLoadingFriends } = AppQuery.friends.useList();
-    const { data: pending, isLoading: isLoadingPending } = AppQuery.friends.usePending();
-
-    if (isLoadingFriends || isLoadingPending) {
-        return <Center py={40}><Loader color="indigo" size="sm" /></Center>;
-    }
-
-    return (
-        <Stack gap="xl">
-            {pending && pending.length > 0 && (
-                <Stack gap="md">
-                    <Text fw={800} size="sm" className="uppercase tracking-widest text-zinc-400 px-md">Pending Requests ({pending.length})</Text>
-                    <Stack gap={0}>
-                        {pending.map((req: any) => (
-                            <UserCard key={req.id} user={req.nguoiGui} />
-                        ))}
-                    </Stack>
-                </Stack>
-            )}
-
-            <Stack gap="md">
-                <Text fw={800} size="sm" className="uppercase tracking-widest text-zinc-400 px-md">Your Friends ({friends?.length || 0})</Text>
-                {friends && friends.length > 0 ? (
-                    <Stack gap={0}>
-                        {friends.map(friend => (
-                            <UserCard key={friend.id} user={friend} />
-                        ))}
-                    </Stack>
-                ) : (
-                    <Center py={60}>
-                        <Text c="dimmed" size="sm" fw={600}>You haven't added any friends yet.</Text>
-                    </Center>
-                )}
-            </Stack>
-        </Stack>
-    );
-}
-
-import { UserCard } from "@/feauture/social/components/UserCard";
