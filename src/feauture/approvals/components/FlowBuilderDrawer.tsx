@@ -46,16 +46,51 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
 
     // Reset form when opened
     useEffect(() => {
-        if (opened && !initialData) {
-            setName('');
-            setDesc('');
-            setCategoryId(null);
-            setSteps([{ id: 1, name: "Duyệt lần 1", rule: 'any', approverType: 'ROLE_GVCN' }]);
-            setFormFields([{ id: 1, label: "Lý do", required: true, type: 'LONG_TEXT' }]);
-            setActiveTab('info');
-        } else if (opened && initialData) {
-            // Populate initial data logic here
-        }
+        // Reset form when opened or initialData changes
+        useEffect(() => {
+            if (opened) {
+                if (initialData) {
+                    // Populate for edit
+                    setName(initialData.ten || '');
+                    setDesc(initialData.moTa || '');
+                    setCategoryId(initialData.danhMucId ? initialData.danhMucId.toString() : null);
+
+                    // Map Steps
+                    if (initialData.cacBuoc && initialData.cacBuoc.length > 0) {
+                        setSteps(initialData.cacBuoc.map((step: any) => ({
+                            id: step.id, // Keep ID for updates
+                            name: step.ten,
+                            rule: step.loaiDuyet || 'any',
+                            approverType: step.nguoiDuyetId || step.vaiTroDuyet || 'ROLE_GVCN' // Fallback
+                        })).sort((a: any, b: any) => (a.thuTu || 0) - (b.thuTu || 0)));
+                    } else {
+                        setSteps([{ id: Date.now(), name: "Duyệt lần 1", rule: 'any', approverType: 'ROLE_GVCN' }]);
+                    }
+
+                    // Map Fields
+                    if (initialData.truongDuLieus && initialData.truongDuLieus.length > 0) {
+                        setFormFields(initialData.truongDuLieus.map((field: any) => ({
+                            id: field.id, // Keep ID
+                            label: field.nhan,
+                            required: field.batBuoc,
+                            type: field.loai
+                        })));
+                    } else {
+                        setFormFields([{ id: Date.now(), label: "Lý do", required: true, type: 'TEXTAREA' }]);
+                    }
+
+                    setActiveTab('info');
+                } else {
+                    // Reset for create
+                    setName('');
+                    setDesc('');
+                    setCategoryId(null);
+                    setSteps([{ id: Date.now(), name: "Duyệt lần 1", rule: 'any', approverType: 'ROLE_GVCN' }]);
+                    setFormFields([{ id: Date.now(), label: "Lý do", required: true, type: 'LONG_TEXT' }]);
+                    setActiveTab('info');
+                }
+            }
+        }, [opened, initialData]);
     }, [opened, initialData]);
 
     // Options
@@ -127,6 +162,7 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         onSave({
+            id: initialData?.id, // Pass ID if editing
             name,
             description: desc,
             category_id: categoryId ? Number(categoryId) : null,
@@ -153,8 +189,8 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
     // But since they depend on state, direct JSX is best for this complexity.
 
     const renderInfoPanel = () => (
-        <ScrollArea.Autosize mah="100%" type="scroll" offsetScrollbars scrollbarSize={6} className="h-full">
-            <Stack p="xl" gap="xl" className="min-h-full pb-24">
+        <ScrollArea h="100%" type="scroll" offsetScrollbars scrollbarSize={6} className="h-full">
+            <Stack p={isMobile ? "md" : "xl"} gap="xl" className="min-h-full pb-24">
                 <Box>
                     <Group gap="xs" mb="lg">
                         <ThemeIcon color="indigo" variant="light" radius="md">
@@ -345,7 +381,7 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                     </Stack>
                 </Box>
             </Stack>
-        </ScrollArea.Autosize>
+        </ScrollArea>
     );
 
     const renderDesignPanel = () => (

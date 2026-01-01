@@ -180,7 +180,17 @@ export default function StudentProfilePage() {
             <EditProfileModal
                 opened={isEditModalOpen}
                 onClose={() => setIsEditModalOpen(false)}
-                profile={profile}
+                profile={{
+                    ...profile,
+                    hoTen: profile?.hoTen || studentInfo?.hoTen || '',
+                    email: profile?.email || user?.email || '',
+                    ngaySinh: studentInfo?.ngaySinh || profile?.ngaySinh,
+                    gioiTinh: studentInfo?.gioiTinh || profile?.gioiTinh,
+                    soDienThoai: studentInfo?.soDienThoai || profile?.soDienThoai,
+                    diaChi: studentInfo?.diaChi || profile?.diaChi,
+                    hoSoHocSinh: studentInfo,
+                    hoSoGiaoVien: profile?.hoSoGiaoVien
+                }}
             />
         </Box>
     );

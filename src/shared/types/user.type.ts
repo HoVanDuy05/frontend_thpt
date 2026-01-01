@@ -59,4 +59,7 @@ export interface THoSoHocSinh {
     lopId?: number;
     avatar?: string;
     lopHoc?: TLopHoc;
+    gioiTinh?: string;
+    soDienThoai?: string;
+    diaChi?: string;
 }
