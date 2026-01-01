@@ -1,262 +1,287 @@
 "use client";
 
-import { Container, Stack, Title, Card, Text, Group, Avatar, Button, Switch, Divider, Box, Badge, ActionIcon } from "@mantine/core";
+import { Box, Group, Stack, Text, Avatar, Badge, Grid, Button, ThemeIcon, Divider, Title, Paper, Image } from "@mantine/core";
+import { IconUser, IconEdit, IconSchool, IconId, IconPhone, IconMapPin, IconCalendar, IconMail, IconLogout, IconSettings, IconChevronRight } from "@tabler/icons-react";
+import { AppQuery } from "@/api/AppQuery";
+import { useState } from "react";
 import { useAppStore } from "@/providers/store/useAppStore";
-import { useMantineColorScheme } from "@mantine/core";
-import { useRouter, Link } from "@/i18n/routing";
-import {
-    IconLogout, IconMoon, IconSun, IconChevronRight, IconUser, IconBell, IconLock,
-    IconLanguage, IconSchool, IconId, IconCertificate, IconBrandInstagram, IconExternalLink
-} from "@tabler/icons-react";
+import { EditProfileModal } from "@/feauture/social/components/EditProfileModal";
+import { dayjs } from "@/shared/utils/date.util";
+import { useRouter } from "@/i18n/routing";
 import { notifications } from "@mantine/notifications";
 import { useTranslations } from "next-intl";
 
-export default function ProfilePage() {
+export default function StudentProfilePage() {
+    const t = useTranslations("student.profile_page");
     const { user, logout } = useAppStore();
-    const { colorScheme, toggleColorScheme } = useMantineColorScheme();
+    const { data: profile } = AppQuery.auth.useProfile();
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const router = useRouter();
-    const t = useTranslations("student.nav"); // Assuming we might add profile keys here later or reuse common ones
+
+    const studentInfo = profile?.hoSoHocSinh;
+
+    // QR Code Data: Public info URL
+    const qrData = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.host}/info/${user?.id}` : `https://thpt-portal.edu.vn/info/${user?.id}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrData)}`;
 
     const handleLogout = () => {
         logout();
-        notifications.show({
-            title: "Đăng xuất thành công",
-            message: "Hẹn gặp lại bạn!",
-            color: "blue",
-        });
         router.push("/auth/login");
-    };
-
-    const menuItems = [
-        { icon: IconUser, label: "Thông tin cá nhân", href: "/student/profile/info" },
-        { icon: IconBell, label: "Cài đặt thông báo", href: "/student/profile/notifications" },
-        { icon: IconLock, label: "Bảo mật & Quyền riêng tư", href: "/student/profile/security" },
-        { icon: IconLanguage, label: "Ngôn ngữ", href: "/student/profile/language" },
-    ];
-
-    // Mock academic data
-    const academicInfo = {
-        studentId: "HS2023001",
-        class: "12A1",
-        major: "Khoa học Tự nhiên",
-        schoolYear: "2023 - 2026",
-        dob: "15/08/2008"
+        notifications.show({
+            title: t('logout_success_title'),
+            message: t('logout_success_message'),
+            color: "blue"
+        });
     };
 
     return (
-        <Container size="lg" className="py-4 pb-24">
-            <Stack gap="lg">
-                <Group justify="space-between" align="center">
-                    <div>
-                        <Title order={2} className="font-black mb-1">
-                            Hồ sơ học sinh
-                        </Title>
-                        <Text size="sm" c="dimmed">
-                            Thẻ học sinh & Thông tin cá nhân
-                        </Text>
-                    </div>
-                </Group>
+        <Box className="pb-24">
+            {/* Header / Cover */}
+            <Box className="h-48 bg-gradient-to-r from-blue-600 to-indigo-700 relative overflow-hidden rounded-b-[2rem] shadow-lg mb-16">
+                {/* Decorative circles */}
+                <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2 blur-2xl"></div>
+                <div className="absolute bottom-0 right-0 w-96 h-96 bg-white/10 rounded-full translate-x-1/3 translate-y-1/3 blur-3xl"></div>
 
-                {/* Digital Student ID Card */}
-                <Card
-                    radius="xl"
-                    padding="xl"
-                    className="relative overflow-hidden bg-gradient-to-br from-indigo-600 to-purple-700 text-white shadow-xl"
-                >
-                    {/* Background Pattern */}
-                    <div className="absolute top-0 right-0 p-8 opacity-10">
-                        <IconSchool size={180} />
-                    </div>
-
-                    <Stack className="relative z-10" gap="lg">
-                        <Group justify="space-between" align="flex-start">
-                            <Group gap="xs">
-                                <Box className="bg-white/20 p-1.5 rounded-lg backdrop-blur-sm">
-                                    <IconSchool size={24} className="text-white" />
-                                </Box>
-                                <div>
-                                    <Text fw={800} size="sm" className="leading-tight uppercase tracking-wide opacity-90">
-                                        Trường THPT
-                                    </Text>
-                                    <Text fw={900} size="lg" className="leading-tight uppercase tracking-tight">
-                                        NGUYEN HUE
-                                    </Text>
-                                </div>
-                            </Group>
-                            <Badge
-                                variant="white"
-                                color="indigo"
-                                size="lg"
-                                radius="md"
-                                className="font-bold shadow-sm"
-                            >
-                                THẺ HỌC SINH
-                            </Badge>
-                        </Group>
-
-                        <Group align="flex-start" gap="lg" className="mt-2">
-                            <div className="relative">
-                                <Avatar
-                                    src={user?.avatar}
-                                    size={100}
-                                    radius="md"
-                                    className="border-4 border-white/20 shadow-md"
-                                />
-                                <div className="absolute -bottom-3 -right-3">
-                                    <Box className="bg-green-500 rounded-full p-1 border-4 border-indigo-700">
-                                        <IconCertificate size={16} className="text-white" />
-                                    </Box>
-                                </div>
-                            </div>
-
-                            <Stack gap={4} className="flex-1">
-                                <Text size="xs" className="uppercase opacity-70 font-bold tracking-wider">Họ và tên</Text>
-                                <Text size="xl" fw={900} className="line-clamp-1">
-                                    {user?.hoTen || user?.taiKhoan || "Nguyễn Văn A"}
-                                </Text>
-
-                                <Group gap="xl" className="mt-2">
-                                    <div>
-                                        <Text size="xs" className="uppercase opacity-70 font-bold tracking-wider">Mã HS</Text>
-                                        <Text fw={700} className="font-mono">{academicInfo.studentId}</Text>
-                                    </div>
-                                    <div>
-                                        <Text size="xs" className="uppercase opacity-70 font-bold tracking-wider">Lớp</Text>
-                                        <Text fw={700}>{academicInfo.class}</Text>
-                                    </div>
-                                    <div>
-                                        <Text size="xs" className="uppercase opacity-70 font-bold tracking-wider">Niên khóa</Text>
-                                        <Text fw={700}>{academicInfo.schoolYear}</Text>
-                                    </div>
-                                </Group>
-                            </Stack>
-                        </Group>
-
-                        <Divider color="white" opacity={0.2} />
-
-                        <Group justify="space-between" align="center">
-                            <Text size="xs" className="opacity-70">
-                                Thẻ này có giá trị sử dụng nội bộ nhà trường
-                            </Text>
-                            <Text fw={700} size="xs" className="font-mono bg-black/20 px-2 py-1 rounded">
-                                {academicInfo.dob}
-                            </Text>
-                        </Group>
-                    </Stack>
-                </Card>
-
-                {/* Social Profile Link */}
-                <Card
-                    component={Link}
-                    href={user?.id ? `/social/profile/${user.id}` : '#'}
-                    withBorder
-                    radius="lg"
-                    padding="md"
-                    className="hover:border-indigo-500 transition-colors group cursor-pointer"
-                >
-                    <Group justify="space-between">
-                        <Group>
-                            <Box className="w-10 h-10 rounded-full bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500 flex items-center justify-center text-white">
-                                <IconBrandInstagram size={20} />
-                            </Box>
-                            <div>
-                                <Text fw={700} size="sm">Hồ sơ Mạng xã hội</Text>
-                                <Text size="xs" c="dimmed">Xem trang cá nhân công khai của bạn</Text>
-                            </div>
-                        </Group>
-                        <ActionIcon variant="light" color="gray" className="group-hover:text-indigo-600 group-hover:bg-indigo-50 transition-colors">
-                            <IconExternalLink size={18} />
-                        </ActionIcon>
+                <Container className="h-full relative z-10 pt-8 px-6 text-white">
+                    <Group justify="space-between" align="start">
+                        <div>
+                            <Text size="lg" fw={500} className="opacity-90">{t('header_title')}</Text>
+                            <Title order={2} className="tracking-tight">{t('header_subtitle')}</Title>
+                        </div>
+                        <Button
+                            variant="white"
+                            color="indigo"
+                            size="xs"
+                            radius="xl"
+                            leftSection={<IconEdit size={14} />}
+                            onClick={() => setIsEditModalOpen(true)}
+                            className="shadow-sm"
+                        >
+                            {t('edit')}
+                        </Button>
                     </Group>
-                </Card>
+                </Container>
+            </Box>
 
-                {/* Settings Section */}
-                <Card withBorder radius="lg" padding="lg">
-                    <Title order={4} className="font-bold mb-4 flex items-center gap-2">
-                        <IconSettings size={20} className="text-gray-500" />
-                        Cài đặt chung
-                    </Title>
+            <Container className="-mt-32 relative z-20 px-4">
+                <Grid gutter="lg">
+                    {/* Left Column: Student Card */}
+                    <Grid.Col span={{ base: 12, md: 5 }}>
+                        <StudentCard
+                            user={user}
+                            profile={profile}
+                            studentInfo={studentInfo}
+                            qrUrl={qrUrl}
+                            t={t}
+                        />
+                    </Grid.Col>
 
-                    <Stack gap="xs">
-                        {/* Dark Mode Toggle */}
-                        <Group justify="space-between" className="py-2 px-2 hover:bg-gray-50 dark:hover:bg-zinc-900 rounded-lg transition-colors">
-                            <Group gap="sm">
-                                <div className={`p-2 rounded-lg ${colorScheme === 'dark' ? 'bg-zinc-800' : 'bg-gray-100'}`}>
-                                    {colorScheme === "dark" ? <IconMoon size={20} /> : <IconSun size={20} />}
-                                </div>
-                                <div>
-                                    <Text fw={600} size="sm">
-                                        Giao diện
-                                    </Text>
-                                    <Text size="xs" c="dimmed">
-                                        {colorScheme === 'dark' ? 'Đang dùng chế độ tối' : 'Đang dùng chế độ sáng'}
-                                    </Text>
-                                </div>
-                            </Group>
-                            <Switch
-                                checked={colorScheme === "dark"}
-                                onChange={() => toggleColorScheme()}
-                                size="md"
-                                color="indigo"
-                            />
-                        </Group>
-
-                        <Divider variant="dashed" my="xs" />
-
-                        {menuItems.map((item) => {
-                            const Icon = item.icon;
-                            return (
-                                <Group
-                                    key={item.label}
-                                    justify="space-between"
-                                    className="py-3 px-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-zinc-900 rounded-lg transition-colors"
-                                    onClick={() => router.push(item.href)}
-                                >
-                                    <Group gap="sm">
-                                        <div className="p-2 bg-gray-50 dark:bg-zinc-800 rounded-lg text-gray-600 dark:text-gray-300">
-                                            <Icon size={20} stroke={1.5} />
-                                        </div>
-                                        <Text fw={600} size="sm">
-                                            {item.label}
-                                        </Text>
+                    {/* Right Column: VNeID Style Info & Settings */}
+                    <Grid.Col span={{ base: 12, md: 7 }}>
+                        <Stack gap="lg">
+                            {/* Personal Information (VNeID Style) */}
+                            <Paper radius="xl" p={0} className="overflow-hidden bg-white dark:bg-zinc-900 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-zinc-800">
+                                <Box className="p-4 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
+                                    <Group>
+                                        <ThemeIcon variant="light" color="blue" size="lg" radius="md">
+                                            <IconUser size={20} />
+                                        </ThemeIcon>
+                                        <Text fw={700} size="md">{t('identity_section')}</Text>
                                     </Group>
-                                    <IconChevronRight size={18} className="text-gray-400" />
-                                </Group>
-                            );
-                        })}
-                    </Stack>
-                </Card>
+                                </Box>
+                                <Stack gap={0}>
+                                    <InfoRow icon={IconId} label={t('identity_id')} value={studentInfo?.maSoHs || t('not_updated')} />
+                                    <Divider className="border-gray-100 dark:border-zinc-800" />
+                                    <InfoRow icon={IconUser} label={t('full_name')} value={profile?.hoTen} highlight />
+                                    <Divider className="border-gray-100 dark:border-zinc-800" />
+                                    <InfoRow icon={IconCalendar} label={t('dob')} value={profile?.ngaySinh ? dayjs(profile.ngaySinh).format('DD/MM/YYYY') : t('not_updated')} />
+                                    <Divider className="border-gray-100 dark:border-zinc-800" />
+                                    <InfoRow icon={IconUser} label={t('gender')} value={profile?.gioiTinh === 'NAM' ? t('gender_male') : t('gender_female')} />
+                                    <Divider className="border-gray-100 dark:border-zinc-800" />
+                                    <InfoRow icon={IconPhone} label={t('phone')} value={profile?.soDienThoai || t('not_updated')} />
+                                    <Divider className="border-gray-100 dark:border-zinc-800" />
+                                    <InfoRow icon={IconMail} label={t('email')} value={profile?.email} />
+                                    <Divider className="border-gray-100 dark:border-zinc-800" />
+                                    <InfoRow icon={IconMapPin} label={t('address')} value={profile?.diaChi || t('not_updated')} isLast />
+                                </Stack>
+                            </Paper>
 
-                {/* Logout Area */}
-                <Box className="px-2">
-                    <Button
-                        variant="subtle"
-                        color="red"
-                        size="md"
-                        radius="xl"
-                        leftSection={<IconLogout size={20} />}
-                        onClick={handleLogout}
-                        className="hover:bg-red-50 dark:hover:bg-red-950/30"
-                        fullWidth
-                    >
-                        Đăng xuất tài khoản
-                    </Button>
+                            {/* Academic Info */}
+                            <Paper radius="xl" p={0} className="overflow-hidden bg-white dark:bg-zinc-900 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-zinc-800">
+                                <Box className="p-4 border-b border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
+                                    <Group>
+                                        <ThemeIcon variant="light" color="teal" size="lg" radius="md">
+                                            <IconSchool size={20} />
+                                        </ThemeIcon>
+                                        <Text fw={700} size="md">{t('academic_section')}</Text>
+                                    </Group>
+                                </Box>
+                                <Stack gap={0}>
+                                    <InfoRow icon={IconSchool} label={t('current_class')} value={studentInfo?.lopHoc?.tenLop || t('not_assigned')} />
+                                    <Divider className="border-gray-100 dark:border-zinc-800" />
+                                    <InfoRow icon={IconSchool} label={t('course')} value="2023 - 2026" />
+                                    <Divider className="border-gray-100 dark:border-zinc-800" />
+                                    <InfoRow icon={IconUser} label={t('homeroom_teacher')} value={studentInfo?.lopHoc?.gvChuNhiem?.hoTen || t('not_available')} isLast />
+                                </Stack>
+                            </Paper>
 
-                    <Text size="xs" c="dimmed" className="text-center mt-4">
-                        Phiên bản 1.2.0 • Build 20260101
-                    </Text>
-                </Box>
-            </Stack>
-        </Container>
+                            {/* Settings */}
+                            <Paper radius="xl" p="md" className="bg-white dark:bg-zinc-900 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-zinc-800">
+                                <Text fw={700} mb="md" size="sm" c="dimmed" tt="uppercase">{t('settings_section')}</Text>
+                                <Stack gap="xs">
+                                    <Button
+                                        variant="light"
+                                        color="gray"
+                                        fullWidth
+                                        justify="space-between"
+                                        h={50}
+                                        radius="lg"
+                                        leftSection={<IconSettings size={20} />}
+                                        rightSection={<IconChevronRight size={16} />}
+                                        className="bg-gray-50 hover:bg-gray-100 dark:bg-zinc-800/50 dark:hover:bg-zinc-800"
+                                    >
+                                        <Text fw={600} c="dark" className="dark:text-white">{t('account_settings')}</Text>
+                                    </Button>
+                                    <Button
+                                        variant="light"
+                                        color="red"
+                                        fullWidth
+                                        justify="space-between"
+                                        h={50}
+                                        radius="lg"
+                                        leftSection={<IconLogout size={20} />}
+                                        onClick={handleLogout}
+                                        className="bg-red-50 hover:bg-red-100 border-red-100 text-red-600 hover:text-red-700 dark:bg-red-900/10 dark:hover:bg-red-900/20"
+                                    >
+                                        <Text fw={600}>{t('logout')}</Text>
+                                    </Button>
+                                </Stack>
+                            </Paper>
+                        </Stack>
+                    </Grid.Col>
+                </Grid>
+            </Container>
+
+            <EditProfileModal
+                opened={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                profile={profile}
+            />
+        </Box>
     );
 }
 
-// Helper icon component since we used it above but didn't import it in the original generic import
-function IconSettings({ size, className }: { size: number, className?: string }) {
+// ----------------------------------------------------------------------
+// SUB COMPONENTS
+// ----------------------------------------------------------------------
+
+function Container({ children, className }: { children: React.ReactNode, className?: string }) {
+    return <Box className={`max-w-5xl mx-auto ${className}`}>{children}</Box>;
+}
+
+function InfoRow({ icon: Icon, label, value, isLast, highlight }: { icon: any, label: string, value: any, isLast?: boolean, highlight?: boolean }) {
     return (
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
-            <path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 0 0 2.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 0 0 1.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 0 0 -1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 0 0 -2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 0 0 -2.573 -1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 0 0 -1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 0 0 1.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path d="M9 12a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
-        </svg>
-    )
+        <Group p="md" align="center" wrap="nowrap" className={`hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors ${!isLast ? '' : ''}`}>
+            <ThemeIcon variant="light" color="gray" size="md" radius="md" className="bg-gray-100 dark:bg-zinc-800 text-gray-500">
+                <Icon size={18} />
+            </ThemeIcon>
+            <div className="flex-1 overflow-hidden">
+                <Text size="xs" c="dimmed" fw={500}>{label}</Text>
+                <Text size="sm" fw={highlight ? 700 : 500} className={`truncate ${highlight ? 'text-indigo-600 dark:text-indigo-400 uppercase' : 'text-gray-900 dark:text-gray-100'}`}>
+                    {value}
+                </Text>
+            </div>
+        </Group>
+    );
+}
+
+function StudentCard({ user, profile, studentInfo, qrUrl, t }: { user: any, profile: any, studentInfo: any, qrUrl: string, t: any }) {
+    return (
+        <Stack>
+            <Box className="relative perspective-1000 group">
+                <Paper
+                    radius="lg"
+                    p="xl"
+                    className="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-blue-900 to-indigo-950 text-white min-h-[340px] shadow-2xl transition-transform transform border border-white/10"
+                >
+                    {/* Background Patterns */}
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+                    <div className="absolute bottom-0 left-0 w-40 h-40 bg-blue-500/20 rounded-full translate-y-1/3 -translate-x-1/3 blur-xl"></div>
+                    <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+
+                    <Stack h="100%" justify="space-between" className="relative z-10">
+                        {/* Header: Logo & School Name */}
+                        <Group justify="space-between" align="start">
+                            <Group gap="xs">
+                                <Box className="bg-white/10 p-1.5 rounded-lg backdrop-blur-sm border border-white/10">
+                                    <IconSchool size={24} className="text-blue-200" />
+                                </Box>
+                                <div className="leading-tight">
+                                    <Text size="xs" className="uppercase opacity-70 tracking-wider">{t('card_school_label')}</Text>
+                                    <Text fw={800} size="sm" className="uppercase font-serif">{t('card_school_name')}</Text>
+                                </div>
+                            </Group>
+                            <Image
+                                src="/logo-white.svg" // Fallback or transparent logo often looks best
+                                w={40}
+                                className="opacity-80"
+                                fallbackSrc="https://placehold.co/40x40/transparent/white?text=LOGO"
+                            />
+                        </Group>
+
+                        {/* Main Content: Avatar & Info */}
+                        <Group align="center" gap="lg" mt="sm">
+                            <Box className="relative">
+                                <Avatar
+                                    src={profile?.avatar}
+                                    size={110}
+                                    className="border-[3px] border-white/30 shadow-xl rounded-2xl bg-white/10 backdrop-blur-sm"
+                                    radius="md"
+                                />
+                                <Badge
+                                    size="sm"
+                                    variant="filled"
+                                    color="green"
+                                    className="absolute -bottom-2 -right-2 border-2 border-blue-900 shadow-sm"
+                                >
+                                    {t('card_role_student')}
+                                </Badge>
+                            </Box>
+                            <div className="flex-1">
+                                <Text size="xs" className="opacity-60 mb-1">{t('full_name')}</Text>
+                                <Title order={3} className="text-white uppercase leading-none mb-3 text-shadow-sm">{profile?.hoTen}</Title>
+
+                                <Group gap="xl">
+                                    <div>
+                                        <Text size="xs" className="opacity-60">{t('card_id_label')}</Text>
+                                        <Text fw={600} className="font-mono tracking-wide">{studentInfo?.maSoHs || "---"}</Text>
+                                    </div>
+                                    <div>
+                                        <Text size="xs" className="opacity-60">{t('card_class_label')}</Text>
+                                        <Text fw={600}>{studentInfo?.lopHoc?.tenLop || "---"}</Text>
+                                    </div>
+                                </Group>
+                            </div>
+                        </Group>
+
+                        {/* Footer: QR Code & Valid Year */}
+                        <Group justify="space-between" align="end" className="mt-4 pt-4 border-t border-white/10">
+                            <Group gap={4}>
+                                <Text size="xs" className="opacity-50">{t('card_year_label')}</Text>
+                                <Text size="xs" fw={600} className="opacity-80">2023 - 2026</Text>
+                            </Group>
+
+                            <Box className="bg-white p-1 rounded-lg shadow-lg">
+                                <Image src={qrUrl} w={50} h={50} radius="sm" />
+                            </Box>
+                        </Group>
+                    </Stack>
+                </Paper>
+            </Box>
+
+            <Text size="xs" c="dimmed" ta="center" mt="sm">
+                {t('scan_qr_hint')}
+            </Text>
+        </Stack>
+    );
 }

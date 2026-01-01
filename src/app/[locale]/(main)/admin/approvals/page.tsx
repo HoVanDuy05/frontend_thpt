@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Container, Stack, Title, Paper, Group, Button, Text, LoadingOverlay, Box, Badge, ActionIcon, Tooltip, Flex, Card, ThemeIcon, SimpleGrid, rem } from '@mantine/core';
+import { Container, Stack, Title, Paper, Group, Button, Text, LoadingOverlay, Box, Badge, ActionIcon, Tooltip, Flex, Card, ThemeIcon, SimpleGrid, rem, RingProgress } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { ApprovalTable } from '@/feauture/approvals/components/ApprovalTable';
 import { FlowCategorySidebar } from '@/feauture/approvals/components/FlowCategorySidebar';
@@ -9,7 +9,7 @@ import { FlowBuilderDrawer } from '@/feauture/approvals/components/FlowBuilderDr
 import { AppQuery } from '@/api/AppQuery';
 import { AppMutation } from '@/api/AppMutation';
 import { notifications } from '@mantine/notifications';
-import { IconPlus, IconStack, IconSchool, IconSettings, IconClipboardList, IconClock, IconCheckbox, IconX } from '@tabler/icons-react';
+import { IconPlus, IconStack, IconSchool, IconSettings, IconClipboardList, IconClock, IconCheckbox, IconX, IconTrendingUp, IconFilter } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 
 export default function ApprovalsPage() {
@@ -74,118 +74,151 @@ export default function ApprovalsPage() {
 
     // Stats
     const stats = [
-        { label: t('stats.total_flows'), value: flows?.length || 0, icon: IconClipboardList, color: 'blue' },
-        { label: t('stats.pending'), value: myRequests?.filter((r: any) => r.trangThai === 'CHO_DUYET').length || 0, icon: IconClock, color: 'orange' },
-        { label: t('stats.approved'), value: myRequests?.filter((r: any) => r.trangThai === 'DA_DUYET').length || 0, icon: IconCheckbox, color: 'green' },
-        { label: t('stats.rejected'), value: myRequests?.filter((r: any) => r.trangThai === 'TU_CHOI').length || 0, icon: IconX, color: 'red' },
+        { label: t('stats.total_flows'), value: flows?.length || 0, icon: IconClipboardList, color: 'blue', progress: 100 },
+        { label: t('stats.pending'), value: myRequests?.filter((r: any) => r.trangThai === 'CHO_DUYET').length || 0, icon: IconClock, color: 'orange', progress: 45 },
+        { label: t('stats.approved'), value: myRequests?.filter((r: any) => r.trangThai === 'DA_DUYET').length || 0, icon: IconCheckbox, color: 'green', progress: 72 },
+        { label: t('stats.rejected'), value: myRequests?.filter((r: any) => r.trangThai === 'TU_CHOI').length || 0, icon: IconX, color: 'red', progress: 15 },
     ];
 
     return (
-        <Box h="calc(100vh - 60px)" className="overflow-hidden flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-900 dark:to-zinc-800">
-            {/* Page Header */}
-            <Box px={{ base: "md", md: "xl" }} py="lg" className="border-b border-gray-200/50 dark:border-zinc-700/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm shrink-0">
+        <Box h="calc(100vh - 60px)" className="overflow-hidden flex flex-col bg-[#F8FAFC] dark:bg-zinc-950">
+            {/* Premium Header */}
+            <Box className="bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 px-6 py-5 shrink-0 shadow-sm relative z-20">
                 <Group justify="space-between" align="center">
-                    <Stack gap={6}>
-                        <Group gap="sm" align="center">
-                            {isMobile && (
-                                <ActionIcon variant="subtle" onClick={toggleSidebar} color="gray" size="lg" className="hover:bg-gray-100 dark:hover:bg-zinc-800">
-                                    <IconSettings size={20} />
-                                </ActionIcon>
-                            )}
-                            <Title order={2} fw={800} className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+                    <Group gap="md">
+                        {isMobile && (
+                            <ActionIcon variant="light" onClick={toggleSidebar} color="indigo" size="lg" radius="md">
+                                <IconSettings size={20} />
+                            </ActionIcon>
+                        )}
+                        <ThemeIcon size={42} radius="12" variant="gradient" gradient={{ from: 'blue', to: 'cyan', deg: 135 }}>
+                            <IconStack size={24} stroke={1.5} />
+                        </ThemeIcon>
+                        <div>
+                            <Title order={2} fw={800} className="text-gray-900 dark:text-white tracking-tight leading-none">
                                 {t('page_title')}
                             </Title>
-                        </Group>
-                        <Text size="sm" c="dimmed" className="text-gray-600 dark:text-gray-400">
-                            {t('page_subtitle')}
-                        </Text>
-                    </Stack>
+                            <Text size="sm" c="dimmed" mt={2} fw={500}>
+                                {t('page_subtitle')}
+                            </Text>
+                        </div>
+                    </Group>
                     <Button
                         leftSection={<IconPlus size={18} />}
                         onClick={openBuilder}
                         size="md"
-                        className="shadow-lg hover:shadow-xl transition-all bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                        radius="md"
+                        className="bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-none transition-all"
                     >
                         {isMobile ? t('create_new_short') : t('create_new')}
                     </Button>
                 </Group>
             </Box>
 
-            <Flex h="100%" className="overflow-hidden">
-                {/* Category Sidebar */}
-                {(!isMobile || sidebarOpened) && (
-                    <Box
-                        className={`${isMobile ? 'fixed inset-0 z-[100] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md' : ''}`}
-                    >
-                        {isMobile && (
-                            <Box p="md" className="border-b border-gray-200/50 dark:border-zinc-700/50 bg-white/80 dark:bg-zinc-900/80">
-                                <Button
-                                    variant="subtle"
-                                    fullWidth
-                                    onClick={toggleSidebar}
-                                    className="hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300"
-                                >
-                                    {t('close_categories')}
-                                </Button>
-                            </Box>
-                        )}
-                        <FlowCategorySidebar
-                            activeCategory={activeCategory}
-                            onCategoryChange={(val) => {
-                                setActiveCategory(val);
-                                if (isMobile) toggleSidebar();
-                            }}
-                            categories={categories}
-                        />
-                    </Box>
+            <Flex h="100%" className="overflow-hidden relative">
+                {/* Sidebar Background Blur for Mobile */}
+                {isMobile && sidebarOpened && (
+                    <Box className="absolute inset-0 bg-black/20 backdrop-blur-sm z-30" onClick={toggleSidebar} />
                 )}
 
+                {/* Category Sidebar */}
+                <Box
+                    className={`
+                        ${isMobile ? 'fixed inset-y-0 left-0 z-40 w-[280px] shadow-2xl transition-transform duration-300 transform' : 'w-[260px] relative border-r border-gray-100 dark:border-zinc-800'}
+                        bg-white dark:bg-zinc-900 flex flex-col
+                        ${isMobile && !sidebarOpened ? '-translate-x-full' : 'translate-x-0'}
+                    `}
+                >
+                    {isMobile && (
+                        <Group p="md" justify="space-between" className="border-b border-gray-100 dark:border-zinc-800">
+                            <Text fw={700}>Danh mục</Text>
+                            <ActionIcon variant="subtle" color="gray" onClick={toggleSidebar}><IconX size={20} /></ActionIcon>
+                        </Group>
+                    )}
+                    <FlowCategorySidebar
+                        activeCategory={activeCategory}
+                        onCategoryChange={(val) => {
+                            setActiveCategory(val);
+                            if (isMobile) toggleSidebar();
+                        }}
+                        categories={categories}
+                    />
+                </Box>
+
                 {/* Main content */}
-                <Box className="flex-1 overflow-auto" p={{ base: "md", md: "xl" }}>
-                    <Stack gap="xl">
-                        {/* Stats Cards */}
-                        <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="lg">
+                <Box className="flex-1 overflow-auto bg-[#F8FAFC] dark:bg-zinc-950 p-6 relative">
+                    {/* Decorative background blobs */}
+                    <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-indigo-50/50 to-transparent dark:from-indigo-950/20 pointer-events-none" />
+
+                    <Stack gap="xl" className="relative z-10 max-w-7xl mx-auto">
+                        {/* Stats Grid */}
+                        <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
                             {stats.map((stat) => (
-                                <Card key={stat.label} withBorder radius="xl" className="bg-white dark:bg-zinc-800 hover:shadow-lg transition-all border-gray-200/50 dark:border-zinc-700/50">
-                                    <Group justify="space-between" align="center">
-                                        <Stack gap={2}>
-                                            <Text size="xs" c="dimmed" fw={700} tt="uppercase" className="text-gray-500 dark:text-gray-400">
-                                                {stat.label}
-                                            </Text>
-                                            <Text size="xl" fw={900} className="text-gray-900 dark:text-white">
-                                                {stat.value}
-                                            </Text>
-                                        </Stack>
-                                        <ThemeIcon size="xl" radius="xl" variant="gradient" gradient={{ from: stat.color, to: stat.color === 'blue' ? 'indigo' : stat.color === 'orange' ? 'yellow' : stat.color === 'green' ? 'emerald' : 'red', deg: 45 }}>
-                                            <stat.icon size={24} className="text-white" />
-                                        </ThemeIcon>
+                                <Paper
+                                    key={stat.label}
+                                    p="md"
+                                    radius="lg"
+                                    className="border border-white/60 dark:border-white/5 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all group"
+                                >
+                                    <Group justify="space-between" align="flex-start" mb="xs">
+                                        <div>
+                                            <Text size="xs" c="dimmed" fw={700} tt="uppercase" lts={0.5}>{stat.label}</Text>
+                                            <Text size="2xl" fw={800} className="text-gray-900 dark:text-white mt-1 group-hover:scale-105 transition-transform origin-left">{stat.value}</Text>
+                                        </div>
+                                        <RingProgress
+                                            size={48}
+                                            thickness={4}
+                                            roundCaps
+                                            sections={[{ value: stat.progress, color: stat.color }]}
+                                            label={
+                                                <Center>
+                                                    <stat.icon size={16} className={`text-${stat.color}-600 dark:text-${stat.color}-400`} />
+                                                </Center>
+                                            }
+                                        />
                                     </Group>
-                                </Card>
+                                    <Text size="xs" c="dimmed" className="flex items-center gap-1">
+                                        <IconTrendingUp size={12} className="text-green-500" />
+                                        <span className="text-green-600 font-medium">+12%</span> so với tháng trước
+                                    </Text>
+                                </Paper>
                             ))}
                         </SimpleGrid>
 
-                        {/* Approvals Table */}
-                        <Paper withBorder radius="xl" className="overflow-hidden shadow-xl bg-white dark:bg-zinc-800 border-gray-200/50 dark:border-zinc-700/50">
-                            <Box p="lg" className="border-b border-gray-200/50 dark:border-zinc-700/50 bg-gradient-to-r from-gray-50 to-white dark:from-zinc-800 dark:to-zinc-800">
-                                <Group justify="space-between" align="center">
-                                    <Stack gap={2}>
-                                        <Text fw={800} size="lg" className="text-gray-900 dark:text-white">{t('table.title')}</Text>
-                                        <Text size="sm" c="dimmed" className="text-gray-600 dark:text-gray-400">
-                                            {myRequests?.length || 0} {t('table.count')}
-                                        </Text>
-                                    </Stack>
-                                </Group>
-                            </Box>
-                            <LoadingOverlay visible={loadingMy || loadingFlows} overlayProps={{ blur: 2 }} />
-                            <Box className="min-h-[400px]">
-                                <ApprovalTable
-                                    requests={myRequests || []}
-                                    isAdmin
-                                    onView={(req) => console.log('View:', req)}
-                                    onAction={(id, action) => action === 'APPROVE' ? handleApprove(id) : handleReject(id)}
-                                />
-                            </Box>
-                        </Paper>
+                        {/* Recent Requests Table */}
+                        <Stack gap="md">
+                            <Group justify="space-between" align="center">
+                                <Title order={3} className="text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                                    <IconClipboardList size={24} className="text-indigo-600" />
+                                    {t('table.title')}
+                                </Title>
+                                <Button variant="subtle" size="sm" rightSection={<IconFilter size={16} />}>Bộ lọc</Button>
+                            </Group>
+
+                            <Paper
+                                radius="lg"
+                                className="overflow-hidden shadow-sm border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"
+                            >
+                                <LoadingOverlay visible={loadingMy || loadingFlows} overlayProps={{ blur: 1 }} />
+                                <Box className="min-h-[400px]">
+                                    {myRequests && myRequests.length > 0 ? (
+                                        <ApprovalTable
+                                            requests={myRequests || []}
+                                            isAdmin
+                                            onView={(req) => console.log('View:', req)}
+                                            onAction={(id, action) => action === 'APPROVE' ? handleApprove(id) : handleReject(id)}
+                                        />
+                                    ) : (
+                                        <Stack align="center" justify="center" h={400} gap="md">
+                                            <ThemeIcon size={64} radius="full" variant="light" color="gray">
+                                                <IconClipboardList size={32} />
+                                            </ThemeIcon>
+                                            <Text size="lg" fw={500} c="dimmed">Chưa có yêu cầu nào</Text>
+                                        </Stack>
+                                    )}
+                                </Box>
+                            </Paper>
+                        </Stack>
                     </Stack>
                 </Box>
             </Flex>
@@ -199,4 +232,8 @@ export default function ApprovalsPage() {
             />
         </Box>
     );
+}
+
+function Center({ children }: { children: React.ReactNode }) {
+    return <div className="flex items-center justify-center h-full text-center w-full">{children}</div>;
 }
