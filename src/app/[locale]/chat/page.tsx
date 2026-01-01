@@ -10,24 +10,31 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useAppStore } from "@/providers/store/useAppStore";
 import { useState, useEffect } from "react";
 import { useAppMutation } from "@/api/hooks/useAppMutation";
+import { notifications } from "@mantine/notifications";
+import { useSocket } from "@/shared/hooks/useSocket";
 
 export default function ChatPage() {
     const { data: channels, isLoading: isLoadingChannels, refetch: refetchChannels } = AppQuery.chat.useChannels();
+    const { data: friends, isLoading: isLoadingFriends } = AppQuery.friends.useList();
     const { user } = useAppStore();
+    const { on, off, isConnected } = useSocket();
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
 
+    const [unreadChannelIds, setUnreadChannelIds] = useState<Set<number>>(new Set());
+
     // State for search functionality
-    const [searchQuery, setSearchQuery] = useState("");
+    const [sidebarQuery, setSidebarQuery] = useState("");
     const [showUserSearch, setShowUserSearch] = useState(false);
+    const [newChatQuery, setNewChatQuery] = useState("");
     const [searchResults, setSearchResults] = useState<TUser[]>([]);
     const [isSearching, setIsSearching] = useState(false);
 
     // Use the friends search query
     const { data: searchQueryData, isLoading: searchQueryLoading } = AppQuery.friends.useSearch(
-        searchQuery,
-        { enabled: searchQuery.length > 0 }
+        newChatQuery,
+        { enabled: newChatQuery.length > 0 }
     );
 
     // Mutation for creating new channel
@@ -39,7 +46,84 @@ export default function ChatPage() {
     const channelIdParam = searchParams.get('id');
     const selectedChannelId = channelIdParam ? Number(channelIdParam) : null;
 
-    const selectedChannel = channels?.find(c => c.id === selectedChannelId);
+    // Normalize API response: backend returns ThanhVienKenh[] with `kenhChat`
+    const normalizedChannels: TChannel[] | undefined = channels && (channels as any[]).length > 0
+        ? ('kenhChat' in (channels as any)[0]
+            ? (channels as any).map((m: any) => m.kenhChat)
+            : channels as any)
+        : (channels as any);
+
+    const selectedChannel = normalizedChannels?.find(c => c.id === selectedChannelId);
+
+    const readStateKey = (userId?: number | null) => `chat_last_read_${userId ?? 'anonymous'}`;
+
+    const getLastReadMap = () => {
+        if (typeof window === 'undefined') return {} as Record<string, number>;
+        try {
+            const raw = localStorage.getItem(readStateKey(user?.id));
+            return raw ? (JSON.parse(raw) as Record<string, number>) : {};
+        } catch {
+            return {} as Record<string, number>;
+        }
+    };
+
+    const setLastRead = (channelId: number, messageId: number) => {
+        if (typeof window === 'undefined') return;
+        const map = getLastReadMap();
+        map[String(channelId)] = messageId;
+        localStorage.setItem(readStateKey(user?.id), JSON.stringify(map));
+        setUnreadChannelIds((prev) => {
+            const next = new Set(prev);
+            next.delete(channelId);
+            return next;
+        });
+    };
+
+    const getIsUnread = (channel: TChannel) => {
+        const latestId = channel.tinNhans?.[0]?.id;
+        if (!latestId) return false;
+        const lastRead = getLastReadMap()[String(channel.id)] || 0;
+        // Unread if latest message is newer than last read and latest isn't mine
+        const latestSenderId = channel.tinNhans?.[0]?.nguoiGuiId;
+        if (latestSenderId && latestSenderId === user?.id) return false;
+        return latestId > lastRead;
+    };
+
+    // When selecting a channel, mark it read using latest message id
+    useEffect(() => {
+        if (!selectedChannelId || !normalizedChannels) return;
+        const ch = normalizedChannels.find((c) => c.id === selectedChannelId);
+        const latestId = ch?.tinNhans?.[0]?.id;
+        if (latestId) setLastRead(selectedChannelId, latestId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedChannelId]);
+
+    // Global realtime updates for sidebar + unread
+    useEffect(() => {
+        if (!isConnected) return;
+
+        const handleNewMessage = (message: any) => {
+            const channelId = message?.kenhChatId;
+            if (!channelId) return;
+
+            // refresh channel list preview/updatedAt
+            refetchChannels();
+
+            // if not currently opened channel -> mark unread
+            if (selectedChannelId !== channelId && message?.nguoiGuiId !== user?.id) {
+                setUnreadChannelIds((prev) => {
+                    const next = new Set(prev);
+                    next.add(channelId);
+                    return next;
+                });
+            }
+        };
+
+        on('message:new', handleNewMessage);
+        return () => {
+            off('message:new', handleNewMessage);
+        };
+    }, [isConnected, on, off, refetchChannels, selectedChannelId, user?.id]);
 
     // Update search results when API query data changes
     useEffect(() => {
@@ -50,6 +134,14 @@ export default function ChatPage() {
         }
         setIsSearching(searchQueryLoading);
     }, [searchQueryData, searchQueryLoading]);
+
+    const q = sidebarQuery.trim().toLowerCase();
+    const filteredChannels = q && normalizedChannels
+        ? normalizedChannels.filter((ch) => {
+            const name = getChannelName(ch, user?.id).toLowerCase();
+            return name.includes(q);
+        })
+        : normalizedChannels;
 
     // Handle creating new chat with user
     const handleStartChat = async (targetUser: TUser) => {
@@ -64,12 +156,17 @@ export default function ChatPage() {
                 refetchChannels();
                 // Close modal and select the new channel
                 setShowUserSearch(false);
-                setSearchQuery("");
+                setNewChatQuery("");
                 setSearchResults([]);
                 handleSelectChannel(result.id);
             }
         } catch (error) {
             console.error('Error creating channel:', error);
+            notifications.show({
+                title: 'Không thể tạo cuộc trò chuyện',
+                message: 'Bạn chỉ có thể nhắn tin cho người đã kết bạn (hoặc bạn không có quyền).',
+                color: 'red'
+            });
         }
     };
 
@@ -121,8 +218,8 @@ export default function ChatPage() {
                         leftSection={<IconSearch size={16} className="text-gray-500" />}
                         radius="xl"
                         size="md"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        value={sidebarQuery}
+                        onChange={(e) => setSidebarQuery(e.target.value)}
                         classNames={{ input: "bg-gray-100 dark:bg-zinc-800/50 border-transparent focus:bg-gray-100 dark:focus:bg-zinc-800 transition-all text-gray-900 dark:text-white placeholder:text-gray-500" }}
                     />
 
@@ -137,58 +234,16 @@ export default function ChatPage() {
 
                 <ScrollArea className="flex-1">
                     <Stack gap={0} px="xs">
-                        {/* Search Results */}
-                        {searchQuery && (
-                            <>
-                                {isSearching ? (
-                                    <Center py="md"><Loader size="sm" color="indigo" /></Center>
-                                ) : searchResults.length > 0 ? (
-                                    <>
-                                        <Text size="xs" c="dimmed" px="md" py="xs" fw={500}>Kết quả tìm kiếm</Text>
-                                        {searchResults.map((searchUser) => (
-                                            <Group
-                                                key={searchUser.id}
-                                                wrap="nowrap"
-                                                className="p-3 rounded-xl cursor-pointer transition-all duration-200 group hover:bg-gray-50 dark:hover:bg-zinc-900"
-                                                onClick={() => handleStartChat(searchUser)}
-                                            >
-                                                <Avatar
-                                                    src={searchUser.avatar}
-                                                    size={48}
-                                                    radius="xl"
-                                                />
-                                                <Stack gap={1} style={{ flex: 1, overflow: 'hidden' }}>
-                                                    <Text size="md" fw={500} className="text-gray-900 dark:text-gray-200">
-                                                        {searchUser.hoTen || searchUser.taiKhoan}
-                                                    </Text>
-                                                    <Text size="sm" c="dimmed" truncate>
-                                                        {searchUser.email}
-                                                    </Text>
-                                                </Stack>
-                                                <ActionIcon variant="subtle" color="blue" radius="xl" size="sm">
-                                                    <IconMessagePlus size={16} />
-                                                </ActionIcon>
-                                            </Group>
-                                        ))}
-                                        <Divider my="sm" />
-                                    </>
-                                ) : searchQuery ? (
-                                    <Center py="md" className="flex-col gap-2 text-center text-gray-400">
-                                        <Text size="sm">Không tìm thấy người dùng</Text>
-                                    </Center>
-                                ) : null}
-                            </>
-                        )}
-
                         {/* Channel List */}
                         {isLoadingChannels ? (
                             <Center py="xl"><Loader size="sm" color="indigo" /></Center>
-                        ) : channels && channels.length > 0 ? (
+                        ) : filteredChannels && filteredChannels.length > 0 ? (
                             <>
-                                {searchQuery && <Text size="xs" c="dimmed" px="md" py="xs" fw={500}>Đoạn chat gần đây</Text>}
-                                {channels.map((channel: TChannel) => {
+                                {filteredChannels.map((channel: TChannel) => {
                                     // Skip channels without members to prevent errors
                                     if (!channel || !channel.thanhViens) return null;
+
+                                    const isUnread = unreadChannelIds.has(channel.id) || getIsUnread(channel);
 
                                     return (
                                         <Group
@@ -198,7 +253,19 @@ export default function ChatPage() {
                                                 ? 'bg-blue-50/50 dark:bg-blue-500/10'
                                                 : 'hover:bg-gray-50 dark:hover:bg-zinc-900'
                                                 }`}
-                                            onClick={() => handleSelectChannel(channel.id)}
+                                            onClick={() => {
+                                                const latestId = channel.tinNhans?.[0]?.id;
+                                                if (latestId) {
+                                                    setLastRead(channel.id, latestId);
+                                                } else {
+                                                    setUnreadChannelIds((prev) => {
+                                                        const next = new Set(prev);
+                                                        next.delete(channel.id);
+                                                        return next;
+                                                    });
+                                                }
+                                                handleSelectChannel(channel.id);
+                                            }}
                                         >
                                             <Box className="relative">
                                                 <Avatar
@@ -213,7 +280,7 @@ export default function ChatPage() {
                                                     {getChannelName(channel, user?.id)}
                                                 </Text>
                                                 <Group gap="xs" wrap="nowrap">
-                                                    <Text size="sm" c="dimmed" truncate style={{ flex: 1 }} fw={channelIdParam ? 400 : 500}>
+                                                    <Text size="sm" c={isUnread ? "blue" : "dimmed"} truncate style={{ flex: 1 }} fw={isUnread ? 700 : 500}>
                                                         {channel.tinNhans?.[0]
                                                             ? (channel.tinNhans[0].nguoiGuiId === user?.id ? "Bạn: " : "") +
                                                             (channel.tinNhans[0].loai === 'HINH_ANH' ? 'Đã gửi một ảnh' : channel.tinNhans[0].noiDung)
@@ -224,8 +291,7 @@ export default function ChatPage() {
                                                     </Text>
                                                 </Group>
                                             </Stack>
-                                            {/* Unread indicator mock - would be conditional */}
-                                            {/* <Box className="w-3 h-3 bg-blue-500 rounded-full" /> */}
+                                            {isUnread && <Box className="w-2.5 h-2.5 bg-blue-500 rounded-full" />}
                                         </Group>
                                     );
                                 })}
@@ -270,7 +336,7 @@ export default function ChatPage() {
                 opened={showUserSearch}
                 onClose={() => {
                     setShowUserSearch(false);
-                    setSearchQuery("");
+                    setNewChatQuery("");
                     setSearchResults([]);
                 }}
                 title="Tìm kiếm người dùng để nhắn tin"
@@ -281,8 +347,8 @@ export default function ChatPage() {
                     <TextInput
                         placeholder="Nhập tên người dùng..."
                         leftSection={<IconSearch size={16} className="text-gray-500" />}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
+                        value={newChatQuery}
+                        onChange={(e) => setNewChatQuery(e.target.value)}
                         autoFocus
                     />
 
@@ -317,15 +383,46 @@ export default function ChatPage() {
                                         </ActionIcon>
                                     </Group>
                                 ))
-                            ) : searchQuery ? (
+                            ) : newChatQuery ? (
                                 <Center py="xl" className="flex-col gap-2 text-center text-gray-400">
                                     <Text size="sm">Không tìm thấy người dùng</Text>
                                     <Text size="xs" c="dimmed">Thử tìm kiếm với từ khóa khác</Text>
                                 </Center>
                             ) : (
-                                <Center py="xl" className="flex-col gap-2 text-center text-gray-400">
-                                    <Text size="sm">Nhập tên để tìm kiếm người dùng</Text>
-                                </Center>
+                                <>
+                                    <Text size="xs" c="dimmed" px="xs">Gợi ý (bạn bè)</Text>
+                                    {isLoadingFriends ? (
+                                        <Center py="xl"><Loader size="sm" color="indigo" /></Center>
+                                    ) : friends && friends.length > 0 ? (
+                                        friends.map((f: any) => (
+                                            <Group
+                                                key={f.id}
+                                                wrap="nowrap"
+                                                p="sm"
+                                                className="cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-900 rounded-lg"
+                                                onClick={() => handleStartChat(f)}
+                                            >
+                                                <Avatar src={f.avatar} size={44} radius="xl" />
+                                                <Stack gap={2} style={{ flex: 1, overflow: 'hidden' }}>
+                                                    <Text size="sm" fw={600} className="text-gray-900 dark:text-gray-200" truncate>
+                                                        {f.hoTen || f.taiKhoan}
+                                                    </Text>
+                                                    <Text size="xs" c="dimmed" truncate>
+                                                        {f.email || ''}
+                                                    </Text>
+                                                </Stack>
+                                                <ActionIcon variant="subtle" color="blue" radius="xl" size="sm">
+                                                    <IconMessagePlus size={16} />
+                                                </ActionIcon>
+                                            </Group>
+                                        ))
+                                    ) : (
+                                        <Center py="xl" className="flex-col gap-2 text-center text-gray-400">
+                                            <Text size="sm">Chưa có bạn bè</Text>
+                                            <Text size="xs" c="dimmed">Hãy kết bạn trước để bắt đầu nhắn tin.</Text>
+                                        </Center>
+                                    )}
+                                </>
                             )}
                         </Stack>
                     </ScrollArea>

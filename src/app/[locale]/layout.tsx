@@ -14,6 +14,7 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { ThemeSync } from "@/shared/components/ThemeSync";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "NHers - Nguyễn Huệ Academy",
@@ -66,7 +67,9 @@ export default async function RootLayout({
         className={`${beVietnamPro.variable} antialiased`}
       >
         <AppProvider locale={locale} messages={messages}>
-          <ThemeSync />
+          <Suspense fallback={null}>
+            <ThemeSync />
+          </Suspense>
           <div className="app-content">
             {children}
           </div>

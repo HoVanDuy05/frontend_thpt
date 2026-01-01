@@ -82,6 +82,10 @@ export default function LoginPage() {
                         }
                     }
 
+                    // Remove locale prefix if present to avoid duplication (e.g., /vi/vi/...)
+                    // router.push from next-intl automatically adds the current locale
+                    targetUrl = targetUrl.replace(/^\/(vi|en)(\/|$)/, '/');
+
                     router.push(targetUrl);
                 } catch (e) {
                     notifications.show({

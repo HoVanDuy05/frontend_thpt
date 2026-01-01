@@ -55,14 +55,14 @@ export function FlowCategorySidebar({ activeCategory, onCategoryChange, categori
     return (
         <Box
             component="aside"
-            className="w-full sm:w-[280px] shrink-0 border-r border-gray-200 dark:border-zinc-800 h-full bg-white dark:bg-zinc-900 transition-all"
+            className="w-full sm:w-[280px] shrink-0 border-r border-gray-200/50 dark:border-zinc-700/50 h-full bg-white dark:bg-zinc-900 transition-all"
         >
             <Stack gap={4} p="md">
                 <Group justify="space-between" mb="xs" px="md">
-                    <Text size="xs" fw={800} c="dimmed" tt="uppercase" lts={1}>
+                    <Text size="xs" fw={800} c="dimmed" tt="uppercase" lts={1} className="text-gray-500 dark:text-gray-400">
                         Danh mục quy trình
                     </Text>
-                    <Popover opened={popoverOpened} onChange={setPopoverOpened} position="bottom-end" withArrow shadow="md">
+                    <Popover opened={popoverOpened} onChange={setPopoverOpened} position="bottom-end" withArrow shadow="lg">
                         <Popover.Target>
                             <Tooltip label="Tạo danh mục mới">
                                 <ActionIcon
@@ -70,6 +70,7 @@ export function FlowCategorySidebar({ activeCategory, onCategoryChange, categori
                                     color="indigo"
                                     size="sm"
                                     onClick={() => setPopoverOpened((o) => !o)}
+                                    className="hover:bg-indigo-100 dark:hover:bg-indigo-900/30"
                                 >
                                     <IconPlus size={14} />
                                 </ActionIcon>
@@ -120,17 +121,17 @@ export function FlowCategorySidebar({ activeCategory, onCategoryChange, categori
                             key={cat.id}
                             onClick={() => onCategoryChange(cat.id)}
                             className={`px-4 py-3 rounded-xl transition-all flex items-center justify-between group ${isActive
-                                    ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400'
-                                    : 'hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-700 dark:text-gray-300'
+                                ? 'bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 text-indigo-700 dark:text-indigo-300 shadow-sm'
+                                : 'hover:bg-gray-100/80 dark:hover:bg-zinc-800/80 text-gray-700 dark:text-gray-300'
                                 }`}
                         >
                             <Group gap="sm">
                                 <Icon
                                     size={20}
                                     stroke={isActive ? 2.5 : 1.5}
-                                    className={`transition-transform duration-200 ${isActive ? 'scale-110' : 'group-hover:scale-105'}`}
+                                    className={`transition-transform duration-200 ${isActive ? 'scale-110 text-indigo-600 dark:text-indigo-400' : 'group-hover:scale-105 text-gray-500 dark:text-gray-400'}`}
                                 />
-                                <Text size="sm" fw={isActive ? 700 : 500}>
+                                <Text size="sm" fw={isActive ? 700 : 500} className={isActive ? 'text-indigo-700 dark:text-indigo-300' : ''}>
                                     {cat.label}
                                 </Text>
                             </Group>
@@ -139,6 +140,7 @@ export function FlowCategorySidebar({ activeCategory, onCategoryChange, categori
                                 color={isActive ? "indigo" : "gray"}
                                 size="sm"
                                 radius="sm"
+                                className={isActive ? 'bg-indigo-600 text-white' : ''}
                             >
                                 {cat.count}
                             </Badge>

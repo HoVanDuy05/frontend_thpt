@@ -40,7 +40,7 @@ export function UserMenu() {
                 <Menu.Label>Tài khoản</Menu.Label>
                 <Menu.Item
                     leftSection={<IconUser size={16} />}
-                    onClick={() => router.push("/social/profile")}
+                    onClick={() => router.push(`/social/profile/${user.id}`)}
                 >
                     Hồ sơ
                 </Menu.Item>

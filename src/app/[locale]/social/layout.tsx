@@ -5,21 +5,25 @@ import { IconHome, IconSearch, IconPlus, IconHeart, IconUser, IconChevronLeft, I
 import { useRouter, usePathname, Link } from "@/i18n/routing";
 import { withAuth } from "@/shared/hocs/withAuth";
 import { UserMenu } from "@/shared/components/UserMenu";
+import { useAppStore } from "@/providers/store/useAppStore";
 
 const SocialLayout = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter();
     const pathname = usePathname();
+    const { user } = useAppStore();
+
+    const myProfileHref = user?.id ? `/social/profile/${user.id}` : '/social/profile';
 
     const NavIcon = ({ icon: Icon, href, active }: any) => (
         <UnstyledButton
             component={Link}
             href={href}
-            className={`flex flex-1 items-center justify-center py-4 transition-all duration-300 cursor-pointer rounded-2xl mx-1 ${active
-                ? "text-black dark:text-white bg-gray-50 dark:bg-zinc-900/80 scale-105"
-                : "text-gray-300 dark:text-zinc-700 hover:text-gray-500 dark:hover:text-zinc-400"
+            className={`group flex items-center justify-center py-3 transition-all duration-200 cursor-pointer rounded-xl ${active
+                ? "text-black dark:text-white"
+                : "text-gray-400 dark:text-gray-600 hover:text-gray-600 dark:hover:text-gray-400"
                 }`}
         >
-            <Icon size={28} stroke={active ? 2.5 : 2} />
+            <Icon size={24} stroke={2} />
         </UnstyledButton>
     );
 
@@ -28,32 +32,34 @@ const SocialLayout = ({ children }: { children: React.ReactNode }) => {
             {/* Desktop Navigation (Left Sidebar) */}
             <Box
                 visibleFrom="md"
-                className="fixed left-0 top-0 bottom-0 w-[100px] flex flex-col items-center py-10 border-r border-gray-100 dark:border-zinc-900 z-50 bg-white/50 dark:bg-black/50 backdrop-blur-xl"
+                className="fixed left-0 top-0 bottom-0 w-[76px] flex flex-col items-center pt-6 border-r border-gray-200 dark:border-zinc-800 z-50 bg-white dark:bg-black"
             >
-                <Link href="/social" className="hover:rotate-12 transition-transform duration-500">
-                    <Title order={1} className="text-4xl font-black mb-16 tracking-tighter" style={{ fontFamily: 'Georgia, serif' }}>NHers Social</Title>
+                <Link href="/social" className="mb-8">
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-500 rounded-xl flex items-center justify-center">
+                        <span className="text-white text-xl font-bold">NH</span>
+                    </div>
                 </Link>
 
-                <Stack gap="xl" className="w-full px-4">
+                <Stack gap="1" className="w-full px-2 flex-grow">
                     <NavIcon icon={IconHome} href="/social" active={pathname === "/social"} />
                     <NavIcon icon={IconSearch} href="/social/explore" active={pathname === "/social/explore"} />
                     <NavIcon icon={IconPlus} href="/social/create" active={pathname === "/social/create"} />
                     <NavIcon icon={IconMessage} href="/chat" active={pathname.startsWith("/chat")} />
                     <NavIcon icon={IconUsers} href="/social/friends" active={pathname === "/social/friends"} />
                     <NavIcon icon={IconHeart} href="/social/activity" active={pathname === "/social/activity"} />
-                    <NavIcon icon={IconUser} href="/social/profile" active={pathname.startsWith("/social/profile")} />
+                    <NavIcon icon={IconUser} href={myProfileHref} active={pathname.startsWith("/social/profile")} />
                 </Stack>
 
-                <Box className="mt-auto pb-6">
+                <Box className="pb-4">
                     <ActionIcon
-                        variant="subtle"
-                        size="xl"
+                        variant="transparent"
+                        size="lg"
                         radius="xl"
                         onClick={() => router.push("/admin/dashboard")}
                         title="Quay lại Portal"
-                        className="hover:bg-gray-100 dark:hover:bg-zinc-900 transition-colors"
+                        className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     >
-                        <IconLayoutNavbar size={26} stroke={1.5} className="text-zinc-400" />
+                        <IconLayoutNavbar size={20} stroke={2} />
                     </ActionIcon>
                 </Box>
             </Box>
@@ -75,8 +81,8 @@ const SocialLayout = ({ children }: { children: React.ReactNode }) => {
                         <IconChevronLeft size={24} stroke={2.5} />
                     </ActionIcon>
 
-                    <Title order={3} className="text-2xl font-black tracking-tighter" style={{ fontFamily: 'Georgia, serif' }}>
-                        NHers Social
+                    <Title order={3} className="text-xl font-black tracking-tighter" style={{ fontFamily: 'Georgia, serif' }}>
+                        NH Social
                     </Title>
 
                     <UserMenu />
@@ -84,8 +90,8 @@ const SocialLayout = ({ children }: { children: React.ReactNode }) => {
             </Box>
 
             {/* Main Content Area */}
-            <Box className="flex-grow md:ml-[100px]">
-                <Container size="sm" className="px-4 sm:px-6 py-4 sm:py-10 min-h-screen">
+            <Box className="flex-grow md:ml-[76px]">
+                <Container size="sm" className="px-4 sm:px-6 py-4 sm:py-8 min-h-screen">
                     {children}
                 </Container>
             </Box>
@@ -103,7 +109,7 @@ const SocialLayout = ({ children }: { children: React.ReactNode }) => {
                         <NavIcon icon={IconMessage} href="/chat" active={pathname.startsWith("/chat")} />
                         <NavIcon icon={IconUsers} href="/social/friends" active={pathname === "/social/friends"} />
                         <NavIcon icon={IconHeart} href="/social/activity" active={pathname === "/social/activity"} />
-                        <NavIcon icon={IconUser} href="/social/profile" active={pathname.startsWith("/social/profile")} />
+                        <NavIcon icon={IconUser} href={myProfileHref} active={pathname.startsWith("/social/profile")} />
                     </Group>
                 </Container>
             </Box>

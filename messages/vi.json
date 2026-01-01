@@ -37,5 +37,38 @@
             "chat": "Tin nhắn"
         },
         "settings": "Cài đặt hệ thống"
+    },
+    "profile": {
+        "edit": "Chỉnh sửa",
+        "share": "Chia sẻ",
+        "follow": "Theo dõi",
+        "following": "Đang theo dõi",
+        "sentRequest": "Đã gửi lời mời",
+        "accept": "Chấp nhận",
+        "blocked": "Đã chặn",
+        "message": "Nhắn tin",
+        "about": "Giới thiệu",
+        "posts": "Bài viết",
+        "replies": "Phản hồi",
+        "reposts": "Chia sẻ",
+        "personalInfo": "Thông tin cá nhân",
+        "email": "Email",
+        "dateOfBirth": "Ngày sinh",
+        "gender": "Giới tính",
+        "phone": "Số điện thoại",
+        "address": "Địa chỉ",
+        "class": "Lớp học",
+        "specialization": "Chuyên môn",
+        "noInfo": "Chưa có thông tin nào được cập nhật",
+        "noPosts": "Chưa có bài viết nào",
+        "noReplies": "Chưa có phản hồi nào",
+        "noReposts": "Chưa có bài đăng lại nào",
+        "male": "Nam",
+        "female": "Nữ",
+        "followers": "người theo dõi",
+        "error": {
+            "chatError": "Không thể mở cuộc trò chuyện. Vui lòng kết bạn trước.",
+            "actionError": "Không thể thực hiện thao tác. Vui lòng thử lại."
+        }
     }
 }

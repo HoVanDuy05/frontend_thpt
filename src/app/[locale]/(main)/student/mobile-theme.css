@@ -1,0 +1,105 @@
+/* Mobile-specific styles for student app */
+
+/* Safe area handling for notched devices */
+:root {
+    --safe-area-inset-top: env(safe-area-inset-top, 0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-inset-left: env(safe-area-inset-left, 0px);
+    --safe-area-inset-right: env(safe-area-inset-right, 0px);
+}
+
+.safe-area-bottom {
+    padding-bottom: var(--safe-area-inset-bottom);
+}
+
+.safe-area-top {
+    padding-top: var(--safe-area-inset-top);
+}
+
+/* Touch-friendly tap targets */
+@media (hover: none) and (pointer: coarse) {
+    button,
+    a,
+    [role="button"] {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Hide scrollbar on mobile */
+@media (max-width: 768px) {
+    ::-webkit-scrollbar {
+        display: none;
+    }
+    
+    * {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+}
+
+/* Prevent text selection on tap */
+.no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Pull to refresh indicator */
+@media (max-width: 768px) {
+    body {
+        overscroll-behavior-y: contain;
+    }
+}
+
+/* Smooth transitions */
+* {
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Active state for touch */
+@media (hover: none) {
+    button:active,
+    a:active,
+    [role="button"]:active {
+        opacity: 0.7;
+        transform: scale(0.98);
+    }
+}
+
+/* Status bar styling for iOS */
+@supports (-webkit-touch-callout: none) {
+    .ios-status-bar {
+        padding-top: max(20px, var(--safe-area-inset-top));
+    }
+}
+
+/* Prevent zoom on input focus (iOS) */
+@media (max-width: 768px) {
+    input,
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+}
+
+/* Bottom navigation safe area */
+.bottom-nav {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+}
+
+/* Card hover effects on mobile */
+@media (hover: none) {
+    .card-interactive:active {
+        transform: scale(0.98);
+        transition: transform 0.1s ease;
+    }
+}

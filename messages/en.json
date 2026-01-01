@@ -26,5 +26,38 @@
             "finance": "Finance"
         },
         "settings": "System Settings"
+    },
+    "profile": {
+        "edit": "Edit",
+        "share": "Share",
+        "follow": "Follow",
+        "following": "Following",
+        "sentRequest": "Request sent",
+        "accept": "Accept",
+        "blocked": "Blocked",
+        "message": "Message",
+        "about": "About",
+        "posts": "Posts",
+        "replies": "Replies",
+        "reposts": "Reposts",
+        "personalInfo": "Personal Information",
+        "email": "Email",
+        "dateOfBirth": "Date of Birth",
+        "gender": "Gender",
+        "phone": "Phone",
+        "address": "Address",
+        "class": "Class",
+        "specialization": "Specialization",
+        "noInfo": "No information has been updated yet",
+        "noPosts": "No posts yet",
+        "noReplies": "No replies yet",
+        "noReposts": "No reposts yet",
+        "male": "Male",
+        "female": "Female",
+        "followers": "followers",
+        "error": {
+            "chatError": "Cannot open conversation. Please add as friend first.",
+            "actionError": "Cannot perform action. Please try again."
+        }
     }
 }

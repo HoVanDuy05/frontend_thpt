@@ -4,7 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAppStore } from "@/providers/store/useAppStore";
 
-const SOCKET_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const SOCKET_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000")
+    .replace(/\/api\/?$/, "");
 
 export function useSocket() {
     const socketRef = useRef<Socket | null>(null);
@@ -12,11 +13,39 @@ export function useSocket() {
     const { token } = useAppStore();
 
     useEffect(() => {
-        // Temporarily disable socket connection to prevent namespace errors
-        // TODO: Re-enable when socket server is properly configured
-        setIsConnected(false);
+        if (!token) {
+            setIsConnected(false);
+            return;
+        }
+
+        // Initialize socket connection with authentication
+        const socket = io(SOCKET_URL, {
+            auth: {
+                token: token
+            },
+            transports: ['websocket', 'polling'],
+        });
+
+        socket.on('connect', () => {
+            console.log('Socket connected:', socket.id);
+            setIsConnected(true);
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Socket disconnected');
+            setIsConnected(false);
+        });
+
+        socket.on('connect_error', (error) => {
+            console.error('Socket connection error:', error);
+            setIsConnected(false);
+        });
+
+        socketRef.current = socket;
+
         return () => {
-            // Cleanup if needed
+            socket.disconnect();
+            socketRef.current = null;
         };
     }, [token]);
 

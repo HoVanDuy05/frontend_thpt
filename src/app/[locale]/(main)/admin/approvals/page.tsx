@@ -81,22 +81,22 @@ export default function ApprovalsPage() {
     ];
 
     return (
-        <Box h="calc(100vh - 60px)" className="overflow-hidden flex flex-col bg-gray-50 dark:bg-zinc-900">
+        <Box h="calc(100vh - 60px)" className="overflow-hidden flex flex-col bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-900 dark:to-zinc-800">
             {/* Page Header */}
-            <Box px="xl" py="md" className="border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0">
+            <Box px={{ base: "md", md: "xl" }} py="lg" className="border-b border-gray-200/50 dark:border-zinc-700/50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm shrink-0">
                 <Group justify="space-between">
-                    <Stack gap={4}>
+                    <Stack gap={6}>
                         <Group gap="sm">
                             {isMobile && (
-                                <ActionIcon variant="subtle" onClick={toggleSidebar} color="gray" size="lg">
+                                <ActionIcon variant="subtle" onClick={toggleSidebar} color="gray" size="lg" className="hover:bg-gray-100 dark:hover:bg-zinc-800">
                                     <IconSettings size={20} />
                                 </ActionIcon>
                             )}
-                            <Title order={2} fw={800} className="text-gray-900 dark:text-white">
+                            <Title order={2} fw={800} className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                                 {t('page_title')}
                             </Title>
                         </Group>
-                        <Text size="sm" c="dimmed">
+                        <Text size="sm" c="dimmed" className="text-gray-600 dark:text-gray-400">
                             {t('page_subtitle')}
                         </Text>
                     </Stack>
@@ -104,8 +104,7 @@ export default function ApprovalsPage() {
                         leftSection={<IconPlus size={18} />}
                         onClick={openBuilder}
                         size="md"
-                        className="shadow-sm"
-                        color="indigo"
+                        className="shadow-lg hover:shadow-xl transition-all bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
                     >
                         {isMobile ? t('create_new_short') : t('create_new')}
                     </Button>
@@ -116,11 +115,13 @@ export default function ApprovalsPage() {
                 {/* Category Sidebar */}
                 {(!isMobile || sidebarOpened) && (
                     <Box
-                        className={`${isMobile ? 'fixed inset-0 z-[100] bg-white dark:bg-zinc-900' : ''}`}
+                        className={`${isMobile ? 'fixed inset-0 z-[100] bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md' : ''}`}
                     >
                         {isMobile && (
-                            <Box p="md" className="border-b border-gray-200 dark:border-zinc-800">
-                                <Button variant="subtle" fullWidth onClick={toggleSidebar}>{t('close_categories')}</Button>
+                            <Box p="md" className="border-b border-gray-200/50 dark:border-zinc-700/50 bg-white/80 dark:bg-zinc-900/80">
+                                <Button variant="subtle" fullWidth onClick={toggleSidebar} className="hover:bg-gray-100 dark:hover:bg-zinc-800">
+                                    {t('close_categories')}
+                                </Button>
                             </Box>
                         )}
                         <FlowCategorySidebar
@@ -135,23 +136,23 @@ export default function ApprovalsPage() {
                 )}
 
                 {/* Main content */}
-                <Box className="flex-1 overflow-auto" p="xl">
+                <Box className="flex-1 overflow-auto" p={{ base: "md", md: "xl" }}>
                     <Stack gap="xl">
                         {/* Stats Cards */}
-                        <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="md">
+                        <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="lg">
                             {stats.map((stat) => (
-                                <Card key={stat.label} withBorder radius="md" className="bg-white dark:bg-zinc-800">
+                                <Card key={stat.label} withBorder radius="xl" className="bg-white dark:bg-zinc-800 hover:shadow-lg transition-all border-gray-200/50 dark:border-zinc-700/50">
                                     <Group justify="space-between">
-                                        <Stack gap={4}>
-                                            <Text size="xs" c="dimmed" fw={600} tt="uppercase">
+                                        <Stack gap={2}>
+                                            <Text size="xs" c="dimmed" fw={700} tt="uppercase" className="text-gray-500 dark:text-gray-400">
                                                 {stat.label}
                                             </Text>
-                                            <Text size="xl" fw={900}>
+                                            <Text size="xl" fw={900} className="text-gray-900 dark:text-white">
                                                 {stat.value}
                                             </Text>
                                         </Stack>
-                                        <ThemeIcon size="xl" radius="md" variant="light" color={stat.color}>
-                                            <stat.icon size={24} />
+                                        <ThemeIcon size="xl" radius="xl" variant="gradient" gradient={{ from: stat.color, to: stat.color === 'blue' ? 'indigo' : stat.color === 'orange' ? 'yellow' : stat.color === 'green' ? 'emerald' : 'red', deg: 45 }}>
+                                            <stat.icon size={24} className="text-white" />
                                         </ThemeIcon>
                                     </Group>
                                 </Card>
@@ -159,18 +160,18 @@ export default function ApprovalsPage() {
                         </SimpleGrid>
 
                         {/* Approvals Table */}
-                        <Paper withBorder radius="lg" className="overflow-hidden shadow-sm bg-white dark:bg-zinc-800">
-                            <Box p="md" className="border-b border-gray-200 dark:border-zinc-800">
+                        <Paper withBorder radius="xl" className="overflow-hidden shadow-xl bg-white dark:bg-zinc-800 border-gray-200/50 dark:border-zinc-700/50">
+                            <Box p="lg" className="border-b border-gray-200/50 dark:border-zinc-700/50 bg-gradient-to-r from-gray-50 to-white dark:from-zinc-800 dark:to-zinc-800">
                                 <Group justify="space-between">
-                                    <Stack gap={4}>
-                                        <Text fw={700} size="lg">{t('table.title')}</Text>
-                                        <Text size="sm" c="dimmed">
+                                    <Stack gap={2}>
+                                        <Text fw={800} size="lg" className="text-gray-900 dark:text-white">{t('table.title')}</Text>
+                                        <Text size="sm" c="dimmed" className="text-gray-600 dark:text-gray-400">
                                             {myRequests?.length || 0} {t('table.count')}
                                         </Text>
                                     </Stack>
                                 </Group>
                             </Box>
-                            <LoadingOverlay visible={loadingMy || loadingFlows} overlayProps={{ blur: 1 }} />
+                            <LoadingOverlay visible={loadingMy || loadingFlows} overlayProps={{ blur: 2 }} />
                             <ApprovalTable
                                 requests={myRequests || []}
                                 isAdmin

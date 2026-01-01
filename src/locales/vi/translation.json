@@ -205,7 +205,9 @@
             "success": "Đăng nhập thành công",
             "error": "Đăng nhập thất bại",
             "welcome_back": "Chào mừng trở lại, {name}!",
-            "auth_failed": "Xác thực thất bại"
+            "auth_failed": "Xác thực thất bại",
+            "session_expired": "Phiên đăng nhập hết hạn",
+            "session_expired_message": "Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại để tiếp tục."
         },
         "register": {
             "title": "Tạo tài khoản mới",
@@ -350,6 +352,62 @@
         },
         "recent_activity": {
             "title": "Hoạt động gần đây"
+        }
+    },
+    "profile": {
+        "edit": "Chỉnh sửa",
+        "share": "Chia sẻ",
+        "follow": "Theo dõi",
+        "following": "Đang theo dõi",
+        "sentRequest": "Đã gửi lời mời",
+        "accept": "Chấp nhận",
+        "blocked": "Đã chặn",
+        "message": "Nhắn tin",
+        "about": "Giới thiệu",
+        "posts": "Bài viết",
+        "replies": "Phản hồi",
+        "reposts": "Chia sẻ",
+        "personalInfo": "Thông tin cá nhân",
+        "email": "Email",
+        "dateOfBirth": "Ngày sinh",
+        "gender": "Giới tính",
+        "phone": "Số điện thoại",
+        "address": "Địa chỉ",
+        "class": "Lớp học",
+        "specialization": "Chuyên môn",
+        "noInfo": "Chưa có thông tin nào được cập nhật",
+        "noPosts": "Chưa có bài viết nào",
+        "noReplies": "Chưa có phản hồi nào",
+        "noReposts": "Chưa có bài đăng lại nào",
+        "male": "Nam",
+        "female": "Nữ",
+        "followers": "người theo dõi",
+        "error": {
+            "chatError": "Không thể mở cuộc trò chuyện. Vui lòng kết bạn trước.",
+            "actionError": "Không thể thực hiện thao tác. Vui lòng thử lại."
+        }
+    },
+    "student": {
+        "nav": {
+            "home": "Trang chủ",
+            "schedule": "Lịch học",
+            "grades": "Kết quả",
+            "social": "Xã hội",
+            "profile": "Cá nhân"
+        },
+        "home": {
+            "greeting": "Chào buổi sáng",
+            "attendance": "Điểm danh",
+            "gpa": "ĐTB",
+            "assignments": "Bài tập",
+            "notifications": "Thông báo",
+            "today_schedule": "Lịch học hôm nay",
+            "upcoming_assignments": "Bài tập sắp đến hạn",
+            "due_date": "Hạn nộp: {date}",
+            "new_announcements": "Thông báo mới",
+            "important": "Quan trọng",
+            "exam": "Thi cử",
+            "event": "Sự kiện"
         }
     }
 }

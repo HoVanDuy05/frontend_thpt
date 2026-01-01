@@ -103,11 +103,14 @@ export const AppQuery = {
     },
     chat: {
         useChannels: (options?: AppQueryOptions<"getChannels">) =>
-            useAppQuery({ url: { baseUrl: "/communication/chat/channels" }, options }),
+            useAppQuery<"getChannels">({ url: { baseUrl: "/communication/chat/channels" }, options }),
         useMessages: (channelId: number, params?: { page?: number }, options?: AppQueryOptions<"getMessages">) =>
-            useAppQuery({
+            useAppQuery<"getMessages">({
                 url: { baseUrl: "/communication/chat/channels/:id/messages", urlParams: { id: channelId }, queryParams: params },
-                options,
+                options: {
+                    ...options,
+                    queryKey: ["chat", "messages", channelId, params?.page || 1, ...(options?.queryKey || [])],
+                },
                 refetchInterval: options?.refetchInterval
             }),
     },

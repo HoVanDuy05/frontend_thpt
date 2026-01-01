@@ -1,10 +1,11 @@
 "use client";
 
-import { StudentHeader } from "@/shared/components/layout/StudentHeader";
+import { MobileHeader } from "@/shared/components/layout/MobileHeader";
+import { BottomNav } from "@/shared/components/layout/BottomNav";
 import { RoleGuard } from "@/shared/components/auth/RoleGuard";
 import { withAuth } from "@/shared/hocs/withAuth";
 
-// Retain RoleGuard for specific role check, use withAuth for profile hydration
+// Mobile-first layout for student app
 const StudentLayout = ({
     children,
 }: {
@@ -13,13 +14,15 @@ const StudentLayout = ({
     return (
         <RoleGuard allowedRoles={["HOC_SINH"]}>
             <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-zinc-950">
-                <StudentHeader />
-                <main className="flex-1">
+                <MobileHeader />
+                <main className="flex-1 pb-16 overflow-y-auto">
                     {children}
                 </main>
+                <BottomNav />
             </div>
         </RoleGuard>
     );
 };
 
 export default withAuth(StudentLayout);
+
