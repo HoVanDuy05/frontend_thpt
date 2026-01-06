@@ -76,6 +76,7 @@ export const UserCard: React.FC<UserCardProps> = ({ user }) => {
             component={Link}
             href={`/social/profile/${user.id}`}
             p="md"
+            mb="xs"
             bg="transparent"
             className="hover:bg-gray-50/80 dark:hover:bg-zinc-900/50 transition-all cursor-pointer group rounded-2xl border border-transparent hover:border-gray-100 dark:hover:border-zinc-800"
         >
@@ -121,7 +122,12 @@ export const UserCard: React.FC<UserCardProps> = ({ user }) => {
                         e.stopPropagation();
                         handleAction();
                     }}
-                    className={`px-4 min-w-[100px] h-[34px] uppercase tracking-widest text-[10px] shadow-sm ${btnProps.variant === 'filled' && btnProps.color === 'black' ? 'dark:bg-white dark:text-black' : ''}`}
+                    className={`px-4 min-w-[100px] h-[34px] uppercase tracking-widest text-[10px] shadow-sm ${btnProps.variant === 'filled' && btnProps.color === 'black'
+                            ? 'dark:bg-white dark:text-black'
+                            : btnProps.variant === 'outline'
+                                ? 'text-gray-700 dark:text-gray-300 border-gray-300 dark:border-zinc-600'
+                                : ''
+                        }`}
                 >
                     {btnProps.children}
                 </Button>

@@ -1,16 +1,15 @@
 "use client";
 
-import { Container, Title, Text, Button, Group, Stack, Badge, SimpleGrid, Card, Box, Avatar, Overlay, Image, AspectRatio, Affix, Transition, ActionIcon, rem } from "@mantine/core";
+import { ActionIcon, Anchor, AspectRatio, Avatar, Badge, Box, Button, Card, Center, Container, Divider, Group, Image, Overlay, SimpleGrid, Stack, Text, Title, Transition, Affix, rem } from "@mantine/core";
 import { IconArrowRight, IconCalendar, IconNewSection, IconSchool, IconUsers, IconFlag, IconAward, IconMapPin, IconDeviceMobile, IconLayoutDashboard, IconLogin, IconDownload, IconChevronUp } from "@tabler/icons-react";
 import { Link } from "@/i18n/routing";
 import { useLandingAuth } from "@/shared/hooks/useLandingAuth";
-import { usePWA } from "@/shared/hooks/usePWA";
+import { usePWA } from "@/providers/PWAProvider";
 import { useWindowScroll } from "@mantine/hooks";
-import { Divider } from "@mantine/core";
 
 export default function LandingPage() {
     const { isLoggedIn, handleAccessPortal } = useLandingAuth();
-    const { isStandalone, handleInstall } = usePWA();
+    const { isInstallable, installApp, isInstalled } = usePWA();
     const [scroll, scrollTo] = useWindowScroll();
 
     const news = [
@@ -64,7 +63,7 @@ export default function LandingPage() {
     return (
         <Box className="overflow-hidden bg-white dark:bg-zinc-950">
             {/* Hero Section */}
-            <section className="relative pt-20 pb-16 sm:pt-32 sm:pb-40 lg:pt-48 lg:pb-64 overflow-hidden">
+            <section className="relative pt-32 pb-16 sm:pt-48 sm:pb-40 lg:pt-56 lg:pb-64 overflow-hidden">
                 <Box className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
                     <div className="absolute top-[-5%] right-[-5%] w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] bg-blue-100/40 dark:bg-blue-900/10 rounded-full blur-[60px] sm:blur-[120px] animate-pulse" />
                     <div className="absolute bottom-[10%] left-[-5%] w-[250px] sm:w-[500px] h-[250px] sm:h-[500px] bg-indigo-100/40 dark:bg-indigo-900/10 rounded-full blur-[60px] sm:blur-[120px]" />
@@ -80,11 +79,11 @@ export default function LandingPage() {
                                     size="lg"
                                     variant="gradient"
                                     gradient={{ from: 'blue', to: 'indigo' }}
-                                    className="mb-8 px-6 py-2 uppercase tracking-[0.2em] font-black shadow-xl shadow-blue-500/20 border-none h-9"
+                                    className="mb-8 px-4 sm:px-6 py-1 sm:py-2 uppercase tracking-[0.1em] sm:tracking-[0.2em] font-black shadow-xl shadow-blue-500/20 border-none h-auto sm:h-9 text-[10px] sm:text-xs"
                                 >
                                     Thành tích - Kỷ cương - Tình thương
                                 </Badge>
-                                <Title className="text-5xl sm:text-7xl lg:text-8xl font-[900] leading-[1.05] tracking-tight text-zinc-900 dark:text-white mb-8">
+                                <Title className="text-3xl sm:text-7xl lg:text-8xl font-[900] leading-[1.1] sm:leading-[1.05] tracking-tight text-zinc-900 dark:text-white mb-6 sm:mb-8">
                                     Trường THPT <br />
                                     <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent italic">
                                         Nguyễn Huệ
@@ -101,7 +100,7 @@ export default function LandingPage() {
                                         <Button
                                             size="xl"
                                             radius="xl"
-                                            className="bg-blue-600 hover:bg-blue-700 h-16 sm:h-20 px-10 sm:px-14 text-lg sm:text-xl font-black shadow-2xl shadow-blue-600/30 hover:scale-105 transition-all duration-300 flex-1 sm:flex-none border-none outline-none"
+                                            className="bg-indigo-600 hover:bg-indigo-700 h-16 sm:h-20 px-10 sm:px-14 text-lg sm:text-xl font-black shadow-2xl shadow-indigo-600/30 hover:scale-105 transition-all duration-300 flex-1 sm:flex-none border-none outline-none"
                                             component={Link}
                                             href="/auth/register"
                                             rightSection={<IconArrowRight size={26} stroke={3} />}
@@ -119,6 +118,20 @@ export default function LandingPage() {
                                         >
                                             Đăng nhập
                                         </Button>
+
+                                        {isInstallable && !isInstalled && (
+                                            <Button
+                                                size="xl"
+                                                radius="xl"
+                                                variant="light"
+                                                color="indigo"
+                                                className="h-16 sm:h-20 px-10 sm:px-14 text-lg sm:text-xl font-bold hover:scale-105 transition-all flex-1 sm:flex-none border-none animate-pulse"
+                                                onClick={installApp}
+                                                leftSection={<IconDownload size={24} stroke={2.5} />}
+                                            >
+                                                Tải App
+                                            </Button>
+                                        )}
                                     </>
                                 ) : (
                                     <Button
@@ -136,23 +149,23 @@ export default function LandingPage() {
                                 )}
                             </Group>
 
-                            <SimpleGrid cols={2} spacing="xl" mt="xl" className="max-w-md">
-                                <Group gap="md" wrap="nowrap">
-                                    <Box className="p-3 bg-blue-50 dark:bg-blue-900/40 rounded-2xl text-blue-600 shadow-sm border border-blue-100 dark:border-blue-800">
-                                        <IconAward size={32} stroke={2.5} />
+                            <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="md" mt="xl" className="max-w-md">
+                                <Group gap="sm" wrap="nowrap">
+                                    <Box className="p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/40 rounded-2xl text-blue-600 shadow-sm border border-blue-100 dark:border-blue-800">
+                                        <IconAward size={24} stroke={2.5} />
                                     </Box>
                                     <div>
-                                        <Text fw={900} size="sm">Top 10 Toàn Quốc</Text>
-                                        <Text size="xs" c="dimmed" tt="uppercase" className="font-bold">Chất lượng đào tạo</Text>
+                                        <Text fw={900} size="xs" className="sm:text-sm">Top 10 Toàn Quốc</Text>
+                                        <Text size="10px" className="sm:text-xs font-bold text-zinc-500 uppercase tracking-widest">Chất lượng đào tạo</Text>
                                     </div>
                                 </Group>
-                                <Group gap="md" wrap="nowrap">
-                                    <Box className="p-3 bg-indigo-50 dark:bg-indigo-900/40 rounded-2xl text-indigo-600 shadow-sm border border-indigo-100 dark:border-indigo-800">
-                                        <IconSchool size={32} stroke={2.5} />
+                                <Group gap="sm" wrap="nowrap">
+                                    <Box className="p-2 sm:p-3 bg-indigo-50 dark:bg-indigo-900/40 rounded-2xl text-indigo-600 shadow-sm border border-indigo-100 dark:border-indigo-800">
+                                        <IconSchool size={24} stroke={2.5} />
                                     </Box>
                                     <div>
-                                        <Text fw={900} size="sm">50+ Năm Lịch Sử</Text>
-                                        <Text size="xs" c="dimmed" tt="uppercase" className="font-bold">Truyền thống vẻ vang</Text>
+                                        <Text fw={900} size="xs" className="sm:text-sm">50+ Năm Lịch Sử</Text>
+                                        <Text size="10px" className="sm:text-xs font-bold text-zinc-500 uppercase tracking-widest">Truyền thống vẻ vang</Text>
                                     </div>
                                 </Group>
                             </SimpleGrid>
@@ -356,6 +369,8 @@ export default function LandingPage() {
                                         variant="outline"
                                         className="text-white border-white/30 h-18 sm:h-20 px-10 sm:px-14 shadow-sm hover:bg-white/10 transition-all font-black text-xl flex-1 sm:flex-none uppercase"
                                         leftSection={<IconDownload size={24} stroke={3} />}
+                                        onClick={installApp}
+                                        style={{ display: isInstallable && !isInstalled ? 'flex' : 'none' }}
                                     >
                                         Tải Apps
                                     </Button>
@@ -381,8 +396,17 @@ export default function LandingPage() {
                     <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing={60}>
                         <Stack gap="xl">
                             <Group gap="xs">
-                                <Box className="w-11 h-11 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-lg">P</Box>
-                                <Title order={3} className="text-2xl font-black bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent italic tracking-tighter">Nguyễn Huệ</Title>
+                                <Box className="w-12 h-12 bg-white dark:bg-zinc-900 rounded-2xl flex items-center justify-center p-2 shadow-lg border border-zinc-100 dark:border-zinc-800">
+                                    <Image src="/favicon.png" alt="Logo" className="w-full h-full object-contain" />
+                                </Box>
+                                <Stack gap={0}>
+                                    <Text fw={900} size="xl" className="leading-tight tracking-tighter text-zinc-900 dark:text-white uppercase">
+                                        Nguyễn Huệ
+                                    </Text>
+                                    <Text size="xs" fw={800} className="text-indigo-600 dark:text-indigo-400 uppercase tracking-[0.2em] leading-none opacity-80">
+                                        Academy
+                                    </Text>
+                                </Stack>
                             </Group>
                             <Text size="md" c="dimmed" className="font-bold leading-relaxed">
                                 Hệ thống quản lí giáo dục thông minh. <br /> Kết nối sức mạnh cộng đồng Nguyễn Huệ.
@@ -427,15 +451,15 @@ export default function LandingPage() {
                 <Transition transition="slide-up" mounted={scroll.y > 0}>
                     {(transitionStyles) => (
                         <Group gap="xs" style={transitionStyles}>
-                            {!isStandalone && (
+                            {isInstallable && !isInstalled && (
                                 <Button
                                     leftSection={<IconDeviceMobile size={22} stroke={3} />}
                                     size="lg"
                                     radius="xl"
-                                    className="bg-blue-600 dark:bg-zinc-200 text-white dark:text-zinc-900 border-none px-6 font-black shadow-[0_20px_40px_-10px_rgba(37,99,235,0.4)] active:scale-95 transition-all h-14"
-                                    onClick={handleInstall}
+                                    className="bg-indigo-600 dark:bg-zinc-200 text-white dark:text-zinc-900 border-none px-6 font-black shadow-[0_20px_40px_-10px_rgba(79,70,229,0.4)] active:scale-95 transition-all h-14"
+                                    onClick={installApp}
                                 >
-                                    Tải Ứng Dụng
+                                    Cài đặt App
                                 </Button>
                             )}
                             <ActionIcon

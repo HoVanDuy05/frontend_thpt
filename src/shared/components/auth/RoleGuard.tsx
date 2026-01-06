@@ -4,7 +4,7 @@ import { useEffect, ReactNode } from "react";
 import { useRouter, usePathname } from "@/i18n/routing";
 import { useAppStore } from "@/providers/store/useAppStore";
 import { UserRole } from "@/shared/types/user.type";
-import { Loading } from "@/shared/components/Loading";
+import { BrandLoader } from "../BrandLoader";
 
 interface RoleGuardProps {
     children: ReactNode;
@@ -34,7 +34,7 @@ export function RoleGuard({ children, allowedRoles }: RoleGuardProps) {
 
     // Show loading state while hydrating or waiting for redirect
     if (!isHydrated || !user || (allowedRoles && !allowedRoles.includes(user.vaiTro))) {
-        return <Loading fullScreen />;
+        return <BrandLoader fullscreen />;
     }
 
     return <>{children}</>;

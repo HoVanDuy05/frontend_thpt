@@ -40,6 +40,102 @@
         "approvals": "Approvals",
         "social": "Social Network"
     },
+    "social": {
+        "nav": {
+            "home": "Home",
+            "explore": "Explore",
+            "friends": "Friends",
+            "messages": "Messages",
+            "activities": "Activities",
+            "profile": "Profile",
+            "create": "Create",
+            "settings": "Settings"
+        },
+        "widgets": {
+            "search_placeholder": "Search NH Social",
+            "trending": "Trending for you",
+            "suggested": "Who to follow",
+            "trending_subtitle": "{count} posts",
+            "follow": "Follow",
+            "following": "Following"
+        },
+        "profile": {
+            "title": "Profile",
+            "subtitle": "Profile",
+            "create": "Create",
+            "no_data": "No data",
+            "no_data_subtitle": "No data",
+            "create_now": "Create now",
+            "edit": "Edit",
+            "cover": "Cover",
+            "avatar": "Avatar",
+            "name": "Name",
+            "description": "Description",
+            "save": "Save"
+        },
+        "create_post": "New Thread",
+        "create_placeholder": "What's new?",
+        "cancel": "Cancel",
+        "done": "Done",
+        "post": "Post",
+        "share": "Share",
+        "search": {
+            "title": "Search",
+            "placeholder": "Search...",
+            "tabs": {
+                "all": "All",
+                "users": "Users",
+                "posts": "Posts"
+            },
+            "sections": {
+                "users": "USERS",
+                "posts": "POSTS",
+                "suggested": "SUGGESTED"
+            },
+            "empty": {
+                "no_results": "No results found for \"{query}\"",
+                "search_users_title": "Search for friends",
+                "search_users_subtitle": "Search by name, username or email to find and follow your friends.",
+                "search_posts_title": "Search for posts",
+                "search_posts_subtitle": "Enter a search term to find posts across NH Social."
+            }
+        },
+        "time": {
+            "just_now": "just now",
+            "seconds": "{count}s",
+            "minutes": "{count}minutes",
+            "hours": "{count}hours",
+            "days": "{count}days",
+            "weeks": "{count}weeks",
+            "months": "{count}months",
+            "years": "{count}years",
+            "suffix": "ago"
+        },
+        "friends": {
+            "title": "Friend Requests",
+            "tabs": {
+                "received": "Received",
+                "sent": "Sent"
+            },
+            "card": {
+                "accept": "Accept",
+                "decline": "Decline",
+                "cancel": "Cancel",
+                "unfriend": "Unfriend",
+                "message": "Message",
+                "new": "New",
+                "sent": "Sent",
+                "received_at": "Received on {date}",
+                "sent_at": "Sent on {date}"
+            },
+            "empty": {
+                "received_title": "No requests yet",
+                "received_subtitle": "You don't have any pending friend requests to see",
+                "sent_title": "No sent requests",
+                "sent_subtitle": "You haven't sent any friend requests yet"
+            }
+        }
+    },
     "approvals": {
         "page_title": "Workflow Management",
         "page_subtitle": "Configure and manage approval workflows",
@@ -201,14 +297,19 @@
             "username": "Username",
             "password": "Password",
             "forgot_password": "Forgot password",
+            "remember_me": "Remember session",
             "submit": "Sign In",
+            "instant_login": "Instant Login",
+            "google_account": "Continue with Google",
+            "no_account": "No account?",
             "register_link": "Register now",
+            "download_app": "Download NHers App",
             "success": "Login successful",
             "error": "Login failed",
             "welcome_back": "Welcome back, {name}!",
             "auth_failed": "Authentication failed",
-            "session_expired": "Session Expired",
-            "session_expired_message": "Your session has expired. Please sign in again to continue."
+            "session_expired": "Session expired",
+            "session_expired_message": "Your session has expired. Please log in again."
         },
         "register": {
             "title": "Create New Account",
@@ -251,6 +352,7 @@
         }
     },
     "validation": {
+        "email_đã_được_sử_dụng": "This email is already in use",
         "invalid_credentials": "Invalid login credentials",
         "required": "This field is required",
         "minLength": "Minimum {{min}} characters",
@@ -300,6 +402,11 @@
         }
     },
     "common": {
+        "loading": {
+            "starting": "Starting system",
+            "please_wait": "Please wait a moment",
+            "smart_system": "Smart Education System"
+        },
         "actions": {
             "create": "Create",
             "edit": "Edit",
@@ -383,10 +490,12 @@
         "male": "Male",
         "female": "Female",
         "followers": "followers",
+        "settings": "Settings",
         "error": {
             "chatError": "Cannot open conversation. Please add as friend first.",
             "actionError": "Cannot perform action. Please try again."
-        }
+        },
+        "start_thread": "Start a thread..."
     },
     "student": {
         "nav": {
@@ -445,6 +554,63 @@
             "my_flows": "My Flows",
             "gender_male": "Male",
             "gender_female": "Female"
+        }
+    },
+    "chat": {
+        "conversations": "Chats",
+        "search_placeholder": "Search Messenger",
+        "active_now": "Active Now",
+        "tabs": {
+            "all": "All",
+            "unread": "Unread",
+            "groups": "Groups"
+        },
+        "you": "You",
+        "new_message": "New Message",
+        "new_message_from": "New message from {name}",
+        "sent_attachment": "Sent an attachment",
+        "attachment": "Attachment",
+        "read": "Read",
+        "delivered": "Delivered",
+        "search_users_placeholder": "Search users...",
+        "user_not_found": "User not found",
+        "try_different_keyword": "Try searching with a different keyword",
+        "suggested": "SUGGESTED",
+        "no_friends": "No friends yet",
+        "add_friend_hint": "Add friends to start chatting.",
+        "type_message": "Type a message...",
+        "replying_to": "Replying to {name}",
+        "load_more": "Load older messages",
+        "sent": "Sent",
+        "no_conversations_title": "No conversations",
+        "no_conversations_subtitle": "Try searching for your friends",
+        "sidebar": {
+            "profile": "View Profile",
+            "mute": "Mute notifications",
+            "search": "Search in conversation",
+            "chat_info": "Chat Info",
+            "encryption_notice": "This conversation is end-to-end encrypted for your privacy.",
+            "customize_chat": "Customize Chat",
+            "theme": "Theme",
+            "quick_emoji": "Quick Emoji",
+            "media_files": "Media, files and links",
+            "view_all": "View all",
+            "privacy_support": "Privacy & Support",
+            "block": "Block"
+        },
+        "settings": {
+            "title": "Settings",
+            "general": "General",
+            "profile": "Profile",
+            "privacy_security": "Privacy & Security",
+            "notifications": "Notifications",
+            "pms": "Learning System",
+            "social": "Social Network",
+            "navigation": "Navigation",
+            "preferences": "Preferences",
+            "dark_mode": "Dark Mode",
+            "language": "Language",
+            "logout": "Log Out"
         }
     }
 }

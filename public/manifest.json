@@ -1,17 +1,22 @@
 {
     "id": "com.nguyenhue.school.student",
-    "name": "NHers",
-    "short_name": "NHers",
+    "name": "NHers - Social",
+    "short_name": "NHers Social",
     "description": "Ứng dụng học sinh - Trường THPT Nguyễn Huệ",
-    "start_url": "/vi/student",
+    "start_url": "/",
     "scope": "/",
     "display": "standalone",
-    "background_color": "#18181b",
+    "display_override": [
+        "standalone",
+        "window-controls-overlay"
+    ],
+    "background_color": "#ffffff",
     "theme_color": "#4f46e5",
     "orientation": "portrait",
     "categories": [
         "education",
-        "productivity"
+        "productivity",
+        "social"
     ],
     "icons": [
         {

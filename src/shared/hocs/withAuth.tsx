@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "@/i18n/routing";
 import { useAppStore } from "@/providers/store/useAppStore";
 import { EScreen } from "@/shared/types/screen.type";
 import { useRBAC } from "@/shared/hooks/useRBAC";
-import { Loading } from "@/shared/components/Loading";
+import { BrandLoader } from "@/shared/components/BrandLoader";
 import axiosClient from "@/api/axiosClient";
 
 export function withAuth<P extends object>(
@@ -47,7 +47,7 @@ export function withAuth<P extends object>(
         }, [token, isHydrated, router, pathname, user, setUser]);
 
         if (!isHydrated || verifying) {
-            return <Loading fullScreen />;
+            return <BrandLoader fullscreen />;
         }
 
         // Role Check

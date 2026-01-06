@@ -1,12 +1,14 @@
 "use client";
 
-import { Box, Text, Stack, Group, Title } from "@mantine/core";
+import { Box, Text, Stack, Title } from "@mantine/core";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 export function SplashScreen() {
     const [progress, setProgress] = useState(0);
     const [fadeOut, setFadeOut] = useState(false);
     const [visible, setVisible] = useState(true);
+    const t = useTranslations("common.loading");
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -21,7 +23,7 @@ export function SplashScreen() {
             setProgress(100);
             setFadeOut(true);
             setTimeout(() => setVisible(false), 700);
-        }, 2500);
+        }, 2200);
 
         return () => {
             clearInterval(timer);
@@ -49,17 +51,17 @@ export function SplashScreen() {
                 </Box>
 
                 {/* Typography Section */}
-                <Stack align="center" gap={4}>
+                <Stack align="center" gap={4} className="w-full">
                     <Title
                         order={1}
-                        className="text-3xl sm:text-4xl font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 text-center"
+                        className="text-3xl sm:text-4xl font-black uppercase tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400 text-center whitespace-nowrap"
                     >
                         Nguyễn Huệ
                     </Title>
                     <Text
                         size="sm"
                         fw={600}
-                        className="text-blue-600 dark:text-blue-400 uppercase tracking-[0.4em] text-center"
+                        className="text-indigo-600 dark:text-indigo-400 uppercase tracking-[0.3em] text-center whitespace-nowrap"
                     >
                         Trường THPT Nguyễn Huệ
                     </Text>
@@ -69,12 +71,12 @@ export function SplashScreen() {
                 <Stack align="center" gap="xs" className="w-64 sm:w-80 mt-8">
                     <Box className="relative w-full h-1 bg-gray-100 dark:bg-zinc-800 rounded-full overflow-hidden">
                         <Box
-                            className="h-full bg-blue-600 dark:bg-blue-500 transition-all duration-200 ease-linear rounded-full"
+                            className="h-full bg-indigo-600 dark:bg-indigo-500 transition-all duration-200 ease-linear rounded-full"
                             style={{ width: `${progress}%` }}
                         />
                     </Box>
-                    <Text size="xs" c="dimmed" className="font-bold uppercase tracking-wider">
-                        Đang khởi động hệ thống
+                    <Text size="xs" c="dimmed" className="font-bold uppercase tracking-wider whitespace-nowrap">
+                        {t('starting')}
                     </Text>
                 </Stack>
             </Stack>
@@ -82,7 +84,7 @@ export function SplashScreen() {
             {/* Footer */}
             <Box className="absolute bottom-8 w-full text-center">
                 <Text size="xs" fw={700} c="dimmed" className="uppercase tracking-[0.2em] opacity-50">
-                    Smart Education System
+                    {t('smart_system')}
                 </Text>
             </Box>
         </Box>

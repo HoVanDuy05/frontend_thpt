@@ -1,6 +1,6 @@
 "use client";
 
-import { Container, Stack, Title, Text, Card, Group, Avatar, Button } from "@mantine/core";
+import { Container, Stack, Title, Text, Card, Group, Button } from "@mantine/core";
 import { IconMessageCircle } from "@tabler/icons-react";
 import { Link } from "@/i18n/routing";
 
@@ -27,7 +27,7 @@ export default function SocialPage() {
                                 Tính năng Social Network
                             </Title>
                             <Text size="sm" c="dimmed" className="max-w-md mx-auto">
-                                Tính năng mạng xã hội đang được tích hợp. Bạn có thể truy cập tính năng chat và social network hiện tại.
+                                Tính năng mạng xã hội đầy đủ (Newsfeed, Friends, Profile) đã sẵn sàng.
                             </Text>
                         </div>
                         <Group>
@@ -39,7 +39,7 @@ export default function SocialPage() {
                                 size="md"
                                 radius="xl"
                             >
-                                Đi đến Social Network
+                                Truy cập Social Network
                             </Button>
                             <Button
                                 component={Link}

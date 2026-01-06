@@ -40,6 +40,120 @@
         "approvals": "Phê duyệt",
         "social": "Mạng xã hội"
     },
+    "social": {
+        "nav": {
+            "home": "Trang chủ",
+            "explore": "Khám phá",
+            "friends": "Bạn bè",
+            "messages": "Tin nhắn",
+            "activities": "Hoạt động",
+            "profile": "Hồ sơ",
+            "create": "Đăng bài",
+            "settings": "Cài đặt"
+        },
+        "widgets": {
+            "search_placeholder": "Tìm kiếm trên NH Social",
+            "trending": "Xu hướng cho bạn",
+            "suggested": "Gợi ý theo dõi",
+            "trending_subtitle": "{count} bài viết",
+            "follow": "Theo dõi",
+            "following": "Đang theo dõi"
+        },
+        "profile": {
+            "title": "Hồ sơ",
+            "subtitle": "Cấu hình thông tin hồ sơ",
+            "create": "Tạo hồ sơ",
+            "no_data": "Chưa có hồ sơ",
+            "no_data_subtitle": "Bắt đầu bằng cách tạo hồ sơ đầu tiên của bạn",
+            "create_now": "Tạo hồ sơ ngay",
+            "edit": "Chỉnh sửa hồ sơ",
+            "cover": "Ảnh bìa",
+            "avatar": "Ảnh đại diện",
+            "name": "Tên",
+            "description": "Mô tả",
+            "save": "Lưu"
+        },
+        "create_post": "Thread mới",
+        "create_placeholder": "Có gì mới?",
+        "cancel": "Hủy",
+        "done": "Xong",
+        "post": "Đăng",
+        "share": "Chia sẻ",
+        "search": {
+            "title": "Tìm kiếm",
+            "placeholder": "Tìm kiếm...",
+            "tabs": {
+                "all": "Tất cả",
+                "users": "Người dùng",
+                "posts": "Bài viết"
+            },
+            "sections": {
+                "users": "NGƯỜI DÙNG",
+                "posts": "BÀI VIẾT",
+                "suggested": "GỢI Ý"
+            },
+            "empty": {
+                "no_results": "Không tìm thấy kết quả cho \"{query}\"",
+                "search_users_title": "Tìm kiếm bạn bè",
+                "search_users_subtitle": "Tìm kiếm theo tên, tên người dùng hoặc email để tìm và theo dõi bạn bè của bạn.",
+                "search_posts_title": "Tìm kiếm bài viết",
+                "search_posts_subtitle": "Nhập từ khóa để tìm bài viết trên NH Social."
+            }
+        },
+        "time": {
+            "just_now": "vừa xong",
+            "seconds": "{count} giây",
+            "minutes": "{count} phút",
+            "hours": "{count} giờ",
+            "days": "{count} ngày",
+            "weeks": "{count} tuần",
+            "months": "{count} tháng",
+            "years": "{count} năm",
+            "suffix": "trước"
+        },
+        "activity": {
+            "title": "Hoạt động",
+            "tabs": {
+                "all": "Tất cả",
+                "follows": "Theo dõi",
+                "replies": "Phản hồi",
+                "likes": "Lượt thích"
+            },
+            "types": {
+                "follow": "đã bắt đầu theo dõi bạn",
+                "like": "đã thích thread của bạn",
+                "reply": "đã trả lời bạn"
+            },
+            "empty": "Chưa có hoạt động nào",
+            "no_followers": "Chưa có người theo dõi mới",
+            "no_replies": "Chưa có phản hồi nào",
+            "no_likes": "Chưa có lượt thích nào"
+        },
+        "friends": {
+            "title": "Lời mời kết bạn",
+            "tabs": {
+                "received": "Đã nhận",
+                "sent": "Đã gửi"
+            },
+            "card": {
+                "accept": "Chấp nhận",
+                "decline": "Từ chối",
+                "cancel": "Hủy lời mời",
+                "unfriend": "Hủy kết bạn",
+                "message": "Nhắn tin",
+                "new": "Mới",
+                "sent": "Đã gửi",
+                "received_at": "Đã nhận ngày {date}",
+                "sent_at": "Đã gửi ngày {date}"
+            },
+            "empty": {
+                "received_title": "Không có lời mời nào",
+                "received_subtitle": "Bạn chưa có lời mời kết bạn nào để xem",
+                "sent_title": "Chưa gửi lời mời",
+                "sent_subtitle": "Bạn chưa gửi lời mời kết bạn cho ai"
+            }
+        }
+    },
     "approvals": {
         "page_title": "Quản lý Quy trình",
         "page_subtitle": "Thiết lập và quản lý các quy trình phê duyệt",
@@ -201,8 +315,13 @@
             "username": "Tên đăng nhập",
             "password": "Mật khẩu",
             "forgot_password": "Quên mật khẩu",
+            "remember_me": "Duy trì đăng nhập",
             "submit": "Đăng nhập",
+            "instant_login": "Đăng nhập nhanh",
+            "google_account": "Tiếp tục với Google",
+            "no_account": "Chưa có tài khoản?",
             "register_link": "Đăng ký ngay",
+            "download_app": "Tải ứng dụng NHers",
             "success": "Đăng nhập thành công",
             "error": "Đăng nhập thất bại",
             "welcome_back": "Chào mừng trở lại, {name}!",
@@ -251,6 +370,7 @@
         }
     },
     "validation": {
+        "email_đã_được_sử_dụng": "Email này đã được sử dụng bởi người khác",
         "thông_tin_đăng_nhập_không_chính_xác": "Thông tin đăng nhập không chính xác",
         "required": "Trường này là bắt buộc",
         "minLength": "Tối thiểu {{min}} ký tự",
@@ -300,6 +420,11 @@
         }
     },
     "common": {
+        "loading": {
+            "starting": "Đang khởi động hệ thống",
+            "please_wait": "Vui lòng đợi trong giây lát",
+            "smart_system": "Hệ thống Giáo dục Thông minh"
+        },
         "actions": {
             "create": "Tạo mới",
             "edit": "Chỉnh sửa",
@@ -358,6 +483,7 @@
     "profile": {
         "edit": "Chỉnh sửa",
         "share": "Chia sẻ",
+        "settings": "Cài đặt",
         "follow": "Theo dõi",
         "following": "Đang theo dõi",
         "sentRequest": "Đã gửi lời mời",
@@ -386,15 +512,15 @@
         "error": {
             "chatError": "Không thể mở cuộc trò chuyện. Vui lòng kết bạn trước.",
             "actionError": "Không thể thực hiện thao tác. Vui lòng thử lại."
-        }
+        },
+        "start_thread": "Bắt đầu thread mới..."
     },
     "student": {
         "nav": {
             "home": "Trang chủ",
-            "schedule": "Lịch học",
-            "grades": "Kết quả",
-            "social": "Xã hội",
-            "flow": "Quy trình",
+            "search": "Tìm kiếm",
+            "create": "Tạo mới",
+            "activity": "Hoạt động",
             "profile": "Cá nhân"
         },
         "home": {
@@ -444,6 +570,63 @@
             "scan_qr_hint": "Quét mã QR để xem thông tin học sinh",
             "gender_male": "Nam",
             "gender_female": "Nữ"
+        }
+    },
+    "chat": {
+        "conversations": "Đoạn chat",
+        "search_placeholder": "Tìm kiếm trên Messenger",
+        "active_now": "Đang hoạt động",
+        "tabs": {
+            "all": "Tất cả",
+            "unread": "Chưa đọc",
+            "groups": "Nhóm"
+        },
+        "you": "Bạn",
+        "new_message": "Tin nhắn mới",
+        "new_message_from": "Tin nhắn mới từ {name}",
+        "sent_attachment": "Đã gửi một tệp tin/hình ảnh",
+        "attachment": "File đính kèm",
+        "read": "Đã xem",
+        "delivered": "Đã nhận",
+        "search_users_placeholder": "Tìm kiếm người dùng...",
+        "user_not_found": "Không tìm thấy người dùng",
+        "try_different_keyword": "Thử tìm kiếm với từ khóa khác",
+        "suggested": "GỢI Ý",
+        "no_friends": "Chưa có bạn bè",
+        "add_friend_hint": "Hãy kết bạn trước để bắt đầu nhắn tin.",
+        "type_message": "Nhập tin nhắn...",
+        "replying_to": "Đang trả lời {name}",
+        "load_more": "Xem thêm tin nhắn cũ",
+        "sent": "Đã gửi",
+        "no_conversations_title": "Không có cuộc trò chuyện nào",
+        "no_conversations_subtitle": "Hãy thử tìm kiếm bạn bè của bạn",
+        "sidebar": {
+            "profile": "Trang cá nhân",
+            "mute": "Tắt thông báo",
+            "search": "Tìm kiếm",
+            "chat_info": "Thông tin về đoạn chat",
+            "encryption_notice": "Cuộc trò chuyện này được mã hóa đầu cuối để đảm bảo tính riêng tư của bạn.",
+            "customize_chat": "Tùy chỉnh đoạn chat",
+            "theme": "Chủ đề",
+            "quick_emoji": "Biểu tượng cảm xúc nhanh",
+            "media_files": "File phương tiện, file và liên kết",
+            "view_all": "Xem tất cả",
+            "privacy_support": "Quyền riêng tư & hỗ trợ",
+            "block": "Chặn"
+        },
+        "settings": {
+            "title": "Cài đặt",
+            "general": "Chung",
+            "profile": "Trang cá nhân",
+            "privacy_security": "Quyền riêng tư & bảo mật",
+            "notifications": "Thông báo",
+            "pms": "Hệ thống học tập",
+            "social": "Mạng xã hội",
+            "navigation": "Di chuyển",
+            "preferences": "Tùy chỉnh",
+            "dark_mode": "Chế độ tối",
+            "language": "Ngôn ngữ",
+            "logout": "Đăng xuất"
         }
     }
 }

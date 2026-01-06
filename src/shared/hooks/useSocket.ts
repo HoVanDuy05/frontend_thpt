@@ -7,58 +7,74 @@ import { useAppStore } from "@/providers/store/useAppStore";
 const SOCKET_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000")
     .replace(/\/api\/?$/, "");
 
+let socketInstance: Socket | null = null;
+
 export function useSocket() {
-    const socketRef = useRef<Socket | null>(null);
-    const [isConnected, setIsConnected] = useState(false);
+    const [isConnected, setIsConnected] = useState(socketInstance?.connected || false);
     const { token } = useAppStore();
 
     useEffect(() => {
         if (!token) {
+            if (socketInstance) {
+                socketInstance.disconnect();
+                socketInstance = null;
+            }
             setIsConnected(false);
             return;
         }
 
-        // Initialize socket connection with authentication
-        const socket = io(SOCKET_URL, {
-            auth: {
-                token: token
-            },
-            transports: ['websocket', 'polling'],
-        });
+        if (!socketInstance) {
+            socketInstance = io(SOCKET_URL, {
+                auth: {
+                    token: token
+                },
+                transports: ['websocket', 'polling'],
+                reconnection: true,
+                reconnectionAttempts: 5,
+                reconnectionDelay: 1000,
+            });
 
-        socket.on('connect', () => {
-            console.log('Socket connected:', socket.id);
-            setIsConnected(true);
-        });
+            socketInstance.on('connect', () => {
+                console.log('Socket connected:', socketInstance?.id);
+                setIsConnected(true);
+            });
 
-        socket.on('disconnect', () => {
-            console.log('Socket disconnected');
-            setIsConnected(false);
-        });
+            socketInstance.on('disconnect', () => {
+                console.log('Socket disconnected');
+                setIsConnected(false);
+            });
 
-        socket.on('connect_error', (error) => {
-            console.error('Socket connection error:', error);
-            setIsConnected(false);
-        });
+            socketInstance.on('connect_error', (error) => {
+                console.error('Socket connection error:', error);
+                setIsConnected(false);
+            });
+        } else {
+            setIsConnected(socketInstance.connected);
 
-        socketRef.current = socket;
+            // Re-bind listeners just in case
+            const handleConnect = () => setIsConnected(true);
+            const handleDisconnect = () => setIsConnected(false);
 
-        return () => {
-            socket.disconnect();
-            socketRef.current = null;
-        };
+            socketInstance.on('connect', handleConnect);
+            socketInstance.on('disconnect', handleDisconnect);
+
+            return () => {
+                socketInstance?.off('connect', handleConnect);
+                socketInstance?.off('disconnect', handleDisconnect);
+            };
+        }
     }, [token]);
 
     const emit = (event: string, data: any) => {
-        socketRef.current?.emit(event, data);
+        socketInstance?.emit(event, data);
     };
 
     const on = (event: string, callback: (...args: any[]) => void) => {
-        socketRef.current?.on(event, callback);
+        socketInstance?.on(event, callback);
     };
 
     const off = (event: string, callback?: (...args: any[]) => void) => {
-        socketRef.current?.off(event, callback);
+        socketInstance?.off(event, callback);
     };
 
     const joinChannel = (channelId: number) => {
@@ -78,7 +94,7 @@ export function useSocket() {
     };
 
     return {
-        socket: socketRef.current,
+        socket: socketInstance,
         isConnected,
         emit,
         on,

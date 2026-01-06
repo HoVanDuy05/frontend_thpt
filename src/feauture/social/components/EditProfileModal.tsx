@@ -16,28 +16,32 @@ import {
     SimpleGrid,
     Input,
     ActionIcon,
-    Overlay,
     Center,
-    Badge
+    Divider,
+    Grid,
+    GridCol
 } from "@mantine/core";
+import { useTranslations } from "next-intl";
 import {
     IconCamera,
-    IconEdit,
     IconX,
-    IconMail,
+    IconCalendar,
+    IconMapPin,
     IconUser,
     IconPhone,
-    IconMapPin,
-    IconCalendar,
+    IconMail,
+    IconEdit,
+    IconBuildingSkyscraper,
     IconSchool,
     IconCheck,
-    IconBuildingSkyscraper
+    IconArrowLeft
 } from "@tabler/icons-react";
 import { useAppStore } from "@/providers/store/useAppStore";
 import { AppMutation } from "@/api/AppMutation";
 import { notifications } from "@mantine/notifications";
 import { useMediaQuery } from "@mantine/hooks";
 import { dayjs } from "@/shared/utils/date.util";
+import { SocialButton } from "./SocialButton";
 
 interface ProfileFormData {
     hoTen?: string;
@@ -118,6 +122,7 @@ export function EditProfileModal({ opened, onClose, profile }: EditProfileModalP
         };
     };
 
+    const t = useTranslations('social');
     const { user } = useAppStore();
 
     const initializeForm = () => {
@@ -250,288 +255,252 @@ export function EditProfileModal({ opened, onClose, profile }: EditProfileModalP
             withCloseButton={false}
             overlayProps={{ opacity: 0.4, blur: 4 }}
         >
-            <Stack h="100%" gap={0} className="bg-gray-50 dark:bg-zinc-950 text-gray-900 dark:text-gray-100 transition-colors">
+            <Stack h="100%" gap={0} className="bg-white dark:bg-zinc-950 text-gray-900 dark:text-gray-50 transition-colors">
                 {/* Header */}
-                <Box className="px-6 py-4 bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 sticky top-0 z-20">
-                    <Group justify="space-between">
-                        <Group gap="sm">
-                            <Box className="bg-indigo-600 p-2 rounded-xl text-white shadow-lg shadow-indigo-600/20">
-                                <IconEdit size={20} stroke={2} />
-                            </Box>
-                            <div>
-                                <Title order={4} fw={800} className="text-gray-900 dark:text-white">Chỉnh sửa hồ sơ</Title>
-                                <Text size="xs" c="dimmed">Cập nhật thông tin cá nhân</Text>
-                            </div>
-                        </Group>
-                        <ActionIcon variant="subtle" color="gray" onClick={onClose} size="lg" radius="xl">
-                            <IconX size={22} />
+                <Box className="relative px-4 py-3 border-b border-gray-100 dark:border-zinc-800 sticky top-0 z-20 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-md">
+                    <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+                        <ActionIcon
+                            variant="subtle"
+                            color="gray"
+                            onClick={onClose}
+                            size="lg"
+                            radius="full"
+                            className="bg-transparent hover:bg-gray-100 dark:hover:bg-zinc-800 -ml-2"
+                        >
+                            <IconArrowLeft size={24} className="text-gray-900 dark:text-white" />
                         </ActionIcon>
-                    </Group>
+
+                        <Title order={4} fw={700} className="text-gray-900 dark:text-white text-[17px] text-center">
+                            {t('profile.edit')}
+                        </Title>
+
+                        <Group justify="flex-end">
+                            <SocialButton
+                                variantType="primary"
+                                size="sm"
+                                onClick={handleSave}
+                                loading={updateProfileMutation.isPending}
+                                className="px-5"
+                            >
+                                {t('profile.save')}
+                            </SocialButton>
+                        </Group>
+                    </div>
                 </Box>
 
                 {/* Scrollable Content */}
                 <Box className="flex-1 overflow-y-auto">
-                    <Stack gap={0}>
-                        {/* Premium Avatar Section */}
-                        <Box className="relative bg-gradient-to-b from-indigo-600 to-indigo-800 pt-10 pb-16 px-6">
-                            <Center>
-                                <Stack align="center" gap="md" className="relative z-10">
-                                    <Box className="relative group">
-                                        <div className="rounded-full p-1 bg-white/20 backdrop-blur-sm">
-                                            <Avatar
-                                                src={avatarPreview || profile?.avatar}
-                                                size={140}
-                                                radius="100%"
-                                                className="border-4 border-white dark:border-zinc-900 shadow-2xl"
-                                            />
-                                        </div>
-                                        <ActionIcon
-                                            component="label"
-                                            htmlFor="avatar-input"
-                                            variant="filled"
-                                            color="dark"
-                                            size={42}
-                                            radius="xl"
-                                            className="absolute bottom-1 right-1 border-4 border-indigo-700 shadow-lg cursor-pointer hover:scale-110 transition-transform"
-                                        >
-                                            <IconCamera size={20} />
-                                        </ActionIcon>
-                                        <input
-                                            id="avatar-input"
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleAvatarChange}
-                                            style={{ display: 'none' }}
-                                        />
-                                    </Box>
+                    <Stack gap={0} align="stretch">
 
-                                    {avatarFile ? (
-                                        <Button
-                                            size="sm"
-                                            variant="white"
-                                            color="indigo"
-                                            radius="xl"
-                                            leftSection={<IconCheck size={16} />}
-                                            onClick={handleAvatarUpload}
-                                            loading={uploadAvatarMutation.isPending}
-                                            className="shadow-lg animate-in fade-in zoom-in duration-300"
-                                        >
-                                            Lưu Avatar Mới
-                                        </Button>
-                                    ) : (
-                                        <Text size="sm" className="text-white/80 font-medium">
-                                            Cham vào icon camera để thay đổi ảnh
-                                        </Text>
-                                    )}
-                                </Stack>
-                            </Center>
-
-                            {/* Decorative Background Pattern */}
-                            <div className="absolute inset-0 opacity-10 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] mix-blend-overlay"></div>
-                        </Box>
-
-                        {/* Form Content */}
-                        <Stack gap="xl" p="lg" className="-mt-6 relative z-10">
-
-                            {/* Account Block */}
-                            <Box className="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-zinc-800">
-                                <Group gap="md" mb="md" align="center">
-                                    <IconMail size={20} className="text-indigo-500" />
-                                    <Text fw={700} className="text-gray-900 dark:text-gray-100">Thông tin đăng nhập</Text>
-                                </Group>
-                                <Stack gap="xs">
-                                    <TextInput
-                                        label="Email"
-                                        value={formData.email}
-                                        onChange={(e) => handleInputChange('email', e.target.value)}
-                                        size="md"
-                                        radius="md"
-                                        classNames={{ input: "bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700" }}
+                        {/* Avatar Section - Centered & Minimal */}
+                        <Center py="xl" className="bg-white dark:bg-zinc-950">
+                            <Stack align="center" gap="sm">
+                                <Box className="relative">
+                                    <Avatar
+                                        src={avatarPreview || profile?.avatar}
+                                        size={100}
+                                        radius="full"
+                                        className="border border-gray-200 dark:border-zinc-800"
                                     />
-                                    <Group gap={6} className="bg-red-50 dark:bg-red-900/10 p-3 rounded-lg border border-red-100 dark:border-red-900/30">
-                                        <Text size="xs" c="red" fw={500} className="leading-snug">
-                                            Lưu ý: Email là tên đăng nhập của bạn. Thay đổi email sẽ thay đổi tài khoản đăng nhập.
-                                        </Text>
-                                    </Group>
-                                </Stack>
+                                    {uploadAvatarMutation.isPending && (
+                                        <Box className="absolute inset-0 bg-black/30 rounded-full flex items-center justify-center">
+                                            {/* Loader could go here */}
+                                        </Box>
+                                    )}
+                                </Box>
+                                <Button
+                                    component="label"
+                                    htmlFor="avatar-input"
+                                    variant="transparent"
+                                    size="sm"
+                                    className="text-blue-500 font-semibold hover:no-underline p-0 h-auto hover:bg-transparent"
+                                >
+                                    Chỉnh sửa ảnh
+                                </Button>
+                                <input
+                                    id="avatar-input"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleAvatarChange}
+                                    style={{ display: 'none' }}
+                                />
+                                {avatarFile && (
+                                    <Button
+                                        size="xs"
+                                        variant="light"
+                                        color="blue"
+                                        radius="xl"
+                                        onClick={handleAvatarUpload}
+                                        loading={uploadAvatarMutation.isPending}
+                                    >
+                                        Lưu ảnh mới
+                                    </Button>
+                                )}
+                            </Stack>
+                        </Center>
+
+                        <Divider color="gray.1" className="dark:border-zinc-800" />
+
+                        {/* Fields Section - List Style */}
+                        <Stack gap={0} className="px-6">
+                            {/* Name */}
+                            <Box py="md" className="border-b border-gray-100 dark:border-zinc-800">
+                                <Grid gutter="md" align="center">
+                                    <Grid.Col span={3}>
+                                        <Text fw={600} className="text-gray-900 dark:text-white">Tên</Text>
+                                    </Grid.Col>
+                                    <Grid.Col span={9}>
+                                        <TextInput
+                                            value={formData.hoTen}
+                                            onChange={(e) => handleInputChange('hoTen', e.target.value)}
+                                            variant="unstyled"
+                                            placeholder="Tên của bạn"
+                                            classNames={{ input: "text-gray-900 dark:text-white p-0 font-normal text-base placeholder:text-gray-400" }}
+                                        />
+                                    </Grid.Col>
+                                </Grid>
                             </Box>
 
-                            {/* Personal Info Block */}
-                            <Box className="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-zinc-800">
-                                <Group gap="md" mb="md" align="center">
-                                    <IconUser size={20} className="text-indigo-500" />
-                                    <Text fw={700} className="text-gray-900 dark:text-gray-100">Thông tin cá nhân</Text>
-                                </Group>
-                                <Stack gap="md">
-                                    <TextInput
-                                        label="Họ và tên"
-                                        value={formData.hoTen}
-                                        onChange={(e) => handleInputChange('hoTen', e.target.value)}
-                                        size="md"
-                                        radius="md"
-                                        placeholder="Nhập họ tên đầy đủ"
-                                        classNames={{ input: "bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700" }}
-                                    />
-
-                                    <SimpleGrid cols={2}>
+                            {/* Gender */}
+                            {/* Gender */}
+                            <Box py="md" className="border-b border-gray-100 dark:border-zinc-800">
+                                <Grid gutter="md" align="center">
+                                    <Grid.Col span={3}>
+                                        <Text fw={600} className="text-gray-900 dark:text-white">Giới tính</Text>
+                                    </Grid.Col>
+                                    <Grid.Col span={9}>
                                         <Select
-                                            label="Giới tính"
                                             value={formData.gioiTinh}
                                             onChange={(value) => value && handleInputChange('gioiTinh', value)}
                                             data={[{ value: 'NAM', label: 'Nam' }, { value: 'NU', label: 'Nữ' }]}
-                                            size="md"
-                                            radius="md"
-                                            classNames={{ input: "bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700" }}
+                                            variant="unstyled"
+                                            classNames={{ input: "text-gray-900 dark:text-white p-0 font-normal text-base" }}
                                         />
+                                    </Grid.Col>
+                                </Grid>
+                            </Box>
+
+                            {/* Bio / Major */}
+                            <Box py="md" className="border-b border-gray-100 dark:border-zinc-800">
+                                <Grid gutter="md" align="center">
+                                    <Grid.Col span={3}>
+                                        <Text fw={600} className="text-gray-900 dark:text-white">Tiểu sử</Text>
+                                    </Grid.Col>
+                                    <Grid.Col span={9}>
+                                        <Textarea
+                                            value={formData.chuyenMon}
+                                            onChange={(e) => handleInputChange('chuyenMon', e.target.value)}
+                                            variant="unstyled"
+                                            autosize
+                                            minRows={1}
+                                            placeholder="Giới thiệu nhanh về bản thân..."
+                                            classNames={{ input: "text-gray-900 dark:text-white p-0 font-normal text-base placeholder:text-gray-400" }}
+                                        />
+                                    </Grid.Col>
+                                </Grid>
+                            </Box>
+
+                            {/* Private Info Divider */}
+                            <Box pt={32} pb="md">
+                                <Text fw={700} size="xs" className="uppercase tracking-widest text-gray-500 dark:text-gray-400 px-1">
+                                    Thông tin riêng tư
+                                </Text>
+                            </Box>
+
+                            {/* Email */}
+                            <Box py="md" className="border-b border-gray-100 dark:border-zinc-800">
+                                <Grid gutter="md" align="center">
+                                    <Grid.Col span={3}>
+                                        <Text fw={600} className="text-gray-900 dark:text-white">Email</Text>
+                                    </Grid.Col>
+                                    <Grid.Col span={9}>
                                         <TextInput
-                                            label="Số điện thoại"
+                                            value={formData.email}
+                                            readOnly
+                                            disabled
+                                            variant="unstyled"
+                                            classNames={{ input: "text-gray-500 dark:text-gray-500 p-0 font-normal text-base cursor-not-allowed opacity-70" }}
+                                        />
+                                    </Grid.Col>
+                                </Grid>
+                            </Box>
+
+                            {/* Phone */}
+                            <Box py="md" className="border-b border-gray-100 dark:border-zinc-800">
+                                <Grid gutter="md" align="center">
+                                    <Grid.Col span={3}>
+                                        <Text fw={600} className="text-gray-900 dark:text-white">SĐT</Text>
+                                    </Grid.Col>
+                                    <Grid.Col span={9}>
+                                        <TextInput
                                             value={formData.soDienThoai}
                                             onChange={(e) => handleInputChange('soDienThoai', e.target.value)}
-                                            size="md"
-                                            radius="md"
-                                            placeholder="0123..."
-                                            classNames={{ input: "bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700" }}
+                                            variant="unstyled"
+                                            placeholder="+84..."
+                                            classNames={{ input: "text-gray-900 dark:text-white p-0 font-normal text-base" }}
                                         />
-                                    </SimpleGrid>
+                                    </Grid.Col>
+                                </Grid>
+                            </Box>
 
-                                    {/* Split Date Input */}
-                                    <Box>
-                                        <Text size="sm" fw={500} mb={4}>Ngày sinh</Text>
-                                        <SimpleGrid cols={3} spacing="xs">
+                            {/* Address (City) */}
+                            <Box py="md" className="border-b border-gray-100 dark:border-zinc-800">
+                                <Grid gutter="md" align="center">
+                                    <Grid.Col span={3}>
+                                        <Text fw={600} className="text-gray-900 dark:text-white">Địa chỉ</Text>
+                                    </Grid.Col>
+                                    <Grid.Col span={9}>
+                                        <Select
+                                            data={CITIES}
+                                            value={formData.addrCity || 'Khác'}
+                                            onChange={(val) => val && handleInputChange('addrCity', val)}
+                                            variant="unstyled"
+                                            searchable
+                                            classNames={{ input: "text-gray-900 dark:text-white p-0 font-normal text-base" }}
+                                        />
+                                    </Grid.Col>
+                                </Grid>
+                            </Box>
+
+                            {/* DOB */}
+                            <Box py="md" className="">
+                                <Grid gutter="md" align="center">
+                                    <Grid.Col span={3}>
+                                        <Text fw={600} className="text-gray-900 dark:text-white">Ngày sinh</Text>
+                                    </Grid.Col>
+                                    <Grid.Col span={9}>
+                                        <Group gap="xs">
                                             <TextInput
                                                 placeholder="Ngày"
-                                                type="number"
-                                                min={1} max={31}
                                                 value={formData.dobDay}
                                                 onChange={(e) => handleInputChange('dobDay', e.target.value)}
-                                                radius="md"
-                                                size="md"
-                                                className="text-center"
-                                                classNames={{ input: "bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-center" }}
+                                                variant="unstyled"
+                                                className="w-12 text-center border-b border-gray-200 dark:border-zinc-800 pb-1"
+                                                classNames={{ input: "text-gray-900 dark:text-white p-0 text-center" }}
                                             />
                                             <Select
                                                 placeholder="Tháng"
                                                 data={MONTHS}
                                                 value={formData.dobMonth}
                                                 onChange={(val) => val && handleInputChange('dobMonth', val)}
-                                                radius="md"
-                                                size="md"
-                                                searchable
-                                                classNames={{ input: "bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700" }}
+                                                variant="unstyled"
+                                                className="w-24 border-b border-gray-200 dark:border-zinc-800 pb-1"
+                                                classNames={{ input: "text-gray-900 dark:text-white p-0" }}
                                             />
                                             <TextInput
                                                 placeholder="Năm"
-                                                type="number"
-                                                min={1900} max={2100}
                                                 value={formData.dobYear}
                                                 onChange={(e) => handleInputChange('dobYear', e.target.value)}
-                                                radius="md"
-                                                size="md"
-                                                classNames={{ input: "bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-center" }}
+                                                variant="unstyled"
+                                                className="w-16 text-center border-b border-gray-200 dark:border-zinc-800 pb-1"
+                                                classNames={{ input: "text-gray-900 dark:text-white p-0 text-center" }}
                                             />
-                                        </SimpleGrid>
-                                    </Box>
-                                </Stack>
+                                        </Group>
+                                    </Grid.Col>
+                                </Grid>
                             </Box>
-
-                            {/* Address Block */}
-                            <Box className="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-zinc-800">
-                                <Group gap="md" mb="md" align="center">
-                                    <IconMapPin size={20} className="text-indigo-500" />
-                                    <Text fw={700} className="text-gray-900 dark:text-gray-100">Địa chỉ liên hệ</Text>
-                                </Group>
-                                <Stack gap="md">
-                                    <Select
-                                        label="Tỉnh / Thành phố"
-                                        placeholder="Chọn tỉnh thành..."
-                                        data={CITIES}
-                                        value={formData.addrCity || 'Khác'}
-                                        onChange={(val) => val && handleInputChange('addrCity', val)}
-                                        size="md"
-                                        radius="md"
-                                        searchable
-                                        checkIconPosition="right"
-                                        leftSection={<IconBuildingSkyscraper size={16} />}
-                                        classNames={{ input: "bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700" }}
-                                    />
-
-                                    <Textarea
-                                        label="Chi tiết (Số nhà, Đường, Phường/Xã, Quận/Huyện)"
-                                        value={formData.addrDetail}
-                                        onChange={(e) => handleInputChange('addrDetail', e.target.value)}
-                                        placeholder="Nhập địa chỉ chi tiết..."
-                                        minRows={2}
-                                        autosize
-                                        radius="md"
-                                        size="md"
-                                        classNames={{ input: "bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700" }}
-                                    />
-                                </Stack>
-                            </Box>
-
-                            {/* Additional Info */}
-                            {profile?.vaiTro === 'HOC_SINH' && (
-                                <Box className="bg-white dark:bg-zinc-900 rounded-2xl p-5 shadow-xl shadow-gray-200/50 dark:shadow-none border border-gray-100 dark:border-zinc-800">
-                                    <Group gap="md" mb="md" align="center">
-                                        <IconSchool size={20} className="text-indigo-500" />
-                                        <Text fw={700} className="text-gray-900 dark:text-gray-100">Thông tin học tập</Text>
-                                    </Group>
-                                    <SimpleGrid cols={{ base: 1, sm: 2 }}>
-                                        <Select
-                                            label="Lớp học"
-                                            value={formData.lopHocId?.toString()}
-                                            onChange={(value) => handleInputChange('lopHocId', value ? parseInt(value) : undefined)}
-                                            placeholder="Chọn lớp"
-                                            data={[]}
-                                            size="md"
-                                            radius="md"
-                                            disabled // Usually managed by admin
-                                            classNames={{ input: "bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700" }}
-                                        />
-                                        <TextInput
-                                            label="Sở trường / Năng khiếu"
-                                            value={formData.chuyenMon}
-                                            onChange={(e) => handleInputChange('chuyenMon', e.target.value)}
-                                            size="md"
-                                            radius="md"
-                                            placeholder="Vẽ, Múa, Toán..."
-                                            classNames={{ input: "bg-gray-50 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700" }}
-                                        />
-                                    </SimpleGrid>
-                                </Box>
-                            )}
-
-                            {/* Bottom Spacing */}
-                            <Box h={80} />
                         </Stack>
                     </Stack>
-                </Box>
-
-                {/* Footer Fixed */}
-                <Box className="p-4 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-t border-gray-200 dark:border-zinc-800 sticky bottom-0 z-50">
-                    <Group justify="flex-end" gap="sm">
-                        <Button
-                            variant="subtle"
-                            color="gray"
-                            size="md"
-                            radius="xl"
-                            onClick={onClose}
-                        >
-                            Hủy
-                        </Button>
-                        <Button
-                            variant="gradient"
-                            gradient={{ from: 'indigo', to: 'blue' }}
-                            size="md"
-                            radius="xl"
-                            onClick={handleSave}
-                            loading={updateProfileMutation.isPending}
-                            className="shadow-lg shadow-indigo-500/30"
-                            px="xl"
-                        >
-                            Lưu Thay Đổi
-                        </Button>
-                    </Group>
                 </Box>
             </Stack>
         </Drawer>

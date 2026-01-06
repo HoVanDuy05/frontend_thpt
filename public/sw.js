@@ -1,39 +1,52 @@
-const CACHE_NAME = 'pms-cache-v2';
+const CACHE_NAME = 'pms-cache-v3';
+const ASSETS_TO_CACHE = [
+    '/',
+    '/manifest.json',
+    '/favicon.png',
+    '/icons/icon-192x192.png',
+    '/icons/icon-512x512.png',
+];
 
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll([
-                '/',
-                '/manifest.json',
-                '/icons/icon-192x192.png',
-                '/icons/icon-512x512.png',
-            ]);
+            return cache.addAll(ASSETS_TO_CACHE);
+        })
+    );
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+    event.waitUntil(
+        caches.keys().then((keys) => {
+            return Promise.all(
+                keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+            );
         })
     );
 });
 
 self.addEventListener('fetch', (event) => {
-    const req = event.request;
-    const url = new URL(req.url);
+    const { request } = event;
+    const url = new URL(request.url);
 
-    // Never cache API calls or non-GET requests
-    if (url.pathname.startsWith('/api') || req.method !== 'GET') {
-        event.respondWith(fetch(req));
+    // Skip API, non-GET, and non-same-origin (except some CDNs if needed)
+    if (url.pathname.startsWith('/api') || request.method !== 'GET' || url.origin !== self.location.origin) {
         return;
     }
 
-    // Cache-first for same-origin GET assets/pages
+    // Stale-while-revalidate for most assets
     event.respondWith(
-        caches.match(req).then((cached) => {
-            if (cached) return cached;
-            return fetch(req).then((res) => {
-                // Only cache successful same-origin responses
-                if (res && res.status === 200 && url.origin === self.location.origin) {
-                    const copy = res.clone();
-                    caches.open(CACHE_NAME).then((cache) => cache.put(req, copy));
-                }
-                return res;
+        caches.open(CACHE_NAME).then((cache) => {
+            return cache.match(request).then((cachedResponse) => {
+                const fetchPromise = fetch(request).then((networkResponse) => {
+                    if (networkResponse && networkResponse.status === 200) {
+                        cache.put(request, networkResponse.clone());
+                    }
+                    return networkResponse;
+                }).catch(() => cachedResponse); // Retain cached if network fails
+
+                return cachedResponse || fetchPromise;
             });
         })
     );

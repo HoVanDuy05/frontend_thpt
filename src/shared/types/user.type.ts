@@ -18,6 +18,7 @@ export interface TUser {
     soDienThoai?: string;
     diaChi?: string;
     tongKetBan?: number;
+    _count?: { followers: number; following: number; };
 
     hoSoGiaoVien?: THoSoGiaoVien;
     hoSoHocSinh?: THoSoHocSinh;

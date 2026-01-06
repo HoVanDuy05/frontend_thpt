@@ -7,6 +7,7 @@ import { NavigationProgress } from "@mantine/nprogress";
 import { useState } from "react";
 import { NextIntlClientProvider, AbstractIntlMessages } from "next-intl";
 import { SplashScreen } from "@/shared/components/SplashScreen";
+import { PWAProvider } from "@/providers/PWAProvider";
 import "@mantine/nprogress/styles.css";
 
 interface AppProviderProps {
@@ -145,7 +146,9 @@ export function AppProvider({ children, messages, locale }: AppProviderProps) {
                     <NavigationProgress color="indigo" size={3} />
                     <Notifications position="top-right" zIndex={1000} />
                     <SplashScreen />
-                    {children}
+                    <PWAProvider>
+                        {children}
+                    </PWAProvider>
                 </MantineProvider>
             </QueryClientProvider>
         </NextIntlClientProvider>

@@ -1,34 +1,45 @@
-import { Paper, Group, ActionIcon, Avatar, Text, Stack, ScrollArea, Box, Loader, Center, Image, Drawer, Divider, Badge, Accordion, ThemeIcon, UnstyledButton, Modal } from "@mantine/core";
+import { Paper, Group, ActionIcon, Avatar, Text, Stack, ScrollArea, Box, Loader, Center, Image, Drawer, Divider, Badge, Accordion, ThemeIcon, UnstyledButton, Modal, Button, useMantineColorScheme } from "@mantine/core";
 import { IconArrowLeft, IconPhone, IconVideo, IconInfoCircle, IconPhoto, IconFile, IconBell, IconSearch } from "@tabler/icons-react";
 import { TChannel } from "@/api/types/api.type";
 import { AppQuery } from "@/api/AppQuery";
 import { useAppStore } from "@/providers/store/useAppStore";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ChatInput } from "./ChatInput";
 import { useSocket } from "@/shared/hooks/useSocket";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useMediaQuery } from "@mantine/hooks";
+import { useTranslations } from "next-intl";
 
 interface ChatWindowProps {
     channel: TChannel;
     onBack?: () => void;
+    onToggleInfo?: () => void;
 }
 
-export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
+export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggleInfo }) => {
     const { user } = useAppStore();
     const queryClient = useQueryClient();
-    const { data: messages, isLoading } = AppQuery.chat.useMessages(channel.id, { page: 1 });
+    const t = useTranslations('chat');
+    const [page, setPage] = useState(1);
+    const [allMessages, setAllMessages] = useState<any[]>([]);
+    const { data: pageMessages, isLoading, isFetching } = AppQuery.chat.useMessages(channel.id, { page });
+    const hasMoreRef = useRef(true);
+    const scrollBeforeRef = useRef<number>(0);
     const { on, off, emit, joinChannel, leaveChannel, startTyping, stopTyping, isConnected } = useSocket();
     const [typingUsers, setTypingUsers] = useState<string[]>([]);
+    const { colorScheme } = useMantineColorScheme();
+    const dark = colorScheme === 'dark';
     const [presence, setPresence] = useState<{ online: boolean; lastSeen: string | null } | null>(null);
     const [receiptByMessageId, setReceiptByMessageId] = useState<Record<number, 'sent' | 'delivered' | 'seen'>>({});
     const [infoOpened, setInfoOpened] = useState(false);
     const [previewImage, setPreviewImage] = useState<string | null>(null);
+    const [replyingTo, setReplyingTo] = useState<any | null>(null);
     const typingTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
     const viewport = useRef<HTMLDivElement>(null);
     const isMobile = useMediaQuery('(max-width: 48em)');
+    const firstLoadRef = useRef(true);
 
     useEffect(() => {
         dayjs.extend(relativeTime);
@@ -46,6 +57,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
         };
     }, [isConnected, channel.id, joinChannel, leaveChannel]);
 
+    // Request Notification Permission
+    useEffect(() => {
+        if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission();
+        }
+    }, []);
+
     // Listen for new messages
     useEffect(() => {
         if (!isConnected) return;
@@ -53,8 +71,18 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
         const handleNewMessage = (message: any) => {
             if (message?.kenhChatId !== channel.id) return;
 
+            const isFromMe = Number(message?.nguoiGuiId) === Number(user?.id);
+
+            // Notify if window not focused and not from me
+            if (!isFromMe && document.visibilityState !== 'visible' && Notification.permission === "granted") {
+                new Notification(t('new_message_from', { name: targetUser?.hoTen || targetUser?.taiKhoan || t('key_fallback_user') }), { // key_fallback_user not defined, use 'you' or custom
+                    body: message.loai === 'VAN_BAN' ? message.noiDung : t('sent_attachment'),
+                    icon: targetUser?.avatar || '/icon.png'
+                });
+            }
+
             // If message is from other user, acknowledge delivered (realtime)
-            if (message?.nguoiGuiId && message.nguoiGuiId !== user?.id && message?.id) {
+            if (message?.nguoiGuiId && Number(message.nguoiGuiId) !== Number(user?.id) && message?.id) {
                 emit('message:delivered', { channelId: channel.id, messageId: message.id });
             }
 
@@ -63,6 +91,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
                     const key = query.queryKey?.[0];
                     return typeof key === 'string' && key.startsWith(`/communication/chat/channels/${channel.id}/messages`);
                 }
+            });
+
+            // Update local state directly for immediate UI feedback
+            setAllMessages(prev => {
+                if (prev.some(m => m.id === message.id)) return prev;
+                const updated = [...prev, message];
+                return updated.sort((a, b) => new Date(a.ngayGui).getTime() - new Date(b.ngayGui).getTime());
             });
         };
 
@@ -91,14 +126,93 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
                 console.warn('Socket event listener cleanup failed:', error);
             }
         };
-    }, [isConnected === true, channel.id, on, off, emit, queryClient, user?.id]);
+    }, [isConnected, channel.id, on, off, emit, queryClient, user?.id]);
 
-    // Scroll to bottom on new messages
+    // Reset when channel changes
     useEffect(() => {
-        if (viewport.current) {
-            viewport.current.scrollTo({ top: viewport.current.scrollHeight, behavior: 'smooth' });
+        setAllMessages([]);
+        setPage(1);
+        hasMoreRef.current = true;
+        firstLoadRef.current = true;
+    }, [channel.id]);
+
+    // Merge messages and handle scroll anchoring
+    useEffect(() => {
+        if (pageMessages) {
+            if (pageMessages.length < 20) hasMoreRef.current = false;
+
+            // Before updating state, save current scroll height if we are loading history
+            if (page > 1 && viewport.current) {
+                scrollBeforeRef.current = viewport.current.scrollHeight;
+            }
+
+            setAllMessages(prev => {
+                const existingIds = new Set(prev.map(m => m.id));
+                const newMsgs = pageMessages.filter((m: any) => !existingIds.has(m.id));
+                const merged = [...prev, ...newMsgs];
+                // Sort by time (newest at bottom)
+                return merged.sort((a, b) => new Date(a.ngayGui).getTime() - new Date(b.ngayGui).getTime());
+            });
         }
-    }, [messages]);
+    }, [pageMessages, page]);
+
+    // Apply scroll anchoring after messages render
+    useEffect(() => {
+        if (page > 1 && scrollBeforeRef.current && viewport.current) {
+            const newHeight = viewport.current.scrollHeight;
+            const diff = newHeight - scrollBeforeRef.current;
+            if (diff > 0) {
+                viewport.current.scrollTop = diff;
+                scrollBeforeRef.current = 0;
+            }
+        }
+    }, [allMessages, page]);
+
+    // Intersection Observer for infinite scroll at the top
+    const topSentinelRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && !isLoading && !isFetching && hasMoreRef.current && pageMessages && pageMessages.length >= 20) {
+                setPage(p => p + 1);
+            }
+        }, { threshold: 0, rootMargin: '100px 0px 0px 0px' });
+
+        if (topSentinelRef.current) observer.observe(topSentinelRef.current);
+        return () => observer.disconnect();
+    }, [isLoading, isFetching, pageMessages]);
+
+    // Scroll to bottom logic
+    const bottomRef = useRef<HTMLDivElement>(null);
+
+    const scrollToBottom = (behavior: ScrollBehavior = 'auto') => {
+        if (bottomRef.current) {
+            bottomRef.current.scrollIntoView({ behavior, block: 'end' });
+        } else if (viewport.current) {
+            viewport.current.scrollTo({
+                top: viewport.current.scrollHeight,
+                behavior
+            });
+        }
+    };
+
+    useEffect(() => {
+        if (isLoading || allMessages.length === 0) return;
+
+        if (firstLoadRef.current) {
+            scrollToBottom('auto');
+            const delays = [100, 300, 600];
+            const timers = delays.map(delay => setTimeout(() => {
+                scrollToBottom('auto');
+                if (delay === 600) firstLoadRef.current = false;
+            }, delay));
+            return () => timers.forEach(clearTimeout);
+        } else if (page === 1) {
+            // Check if last message is from me for instant scroll
+            const lastMsg = allMessages[allMessages.length - 1];
+            const isMe = Number(lastMsg?.nguoiGuiId) === Number(user?.id);
+            scrollToBottom(isMe ? 'auto' : 'smooth');
+        }
+    }, [allMessages, channel.id, isLoading, page, user?.id]);
 
     // Handle typing indicator
     const handleTyping = () => {
@@ -114,7 +228,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
     };
 
     const getOtherMember = () => {
-        return channel.thanhViens?.find(m => m.nguoiDungId !== user?.id)?.nguoiDung;
+        return channel.thanhViens?.find(m => Number(m.nguoiDungId) !== Number(user?.id))?.nguoiDung;
     };
 
     const targetUser = getOtherMember();
@@ -124,13 +238,13 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
 
         const handlePresenceUpdate = (data: any) => {
             if (!targetUser?.id) return;
-            if (data?.userId !== targetUser.id) return;
+            if (Number(data?.userId) !== Number(targetUser.id)) return;
             setPresence({ online: !!data.online, lastSeen: data.lastSeen ?? null });
         };
 
         const handleDelivered = (data: any) => {
             if (data?.channelId !== channel.id) return;
-            if (data?.userId === user?.id) return;
+            if (Number(data?.userId) === Number(user?.id)) return;
             const messageId = data?.messageId;
             if (!messageId) return;
             setReceiptByMessageId((prev) => {
@@ -142,7 +256,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
 
         const handleSeen = (data: any) => {
             if (data?.channelId !== channel.id) return;
-            if (data?.userId === user?.id) return;
+            if (Number(data?.userId) === Number(user?.id)) return;
             const messageId = data?.messageId;
             if (!messageId) return;
             setReceiptByMessageId((prev) => {
@@ -170,240 +284,229 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
     // When messages change, mark latest as seen (realtime, non-persistent)
     useEffect(() => {
         if (!isConnected) return;
-        if (!messages || messages.length === 0) return;
+        if (!allMessages || allMessages.length === 0) return;
 
         // Only mark as seen for the newest *incoming* message.
-        // This avoids instantly marking my own sent message as "Đã xem".
-        const newestIncoming = messages.find((m: any) => m?.nguoiGuiId && m.nguoiGuiId !== user?.id);
+        const newestIncoming = [...allMessages].reverse().find((m: any) => m?.nguoiGuiId && Number(m.nguoiGuiId) !== Number(user?.id));
         const newestIncomingId = newestIncoming?.id;
         if (!newestIncomingId) return;
 
         emit('message:seen', { channelId: channel.id, messageId: newestIncomingId });
-    }, [isConnected, messages, emit, channel.id]);
+    }, [isConnected, allMessages, emit, channel.id, user?.id]);
 
-    const newestOutgoingId = (() => {
-        if (!messages || messages.length === 0) return null;
-        const mine = messages.find((m: any) => m?.nguoiGuiId === user?.id);
+    const newestOutgoingId = useMemo(() => {
+        if (!allMessages || allMessages.length === 0) return null;
+        const mine = [...allMessages].reverse().find((m: any) => Number(m.nguoiGuiId) === Number(user?.id));
         return mine?.id ?? null;
-    })();
+    }, [allMessages, user?.id]);
+
+    const lastSeenMessageId = useMemo(() => {
+        const ids = Object.keys(receiptByMessageId)
+            .filter(k => receiptByMessageId[Number(k)] === 'seen')
+            .map(Number);
+        return ids.length > 0 ? Math.max(...ids) : null;
+    }, [receiptByMessageId]);
 
     const getReceiptLabel = (messageId: number) => {
         const status = receiptByMessageId[messageId];
-        if (status === 'seen') return 'Đã xem';
-        if (status === 'delivered') return 'Đã nhận';
-        return 'Đã gửi';
+        if (status === 'seen') return t('read');
+        if (status === 'delivered') return t('delivered');
+        return t('sent');
     };
 
     return (
-        <div className="h-full flex flex-col overflow-hidden bg-white dark:bg-black">
-            <Drawer
-                opened={infoOpened}
-                onClose={() => setInfoOpened(false)}
-                position="right"
-                size={isMobile ? '100%' : 360}
-                withCloseButton={false}
-                overlayProps={{ opacity: 0.25, blur: 2 }}
-                styles={{
-                    body: { padding: 0 },
-                }}
-            >
-                <div className="h-full flex flex-col bg-white dark:bg-black">
-                    <div className="px-4 py-3 border-b border-gray-200/70 dark:border-zinc-900">
-                        <Group justify="space-between" wrap="nowrap">
-                            <Text fw={700}>Thông tin đoạn chat</Text>
-                            <ActionIcon variant="subtle" color="gray" radius="xl" onClick={() => setInfoOpened(false)}>
-                                <IconArrowLeft size={18} />
-                            </ActionIcon>
-                        </Group>
-                    </div>
+        <div className="h-full flex flex-col overflow-hidden bg-white dark:bg-[#1c1e21]">
 
-                    <ScrollArea className="flex-1">
-                        <Stack gap={0} p="md">
-                            <Center className="flex-col gap-2" py="md">
-                                <Avatar src={targetUser?.avatar} size={84} radius={999} />
-                                <Text fw={800} size="lg" className="text-gray-900 dark:text-white">
+            {/* Header */}
+            <div className="shrink-0 border-b border-gray-100 dark:border-white/5 bg-white/80 dark:bg-[#1c1e21]/80 backdrop-blur-md z-30 shadow-sm">
+                <div className="h-[68px] px-4 flex items-center justify-between gap-2">
+                    <Group gap="xs" className="min-w-0 flex-1">
+                        <ActionIcon variant="subtle" color="gray" onClick={onBack} className="md:hidden">
+                            <IconArrowLeft size={24} stroke={2.5} />
+                        </ActionIcon>
+
+                        <UnstyledButton
+                            className="flex items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-200"
+                            onClick={onToggleInfo}
+                        >
+                            <Box className="relative">
+                                <Avatar
+                                    src={targetUser?.avatar || null}
+                                    radius={999}
+                                    size={44}
+                                    className="border border-gray-100 dark:border-white/10 shadow-sm"
+                                />
+                                {presence?.online && (
+                                    <Box className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#31A24C] border-[3px] border-white dark:border-[#1c1e21] rounded-full" />
+                                )}
+                            </Box>
+                            <div className="min-w-0">
+                                <Text size="16px" fw={700} className="truncate text-gray-900 dark:text-gray-100 leading-tight">
                                     {channel.loaiKenh === 'NHOM' ? channel.tenKenh : (targetUser?.hoTen || targetUser?.taiKhoan)}
                                 </Text>
-                                <Badge variant="light" color="gray" radius="sm" className="normal-case font-normal bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-400">
-                                    Được mã hóa đầu cuối
-                                </Badge>
-                            </Center>
+                                <Text size="13px" c="dimmed" fw={400} className="truncate leading-tight mt-0.5">
+                                    {typingUsers.length > 0
+                                        ? "Đang nhập..."
+                                        : (presence?.online ? 'Đang hoạt động' : 'Ngoại tuyến')}
+                                </Text>
+                            </div>
+                        </UnstyledButton>
+                    </Group>
 
-                            <Divider my="md" />
-
-                            <Group grow gap="sm">
-                                <UnstyledButton className="rounded-xl p-3 bg-gray-50 dark:bg-zinc-900 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
-                                    <Group wrap="nowrap" gap="sm">
-                                        <ThemeIcon variant="light" color="blue" radius="xl"><IconSearch size={16} /></ThemeIcon>
-                                        <Text size="sm" fw={600}>Tìm kiếm</Text>
-                                    </Group>
-                                </UnstyledButton>
-                                <UnstyledButton className="rounded-xl p-3 bg-gray-50 dark:bg-zinc-900 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors">
-                                    <Group wrap="nowrap" gap="sm">
-                                        <ThemeIcon variant="light" color="gray" radius="xl"><IconBell size={16} /></ThemeIcon>
-                                        <Text size="sm" fw={600}>Thông báo</Text>
-                                    </Group>
-                                </UnstyledButton>
-                            </Group>
-
-                            <Divider my="md" />
-
-                            <Accordion variant="separated" radius="md" classNames={{ item: 'border border-gray-200/70 dark:border-zinc-800 bg-white dark:bg-black', control: 'hover:bg-gray-50 dark:hover:bg-zinc-900' }}>
-                                <Accordion.Item value="about">
-                                    <Accordion.Control icon={<ThemeIcon variant="light" color="gray" radius="xl"><IconInfoCircle size={16} /></ThemeIcon>}>
-                                        <Text size="sm" fw={700}>Thông tin về đoạn chat</Text>
-                                    </Accordion.Control>
-                                    <Accordion.Panel>
-                                        <Text size="sm" c="dimmed">Tình trạng: {presence?.online ? 'Đang hoạt động' : 'Ngoại tuyến'}</Text>
-                                    </Accordion.Panel>
-                                </Accordion.Item>
-
-                                <Accordion.Item value="media">
-                                    <Accordion.Control icon={<ThemeIcon variant="light" color="gray" radius="xl"><IconPhoto size={16} /></ThemeIcon>}>
-                                        <Text size="sm" fw={700}>File phương tiện & file</Text>
-                                    </Accordion.Control>
-                                    <Accordion.Panel>
-                                        <Group gap="sm">
-                                            <ThemeIcon variant="light" color="gray" radius="xl"><IconPhoto size={16} /></ThemeIcon>
-                                            <ThemeIcon variant="light" color="gray" radius="xl"><IconFile size={16} /></ThemeIcon>
-                                        </Group>
-                                    </Accordion.Panel>
-                                </Accordion.Item>
-                            </Accordion>
-
-                            <div className="h-6" />
-                        </Stack>
-                    </ScrollArea>
-                </div>
-            </Drawer>
-
-            <div className="shrink-0 border-b border-gray-200/70 dark:border-zinc-900 bg-white/90 dark:bg-black/80 backdrop-blur">
-                <div className="h-14 px-3 flex items-center gap-2">
-                    <ActionIcon variant="subtle" color="gray" onClick={onBack} className="md:hidden">
-                        <IconArrowLeft size={20} />
-                    </ActionIcon>
-
-                    <UnstyledButton
-                        className="min-w-0 flex-1 flex items-center gap-2 rounded-lg px-1.5 py-1 hover:bg-gray-100/70 dark:hover:bg-zinc-900/60 transition-colors"
-                        onClick={() => setInfoOpened(true)}
-                    >
-                        <Avatar src={targetUser?.avatar} radius={999} size={34} />
-                        <div className="min-w-0 flex-1">
-                            <Text size="sm" fw={700} className="truncate">
-                                {channel.loaiKenh === 'NHOM' ? channel.tenKenh : (targetUser?.hoTen || targetUser?.taiKhoan)}
-                            </Text>
-                            <Text size="xs" c="dimmed" className="truncate">
-                                {typingUsers.length > 0
-                                    ? 'đang nhập…'
-                                    : (presence?.online
-                                        ? 'Đang hoạt động'
-                                        : (presence?.lastSeen ? `Hoạt động ${dayjs(presence.lastSeen).fromNow()}` : 'Ngoại tuyến'))}
-                            </Text>
-                        </div>
-                    </UnstyledButton>
-
-                    <Group gap={4} wrap="nowrap">
-                        <ActionIcon variant="subtle" color="gray" radius="xl" size="lg">
-                            <IconPhone size={20} />
+                    <Group gap={8}>
+                        <ActionIcon variant="subtle" radius="xl" size={40} className="text-[#0084FF] hover:bg-gray-100 dark:hover:bg-white/5">
+                            <IconPhone size={24} fill="currentColor" stroke={1.5} />
                         </ActionIcon>
-                        <ActionIcon variant="subtle" color="gray" radius="xl" size="lg">
-                            <IconVideo size={20} />
+                        <ActionIcon variant="subtle" radius="xl" size={40} className="text-[#0084FF] hover:bg-gray-100 dark:hover:bg-white/5">
+                            <IconVideo size={26} fill="currentColor" stroke={1.5} />
                         </ActionIcon>
                     </Group>
                 </div>
             </div>
 
-            <ScrollArea className="flex-1" viewportRef={viewport}>
-                <div className="min-h-full bg-[#f5f7fb] dark:bg-zinc-950">
-                    <Stack gap={8} p="md" className="pb-6">
-                        {isLoading ? (
-                            <Center py={50}><Loader color="indigo" size="sm" /></Center>
-                        ) : (messages || []).length === 0 ? (
-                            <Center py={80}>
-                                <Stack gap={6} align="center">
-                                    <Avatar src={targetUser?.avatar} radius={999} size={64} />
-                                    <Text fw={700}>Bắt đầu cuộc trò chuyện</Text>
-                                    <Text size="sm" c="dimmed" ta="center">Gửi tin nhắn đầu tiên để bắt đầu.</Text>
-                                </Stack>
-                            </Center>
-                        ) : (messages || []).slice().reverse().map((msg) => {
-                            const isMe = msg.nguoiGuiId === user?.id;
+            <ScrollArea viewportRef={viewport} className="flex-1 px-4 py-4 no-scrollbar">
+                <Stack gap={0} className="min-h-full justify-end">
+                    {/* Sentinel for infinite scroll */}
+                    <div ref={topSentinelRef} style={{ height: 1, marginBottom: 10 }} />
+
+                    {isFetching && page > 1 && (
+                        <Center py="xs">
+                            <Loader size="xs" color="blue" />
+                        </Center>
+                    )}
+
+                    {isLoading && page === 1 ? (
+                        <Center h={100}><Loader size="sm" color="blue" /></Center>
+                    ) : (allMessages || []).length === 0 ? (
+                        <Center h={400} className="flex-col animate-in fade-in zoom-in duration-500">
+                            <Avatar src={targetUser?.avatar || null} size={100} radius={999} mb="md" />
+                            <Text fw={700} size="xl">{channel.loaiKenh === 'NHOM' ? channel.tenKenh : (targetUser?.hoTen || targetUser?.taiKhoan)}</Text>
+                            <Text size="sm" c="dimmed" mt={4}>Bắt đầu cuộc trò chuyện trên Messenger</Text>
+                        </Center>
+                    ) : (
+                        (allMessages || []).map((msg, idx, arr) => {
+                            const isMe = Number(msg.nguoiGuiId) === Number(user?.id);
+                            const prevMsg = arr[idx - 1];
+                            const nextMsg = arr[idx + 1];
+
+                            const isFirstInGroup = !prevMsg || Number(prevMsg.nguoiGuiId) !== Number(msg.nguoiGuiId);
+                            const isLastInGroup = !nextMsg || Number(nextMsg.nguoiGuiId) !== Number(msg.nguoiGuiId);
+
                             return (
-                                <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-                                    <div className={`max-w-[78%] ${isMe ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
+                                <div
+                                    key={msg.id}
+                                    className={`flex flex-col w-full ${isMe ? 'items-end' : 'items-start'} ${isFirstInGroup ? 'mt-4' : 'mt-[2px]'}`}
+                                >
+                                    <div className={`flex items-end gap-1.5 max-w-[85%] sm:max-w-[75%] ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
                                         {!isMe && (
-                                            <div className="flex items-end gap-2">
-                                                <Avatar src={msg.nguoiGui.avatar} size={24} radius={999} />
-                                                <div className="flex flex-col gap-1">
-                                                    <Paper
-                                                        p="sm"
-                                                        radius={14}
-                                                        className="bg-white dark:bg-zinc-900 border border-gray-200/70 dark:border-zinc-800"
-                                                    >
-                                                        {msg.loai === 'VAN_BAN' && (
-                                                            <Text size="sm" className="leading-snug text-gray-900 dark:text-zinc-100">{msg.noiDung}</Text>
-                                                        )}
-
-                                                        {msg.loai === 'HINH_ANH' && (
-                                                            <Box style={{ maxWidth: 360 }} className="cursor-pointer overflow-hidden rounded-md" onClick={() => setPreviewImage(msg.duongDanTep || msg.noiDung || null)}>
-                                                                <Image
-                                                                    src={msg.duongDanTep || msg.noiDung}
-                                                                    alt="Image"
-                                                                    radius="md"
-                                                                    className="transition-transform hover:scale-105 duration-300"
-                                                                />
-                                                            </Box>
-                                                        )}
-
-                                                        {msg.loai === 'TEP' && (
-                                                            <Box>
-                                                                <a href={msg.duongDanTep} target="_blank" rel="noopener noreferrer" className="text-sm underline text-blue-600">Tải tệp đính kèm</a>
-                                                            </Box>
-                                                        )}
-                                                    </Paper>
-                                                    <Text size="xs" c="dimmed" ml={10}>{msg.ngayGui ? dayjs(msg.ngayGui).format('HH:mm') : ''}</Text>
-                                                </div>
+                                            <div className="w-8 shrink-0 pb-0.5">
+                                                {isLastInGroup && (
+                                                    <Avatar src={msg.nguoiGui?.avatar || targetUser?.avatar || null} size={28} radius="xl" />
+                                                )}
                                             </div>
                                         )}
 
-                                        {isMe && (
-                                            <div className="flex flex-col items-end gap-1">
-                                                <div className="rounded-[14px] px-3 py-2 text-white bg-[#1a73e8]">
-                                                    {msg.loai === 'VAN_BAN' && (
-                                                        <Text size="sm" className="leading-snug">{msg.noiDung}</Text>
-                                                    )}
-
-                                                    {msg.loai === 'HINH_ANH' && (
-                                                        <Box style={{ maxWidth: 360 }} className="cursor-pointer overflow-hidden rounded-md" onClick={() => setPreviewImage(msg.duongDanTep || msg.noiDung || null)}>
-                                                            <Image
-                                                                src={msg.duongDanTep || msg.noiDung}
-                                                                alt="Image"
-                                                                radius="md"
-                                                                className="transition-transform hover:scale-105 duration-300"
-                                                            />
+                                        <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                                            {msg.loai === 'VAN_BAN' ? (
+                                                <Paper
+                                                    px="14px"
+                                                    py="8px"
+                                                    withBorder={false}
+                                                    className={`shadow-none ${isMe ? 'text-white' : 'text-black dark:text-white'}`}
+                                                    style={{
+                                                        backgroundColor: isMe ? '#0084FF' : undefined,
+                                                        borderTopRightRadius: isMe ? (isFirstInGroup ? 18 : 4) : 18,
+                                                        borderBottomRightRadius: isMe ? (isLastInGroup ? 18 : 4) : 18,
+                                                        borderTopLeftRadius: !isMe ? (isFirstInGroup ? 18 : 4) : 18,
+                                                        borderBottomLeftRadius: !isMe ? (isLastInGroup ? 18 : 4) : 18,
+                                                        maxWidth: 'fit-content',
+                                                        overflowWrap: 'anywhere',
+                                                        wordBreak: 'break-word'
+                                                    }}
+                                                    bg={!isMe ? (dark ? '#3e4042' : '#F0F2F5') : undefined}
+                                                >
+                                                    <Text size="15px" className="leading-snug whitespace-pre-wrap">{msg.noiDung}</Text>
+                                                </Paper>
+                                            ) : msg.loai === 'HINH_ANH' ? (
+                                                <Box
+                                                    className="cursor-pointer overflow-hidden rounded-[18px] transition-all hover:brightness-95 active:scale-[0.98]"
+                                                    onClick={() => setPreviewImage(msg.duongDanTep || msg.noiDung || null)}
+                                                    style={{ maxWidth: '300px' }}
+                                                >
+                                                    <Image
+                                                        src={msg.duongDanTep || msg.noiDung}
+                                                        alt="Image"
+                                                        radius={18}
+                                                        fit="contain"
+                                                        style={{
+                                                            width: '100%',
+                                                            height: 'auto',
+                                                            display: 'block'
+                                                        }}
+                                                    />
+                                                </Box>
+                                            ) : (
+                                                <Paper
+                                                    px="14px"
+                                                    py="8px"
+                                                    withBorder={false}
+                                                    className={`shadow-none ${isMe ? 'text-white' : 'text-black dark:text-white'}`}
+                                                    style={{
+                                                        backgroundColor: isMe ? '#0084FF' : undefined,
+                                                        borderTopRightRadius: isMe ? (isFirstInGroup ? 18 : 4) : 18,
+                                                        borderBottomRightRadius: isMe ? (isLastInGroup ? 18 : 4) : 18,
+                                                        borderTopLeftRadius: !isMe ? (isFirstInGroup ? 18 : 4) : 18,
+                                                        borderBottomLeftRadius: !isMe ? (isLastInGroup ? 18 : 4) : 18,
+                                                        borderRadius: 18,
+                                                        maxWidth: 'fit-content'
+                                                    }}
+                                                    bg={!isMe ? (dark ? '#3e4042' : '#F0F2F5') : undefined}
+                                                >
+                                                    <Group gap="xs" wrap="nowrap" className="py-0.5">
+                                                        <Box className="bg-white/20 p-2 rounded-full">
+                                                            <IconFile size={16} fill="white" />
                                                         </Box>
-                                                    )}
-
-                                                    {msg.loai === 'TEP' && (
-                                                        <Box>
-                                                            <a href={msg.duongDanTep} target="_blank" rel="noopener noreferrer" className="text-sm underline text-white">Tải tệp đính kèm</a>
-                                                        </Box>
-                                                    )}
-                                                </div>
-                                                <div className="flex flex-col items-end">
-                                                    <Text size="xs" c="dimmed" mr={8}>{msg.ngayGui ? dayjs(msg.ngayGui).format('HH:mm') : ''}</Text>
-                                                    {newestOutgoingId === msg.id && (
-                                                        <Text size="xs" c="dimmed" mr={8}>{getReceiptLabel(msg.id)}</Text>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        )}
+                                                        <Text size="sm" className="font-medium cursor-pointer" onClick={() => window.open(msg.duongDanTep, '_blank')}>
+                                                            {t('attachment')}
+                                                        </Text>
+                                                    </Group>
+                                                </Paper>
+                                            )}
+                                        </div>
                                     </div>
+
+                                    {isLastInGroup && (
+                                        <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} w-full mt-1`}>
+                                            {isMe && lastSeenMessageId === msg.id && (
+                                                <Avatar src={targetUser?.avatar} size={16} radius="xl" mr={4} className="opacity-90 transition-all zoom-in animate-in" />
+                                            )}
+                                            {isMe && newestOutgoingId === msg.id && (!lastSeenMessageId || lastSeenMessageId < msg.id) && (
+                                                <Text size="11px" fw={600} c="dimmed" pr={4} className="opacity-70">
+                                                    {getReceiptLabel(msg.id)}
+                                                </Text>
+                                            )}
+                                            <Text size="11px" fw={500} c="dimmed" px={isMe ? 4 : 42} className="opacity-40">
+                                                {dayjs(msg.ngayGui).format('HH:mm')}
+                                            </Text>
+                                        </div>
+                                    )}
                                 </div>
                             );
-                        })}
-                    </Stack>
-                </div>
+                        })
+                    )}
+
+                    {typingUsers.length > 0 && (
+                        <div className="flex items-end gap-2 mt-2">
+                            <div className="w-8 shrink-0" />
+                            <Box className="bg-[#F0F2F5] dark:bg-[#3E4042] px-4 py-3 rounded-[18px] flex items-center gap-1">
+                                <div className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                                <div className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                                <div className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce" />
+                            </Box>
+                        </div>
+                    )}
+                    <div ref={bottomRef} style={{ height: 1, marginTop: -1 }} />
+                </Stack>
             </ScrollArea>
 
             {/* Image Preview Modal */}
@@ -429,9 +532,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack }) => {
                 )}
             </Modal>
 
-            <div className="shrink-0 border-t border-gray-200/70 dark:border-zinc-900 bg-white/90 dark:bg-black/80 backdrop-blur">
-                <ChatInput channelId={channel.id} onTyping={handleTyping} />
+            <div className="shrink-0 border-t border-gray-200/70 dark:border-zinc-800 bg-white/90 dark:bg-[#1c1e21]/80 backdrop-blur">
+                <ChatInput channelId={channel.id} onTyping={handleTyping} replyingTo={replyingTo} onReply={setReplyingTo} />
             </div>
         </div>
     );
-}
+};

@@ -1,34 +1,103 @@
 import React from 'react';
-import { Card, Text, Avatar, Group, ActionIcon, Stack, Image, Box, Divider } from '@mantine/core';
+import { Card, Text, Group, ActionIcon, Stack, Image, Box, Divider } from '@mantine/core';
+import { UserAvatar } from './UserAvatar';
 import { IconHeart, IconMessageCircle, IconRepeat, IconShare, IconHeartFilled } from '@tabler/icons-react';
 import { Thread } from '../types';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { useRouter, usePathname } from '@/i18n/routing';
 
 dayjs.extend(relativeTime);
 
 import { AppMutation } from '@/api/AppMutation';
 import { notifications } from '@mantine/notifications';
+import { useTranslations } from 'next-intl';
 
 interface ThreadCardProps {
     thread: Thread;
 }
 
 export const ThreadCard: React.FC<ThreadCardProps> = ({ thread: initialThread }) => {
+    const t = useTranslations('social');
     const likeMutation = AppMutation().social.useLikeThread(initialThread.id);
     const [thread, setThread] = React.useState(initialThread);
+    const router = useRouter();
+    const pathname = usePathname();
 
-    const handleLike = () => {
+    // Sync local state if props change (e.g. from parent re-fetch)
+    React.useEffect(() => {
+        setThread(initialThread);
+    }, [initialThread]);
+
+    const formatTimeAgo = (date: string) => {
+        const now = dayjs();
+        const then = dayjs(date);
+        const diffInSeconds = now.diff(then, 'second');
+
+        if (diffInSeconds < 60) {
+            return t('time.just_now');
+        }
+
+        const diffInMinutes = now.diff(then, 'minute');
+        if (diffInMinutes < 60) {
+            return t('time.minutes', { count: diffInMinutes }) + (t('time.suffix') ? ` ${t('time.suffix')}` : '');
+        }
+
+        const diffInHours = now.diff(then, 'hour');
+        if (diffInHours < 24) {
+            return t('time.hours', { count: diffInHours }) + (t('time.suffix') ? ` ${t('time.suffix')}` : '');
+        }
+
+        const diffInDays = now.diff(then, 'day');
+        if (diffInDays < 7) {
+            return t('time.days', { count: diffInDays }) + (t('time.suffix') ? ` ${t('time.suffix')}` : '');
+        }
+
+        const diffInWeeks = now.diff(then, 'week');
+        if (diffInWeeks < 4) {
+            return t('time.weeks', { count: diffInWeeks }) + (t('time.suffix') ? ` ${t('time.suffix')}` : '');
+        }
+
+        const diffInMonths = now.diff(then, 'month');
+        if (diffInMonths < 12) {
+            return t('time.months', { count: diffInMonths }) + (t('time.suffix') ? ` ${t('time.suffix')}` : '');
+        }
+
+        const diffInYears = now.diff(then, 'year');
+        return t('time.years', { count: diffInYears }) + (t('time.suffix') ? ` ${t('time.suffix')}` : '');
+    };
+
+    const handleLike = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        // Optimistic update
+        const isLiked = !thread.liked;
+        const newLikesCount = Math.max(0, isLiked ? thread._count.likes + 1 : thread._count.likes - 1);
+
+        setThread(prev => ({
+            ...prev,
+            liked: isLiked,
+            _count: {
+                ...prev._count,
+                likes: newLikesCount
+            }
+        }));
+
         likeMutation.mutate(undefined, {
-            onSuccess: (data) => {
+            onError: () => {
+                // Revert on error
                 setThread(prev => ({
                     ...prev,
-                    liked: data.liked,
+                    liked: !isLiked,
                     _count: {
                         ...prev._count,
-                        likes: data.liked ? prev._count.likes + 1 : prev._count.likes - 1
+                        likes: isLiked ? prev._count.likes - 1 : prev._count.likes + 1
                     }
                 }));
+                notifications.show({
+                    title: 'Lỗi',
+                    message: 'Không thể thực hiện hành động này',
+                    color: 'red'
+                });
             }
         });
     };
@@ -43,24 +112,25 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({ thread: initialThread })
             radius={0}
         >
             <Group align="flex-start" wrap="nowrap" gap="md">
-                <Stack align="center" gap={4} className="h-full">
-                    <Avatar
+                <Stack align="center" gap={0} className="h-full">
+                    <UserAvatar
                         src={thread.tacGia.avatar}
-                        radius="xl"
-                        size="md"
-                        className="shadow-sm border border-zinc-100 dark:border-zinc-800"
+                        size={44}
+                        className="shadow-sm"
                     />
-                    <Box className="w-[1.5px] flex-1 bg-zinc-100 dark:bg-zinc-900 min-h-[40px] rounded-full" />
                 </Stack>
 
-                <Stack gap={4} className="flex-1">
-                    <Group justify="space-between" align="center">
-                        <Text fw={800} size="sm" className="text-zinc-900 dark:text-zinc-100 tracking-tight hover:underline cursor-pointer">
-                            {thread.tacGia.taiKhoan}
-                        </Text>
-                        <Text size="xs" c="dimmed" fw={600} className="tracking-tighter">
-                            {dayjs(thread.ngayTao).fromNow()}
-                        </Text>
+                <Stack gap={6} className="flex-1">
+                    <Group justify="space-between" align="center" mb={2}>
+                        <Group gap="xs">
+                            <Text fw={700} size="sm" className="text-zinc-900 dark:text-zinc-100 tracking-tight hover:underline cursor-pointer">
+                                {thread.tacGia.taiKhoan}
+                            </Text>
+                            <Text size="xs" c="dimmed">•</Text>
+                            <Text size="xs" c="dimmed" fw={500} className="tracking-tight">
+                                {formatTimeAgo(thread.ngayTao)}
+                            </Text>
+                        </Group>
                     </Group>
 
                     <Text size="sm" className="text-zinc-600 dark:text-zinc-400 leading-relaxed font-medium">
@@ -77,14 +147,14 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({ thread: initialThread })
                         <Group gap={4} className="group/action cursor-pointer" onClick={handleLike}>
                             <ActionIcon
                                 variant="subtle"
-                                color={thread.liked ? 'rose' : 'gray'}
+                                color={thread.liked ? 'red' : 'gray'}
                                 size="lg"
                                 radius="xl"
-                                className={`transition-all ${thread.liked ? 'text-rose-500 bg-rose-50/50 dark:bg-rose-500/10' : 'group-hover/action:bg-rose-50 group-hover/action:text-rose-500'}`}
+                                className={`transition-all duration-300 ${thread.liked ? 'text-red-600 bg-red-50/80 dark:bg-red-500/10 scale-110' : 'group-hover/action:bg-red-50/50 group-hover/action:text-red-500'}`}
                             >
-                                {thread.liked ? <IconHeartFilled size={18} stroke={2} /> : <IconHeart size={18} stroke={2} />}
+                                {thread.liked ? <IconHeartFilled size={20} /> : <IconHeart size={20} stroke={2.2} />}
                             </ActionIcon>
-                            <Text size="xs" fw={800} className={`tracking-tighter ${thread.liked ? 'text-rose-600' : 'text-zinc-400 group-hover/action:text-rose-500'}`}>
+                            <Text size="xs" fw={800} className={`tracking-tighter transition-colors ${thread.liked ? 'text-red-600 font-bold' : 'text-zinc-400 group-hover/action:text-red-500'}`}>
                                 {thread._count.likes > 0 && thread._count.likes}
                             </Text>
                         </Group>

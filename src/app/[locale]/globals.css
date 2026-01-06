@@ -52,19 +52,24 @@ html,
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-be-vietnam-pro), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-family: var(--font-be-vietnam), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
 
   height: 100%;
   width: 100%;
   overflow: hidden;
-  /* Prevent body scrolling to fix status bar bounce */
-  overscroll-behavior-y: none;
+  
+  /* Proper Native App Behaviors */
+  overscroll-behavior: none;
+  -webkit-overflow-scrolling: touch;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
 
   /* Support for notch/safe areas */
   padding-bottom: env(safe-area-inset-bottom);
   padding-top: env(safe-area-inset-top);
-
-  user-select: none;
 }
 
 /* Main scrollable area */

@@ -2,29 +2,34 @@
 
 import { useParams } from "next/navigation";
 import { Box, Title, Stack, Text, Avatar, Group, Button, Tabs, Center, Loader, Badge, Divider, Container, Menu, ActionIcon, Grid } from "@mantine/core";
-import { IconDots, IconBrandInstagram, IconLink, IconShare, IconUserPlus, IconUserCheck, IconMessage, IconWorld } from "@tabler/icons-react";
+import { IconDots, IconBrandInstagram, IconLink, IconShare, IconUserPlus, IconUserCheck, IconMessage, IconWorld, IconSettings } from "@tabler/icons-react";
 import { AppQuery } from "@/api/AppQuery";
 import { AppMutation } from "@/api/AppMutation";
 import { ThreadFeed } from "@/feauture/social/components/ThreadFeed";
-import { CreateThread } from "@/feauture/social/components/CreateThread";
+
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
 import { useAppStore } from "@/providers/store/useAppStore";
 import { useState } from "react";
 import { EditProfileModal } from "@/feauture/social/components/EditProfileModal";
 import { usePathname } from "@/i18n/routing";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { UserAvatar } from "@/feauture/social/components/UserAvatar";
+import { UnstyledButton } from "@mantine/core";
+import { SettingsDrawer } from "@/feauture/social/components/chat/SettingsDrawer";
+import { BrandLoader } from "@/shared/components/BrandLoader";
 
 export default function UserProfilePage() {
     const params = useParams();
     const id = Number(params.id);
     const pathname = usePathname();
-    const locale = pathname.split('/')[1];
+    const locale = useLocale();
     const t = useTranslations('profile');
 
-    const { user } = useAppStore();
+    const { user, logout } = useAppStore();
     const isOwner = !!user?.id && user.id === id;
     const [editModalOpened, setEditModalOpened] = useState(false);
+    const [settingsOpened, setSettingsOpened] = useState(false);
 
     const { data: profile, isLoading: isLoadingProfile } = AppQuery.social.useSocialProfile(id);
     const { data: userThreads, isLoading: isLoadingThreads } = AppQuery.social.useUserThreads(id);
@@ -98,7 +103,7 @@ export default function UserProfilePage() {
     };
 
     if (isLoadingProfile) {
-        return <Center h="50vh"><Loader color="black" size="sm" /></Center>;
+        return <BrandLoader fullscreen />
     }
 
     if (!profile) {
@@ -129,23 +134,39 @@ export default function UserProfilePage() {
             {/* Header Section */}
             <Box py="md" px="md">
                 <Group justify="space-between" align="start" wrap="nowrap">
-                    <Stack gap={4} className="flex-1">
-                        <Title order={2} fw={700} className="text-3xl leading-none">
-                            {profile.hoTen || profile.taiKhoan}
-                        </Title>
+                    <Stack gap={2} className="flex-1">
+                        <Group gap="xs" align="center" wrap="nowrap">
+                            <Title order={2} fw={800} className="text-3xl tracking-tight leading-none">
+                                {profile.hoTen || profile.taiKhoan}
+                            </Title>
+                            <ActionIcon
+                                variant="subtle"
+                                color="gray"
+                                radius="full"
+                                onClick={handleShare}
+                                className="text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                            >
+                                <IconShare size={18} />
+                            </ActionIcon>
+                        </Group>
                         <Group gap={6} align="center">
                             <Text size="md" className="text-gray-900 dark:text-gray-100 font-medium">
                                 {profile.taiKhoan}
                             </Text>
-                            <Badge variant="light" color="gray" size="sm" radius="md" className="normal-case font-normal text-gray-500 bg-gray-100 dark:bg-zinc-800 dark:text-gray-400">
-                                threads.net
+                            <Badge
+                                variant="light"
+                                color="gray"
+                                size="sm"
+                                radius="md"
+                                className="normal-case font-normal text-gray-500 bg-gray-100 dark:bg-zinc-800 dark:text-gray-400 hidden"
+                            >
+                                NHers.net
                             </Badge>
                         </Group>
                     </Stack>
-                    <Avatar
+                    <UserAvatar
                         src={profile.avatar}
                         size={84}
-                        radius="full"
                         className="border border-gray-100 dark:border-zinc-800"
                     />
                 </Group>
@@ -196,9 +217,9 @@ export default function UserProfilePage() {
                                 variant="default"
                                 radius="md"
                                 className="border-gray-300 dark:border-zinc-700 font-semibold"
-                                onClick={handleShare}
+                                onClick={() => setSettingsOpened(true)}
                             >
-                                {t('share')}
+                                {t('settings')}
                             </Button>
                         </>
                     ) : (
@@ -211,14 +232,16 @@ export default function UserProfilePage() {
                             >
                                 {buttonProps.label}
                             </Button>
-                            <Button
-                                variant="default"
-                                radius="md"
-                                className="border-gray-300 dark:border-zinc-700 font-semibold"
-                                onClick={handleMessage}
-                            >
-                                {t('message')}
-                            </Button>
+                            {statusData?.status === 'FRIEND' && (
+                                <Button
+                                    variant="default"
+                                    radius="md"
+                                    className="border-gray-300 dark:border-zinc-700 font-semibold"
+                                    onClick={handleMessage}
+                                >
+                                    {t('message')}
+                                </Button>
+                            )}
                         </>
                     )}
                 </Group>
@@ -231,33 +254,38 @@ export default function UserProfilePage() {
                     classNames={{
                         root: "w-full",
                         list: "w-full border-b border-gray-200 dark:border-zinc-800",
-                        tab: "flex-1 font-semibold text-gray-500 data-[active=true]:text-black dark:data-[active=true]:text-white data-[active=true]:border-black dark:data-[active=true]:border-white border-b-2 border-transparent pb-3 hover:bg-transparent hover:text-black dark:hover:text-white transition-colors text-[15px]",
+                        tab: "flex-1 font-bold text-gray-400 dark:text-gray-500 data-[active=true]:text-black dark:data-[active=true]:text-white border-b border-transparent data-[active=true]:border-black dark:data-[active=true]:border-white pb-3 hover:bg-transparent transition-colors text-[15px]",
                         panel: "pt-4"
                     }}
                 >
                     <Tabs.List>
                         <Tabs.Tab value="threads">{t('posts')}</Tabs.Tab>
-                        <Tabs.Tab value="replies">{t('replies')}</Tabs.Tab>
                         <Tabs.Tab value="reposts">{t('reposts')}</Tabs.Tab>
                         <Tabs.Tab value="about">{t('about')}</Tabs.Tab>
                     </Tabs.List>
 
                     <Tabs.Panel value="threads" px={0}>
                         {isOwner && (
-                            <Box mb="md">
-                                <CreateThread
-                                    onPost={async (content, image) => {
-                                        // Handle post creation - you'll need to add this logic
-                                        console.log('Creating post:', content, image);
-                                    }}
-                                    placeholder={`Bài viết mới của ${profile.hoTen || profile.taiKhoan}...`}
-                                    compact={true}
-                                />
+                            <Box mb="md" px="md">
+                                <Group align="center" wrap="nowrap" gap="sm" className="py-2">
+                                    <UserAvatar src={user?.avatar} size={40} />
+                                    <UnstyledButton
+                                        className="flex-1 text-left"
+                                        onClick={() => router.push(`${pathname}?create=true`, { scroll: false })}
+                                    >
+                                        <Box className="bg-gray-50 dark:bg-zinc-900/50 hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors rounded-full px-4 py-2.5 cursor-text">
+                                            <Text size="sm" c="dimmed" fw={400} className="text-gray-400 dark:text-gray-500">
+                                                {t('start_thread')}
+                                            </Text>
+                                        </Box>
+                                    </UnstyledButton>
+                                </Group>
+                                <Divider color="gray.1" className="dark:border-zinc-800 mt-2" />
                             </Box>
                         )}
 
                         {isLoadingThreads ? (
-                            <Center py={40}><Loader color="black" size="sm" /></Center>
+                            <BrandLoader size="sm" minHeight={200} />
                         ) : userThreads && userThreads.length > 0 ? (
                             <ThreadFeed threads={userThreads} />
                         ) : (
@@ -315,11 +343,22 @@ export default function UserProfilePage() {
             </Box>
 
             {isOwner && (
-                <EditProfileModal
-                    opened={editModalOpened}
-                    onClose={() => setEditModalOpened(false)}
-                    profile={profile}
-                />
+                <>
+                    <EditProfileModal
+                        opened={editModalOpened}
+                        onClose={() => setEditModalOpened(false)}
+                        profile={profile}
+                    />
+                    <SettingsDrawer
+                        opened={settingsOpened}
+                        onClose={() => setSettingsOpened(false)}
+                        user={user}
+                        onLogout={() => {
+                            logout();
+                            router.push(`/${locale}/login`);
+                        }}
+                    />
+                </>
             )}
         </Container>
     );

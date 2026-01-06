@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "@/i18n/routing";
 import { useSearchParams } from "next/navigation";
 import { useAppStore } from "@/providers/store/useAppStore";
-import { Loading } from "@/shared/components/Loading";
+import { BrandLoader } from "@/shared/components/BrandLoader";
 import { notifications } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons-react";
 
@@ -64,5 +64,5 @@ export default function AuthCallbackPage() {
         }
     }, [searchParams, setToken, router]);
 
-    return <Loading fullScreen message="Đang xác thực" />;
+    return <BrandLoader fullscreen message="Đang xác thực..." />;
 }

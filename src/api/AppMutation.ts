@@ -305,16 +305,18 @@ export const AppMutation = () => {
             useSendRequest: (id: number) => useAppMutation<"sendFriendRequest">({
                 url: { baseUrl: "/friends/request/:id", urlParams: { id } },
                 onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/social/friend-requests/sent"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/friends/status", id] as any });
                     queryClient.invalidateQueries({ queryKey: ["/friends"] as any });
-                    queryClient.invalidateQueries({ queryKey: ["/social/friend-requests"] as any });
                 }
             }),
             useHandleRequest: (id: number) => useAppMutation<"handleFriendRequest">({
                 url: { baseUrl: "/friends/request/:id", urlParams: { id } },
                 method: "PUT",
                 onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/social/friend-requests/received"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/social/friend-requests/sent"] as any });
                     queryClient.invalidateQueries({ queryKey: ["/friends"] as any });
-                    queryClient.invalidateQueries({ queryKey: ["/social/friend-requests"] as any });
                 }
             }),
             useUnfriend: (id: number) => useAppMutation<"unfriend">({
@@ -322,6 +324,7 @@ export const AppMutation = () => {
                 method: "DELETE",
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["/friends"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/friends/status", id] as any });
                 }
             }),
         },

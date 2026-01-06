@@ -1,14 +1,11 @@
 "use client";
 
 import { SocialLayout } from "@/feauture/social/layouts/SocialLayout";
-import { withAuth } from "@/shared/hocs/withAuth";
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+export default function Layout({ children }: { children: React.ReactNode }) {
     return (
         <SocialLayout>
             {children}
         </SocialLayout>
     );
-};
-
-export default withAuth(Layout);
+}

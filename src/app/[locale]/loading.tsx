@@ -1,7 +1,5 @@
-"use client";
-
-import { Loading } from "@/shared/components/Loading";
+import { BrandLoader } from "@/shared/components/BrandLoader";
 
 export default function LoadingPage() {
-    return <Loading fullScreen />;
+    return <BrandLoader fullscreen />;
 }
