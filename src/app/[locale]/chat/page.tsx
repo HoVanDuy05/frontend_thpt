@@ -17,12 +17,14 @@ import { useAppMutation } from "@/api/hooks/useAppMutation";
 import { notifications } from "@mantine/notifications";
 import { useSocket } from "@/shared/hooks/useSocket";
 import { useMediaQuery } from "@mantine/hooks";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function ChatPage() {
     const { data: channels, isLoading: isLoadingChannels, refetch: refetchChannels } = AppQuery.chat.useChannels();
     const { data: friends, isLoading: isLoadingFriends } = AppQuery.friends.useList();
     const { user } = useAppStore();
     const { on, off, emit, isConnected } = useSocket();
+    const queryClient = useQueryClient();
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
@@ -147,7 +149,37 @@ export default function ChatPage() {
         const handleNewMessage = (message: any) => {
             const channelId = message?.kenhChatId;
             if (!channelId) return;
+
+            // Optimistically update channel list to move to top and update preview
+            queryClient.setQueriesData({
+                predicate: (query) => query.queryKey?.[0] === '/communication/chat/channels',
+            }, (oldData: any) => {
+                if (!Array.isArray(oldData)) return oldData;
+
+                let found = false;
+                const nextData = oldData.map((item: any) => {
+                    const ch = item.kenhChat || item;
+                    if (ch.id === channelId) {
+                        found = true;
+                        const updatedChannel = {
+                            ...ch,
+                            tinNhans: [message],
+                            updatedAt: new Date().toISOString()
+                        };
+                        return item.kenhChat ? { ...item, kenhChat: updatedChannel } : updatedChannel;
+                    }
+                    return item;
+                });
+
+                // If not found (new channel), refetching is safer, but normally it should be there
+                if (!found) refetchChannels();
+
+                return nextData;
+            });
+
+            // Fallback: sync with server
             refetchChannels();
+
             if (selectedChannelId !== channelId && message?.nguoiGuiId !== user?.id) {
                 setUnreadChannelIds((prev) => {
                     const next = new Set(prev);
@@ -158,7 +190,7 @@ export default function ChatPage() {
         };
         on('message:new', handleNewMessage);
         return () => off('message:new', handleNewMessage);
-    }, [isConnected, on, off, refetchChannels, selectedChannelId, user?.id]);
+    }, [isConnected, on, off, refetchChannels, selectedChannelId, user?.id, queryClient]);
 
     useEffect(() => {
         if (searchQueryData) setSearchResults(searchQueryData);

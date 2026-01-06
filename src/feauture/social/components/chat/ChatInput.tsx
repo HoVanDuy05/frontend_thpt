@@ -5,6 +5,8 @@ import {
     IconMoodSmile,
     IconX,
     IconThumbUp,
+    IconPlus,
+    IconPhoto,
 } from "@tabler/icons-react";
 import { useState, useRef, useEffect } from "react";
 import { useAppMutation } from "@/api/hooks/useAppMutation";
@@ -199,13 +201,13 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
                     {!isActive ? (
                         <div className="flex items-center gap-0.5 animate-in fade-in slide-in-from-left-2 duration-300">
                             <ActionIcon variant="subtle" radius="xl" size="lg" className="hover:bg-gray-100 dark:hover:bg-white/10 text-[#0084FF]">
-                                <IconPaperclip size={24} stroke={2.5} />
+                                <IconPlus size={24} stroke={2.5} />
                             </ActionIcon>
                             <ActionIcon variant="subtle" radius="xl" size="lg" onClick={handleImageClick} className="hover:bg-gray-100 dark:hover:bg-white/10 text-[#0084FF]">
-                                <IconPaperclip size={24} stroke={2.5} />
+                                <IconPhoto size={24} stroke={2.5} />
                             </ActionIcon>
                             <ActionIcon variant="subtle" radius="xl" size="lg" className="hover:bg-gray-100 dark:hover:bg-white/10 text-[#0084FF]">
-                                <IconPaperclip size={24} stroke={2.5} />
+                                <IconMoodSmile size={24} stroke={2.5} />
                             </ActionIcon>
                         </div>
                     ) : (

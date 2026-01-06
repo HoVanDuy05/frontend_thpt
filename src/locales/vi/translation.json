@@ -518,9 +518,10 @@
     "student": {
         "nav": {
             "home": "Trang chủ",
-            "search": "Tìm kiếm",
-            "create": "Tạo mới",
-            "activity": "Hoạt động",
+            "schedule": "Lịch học",
+            "grades": "Kết quả",
+            "social": "Mạng xã hội",
+            "flow": "Quy trình",
             "profile": "Cá nhân"
         },
         "home": {

@@ -30,8 +30,8 @@ self.addEventListener('fetch', (event) => {
     const { request } = event;
     const url = new URL(request.url);
 
-    // Skip API, non-GET, and non-same-origin (except some CDNs if needed)
-    if (url.pathname.startsWith('/api') || request.method !== 'GET' || url.origin !== self.location.origin) {
+    // Skip API, socket.io, non-GET, and non-same-origin
+    if (url.pathname.startsWith('/api') || url.pathname.includes('socket.io') || request.method !== 'GET' || url.origin !== self.location.origin) {
         return;
     }
 

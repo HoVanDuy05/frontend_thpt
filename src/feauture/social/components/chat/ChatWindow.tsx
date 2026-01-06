@@ -75,29 +75,42 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
 
             // Notify if window not focused and not from me
             if (!isFromMe && document.visibilityState !== 'visible' && Notification.permission === "granted") {
-                new Notification(t('new_message_from', { name: targetUser?.hoTen || targetUser?.taiKhoan || t('key_fallback_user') }), { // key_fallback_user not defined, use 'you' or custom
+                new Notification(t('new_message_from', { name: targetUser?.hoTen || targetUser?.taiKhoan || 'User' }), {
                     body: message.loai === 'VAN_BAN' ? message.noiDung : t('sent_attachment'),
                     icon: targetUser?.avatar || '/icon.png'
                 });
             }
 
             // If message is from other user, acknowledge delivered (realtime)
-            if (message?.nguoiGuiId && Number(message.nguoiGuiId) !== Number(user?.id) && message?.id) {
+            if (message?.nguoiGuiId && !isFromMe && message?.id) {
                 emit('message:delivered', { channelId: channel.id, messageId: message.id });
             }
 
+            // Update local state directly for immediate UI feedback
+            setAllMessages(prev => {
+                // Check if this message ID already exists (real message already arrived)
+                if (prev.some(m => m.id === message.id)) return prev;
+
+                // Deduplicate optimistic messages for 'me'
+                if (isFromMe) {
+                    const optimisticIdx = prev.findIndex(m => m.id < 0 && (m.noiDung === message.noiDung || m.duongDanTep === message.duongDanTep));
+                    if (optimisticIdx !== -1) {
+                        const next = [...prev];
+                        next[optimisticIdx] = message;
+                        return next.sort((a, b) => new Date(a.ngayGui).getTime() - new Date(b.ngayGui).getTime());
+                    }
+                }
+
+                const updated = [...prev, message];
+                return updated.sort((a, b) => new Date(a.ngayGui).getTime() - new Date(b.ngayGui).getTime());
+            });
+
+            // Invalidate queries to sync with other windows/tabs
             queryClient.invalidateQueries({
                 predicate: (query) => {
                     const key = query.queryKey?.[0];
                     return typeof key === 'string' && key.startsWith(`/communication/chat/channels/${channel.id}/messages`);
                 }
-            });
-
-            // Update local state directly for immediate UI feedback
-            setAllMessages(prev => {
-                if (prev.some(m => m.id === message.id)) return prev;
-                const updated = [...prev, message];
-                return updated.sort((a, b) => new Date(a.ngayGui).getTime() - new Date(b.ngayGui).getTime());
             });
         };
 
@@ -199,20 +212,21 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
         if (isLoading || allMessages.length === 0) return;
 
         if (firstLoadRef.current) {
-            scrollToBottom('auto');
-            const delays = [100, 300, 600];
-            const timers = delays.map(delay => setTimeout(() => {
+            // Consolidated scroll on mount to avoid forced reflows
+            const timer = setTimeout(() => {
                 scrollToBottom('auto');
-                if (delay === 600) firstLoadRef.current = false;
-            }, delay));
-            return () => timers.forEach(clearTimeout);
+                firstLoadRef.current = false;
+            }, 100);
+            return () => clearTimeout(timer);
         } else if (page === 1) {
-            // Check if last message is from me for instant scroll
             const lastMsg = allMessages[allMessages.length - 1];
             const isMe = Number(lastMsg?.nguoiGuiId) === Number(user?.id);
-            scrollToBottom(isMe ? 'auto' : 'smooth');
+            // Non-blocking smooth scroll
+            requestAnimationFrame(() => {
+                scrollToBottom(isMe ? 'auto' : 'smooth');
+            });
         }
-    }, [allMessages, channel.id, isLoading, page, user?.id]);
+    }, [allMessages.length, channel.id, isLoading, page, user?.id]);
 
     // Handle typing indicator
     const handleTyping = () => {

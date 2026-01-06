@@ -30,8 +30,10 @@ export function useSocket() {
                 },
                 transports: ['websocket', 'polling'],
                 reconnection: true,
-                reconnectionAttempts: 5,
+                reconnectionAttempts: Infinity, // Keep trying on mobile
                 reconnectionDelay: 1000,
+                reconnectionDelayMax: 5000,
+                timeout: 20000,
             });
 
             socketInstance.on('connect', () => {
@@ -39,9 +41,10 @@ export function useSocket() {
                 setIsConnected(true);
             });
 
-            socketInstance.on('disconnect', () => {
-                console.log('Socket disconnected');
+            socketInstance.on('disconnect', (reason) => {
+                console.log('Socket disconnected:', reason);
                 setIsConnected(false);
+                // If disconnected by logic, don't auto reconnect here, but io() handles it
             });
 
             socketInstance.on('connect_error', (error) => {
@@ -50,19 +53,21 @@ export function useSocket() {
             });
         } else {
             setIsConnected(socketInstance.connected);
-
-            // Re-bind listeners just in case
-            const handleConnect = () => setIsConnected(true);
-            const handleDisconnect = () => setIsConnected(false);
-
-            socketInstance.on('connect', handleConnect);
-            socketInstance.on('disconnect', handleDisconnect);
-
-            return () => {
-                socketInstance?.off('connect', handleConnect);
-                socketInstance?.off('disconnect', handleDisconnect);
-            };
         }
+
+        // Handle visibility change for mobile (reconnect when app is foregrounded)
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible' && socketInstance && !socketInstance.connected) {
+                console.log('App foregrounded, reconnecting socket...');
+                socketInstance.connect();
+            }
+        };
+
+        window.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            window.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
     }, [token]);
 
     const emit = (event: string, data: any) => {

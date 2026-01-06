@@ -103,13 +103,31 @@
         "time": {
             "just_now": "just now",
             "seconds": "{count}s",
-            "minutes": "{count}minutes",
-            "hours": "{count}hours",
-            "days": "{count}days",
-            "weeks": "{count}weeks",
-            "months": "{count}months",
-            "years": "{count}years",
+            "minutes": "{count}m",
+            "hours": "{count}h",
+            "days": "{count}d",
+            "weeks": "{count}w",
+            "months": "{count}mo",
+            "years": "{count}y",
             "suffix": "ago"
+        },
+        "activity": {
+            "title": "Activities",
+            "tabs": {
+                "all": "All",
+                "follows": "Follows",
+                "replies": "Replies",
+                "likes": "Likes"
+            },
+            "types": {
+                "follow": "started following you",
+                "like": "liked your thread",
+                "reply": "replied to you"
+            },
+            "empty": "No activities yet",
+            "no_followers": "No new followers",
+            "no_replies": "No replies yet",
+            "no_likes": "No likes yet"
         },
         "friends": {
             "title": "Friend Requests",
