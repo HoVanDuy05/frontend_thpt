@@ -66,17 +66,6 @@ export default async function RootLayout({
 
         {/* iOS Splash Screens - simplified approach */}
         <link rel="apple-touch-startup-image" href="/apple-touch-icon.png" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js');
-                });
-              }
-            `,
-          }}
-        />
       </head>
       <body
         className={`${beVietnamPro.variable} antialiased`}

@@ -13,7 +13,7 @@ self.addEventListener('install', (event) => {
             return cache.addAll(ASSETS_TO_CACHE);
         })
     );
-    self.skipWaiting();
+    /* self.skipWaiting(); Removed to support manual update UI */
 });
 
 self.addEventListener('activate', (event) => {
@@ -50,4 +50,10 @@ self.addEventListener('fetch', (event) => {
             });
         })
     );
+});
+
+self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 });
