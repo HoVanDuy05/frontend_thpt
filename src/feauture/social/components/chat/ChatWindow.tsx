@@ -97,20 +97,17 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                     if (optimisticIdx !== -1) {
                         const next = [...prev];
                         next[optimisticIdx] = message;
-                        return next.sort((a, b) => new Date(a.ngayGui).getTime() - new Date(b.ngayGui).getTime());
+                        return next.sort((a, b) => dayjs(a.ngayGui).valueOf() - dayjs(b.ngayGui).valueOf());
                     }
                 }
 
                 const updated = [...prev, message];
-                return updated.sort((a, b) => new Date(a.ngayGui).getTime() - new Date(b.ngayGui).getTime());
+                return updated.sort((a, b) => dayjs(a.ngayGui).valueOf() - dayjs(b.ngayGui).valueOf());
             });
 
             // Invalidate queries to sync with other windows/tabs
             queryClient.invalidateQueries({
-                predicate: (query) => {
-                    const key = query.queryKey?.[0];
-                    return typeof key === 'string' && key.startsWith(`/communication/chat/channels/${channel.id}/messages`);
-                }
+                queryKey: ["chat", "messages", channel.id] as any
             });
         };
 
@@ -164,7 +161,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                 const newMsgs = pageMessages.filter((m: any) => !existingIds.has(m.id));
                 const merged = [...prev, ...newMsgs];
                 // Sort by time (newest at bottom)
-                return merged.sort((a, b) => new Date(a.ngayGui).getTime() - new Date(b.ngayGui).getTime());
+                return merged.sort((a, b) => dayjs(a.ngayGui).valueOf() - dayjs(b.ngayGui).valueOf());
             });
         }
     }, [pageMessages, page]);

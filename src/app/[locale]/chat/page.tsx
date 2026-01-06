@@ -152,7 +152,7 @@ export default function ChatPage() {
 
             // Optimistically update channel list to move to top and update preview
             queryClient.setQueriesData({
-                predicate: (query) => query.queryKey?.[0] === '/communication/chat/channels',
+                queryKey: ["chat", "channels"] as any
             }, (oldData: any) => {
                 if (!Array.isArray(oldData)) return oldData;
 
@@ -192,11 +192,29 @@ export default function ChatPage() {
         return () => off('message:new', handleNewMessage);
     }, [isConnected, on, off, refetchChannels, selectedChannelId, user?.id, queryClient]);
 
+    const matchingFriends = useMemo(() => {
+        if (!newChatQuery.trim() || !friends) return [];
+        const q = newChatQuery.toLowerCase();
+        return friends.filter(f =>
+            (f.hoTen?.toLowerCase().includes(q)) ||
+            (f.taiKhoan?.toLowerCase().includes(q)) ||
+            (f.email?.toLowerCase().includes(q))
+        );
+    }, [newChatQuery, friends]);
+
     useEffect(() => {
-        if (searchQueryData) setSearchResults(searchQueryData);
-        else setSearchResults([]);
+        if (searchQueryData) {
+            // Merge matching friends and search results, avoiding duplicates
+            const friendIds = new Set(matchingFriends.map(f => f.id));
+            const otherResults = searchQueryData.filter((u: TUser) => !friendIds.has(u.id));
+            setSearchResults([...matchingFriends, ...otherResults]);
+        } else if (newChatQuery) {
+            setSearchResults(matchingFriends);
+        } else {
+            setSearchResults([]);
+        }
         setIsSearching(searchQueryLoading);
-    }, [searchQueryData, searchQueryLoading]);
+    }, [searchQueryData, searchQueryLoading, matchingFriends, newChatQuery]);
 
     const handleStartChat = async (targetUser: TUser) => {
         try {

@@ -16,6 +16,25 @@ interface UserSearchDrawerProps {
     onStartChat: (user: TUser) => void;
 }
 
+const UserItem = ({ user, onClick, fontStyle }: { user: TUser, onClick: () => void, fontStyle: any }) => (
+    <Group
+        wrap="nowrap"
+        p="sm"
+        className="cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-900 rounded-xl group"
+        onClick={onClick}
+    >
+        <Avatar src={user.avatar} size={48} radius="xl" className="group-hover:scale-105 transition-transform" />
+        <Stack gap={2} style={{ flex: 1, overflow: 'hidden' }}>
+            <Text size="sm" fw={600} className="text-gray-900 dark:text-gray-200" style={fontStyle}>
+                {user.hoTen || user.taiKhoan}
+            </Text>
+            <Text size="xs" c="dimmed" truncate style={fontStyle}>
+                {user.email || (user.vaiTro === 'HOC_SINH' ? 'Học sinh' : user.vaiTro)}
+            </Text>
+        </Stack>
+    </Group>
+);
+
 export const UserSearchDrawer = ({
     opened,
     onClose,
@@ -61,29 +80,35 @@ export const UserSearchDrawer = ({
                         {isSearching ? (
                             <Center py="xl"><Loader size="sm" color="indigo" /></Center>
                         ) : searchResults.length > 0 ? (
-                            searchResults.map((searchUser) => (
-                                <Group
-                                    key={searchUser.id}
-                                    wrap="nowrap"
-                                    p="sm"
-                                    className="cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-900 rounded-xl"
-                                    onClick={() => onStartChat(searchUser)}
-                                >
-                                    <Avatar
-                                        src={searchUser.avatar}
-                                        size={48}
-                                        radius="xl"
-                                    />
-                                    <Stack gap={2} style={{ flex: 1, overflow: 'hidden' }}>
-                                        <Text size="sm" fw={600} className="text-gray-900 dark:text-gray-200" style={fontStyle}>
-                                            {searchUser.hoTen || searchUser.taiKhoan}
-                                        </Text>
-                                        <Text size="xs" c="dimmed" truncate style={fontStyle}>
-                                            {searchUser.email}
-                                        </Text>
-                                    </Stack>
-                                </Group>
-                            ))
+                            <>
+                                {(() => {
+                                    const friendIds = new Set((friends || []).map(f => f.id));
+                                    const matchingFriends = searchResults.filter(u => friendIds.has(u.id));
+                                    const otherUsers = searchResults.filter(u => !friendIds.has(u.id));
+
+                                    return (
+                                        <>
+                                            {matchingFriends.length > 0 && (
+                                                <>
+                                                    <Text size="xs" c="indigo" px="xs" fw={700} mt="xs" mb={4}>{t('friends') || 'BẠN BÈ'}</Text>
+                                                    {matchingFriends.map((u) => (
+                                                        <UserItem key={u.id} user={u} onClick={() => onStartChat(u)} fontStyle={fontStyle} />
+                                                    ))}
+                                                </>
+                                            )}
+
+                                            {otherUsers.length > 0 && (
+                                                <>
+                                                    <Text size="xs" c="dimmed" px="xs" fw={700} mt="md" mb={4}>{t('others') || 'NGƯỜI DÙNG KHÁC'}</Text>
+                                                    {otherUsers.map((u) => (
+                                                        <UserItem key={u.id} user={u} onClick={() => onStartChat(u)} fontStyle={fontStyle} />
+                                                    ))}
+                                                </>
+                                            )}
+                                        </>
+                                    );
+                                })()}
+                            </>
                         ) : query ? (
                             <Center py="xl" className="flex-col gap-2 text-center text-gray-400">
                                 <Text size="sm">{t('user_not_found')}</Text>
@@ -96,23 +121,7 @@ export const UserSearchDrawer = ({
                                     <Center py="xl"><Loader size="sm" color="indigo" /></Center>
                                 ) : friends && friends.length > 0 ? (
                                     friends.map((f: any) => (
-                                        <Group
-                                            key={f.id}
-                                            wrap="nowrap"
-                                            p="sm"
-                                            className="cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-900 rounded-xl"
-                                            onClick={() => onStartChat(f)}
-                                        >
-                                            <Avatar src={f.avatar} size={48} radius="xl" />
-                                            <Stack gap={2} style={{ flex: 1, overflow: 'hidden' }}>
-                                                <Text size="sm" fw={600} className="text-gray-900 dark:text-gray-200" truncate style={fontStyle}>
-                                                    {f.hoTen || f.taiKhoan}
-                                                </Text>
-                                                <Text size="xs" c="dimmed" truncate style={fontStyle}>
-                                                    {f.email || 'Học sinh'}
-                                                </Text>
-                                            </Stack>
-                                        </Group>
+                                        <UserItem key={f.id} user={f} onClick={() => onStartChat(f)} fontStyle={fontStyle} />
                                     ))
                                 ) : (
                                     <Center py="xl" className="flex-col gap-2 text-center text-gray-400">

@@ -73,22 +73,27 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
         };
 
         // 2. Pre-update Cache (Optimistic)
-        const messageListKey = `/communication/chat/channels/${channelId}/messages`;
+        const chatMessagesKey = ["chat", "messages", channelId];
 
-        // Update Message List
+        // Update Message List (for all pages of this channel)
         queryClient.setQueriesData({
             predicate: (query) => {
-                const key = query.queryKey?.[0];
-                return typeof key === 'string' && key.startsWith(messageListKey);
+                const key = query.queryKey;
+                return Array.isArray(key) && key[0] === 'chat' && key[1] === 'messages' && key[2] === channelId;
             }
         }, (oldData: any) => {
             if (!Array.isArray(oldData)) return [optimisticMessage];
+            // If the API returns newest first, we should prepend. 
+            // If oldest first, we append.
+            // Based on ChatWindow's sort, we probably want oldest at start of array for the cache too, 
+            // but usually ChatWindow sorts everything itself. 
+            // Let's prepend to match the "newest first" pattern common in caches.
             return [optimisticMessage, ...oldData];
         });
 
         // Update Channel List Preview
         queryClient.setQueriesData({
-            predicate: (query) => query.queryKey?.[0] === '/communication/chat/channels',
+            queryKey: ["chat", "channels"] as any
         }, (oldData: any) => {
             if (!Array.isArray(oldData)) return oldData;
             const updateChannel = (ch: any) => {
@@ -114,8 +119,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
             // 4. Replace Optimistic Message with Real Message
             queryClient.setQueriesData({
                 predicate: (query) => {
-                    const key = query.queryKey?.[0];
-                    return typeof key === 'string' && key.startsWith(messageListKey);
+                    const key = query.queryKey;
+                    return Array.isArray(key) && key[0] === 'chat' && key[1] === 'messages' && key[2] === channelId;
                 }
             }, (oldData: any) => {
                 if (!Array.isArray(oldData)) return oldData;
@@ -123,15 +128,15 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
             });
 
             // Re-sync channel list to be sure
-            queryClient.invalidateQueries({ queryKey: ['/communication/chat/channels'] as any });
+            queryClient.invalidateQueries({ queryKey: ["chat", "channels"] as any });
         } catch (error: any) {
             console.error('Failed to send message:', error);
 
             // 5. Rollback Cache on Error
             queryClient.setQueriesData({
                 predicate: (query) => {
-                    const key = query.queryKey?.[0];
-                    return typeof key === 'string' && key.startsWith(messageListKey);
+                    const key = query.queryKey;
+                    return Array.isArray(key) && key[0] === 'chat' && key[1] === 'messages' && key[2] === channelId;
                 }
             }, (oldData: any) => {
                 if (!Array.isArray(oldData)) return oldData;

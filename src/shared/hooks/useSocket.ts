@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAppStore } from "@/providers/store/useAppStore";
 
@@ -30,32 +30,33 @@ export function useSocket() {
                 },
                 transports: ['websocket', 'polling'],
                 reconnection: true,
-                reconnectionAttempts: Infinity, // Keep trying on mobile
+                reconnectionAttempts: Infinity,
                 reconnectionDelay: 1000,
                 reconnectionDelayMax: 5000,
                 timeout: 20000,
             });
-
-            socketInstance.on('connect', () => {
-                console.log('Socket connected:', socketInstance?.id);
-                setIsConnected(true);
-            });
-
-            socketInstance.on('disconnect', (reason) => {
-                console.log('Socket disconnected:', reason);
-                setIsConnected(false);
-                // If disconnected by logic, don't auto reconnect here, but io() handles it
-            });
-
-            socketInstance.on('connect_error', (error) => {
-                console.error('Socket connection error:', error);
-                setIsConnected(false);
-            });
-        } else {
-            setIsConnected(socketInstance.connected);
         }
 
-        // Handle visibility change for mobile (reconnect when app is foregrounded)
+        // Update local state to match instance
+        setIsConnected(socketInstance.connected);
+
+        const handleConnect = () => {
+            console.log('Socket connected:', socketInstance?.id);
+            setIsConnected(true);
+        };
+        const handleDisconnect = (reason: string) => {
+            console.log('Socket disconnected:', reason);
+            setIsConnected(false);
+        };
+        const handleConnectError = (error: any) => {
+            console.error('Socket connection error:', error);
+            setIsConnected(false);
+        };
+
+        socketInstance.on('connect', handleConnect);
+        socketInstance.on('disconnect', handleDisconnect);
+        socketInstance.on('connect_error', handleConnectError);
+
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible' && socketInstance && !socketInstance.connected) {
                 console.log('App foregrounded, reconnecting socket...');
@@ -66,6 +67,9 @@ export function useSocket() {
         window.addEventListener('visibilitychange', handleVisibilityChange);
 
         return () => {
+            socketInstance?.off('connect', handleConnect);
+            socketInstance?.off('disconnect', handleDisconnect);
+            socketInstance?.off('connect_error', handleConnectError);
             window.removeEventListener('visibilitychange', handleVisibilityChange);
         };
     }, [token]);

@@ -1,4 +1,4 @@
-import { IconWorld, IconSmartHome, IconSearch, IconPlus } from "@tabler/icons-react";
+import { IconWorld, IconSmartHome, IconSearch, IconPlus, IconMessagePlus } from "@tabler/icons-react";
 import { useMantineColorScheme, TextInput, Box, Group, ActionIcon, UnstyledButton, Avatar, Text, ScrollArea, Stack, Center, Loader } from "@mantine/core";
 import { TChannel } from "@/api/types/api.type";
 import { TUser } from "@/shared/types/user.type";
@@ -100,6 +100,17 @@ export const ChatSidebar = ({
                     </ActionIcon>
                     <ActionIcon
                         variant="subtle"
+                        color="indigo"
+                        radius="xl"
+                        size="lg"
+                        className="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50"
+                        onClick={onShowSearch}
+                        title={t('new_message')}
+                    >
+                        <IconMessagePlus size={20} />
+                    </ActionIcon>
+                    <ActionIcon
+                        variant="subtle"
                         color="gray"
                         radius="xl"
                         size="lg"
@@ -129,11 +140,11 @@ export const ChatSidebar = ({
                     radius="xl"
                     size="md"
                     variant="filled"
+                    readOnly
+                    onClick={onShowSearch}
                     classNames={{
-                        input: "bg-[#F0F2F5] dark:bg-[#3A3B3C] border-none text-[15px] focus:bg-gray-200 dark:focus:bg-[#4E4F50] transition-colors"
+                        input: "bg-[#F0F2F5] dark:bg-[#3A3B3C] border-none text-[15px] cursor-pointer hover:bg-gray-200 dark:hover:bg-[#4E4F50] transition-colors"
                     }}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.currentTarget.value)}
                 />
             </Box>
 

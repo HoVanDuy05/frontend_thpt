@@ -57,7 +57,7 @@ body {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  
+
   /* Proper Native App Behaviors */
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
@@ -65,7 +65,8 @@ body {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
-  touch-action: manipulation;
+  touch-action: pan-x pan-y;
+  -webkit-text-size-adjust: 100%;
 
   /* Support for notch/safe areas */
   padding-bottom: env(safe-area-inset-bottom);
