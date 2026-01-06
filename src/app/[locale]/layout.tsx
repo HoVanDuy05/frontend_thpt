@@ -51,7 +51,6 @@ export default async function RootLayout({
       <head>
         <ColorSchemeScript defaultColorScheme="auto" />
         <link rel="manifest" href="/manifest.json" />
-        <link rel="manifest" href="/manifest.json" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -66,6 +65,28 @@ export default async function RootLayout({
 
         {/* iOS Splash Screens - simplified approach */}
         <link rel="apple-touch-startup-image" href="/apple-touch-icon.png" />
+
+        {/* Strict Anti-Zoom Script */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              document.addEventListener('touchstart', function(event) {
+                if (event.touches.length > 1) {
+                  event.preventDefault();
+                }
+              }, { passive: false });
+              
+              let lastTouchEnd = 0;
+              document.addEventListener('touchend', function(event) {
+                const now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                  event.preventDefault();
+                }
+                lastTouchEnd = now;
+              }, false);
+            `,
+          }}
+        />
       </head>
       <body
         className={`${beVietnamPro.variable} antialiased`}

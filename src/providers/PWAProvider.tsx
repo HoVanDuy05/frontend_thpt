@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 import { notifications } from "@mantine/notifications";
-import { Button, Group, Text } from "@mantine/core";
+import { Button, Group, Text, Stack } from "@mantine/core";
 import { IconDownload, IconRefresh } from "@tabler/icons-react";
 
 interface PWAContextType {
@@ -11,6 +11,8 @@ interface PWAContextType {
     installApp: () => Promise<void>;
     updateAvailable: boolean;
     applyUpdate: () => void;
+    notificationPermission: NotificationPermission;
+    requestNotificationPermission: () => Promise<boolean>;
 }
 
 const PWAContext = createContext<PWAContextType | undefined>(undefined);
@@ -21,28 +23,34 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
     const [isInstalled, setIsInstalled] = useState(false);
     const [updateAvailable, setUpdateAvailable] = useState(false);
     const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(null);
+    const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(
+        typeof window !== 'undefined' ? Notification.permission : 'default'
+    );
 
     useEffect(() => {
         // Check if already installed
-        if (window.matchMedia("(display-mode: standalone)").matches) {
+        if (typeof window !== 'undefined' && window.matchMedia("(display-mode: standalone)").matches) {
             setIsInstalled(true);
         }
 
-        window.addEventListener("beforeinstallprompt", (e) => {
+        const handleBeforeInstallPrompt = (e: any) => {
             e.preventDefault();
             setDeferredPrompt(e);
             setIsInstallable(true);
-        });
+        };
 
-        window.addEventListener("appinstalled", () => {
+        const handleAppInstalled = () => {
             setDeferredPrompt(null);
             setIsInstallable(false);
             setIsInstalled(true);
             console.log("PWA was installed");
-        });
+        };
+
+        window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+        window.addEventListener("appinstalled", handleAppInstalled);
 
         // Service Worker Registration and Update Logic
-        if ("serviceWorker" in navigator) {
+        if (typeof window !== 'undefined' && "serviceWorker" in navigator) {
             navigator.serviceWorker.register("/sw.js").then((reg) => {
                 setRegistration(reg);
 
@@ -54,6 +62,17 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
                                 // New version available!
                                 setUpdateAvailable(true);
                                 showUpdateNotification(reg);
+
+                                // Show native notification if allowed
+                                if (Notification.permission === 'granted') {
+                                    const options: any = {
+                                        body: 'Nhấn để cập nhật ngay.',
+                                        icon: '/icons/icon-192x192.png',
+                                        tag: 'pwa-update',
+                                        renotify: true
+                                    };
+                                    reg.showNotification('Phiên bản mới đã sẵn sàng!', options);
+                                }
                             }
                         });
                     }
@@ -68,6 +87,11 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
                 }
             });
         }
+
+        return () => {
+            window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+            window.removeEventListener("appinstalled", handleAppInstalled);
+        };
     }, []);
 
     const showUpdateNotification = (reg: ServiceWorkerRegistration) => {
@@ -102,6 +126,19 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
         });
     };
 
+    const requestNotificationPermission = async () => {
+        if (!("Notification" in window)) return false;
+
+        try {
+            const permission = await Notification.requestPermission();
+            setNotificationPermission(permission);
+            return permission === 'granted';
+        } catch (error) {
+            console.error("Error requesting notification permission:", error);
+            return false;
+        }
+    };
+
     const installApp = async () => {
         if (!deferredPrompt) return;
         deferredPrompt.prompt();
@@ -118,13 +155,19 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <PWAContext.Provider value={{ isInstallable, isInstalled, installApp, updateAvailable, applyUpdate }}>
+        <PWAContext.Provider value={{
+            isInstallable,
+            isInstalled,
+            installApp,
+            updateAvailable,
+            applyUpdate,
+            notificationPermission,
+            requestNotificationPermission
+        }}>
             {children}
         </PWAContext.Provider>
     );
 }
-
-import { Stack } from "@mantine/core";
 
 export const usePWA = () => {
     const context = useContext(PWAContext);

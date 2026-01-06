@@ -37,8 +37,12 @@ export function useSocket() {
             });
         }
 
+        if (socketInstance && !socketInstance.connected) {
+            socketInstance.connect();
+        }
+
         // Update local state to match instance
-        setIsConnected(socketInstance.connected);
+        setIsConnected(socketInstance?.connected || false);
 
         const handleConnect = () => {
             console.log('Socket connected:', socketInstance?.id);

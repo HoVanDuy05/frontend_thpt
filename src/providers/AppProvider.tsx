@@ -4,10 +4,11 @@ import { MantineProvider, createTheme, rem } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NavigationProgress } from "@mantine/nprogress";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { NextIntlClientProvider, AbstractIntlMessages } from "next-intl";
 import { SplashScreen } from "@/shared/components/SplashScreen";
 import { PWAProvider } from "@/providers/PWAProvider";
+import { GlobalSocketHandler } from "@/shared/components/GlobalSocketHandler";
 import "@mantine/nprogress/styles.css";
 
 interface AppProviderProps {
@@ -147,6 +148,9 @@ export function AppProvider({ children, messages, locale }: AppProviderProps) {
                     <Notifications position="top-right" zIndex={1000} />
                     <SplashScreen />
                     <PWAProvider>
+                        <Suspense fallback={null}>
+                            <GlobalSocketHandler />
+                        </Suspense>
                         {children}
                     </PWAProvider>
                 </MantineProvider>

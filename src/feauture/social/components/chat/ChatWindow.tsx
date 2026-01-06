@@ -74,12 +74,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
             const isFromMe = Number(message?.nguoiGuiId) === Number(user?.id);
 
             // Notify if window not focused and not from me
-            if (!isFromMe && document.visibilityState !== 'visible' && Notification.permission === "granted") {
-                new Notification(t('new_message_from', { name: targetUser?.hoTen || targetUser?.taiKhoan || 'User' }), {
-                    body: message.loai === 'VAN_BAN' ? message.noiDung : t('sent_attachment'),
-                    icon: targetUser?.avatar || '/icon.png'
-                });
-            }
+            /* Handled globally by GlobalSocketHandler */
 
             // If message is from other user, acknowledge delivered (realtime)
             if (message?.nguoiGuiId && !isFromMe && message?.id) {

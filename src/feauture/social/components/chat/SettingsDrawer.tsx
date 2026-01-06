@@ -4,6 +4,7 @@ import { useMediaQuery } from "@mantine/hooks";
 import { TUser } from "@/shared/types/user.type";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "@/i18n/routing";
+import { usePWA } from "@/providers/PWAProvider";
 
 interface SettingsDrawerProps {
     opened: boolean;
@@ -20,6 +21,7 @@ export const SettingsDrawer = ({ opened, onClose, user, onLogout }: SettingsDraw
     const locale = useLocale();
     const router = useRouter();
     const pathname = usePathname();
+    const { notificationPermission, requestNotificationPermission } = usePWA();
 
     // Explicitly enforce the font family
     const fontStyle = { fontFamily: 'var(--font-be-vietnam), sans-serif' };
@@ -108,11 +110,23 @@ export const SettingsDrawer = ({ opened, onClose, user, onLogout }: SettingsDraw
                                     label={t('settings.privacy_security')}
                                     color="#42B72A"
                                 />
-                                <SettingsItem
-                                    icon={<IconBell size={20} />}
-                                    label={t('settings.notifications')}
-                                    color="#F02849"
-                                />
+                                <UnstyledButton
+                                    onClick={requestNotificationPermission}
+                                    className="w-full h-14 px-3 flex items-center justify-between hover:bg-black/5 dark:hover:bg-white/5 rounded-2xl transition-all"
+                                >
+                                    <Group gap="md">
+                                        <div className="w-9 h-9 flex items-center justify-center bg-red-100 dark:bg-red-900/30 rounded-full">
+                                            <IconBell size={20} className="text-red-600 dark:text-red-400" />
+                                        </div>
+                                        <Text size="15px" fw={600} style={fontStyle}>{t('settings.notifications')}</Text>
+                                    </Group>
+                                    <Switch
+                                        checked={notificationPermission === 'granted'}
+                                        onChange={requestNotificationPermission}
+                                        size="md"
+                                        styles={{ track: { cursor: 'pointer' } }}
+                                    />
+                                </UnstyledButton>
                             </Stack>
                         </div>
 

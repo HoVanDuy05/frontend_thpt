@@ -58,20 +58,26 @@ export function NotificationCenter() {
         const handleNewNotification = (data: any) => {
             // Browser notification
             if ("Notification" in window && Notification.permission === "granted") {
-                const noti = new Notification(
-                    data.message?.nguoiGui?.hoTen || "Thông báo mới",
-                    {
-                        body: data.message?.noiDung || data.noiDung,
-                        icon:
-                            data.message?.nguoiGui?.avatar ||
-                            "/default-avatar.png",
-                    }
-                );
-
-                noti.onclick = () => {
-                    window.focus();
-                    data.lienKet && router.push(data.lienKet);
+                const title = data.message?.nguoiGui?.hoTen || "Thông báo mới";
+                const options: any = {
+                    body: data.message?.noiDung || data.noiDung,
+                    icon: data.message?.nguoiGui?.avatar || "/default-avatar.png",
+                    badge: "/icons/icon-192x192.png",
+                    tag: data.id ? `noti-${data.id}` : undefined,
+                    renotify: true
                 };
+
+                if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.ready.then(reg => {
+                        reg.showNotification(title, options);
+                    });
+                } else {
+                    const noti = new Notification(title, options);
+                    noti.onclick = () => {
+                        window.focus();
+                        data.lienKet && router.push(data.lienKet);
+                    };
+                }
             }
 
             // In-app notification
@@ -95,12 +101,7 @@ export function NotificationCenter() {
         };
     }, [socket, isConnected, router, notificationsQuery]);
 
-    /* ================== PERMISSION ================== */
-    useEffect(() => {
-        if ("Notification" in window && Notification.permission === "default") {
-            Notification.requestPermission();
-        }
-    }, []);
+    /* Notification permission handled by PWAProvider and Settings */
 
     /* ================== HANDLERS ================== */
     const handleMarkAsRead = (id: number) => {
