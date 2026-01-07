@@ -19,7 +19,7 @@ import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
 import { TPhienQuyTrinh, TQuyTrinh, TTruongFormQuyTrinh, LoaiTruongForm } from "@/shared/types/approval.type";
 import { useMediaQuery } from "@mantine/hooks";
-import dayjs from "dayjs";
+import { dayjs } from "@/shared/utils/date.util";
 
 export default function MyFlowPage() {
     const router = useRouter();
