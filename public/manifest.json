@@ -3,11 +3,12 @@
     "name": "NHers - Social",
     "short_name": "NHers Social",
     "description": "Ứng dụng học sinh - Trường THPT Nguyễn Huệ",
-    "start_url": "/",
+    "start_url": "/?utm_source=pwa",
     "scope": "/",
     "display": "standalone",
     "display_override": [
         "standalone",
+        "fullscreen",
         "window-controls-overlay"
     ],
     "background_color": "#ffffff",

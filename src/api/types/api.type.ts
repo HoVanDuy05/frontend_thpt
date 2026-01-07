@@ -470,6 +470,11 @@ export type ApiMutationType = {
         payload: FormData;
         response: { url: string; public_id: string };
     };
+    uploadAudio: {
+        url: { baseUrl: "/upload/audio" };
+        payload: FormData;
+        response: { url: string; public_id: string };
+    };
     // Calendar
     createCalendar: {
         url: { baseUrl: "/calendar" };
@@ -575,7 +580,7 @@ export type ApiMutationType = {
     };
     sendMessage: {
         url: { baseUrl: "/communication/chat/messages" };
-        payload: { kenhChatId: number; noiDung?: string; loai?: 'VAN_BAN' | 'HINH_ANH' | 'TEP'; duongDanTep?: string };
+        payload: { kenhChatId: number; noiDung?: string; loai?: 'VAN_BAN' | 'HINH_ANH' | 'TEP' | 'GHI_AM'; duongDanTep?: string };
         response: TMessage;
     };
 };
@@ -605,7 +610,7 @@ export type TMessage = {
     kenhChatId: number;
     nguoiGuiId: number;
     noiDung?: string;
-    loai: 'VAN_BAN' | 'HINH_ANH' | 'TEP';
+    loai: 'VAN_BAN' | 'HINH_ANH' | 'TEP' | 'GHI_AM';
     duongDanTep?: string;
     ngayGui: string;
     nguoiGui: {

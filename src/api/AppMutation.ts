@@ -220,6 +220,9 @@ export const AppMutation = () => {
             useUploadAvatar: () => useAppMutation<"uploadAvatar">({
                 url: { baseUrl: "/auth/avatar" },
             }),
+            useUploadAudio: () => useAppMutation<"uploadAudio">({
+                url: { baseUrl: "/upload/audio" },
+            }),
         },
         approvals: {
             useCreateFlow: () => useAppMutation<"createFlow">({

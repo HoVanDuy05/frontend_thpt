@@ -126,7 +126,8 @@ export default function LandingPage() {
                                                 variant="light"
                                                 color="indigo"
                                                 className="h-16 sm:h-20 px-10 sm:px-14 text-lg sm:text-xl font-bold hover:scale-105 transition-all flex-1 sm:flex-none border-none animate-pulse"
-                                                onClick={installApp}
+                                                component={Link}
+                                                href="/download"
                                                 leftSection={<IconDownload size={24} stroke={2.5} />}
                                             >
                                                 Tải App
@@ -369,7 +370,8 @@ export default function LandingPage() {
                                         variant="outline"
                                         className="text-white border-white/30 h-18 sm:h-20 px-10 sm:px-14 shadow-sm hover:bg-white/10 transition-all font-black text-xl flex-1 sm:flex-none uppercase"
                                         leftSection={<IconDownload size={24} stroke={3} />}
-                                        onClick={installApp}
+                                        component={Link}
+                                        href="/download"
                                         style={{ display: isInstallable && !isInstalled ? 'flex' : 'none' }}
                                     >
                                         Tải Apps
@@ -457,7 +459,8 @@ export default function LandingPage() {
                                     size="lg"
                                     radius="xl"
                                     className="bg-indigo-600 dark:bg-zinc-200 text-white dark:text-zinc-900 border-none px-6 font-black shadow-[0_20px_40px_-10px_rgba(79,70,229,0.4)] active:scale-95 transition-all h-14"
-                                    onClick={installApp}
+                                    component={Link}
+                                    href="/download"
                                 >
                                     Cài đặt App
                                 </Button>

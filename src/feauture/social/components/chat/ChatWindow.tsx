@@ -1,5 +1,5 @@
 import { Paper, Group, ActionIcon, Avatar, Text, Stack, ScrollArea, Box, Loader, Center, Image, Drawer, Divider, Badge, Accordion, ThemeIcon, UnstyledButton, Modal, Button, useMantineColorScheme } from "@mantine/core";
-import { IconArrowLeft, IconPhone, IconVideo, IconInfoCircle, IconPhoto, IconFile, IconBell, IconSearch } from "@tabler/icons-react";
+import { IconArrowLeft, IconPhone, IconVideo, IconInfoCircle, IconPhoto, IconFile, IconBell, IconSearch, IconMicrophone } from "@tabler/icons-react";
 import { TChannel } from "@/api/types/api.type";
 import { AppQuery } from "@/api/AppQuery";
 import { useAppStore } from "@/providers/store/useAppStore";
@@ -451,6 +451,34 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                                                         }}
                                                     />
                                                 </Box>
+                                            ) : msg.loai === 'GHI_AM' ? (
+                                                <Paper
+                                                    px="8px"
+                                                    py="8px"
+                                                    withBorder={false}
+                                                    className={`shadow-none ${isMe ? 'text-white' : 'text-black dark:text-white'}`}
+                                                    style={{
+                                                        backgroundColor: isMe ? '#0084FF' : undefined,
+                                                        borderRadius: 18,
+                                                        maxWidth: '240px',
+                                                        width: '240px'
+                                                    }}
+                                                    bg={!isMe ? (dark ? '#3e4042' : '#F0F2F5') : undefined}
+                                                >
+                                                    <Group gap="xs" wrap="nowrap" className="w-full">
+                                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isMe ? 'bg-white/20' : 'bg-[#0084FF] text-white'}`}>
+                                                            <IconMicrophone size={16} />
+                                                        </div>
+                                                        <audio
+                                                            src={msg.duongDanTep || msg.noiDung}
+                                                            controls
+                                                            className={`h-8 w-40 ${isMe ? 'filter invert brightness-200' : ''}`}
+                                                            style={{
+                                                                borderRadius: '999px',
+                                                            }}
+                                                        />
+                                                    </Group>
+                                                </Paper>
                                             ) : (
                                                 <Paper
                                                     px="14px"

@@ -13,6 +13,9 @@ interface PWAContextType {
     applyUpdate: () => void;
     notificationPermission: NotificationPermission;
     requestNotificationPermission: () => Promise<boolean>;
+    subscribeToPush: () => Promise<boolean>;
+    isIOS: boolean;
+    isIPad: boolean;
 }
 
 const PWAContext = createContext<PWAContextType | undefined>(undefined);
@@ -26,8 +29,19 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
     const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>(
         typeof window !== 'undefined' ? Notification.permission : 'default'
     );
+    const [isIOS, setIsIOS] = useState(false);
+    const [isIPad, setIsIPad] = useState(false);
 
     useEffect(() => {
+        // iOS detection
+        if (typeof window !== 'undefined') {
+            const ua = window.navigator.userAgent.toLowerCase();
+            const ios = /iphone|ipod/.test(ua);
+            const ipad = /ipad/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            setIsIOS(ios || ipad);
+            setIsIPad(ipad);
+        }
+
         // Check if already installed
         if (typeof window !== 'undefined' && window.matchMedia("(display-mode: standalone)").matches) {
             setIsInstalled(true);
@@ -154,6 +168,54 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    const urlBase64ToUint8Array = (base64String: string) => {
+        const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+        const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
+        const rawData = window.atob(base64);
+        const outputArray = new Uint8Array(rawData.length);
+        for (let i = 0; i < rawData.length; ++i) {
+            outputArray[i] = rawData.charCodeAt(i);
+        }
+        return outputArray;
+    };
+
+    const subscribeToPush = async () => {
+        if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+            console.warn("Push messaging is not supported");
+            return false;
+        }
+
+        try {
+            const reg = await navigator.serviceWorker.ready;
+
+            const vapidPublicKey = 'BLwohOk-X447v2Y097jpn9f6QHAZh6pQAptJ-UMHmjjdDVUqWk3x8zBSG7j1N5NpHzCDA6zc_Wfq-I3HHUgOWXw';
+            const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
+
+            const subscription = await reg.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: convertedVapidKey
+            });
+
+            // Get token from cookie or localStorage (adjust as per app auth)
+            // Usually next-intl/nextjs uses cookies or similar.
+            // Let's assume there's a way to get the session. 
+            // In your app, messages are sent via fetch with auth headers likely.
+
+            const response = await fetch('/api/communication/push/subscribe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(subscription)
+            });
+
+            return response.ok;
+        } catch (error) {
+            console.error("Error subscribing to push:", error);
+            return false;
+        }
+    };
+
     return (
         <PWAContext.Provider value={{
             isInstallable,
@@ -162,7 +224,10 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
             updateAvailable,
             applyUpdate,
             notificationPermission,
-            requestNotificationPermission
+            requestNotificationPermission,
+            subscribeToPush,
+            isIOS,
+            isIPad
         }}>
             {children}
         </PWAContext.Provider>
