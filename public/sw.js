@@ -1,22 +1,22 @@
-const CACHE_NAME = 'pms-cache-v3';
+const CACHE_NAME = 'pms-cache-v4';
 const ASSETS_TO_CACHE = [
-    '/',
-    '/?utm_source=pwa',
     '/manifest.json',
     '/favicon.png',
     '/icons/icon-192x192.png',
     '/icons/icon-512x512.png',
 ];
 
+// Sự kiện Install: Cài đặt và lưu các assets cơ bản vào cache
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
+            // Thêm tất cả assets vào cache
             return cache.addAll(ASSETS_TO_CACHE);
         })
     );
-    /* self.skipWaiting(); Removed to support manual update UI */
 });
 
+// Sự kiện Activate: Dọn dẹp cache cũ khi có phiên bản mới
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((keys) => {
@@ -25,32 +25,71 @@ self.addEventListener('activate', (event) => {
             );
         })
     );
+    // Yêu cầu các tab đang mở sử dụng SW mới ngay lập tức
+    return self.clients.claim();
 });
 
 self.addEventListener('fetch', (event) => {
     const { request } = event;
     const url = new URL(request.url);
 
-    // Skip API, socket.io, non-GET, and non-same-origin
-    if (url.pathname.startsWith('/api') || url.pathname.includes('socket.io') || request.method !== 'GET' || url.origin !== self.location.origin) {
+    // Chỉ xử lý các yêu cầu GET cùng origin (nội bộ)
+    if (request.method !== 'GET' || url.origin !== self.location.origin) {
         return;
     }
 
-    // Stale-while-revalidate for most assets
-    event.respondWith(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.match(request).then((cachedResponse) => {
-                const fetchPromise = fetch(request).then((networkResponse) => {
+    // Bỏ qua các API, socket.io và file nội bộ của Next.js
+    if (url.pathname.startsWith('/api') || url.pathname.includes('socket.io') || url.pathname.startsWith('/_next')) {
+        return;
+    }
+
+    // Chiến lược Caching: Network First cho HTML (trang web), Cache First cho Tài nguyên (Assets)
+    const isHtml = request.headers.get('accept')?.includes('text/html');
+
+    if (isHtml) {
+        // Network First cho HTML: Ưu tiên tải từ mạng để đảm bảo dữ liệu mới nhất
+        event.respondWith(
+            fetch(request)
+                .then((networkResponse) => {
                     if (networkResponse && networkResponse.status === 200) {
-                        cache.put(request, networkResponse.clone());
+                        const responseClone = networkResponse.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone));
                     }
                     return networkResponse;
-                }).catch(() => cachedResponse); // Retain cached if network fails
+                })
+                .catch(async () => {
+                    const cachedResponse = await caches.match(request, { ignoreSearch: true });
+                    if (cachedResponse) return cachedResponse;
 
-                return cachedResponse || fetchPromise;
-            });
-        })
-    );
+                    // Nếu không có mạng và không có cache, có thể trả về một trang offline lỗi
+                    // Hoặc ném lỗi để trình duyệt tự xử lý (nhưng nếu đã respondWith thì nên trả về Response)
+                    return new Response("Bạn đang ngoại tuyến và trang này chưa được lưu. Vui lòng kết nối mạng để tiếp tục.", {
+                        status: 503,
+                        statusText: "Service Unavailable",
+                        headers: new Headers({ "Content-Type": "text/plain; charset=utf-8" })
+                    });
+                })
+        );
+    } else {
+        // Stale-while-revalidate cho tài nguyên (ảnh, js, css, etc.)
+        event.respondWith(
+            caches.open(CACHE_NAME).then((cache) => {
+                return cache.match(request, { ignoreSearch: true }).then((cachedResponse) => {
+                    const fetchPromise = fetch(request).then((networkResponse) => {
+                        if (networkResponse && networkResponse.status === 200) {
+                            cache.put(request, networkResponse.clone());
+                        }
+                        return networkResponse;
+                    }).catch(() => {
+                        // Lỗi mạng, trả về null để sau đó dùng || cachedResponse
+                        return null;
+                    });
+
+                    return cachedResponse || fetchPromise;
+                });
+            })
+        );
+    }
 });
 
 self.addEventListener('message', (event) => {
@@ -64,13 +103,14 @@ self.addEventListener('push', (event) => {
 
     try {
         const data = event.data.json();
-        const { title, body, icon, data: customData } = data.notification;
+        const notification = data.notification || data; // Xử lý cấu trúc lồng hoặc phẳng
+        const { title, body, icon, data: customData } = notification;
 
         const options = {
             body: body || '',
             icon: icon || '/favicon.png',
             badge: '/favicon.png',
-            data: customData || {},
+            data: customData || { url: '/' },
             vibrate: [100, 50, 100],
             actions: [
                 { action: 'open', title: 'Xem ngay' },
@@ -82,7 +122,7 @@ self.addEventListener('push', (event) => {
             self.registration.showNotification(title || 'Thông báo mới', options)
         );
     } catch (error) {
-        console.error('Error handling push event:', error);
+        console.error('Lỗi khi xử lý sự kiện push:', error);
     }
 });
 
@@ -95,14 +135,14 @@ self.addEventListener('notificationclick', (event) => {
 
     event.waitUntil(
         clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
-            // Check if there is already a window open with this URL
+            // Kiểm tra xem có tab nào đang mở URL này không
             for (let i = 0; i < windowClients.length; i++) {
                 const client = windowClients[i];
                 if (client.url.includes(urlToOpen) && 'focus' in client) {
                     return client.focus();
                 }
             }
-            // If no window is open, open a new one
+            // Nếu chưa mở, tiến hành mở tab mới
             if (clients.openWindow) {
                 return clients.openWindow(urlToOpen);
             }

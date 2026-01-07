@@ -38,7 +38,8 @@
         },
         "settings": "Cài đặt",
         "approvals": "Phê duyệt",
-        "social": "Mạng xã hội"
+        "social": "Mạng xã hội",
+        "logout": "Đăng xuất"
     },
     "social": {
         "nav": {
@@ -425,6 +426,9 @@
             "please_wait": "Vui lòng đợi trong giây lát",
             "smart_system": "Hệ thống Giáo dục Thông minh"
         },
+        "student_portal": "Cổng thông tin học sinh",
+        "light_mode": "Chế độ sáng",
+        "dark_mode": "Chế độ tối",
         "actions": {
             "create": "Tạo mới",
             "edit": "Chỉnh sửa",
@@ -611,6 +615,12 @@
         "sent": "Đã gửi",
         "no_conversations_title": "Không có cuộc trò chuyện nào",
         "no_conversations_subtitle": "Hãy thử tìm kiếm bạn bè của bạn",
+        "typing": "Đang nhập...",
+        "active": "Đang hoạt động",
+        "offline": "Ngoại tuyến",
+        "start_conversation": "Bắt đầu cuộc trò chuyện trên Messenger",
+        "micro_error_title": "Lỗi Micro",
+        "micro_error_message": "Không thể truy cập microphone. Vui lòng kiểm tra quyền truy cập.",
         "sidebar": {
             "profile": "Trang cá nhân",
             "mute": "Tắt thông báo",
@@ -638,6 +648,52 @@
             "dark_mode": "Chế độ tối",
             "language": "Ngôn ngữ",
             "logout": "Đăng xuất"
+        }
+    },
+    "pwa": {
+        "download": {
+            "title": "NHers Academy",
+            "subtitle": "Smart School App",
+            "version": "Phiên bản chính thức 2.5",
+            "installed_title": "Ứng dụng đã được cài đặt!",
+            "installed_subtitle": "Bạn có thể mở NHers từ màn hình chính điện thoại để bắt đầu trải nghiệm chuyên nghiệp nhất.",
+            "access_now": "Truy cập ngay",
+            "device_detection": "Phát hiện thiết bị: {os}",
+            "transform_title": "Trang web đã sẵn sàng để \"Biến hình\" thành App.",
+            "transform_subtitle": "Cài đặt NHers Academy sẽ giúp bạn bỏ qua thanh địa chỉ trình duyệt, hoạt động mượt mà và nhận thông báo tức thì.",
+            "ios_guide_title": "Hướng dẫn cài đặt trên iOS",
+            "ios_step_1": "Nhấn vào nút Chia sẻ ở thanh công cụ Safari.",
+            "ios_step_2": "Kéo xuống dưới và chọn Thêm vào MH chính.",
+            "ios_step_3": "Nhấn Thêm ở góc phải màn hình để hoàn tất.",
+            "ios_illustration_alt": "Ảnh minh họa hướng dẫn sẽ hiển thị ở đây",
+            "android_guide_title": "Hướng dẫn cài đặt trên Android",
+            "android_ready_title": "Sẵn sàng cài đặt!",
+            "android_ready_subtitle": "Nhấn nút bên dưới để tải App NHers về điện thoại của bạn ngay lập tức.",
+            "android_install_btn": "CÀI ĐẶT APP NGAY",
+            "android_manual_title": "App đã sẵn sàng trong menu trình duyệt!",
+            "android_manual_subtitle": "Nhấn vào dấu 3 chấm ⋮ ở góc trên trình duyệt Chrome và chọn \"Cài đặt ứng dụng\".",
+            "push_title": "Thông báo Đẩy",
+            "push_subtitle": "Nhận tin nhắn và thông báo ngay cả khi đóng ứng dụng.",
+            "push_status_on": "Đã bật",
+            "push_status_off": "Chưa bật",
+            "push_permission_warning": "Bạn cần cho phép thông báo trên trình duyệt trước khi đăng ký nhận tin nhắn.",
+            "push_permission_btn": "CHO PHÉP THÔNG BÁO",
+            "push_sync_tip": "Sau khi cài đặt App, hãy nhấn nút bên dưới để đồng bộ hóa thiết bị này với hệ thống thông báo của trường.",
+            "push_subscribe_btn": "ĐĂNG KÝ NHẬN THÔNG BÁO ĐẨY",
+            "push_success": "Đăng ký thông báo thành công!",
+            "push_error": "Đăng ký không thành công. Hãy đảm bảo bạn sử dụng trình duyệt hỗ trợ (Chrome/Safari) và đã cài đặt ứng dụng.",
+            "features_title": "Tại sao nên dùng bản App?",
+            "feature_clean_title": "Sạch sẽ & Gọn gàng",
+            "feature_clean_desc": "Loại bỏ hoàn toàn các thanh công cụ thừa từ trình duyệt.",
+            "feature_push_title": "Thông báo tức thì",
+            "feature_push_desc": "Nhận tin nhắn, lịch học ngay khi app đang đóng.",
+            "continue_web": "Tiếp tục dùng bản Web",
+            "support_title": "Hỗ trợ kỹ thuật",
+            "support_desc": "Gặp khó khăn khi cài đặt? Liên hệ Ban CNTT trường qua Zalo hoặc Hotline:",
+            "update_title": "Phiên bản mới đã sẵn sàng!",
+            "update_body": "Cập nhật ngay để trải nghiệm các tính năng mới nhất.",
+            "update_btn": "Cập nhật",
+            "update_native_body": "Nhấn để cập nhật ngay."
         }
     }
 }

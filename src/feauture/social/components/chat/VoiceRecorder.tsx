@@ -2,6 +2,7 @@ import { ActionIcon, Group, Text, rem } from "@mantine/core";
 import { IconMicrophone, IconPlayerStop, IconSend, IconTrash, IconX } from "@tabler/icons-react";
 import { useEffect, useRef, useState } from "react";
 import { notifications } from "@mantine/notifications";
+import { useTranslations } from "next-intl";
 
 interface VoiceRecorderProps {
     onSend: (audioBlob: Blob, durationMs: number) => void;
@@ -9,8 +10,10 @@ interface VoiceRecorderProps {
 }
 
 export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onSend, onCancel }) => {
+    const t = useTranslations("chat");
     const [isRecording, setIsRecording] = useState(false);
     const [duration, setDuration] = useState(0);
+    // ... rest of state
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const audioChunksRef = useRef<Blob[]>([]);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -48,8 +51,8 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onSend, onCancel }
         } catch (error) {
             console.error("Error accessing microphone:", error);
             notifications.show({
-                title: "Lỗi Micro",
-                message: "Không thể truy cập microphone. Vui lòng kiểm tra quyền truy cập.",
+                title: t("micro_error_title"),
+                message: t("micro_error_message"),
                 color: "red"
             });
             onCancel();

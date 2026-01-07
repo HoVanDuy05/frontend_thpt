@@ -38,7 +38,8 @@
         },
         "settings": "Settings",
         "approvals": "Approvals",
-        "social": "Social Network"
+        "social": "Social Network",
+        "logout": "Log Out"
     },
     "social": {
         "nav": {
@@ -425,6 +426,9 @@
             "please_wait": "Please wait a moment",
             "smart_system": "Smart Education System"
         },
+        "student_portal": "Student Portal",
+        "light_mode": "Light Mode",
+        "dark_mode": "Dark Mode",
         "actions": {
             "create": "Create",
             "edit": "Edit",
@@ -612,6 +616,12 @@
         "sent": "Sent",
         "no_conversations_title": "No conversations",
         "no_conversations_subtitle": "Try searching for your friends",
+        "typing": "is typing...",
+        "active": "Active now",
+        "offline": "Offline",
+        "start_conversation": "Start a conversation on Messenger",
+        "micro_error_title": "Microphone Error",
+        "micro_error_message": "Cannot access microphone. Please check permissions.",
         "sidebar": {
             "profile": "View Profile",
             "mute": "Mute notifications",
@@ -639,6 +649,52 @@
             "dark_mode": "Dark Mode",
             "language": "Language",
             "logout": "Log Out"
+        }
+    },
+    "pwa": {
+        "download": {
+            "title": "NHers Academy",
+            "subtitle": "Smart School App",
+            "version": "Official Version 2.5",
+            "installed_title": "App installed successfully!",
+            "installed_subtitle": "You can open NHers from your home screen to start the most professional experience.",
+            "access_now": "Access Now",
+            "device_detection": "Device detected: {os}",
+            "transform_title": "The website is ready to \"Transform\" into an App.",
+            "transform_subtitle": "Installing NHers Academy will help you bypass the browser address bar, run smoothly and receive instant notifications.",
+            "ios_guide_title": "Installation Guide for iOS",
+            "ios_step_1": "Tap the Share button in the Safari toolbar.",
+            "ios_step_2": "Scroll down and select Add to Home Screen.",
+            "ios_step_3": "Tap Add in the top right corner to complete.",
+            "ios_illustration_alt": "Instruction illustration will be displayed here",
+            "android_guide_title": "Installation Guide for Android",
+            "android_ready_title": "Ready to install!",
+            "android_ready_subtitle": "Tap the button below to download the NHers App to your phone immediately.",
+            "android_install_btn": "INSTALL APP NOW",
+            "android_manual_title": "App is ready in the browser menu!",
+            "android_manual_subtitle": "Tap the 3 dots ⋮ in the top corner of your Chrome browser and select \"Install App\".",
+            "push_title": "Push Notifications",
+            "push_subtitle": "Receive messages and notifications even when the app is closed.",
+            "push_status_on": "Enabled",
+            "push_status_off": "Disabled",
+            "push_permission_warning": "You need to allow notifications in your browser before subscribing.",
+            "push_permission_btn": "ALLOW NOTIFICATIONS",
+            "push_sync_tip": "After installing the App, tap the button below to sync this device with the school's notification system.",
+            "push_subscribe_btn": "SUBSCRIBE TO PUSH NOTIFICATIONS",
+            "push_success": "Notification subscription successful!",
+            "push_error": "Subscription failed. Please ensure you are using a supported browser (Chrome/Safari) and have installed the app.",
+            "features_title": "Why use the App version?",
+            "feature_clean_title": "Clean & Organized",
+            "feature_clean_desc": "Completely remove unnecessary browser toolbars.",
+            "feature_push_title": "Instant Notifications",
+            "feature_push_desc": "Receive messages and schedules even when the app is closed.",
+            "continue_web": "Continue using Web version",
+            "support_title": "Technical Support",
+            "support_desc": "Having trouble installing? Contact the school's IT Department via Zalo or Hotline:",
+            "update_title": "New version ready!",
+            "update_body": "Update now to experience the latest features.",
+            "update_btn": "Update",
+            "update_native_body": "Tap to update now."
         }
     }
 }

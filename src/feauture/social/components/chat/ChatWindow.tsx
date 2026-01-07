@@ -352,8 +352,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                                 </Text>
                                 <Text size="13px" c="dimmed" fw={400} className="truncate leading-tight mt-0.5">
                                     {typingUsers.length > 0
-                                        ? "Đang nhập..."
-                                        : (presence?.online ? 'Đang hoạt động' : 'Ngoại tuyến')}
+                                        ? t("typing")
+                                        : (presence?.online ? t("active") : t("offline"))}
                                 </Text>
                             </div>
                         </UnstyledButton>
@@ -387,7 +387,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                         <Center h={400} className="flex-col animate-in fade-in zoom-in duration-500">
                             <Avatar src={targetUser?.avatar || null} size={100} radius={999} mb="md" />
                             <Text fw={700} size="xl">{channel.loaiKenh === 'NHOM' ? channel.tenKenh : (targetUser?.hoTen || targetUser?.taiKhoan)}</Text>
-                            <Text size="sm" c="dimmed" mt={4}>Bắt đầu cuộc trò chuyện trên Messenger</Text>
+                            <Text size="sm" c="dimmed" mt={4}>{t('start_conversation')}</Text>
                         </Center>
                     ) : (
                         (allMessages || []).map((msg, idx, arr) => {

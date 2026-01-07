@@ -11,7 +11,7 @@ export function MobileHeader() {
     const { user, logout } = useAppStore();
     const router = useRouter();
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
-    const t = useTranslations("admin.header");
+    const t = useTranslations();
 
     const handleLogout = () => {
         logout();
@@ -41,7 +41,7 @@ export function MobileHeader() {
                                 NHers Student
                             </Title>
                             <Text size="xs" c="dimmed" fw={500} visibleFrom="xs">
-                                Cổng thông tin học sinh
+                                {t('common.student_portal')}
                             </Text>
                         </Stack>
                     </Group>
@@ -78,20 +78,20 @@ export function MobileHeader() {
                     </Menu.Target>
 
                     <Menu.Dropdown className="p-2">
-                        <Menu.Label>Tài khoản</Menu.Label>
+                        <Menu.Label>{t('menu.accounts.title')}</Menu.Label>
                         <Menu.Item
                             leftSection={<IconUser size={16} />}
                             onClick={() => router.push("/student/profile")}
                             className="rounded-md"
                         >
-                            Hồ sơ cá nhân
+                            {t('social.nav.profile')}
                         </Menu.Item>
                         <Menu.Item
                             leftSection={<IconSettings size={16} />}
                             onClick={() => router.push("/student/profile")}
                             className="rounded-md"
                         >
-                            Cài đặt
+                            {t('menu.settings')}
                         </Menu.Item>
 
                         <Menu.Divider />
@@ -101,7 +101,7 @@ export function MobileHeader() {
                             onClick={() => toggleColorScheme()}
                             className="rounded-md"
                         >
-                            {colorScheme === "dark" ? "Chế độ sáng" : "Chế độ tối"}
+                            {colorScheme === "dark" ? t('common.light_mode') : t('common.dark_mode')}
                         </Menu.Item>
 
                         <Menu.Divider />
@@ -112,7 +112,7 @@ export function MobileHeader() {
                             onClick={handleLogout}
                             className="rounded-md"
                         >
-                            Đăng xuất
+                            {t('menu.logout')}
                         </Menu.Item>
                     </Menu.Dropdown>
                 </Menu>

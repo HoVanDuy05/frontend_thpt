@@ -64,18 +64,18 @@ export function StudentHeader() {
                                 </Menu.Target>
 
                                 <Menu.Dropdown>
-                                    <Menu.Label>Tài khoản</Menu.Label>
+                                    <Menu.Label>{t('menu.accounts.title')}</Menu.Label>
                                     <Menu.Item
                                         leftSection={<IconUser size={16} />}
                                         onClick={() => router.push("/student")}
                                     >
-                                        Trang chủ
+                                        {t('menu.dashboard')}
                                     </Menu.Item>
                                     <Menu.Item
                                         leftSection={<IconSettings size={16} />}
                                         onClick={() => router.push("/student/settings")}
                                     >
-                                        Cài đặt
+                                        {t('menu.settings')}
                                     </Menu.Item>
 
                                     <Menu.Divider />
@@ -85,7 +85,7 @@ export function StudentHeader() {
                                         leftSection={<IconLogout size={16} />}
                                         onClick={handleLogout}
                                     >
-                                        Đăng xuất
+                                        {t('menu.logout')}
                                     </Menu.Item>
                                 </Menu.Dropdown>
                             </Menu>

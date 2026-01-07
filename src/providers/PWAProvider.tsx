@@ -1,9 +1,10 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
 import { notifications } from "@mantine/notifications";
 import { Button, Group, Text, Stack } from "@mantine/core";
 import { IconDownload, IconRefresh } from "@tabler/icons-react";
+import { useTranslations } from "next-intl";
 
 interface PWAContextType {
     isInstallable: boolean;
@@ -21,6 +22,7 @@ interface PWAContextType {
 const PWAContext = createContext<PWAContextType | undefined>(undefined);
 
 export function PWAProvider({ children }: { children: React.ReactNode }) {
+    const t = useTranslations("pwa.download");
     const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
     const [isInstallable, setIsInstallable] = useState(false);
     const [isInstalled, setIsInstalled] = useState(false);
@@ -31,6 +33,38 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
     );
     const [isIOS, setIsIOS] = useState(false);
     const [isIPad, setIsIPad] = useState(false);
+
+    const showUpdateNotification = useCallback((reg: ServiceWorkerRegistration) => {
+        notifications.show({
+            id: 'pwa-update',
+            title: t('update_title'),
+            message: (
+                <Stack gap="xs">
+                    <Text size="sm">{t('update_body')}</Text>
+                    <Group justify="flex-end">
+                        <Button
+                            variant="filled"
+                            color="blue"
+                            size="compact-sm"
+                            leftSection={<IconRefresh size={14} />}
+                            onClick={() => {
+                                reg.waiting?.postMessage({ type: 'SKIP_WAITING' });
+                                notifications.hide('pwa-update');
+                            }}
+                        >
+                            {t('update_btn')}
+                        </Button>
+                    </Group>
+                </Stack>
+            ),
+            autoClose: false,
+            withCloseButton: true,
+            icon: <IconDownload size={18} />,
+            styles: {
+                root: { padding: '12px' }
+            }
+        });
+    }, [t]);
 
     useEffect(() => {
         // iOS detection
@@ -80,12 +114,12 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
                                 // Show native notification if allowed
                                 if (Notification.permission === 'granted') {
                                     const options: any = {
-                                        body: 'Nhấn để cập nhật ngay.',
+                                        body: t('update_native_body'),
                                         icon: '/icons/icon-192x192.png',
                                         tag: 'pwa-update',
                                         renotify: true
                                     };
-                                    reg.showNotification('Phiên bản mới đã sẵn sàng!', options);
+                                    reg.showNotification(t('update_title'), options);
                                 }
                             }
                         });
@@ -106,39 +140,7 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
             window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
             window.removeEventListener("appinstalled", handleAppInstalled);
         };
-    }, []);
-
-    const showUpdateNotification = (reg: ServiceWorkerRegistration) => {
-        notifications.show({
-            id: 'pwa-update',
-            title: 'Phiên bản mới đã sẵn sàng!',
-            message: (
-                <Stack gap="xs">
-                    <Text size="sm">Cập nhật ngay để trải nghiệm các tính năng mới nhất.</Text>
-                    <Group justify="flex-end">
-                        <Button
-                            variant="filled"
-                            color="blue"
-                            size="compact-sm"
-                            leftSection={<IconRefresh size={14} />}
-                            onClick={() => {
-                                reg.waiting?.postMessage({ type: 'SKIP_WAITING' });
-                                notifications.hide('pwa-update');
-                            }}
-                        >
-                            Cập nhật
-                        </Button>
-                    </Group>
-                </Stack>
-            ),
-            autoClose: false,
-            withCloseButton: true,
-            icon: <IconDownload size={18} />,
-            styles: {
-                root: { padding: '12px' }
-            }
-        });
-    };
+    }, [showUpdateNotification, t]);
 
     const requestNotificationPermission = async () => {
         if (!("Notification" in window)) return false;
@@ -195,11 +197,6 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
                 userVisibleOnly: true,
                 applicationServerKey: convertedVapidKey
             });
-
-            // Get token from cookie or localStorage (adjust as per app auth)
-            // Usually next-intl/nextjs uses cookies or similar.
-            // Let's assume there's a way to get the session. 
-            // In your app, messages are sent via fetch with auth headers likely.
 
             const response = await fetch('/api/communication/push/subscribe', {
                 method: 'POST',

@@ -154,7 +154,7 @@ export const useMenu = () => {
                 },
                 {
                     key: "portal",
-                    label: t("menu.portal.title") || "Cổng thông tin",
+                    label: t("menu.portal.title"),
                     icon: IconNews,
                     path: PMS_PATH.PORTAL.ROOT,
                     color: "#15aabf",
@@ -162,21 +162,21 @@ export const useMenu = () => {
                     children: [
                         {
                             key: "banners",
-                            label: t("menu.portal.banners") || "Banners",
+                            label: t("menu.portal.banners"),
                             path: PMS_PATH.PORTAL.BANNERS,
                             icon: IconPhoto,
                             showMenu: !isTeacher, // Restricted for Teacher
                         },
                         {
                             key: "posts",
-                            label: t("menu.portal.posts") || "Bài viết",
+                            label: t("menu.portal.posts"),
                             path: PMS_PATH.PORTAL.POSTS,
                             icon: IconNews,
                             showMenu: true,
                         },
                         {
                             key: "comments",
-                            label: t("menu.portal.comments") || "Bình luận",
+                            label: t("menu.portal.comments"),
                             path: PMS_PATH.PORTAL.COMMENTS,
                             icon: IconMessage,
                             showMenu: true,
@@ -185,7 +185,7 @@ export const useMenu = () => {
                 },
                 {
                     key: "communication",
-                    label: t("menu.communication.title") || "Liên lạc",
+                    label: t("menu.communication.title"),
                     icon: IconMessage,
                     path: PMS_PATH.COMMUNICATION.ROOT,
                     color: "#be4bdb",
@@ -193,14 +193,14 @@ export const useMenu = () => {
                     children: [
                         {
                             key: "notifications",
-                            label: t("menu.communication.notifications") || "Thông báo",
+                            label: t("menu.communication.notifications"),
                             path: PMS_PATH.COMMUNICATION.NOTIFICATIONS,
                             icon: IconBell,
                             showMenu: true,
                         },
                         {
                             key: "chat",
-                            label: t("menu.communication.chat") || "Tin nhắn",
+                            label: t("menu.communication.chat"),
                             path: PMS_PATH.COMMUNICATION.CHAT,
                             icon: IconMessage,
                             showMenu: true,
