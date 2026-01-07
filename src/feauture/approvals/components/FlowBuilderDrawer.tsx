@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Drawer, Stack, TextInput, Textarea, Select, Group, Button, Text, Badge, ActionIcon, Divider, Box, rem, Switch, ScrollArea, UnstyledButton, Paper, ThemeIcon, Tooltip, SimpleGrid, LoadingOverlay, Tabs, Popover, ComboboxItem, OptionsFilter } from '@mantine/core';
-import { IconPlus, IconTrash, IconArrowRight, IconUser, IconSettings, IconInfoCircle, IconFileDescription, IconCheck, IconX, IconGripVertical, IconForms, IconGitPullRequest, IconCategory, IconTemplate, IconDeviceFloppy, IconChevronRight } from '@tabler/icons-react';
+import { IconPlus, IconTrash, IconArrowRight, IconUser, IconSettings, IconInfoCircle, IconFileDescription, IconCheck, IconX, IconGripVertical, IconForms, IconGitPullRequest, IconCategory, IconTemplate, IconDeviceFloppy, IconChevronRight, IconUserCheck } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 import { AppQuery } from '@/api/AppQuery';
 import { AppMutation } from '@/api/AppMutation';
@@ -58,12 +58,24 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
 
                 // Map Steps
                 if (initialData.cacBuoc && initialData.cacBuoc.length > 0) {
-                    setSteps(initialData.cacBuoc.map((step: any) => ({
-                        id: step.id, // Keep ID for updates
-                        name: step.ten,
-                        rule: step.loaiDuyet || 'any',
-                        approverType: step.nguoiDuyetId || step.vaiTroDuyet || 'ROLE_GVCN' // Fallback
-                    })).sort((a: any, b: any) => (a.thuTu || 0) - (b.thuTu || 0)));
+                    setSteps(initialData.cacBuoc.map((step: any) => {
+                        let approverType = 'ROLE_GVCN'; // Default
+                        if (step.nguoiDuyets && step.nguoiDuyets.length > 0) {
+                            const config = step.nguoiDuyets[0];
+                            if (config.loaiNguoiPheDuyet === 'NGUOI_DUNG_CU_THE') {
+                                approverType = config.approverId?.toString();
+                            } else if (config.loaiNguoiPheDuyet === 'VAI_TRO') {
+                                approverType = `ROLE_${config.approverRole}`;
+                            }
+                        }
+
+                        return {
+                            id: step.id,
+                            name: step.ten,
+                            rule: step.loaiQuyTac === 'TAT_CA' ? 'all' : 'any',
+                            approverType: approverType
+                        };
+                    }).sort((a: any, b: any) => (a.thuTuBuoc || 0) - (b.thuTuBuoc || 0)));
                 } else {
                     setSteps([{ id: Date.now(), name: "Duyệt lần 1", rule: 'any', approverType: 'ROLE_GVCN' }]);
                 }
@@ -71,12 +83,19 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                 if (initialData.truongDuLieus || initialData.cacTruong) {
                     const fieldsSource = initialData.truongDuLieus || initialData.cacTruong;
                     if (fieldsSource.length > 0) {
-                        setFormFields(fieldsSource.map((field: any) => ({
-                            id: field.id, // Keep ID
-                            label: field.nhan,
-                            required: field.batBuoc,
-                            type: field.loai
-                        })));
+                        setFormFields(fieldsSource.map((field: any) => {
+                            let options = field.tuyChon;
+                            if (typeof options === 'string') {
+                                try { options = JSON.parse(options); } catch (e) { options = []; }
+                            }
+                            return {
+                                id: field.id,
+                                label: field.nhan,
+                                required: field.batBuoc,
+                                type: field.loai,
+                                options: options || []
+                            };
+                        }));
                     } else {
                         setFormFields([{ id: Date.now(), label: "Lý do", required: true, type: 'TEXTAREA' }]);
                     }
@@ -139,13 +158,27 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
 
     // Filter and map users for Select options
     const approverOptions = React.useMemo(() => {
-        if (!usersData) return [];
-        return usersData
+        const roles = [
+            {
+                group: 'Vai trò hệ thống', items: [
+                    { value: 'ROLE_ADMIN', label: 'Quản trị viên (Admin)' },
+                    { value: 'ROLE_GVCN', label: 'Giáo viên chủ nhiệm (GVCN)' },
+                    { value: 'ROLE_TRUONG_KHOA', label: 'Trưởng khoa / Phòng' },
+                ]
+            },
+        ];
+
+        const users = usersData ? usersData
             .filter((u: any) => u.vaiTro === 'GIAO_VIEN' || u.vaiTro === 'ADMIN')
             .map((u: any) => ({
                 value: u.id.toString(),
                 label: `${u.hoTen || u.taiKhoan} (${u.vaiTro === 'ADMIN' ? 'Admin' : 'Giáo viên'})`
-            }));
+            })) : [];
+
+        return [
+            ...roles[0].items,
+            ...(users.length > 0 ? [{ group: 'Cá nhân cụ thể', items: users }] : users)
+        ];
     }, [usersData]);
 
     const handleCreateCategory = async (query: string) => {
@@ -516,13 +549,16 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
 
                             </Box>
 
-                            {/* END NODE */}
+                            {/* END NODE (Callback to sender) */}
                             <Box className="flex flex-col md:flex-row gap-4 items-center self-center h-auto md:h-[200px] shrink-0">
                                 <Box className="flex flex-col items-center">
-                                    <ThemeIcon size={56} radius="full" color="green" variant="gradient" gradient={{ from: 'teal', to: 'green' }} className="shadow-lg shadow-green-200 dark:shadow-none">
-                                        <IconCheck size={28} />
+                                    <ThemeIcon size={56} radius="full" color="blue" variant="gradient" gradient={{ from: 'indigo', to: 'cyan' }} className="shadow-lg shadow-blue-200 dark:shadow-none">
+                                        <IconUserCheck size={28} />
                                     </ThemeIcon>
-                                    <Text size="xs" fw={700} mt="sm" c="green" tt="uppercase" lts={1}>Hoàn tất</Text>
+                                    <Box className="text-center" mt="sm">
+                                        <Text size="xs" fw={700} c="blue" tt="uppercase" lts={1}>Kết thúc & Trả kết quả</Text>
+                                        <Text size="10px" c="dimmed" fw={500}>Người gửi nhận phản hồi</Text>
+                                    </Box>
                                 </Box>
                             </Box>
 

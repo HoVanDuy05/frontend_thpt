@@ -90,9 +90,8 @@ export default function ApprovalsPage() {
                 moTa: data.description,
                 danhMucId: data.category_id,
                 trangThai: data.status,
-                // We might need to handle steps/fields update separately if backend doesn't support nested update
-                // For this UI demo, let's assume simple property updates work or just notify "Feature pending" for complex parts if needed.
-                // Re-sending steps/fields might be required.
+                steps: data.steps,
+                fields: data.fields
             };
 
             (updateFlowMutation.mutate as any)({
