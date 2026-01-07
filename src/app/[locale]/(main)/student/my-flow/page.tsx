@@ -241,7 +241,7 @@ export default function MyFlowPage() {
                                                                     <IconFiles size={48} stroke={1} />
                                                                 </Box>
                                                                 <Text fw={900} size="xl" className="text-gray-400 tracking-tight mt-6">Hộp thư hồ sơ trống</Text>
-                                                                <Text size="sm" c="dimmed" maxW={300} ta="center">Bạn chưa có bất kỳ yêu cầu phê duyệt nào được khởi tạo trong hệ thống.</Text>
+                                                                <Text size="sm" c="dimmed" maw={300} ta="center">Bạn chưa có bất kỳ yêu cầu phê duyệt nào được khởi tạo trong hệ thống.</Text>
                                                                 <Button variant="light" color="indigo" radius="xl" size="md" mt={24} onClick={() => setIsDrawerOpen(true)}>Khởi tạo ngay</Button>
                                                             </Stack>
                                                         </Table.Td>
@@ -291,35 +291,40 @@ function CreateRequestDrawer({ opened, onClose, templates }: { opened: boolean, 
             opened={opened}
             onClose={handleClose}
             position="right"
-            size={isMobile ? "100%" : "680px"}
+            size={isMobile ? "100%" : "720px"}
             withCloseButton={false}
             padding={0}
-            transitionProps={{ transition: 'slide-left', duration: 400, timingFunction: 'ease' }}
+            transitionProps={{ transition: 'slide-left', duration: 600, timingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)' }}
+            className="selection:bg-indigo-100"
         >
-            <Box h="100%" className="flex flex-col bg-white dark:bg-zinc-950">
-                {/* Custom Drawer Header */}
-                <Box px={32} py={24} className="border-b border-gray-100 dark:border-zinc-800 shrink-0">
+            <Box h="100%" className="flex flex-col bg-white dark:bg-zinc-950 relative overflow-hidden">
+                {/* Decorative background element */}
+                <Box className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none" />
+
+                {/* Custom Drawer Header - Masterpiece Edition */}
+                <Box px={40} py={32} className="border-b border-gray-100 dark:border-zinc-800 shrink-0 relative">
                     <Group justify="space-between">
-                        <Group gap="md">
+                        <Group gap="xl">
                             <ActionIcon
-                                variant="subtle"
-                                color="gray"
-                                radius="xl"
-                                size="lg"
+                                variant="light"
+                                color="indigo"
+                                radius="16px"
+                                size={48}
                                 onClick={selectedTemplate ? () => setSelectedTemplate(null) : handleClose}
+                                className="shadow-sm hover:scale-110 active:scale-95 transition-all"
                             >
-                                <IconChevronLeft size={22} stroke={2.5} />
+                                <IconChevronLeft size={24} stroke={3} />
                             </ActionIcon>
                             <div>
-                                <Title order={4} fw={850} className="tracking-tight">
-                                    {selectedTemplate ? "Chi tiết đề xuất" : "Dịch vụ hành chính"}
+                                <Title order={3} fw={950} className="tracking-tighter text-gray-900 dark:text-gray-50 leading-none mb-1">
+                                    {selectedTemplate ? selectedTemplate.ten : "Dịch vụ Smart Portal"}
                                 </Title>
-                                <Text size="xs" fw={700} c="dimmed" lts={0.5}>HỆ THỐNG PHÊ DUYỆT TỰ ĐỘNG</Text>
+                                <Text size="10px" fw={900} c="indigo" tt="uppercase" lts={2}>Trung tâm hành chính công số</Text>
                             </div>
                         </Group>
                         {!selectedTemplate && (
-                            <ActionIcon variant="light" color="red" radius="xl" size="xl" onClick={handleClose}>
-                                <IconX size={20} stroke={2.5} />
+                            <ActionIcon variant="subtle" color="gray" radius="xl" size="lg" onClick={handleClose}>
+                                <IconX size={24} stroke={2.5} />
                             </ActionIcon>
                         )}
                     </Group>
@@ -442,14 +447,14 @@ function DynamicRequestForm({ template, onBack, onSuccess }: { template: TQuyTri
     return (
         <Stack gap={0} h="100%" className="bg-white dark:bg-zinc-950">
             {/* Minimal Form Stepper */}
-            <Box px={32} py={20} className="bg-gray-50/50 dark:bg-zinc-900/30">
-                <Stepper active={activeStep} onStepClick={setActiveStep} size="xs" color="indigo" radius="xl" allowNextStepsSelect={false}>
-                    <Stepper.Step label={<Text fw={900} size="10px" tt="uppercase" lts={1}>Tiến trình</Text>} />
-                    <Stepper.Step label={<Text fw={900} size="10px" tt="uppercase" lts={1}>Dữ liệu</Text>} />
+            <Box px={40} py={24} className="bg-gray-50/50 dark:bg-zinc-900/30 border-b border-gray-100 dark:border-zinc-800">
+                <Stepper active={activeStep} onStepClick={setActiveStep} size="sm" color="indigo" radius="xl" allowNextStepsSelect={false}>
+                    <Stepper.Step label={<Text fw={900} size="11px" tt="uppercase" lts={1.5}>Luồng truyền tải</Text>} />
+                    <Stepper.Step label={<Text fw={900} size="11px" tt="uppercase" lts={1.5}>Khai báo dữ liệu</Text>} />
                 </Stepper>
             </Box>
 
-            <ScrollArea className="flex-1" p={32}>
+            <ScrollArea className="flex-1" p={40}>
                 <div className="max-w-xl mx-auto">
                     {activeStep === 0 ? (
                         <Stack gap={32}>
