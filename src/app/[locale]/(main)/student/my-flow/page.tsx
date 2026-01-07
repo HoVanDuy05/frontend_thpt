@@ -2,22 +2,21 @@
 
 import { useState } from "react";
 import {
-    Stack, Title, Text, Button, Tabs, Card, Group,
+    Stack, Title, Text, Button, Tabs, Group,
     Badge, ThemeIcon, ActionIcon, Drawer, Box, Paper, LoadingOverlay,
     Select, TextInput, NumberInput, Textarea, ScrollArea, Stepper,
-    Divider, SimpleGrid, Table, UnstyledButton, Avatar
+    SimpleGrid, Table, UnstyledButton
 } from "@mantine/core";
 import {
     IconPlus, IconFileDescription, IconClock, IconCheck, IconX,
     IconChevronRight, IconCalendar, IconChevronLeft, IconFiles,
-    IconActivity, IconExternalLink, IconMessage2, IconInfoCircle,
-    IconSearch
+    IconActivity, IconExternalLink, IconSearch
 } from "@tabler/icons-react";
 import { AppQuery } from "@/api/AppQuery";
 import { AppMutation } from "@/api/AppMutation";
 import { notifications } from "@mantine/notifications";
 import { useRouter } from "next/navigation";
-import { TPhienQuyTrinh, TQuyTrinh } from "@/shared/types/approval.type";
+import { TPhienQuyTrinh, TQuyTrinh, TTruongFormQuyTrinh, LoaiTruongForm } from "@/shared/types/approval.type";
 import { useMediaQuery } from "@mantine/hooks";
 import dayjs from "dayjs";
 
@@ -378,7 +377,7 @@ function DynamicRequestForm({ template, onBack, onSuccess }: { template: TQuyTri
     const { data: fields, isLoading } = AppQuery.approvals.useFormFields(flowId);
     const submitMutation = AppMutation().approvals.useSubmit();
 
-    const [formData, setFormData] = useState<Record<string, any>>({});
+    const [formData, setFormData] = useState<Record<string, string | number | boolean | null>>({});
     const [activeStep, setActiveStep] = useState(0);
 
     const hasSteps = Array.isArray(template.cacBuoc) && template.cacBuoc.length > 0;
@@ -407,8 +406,9 @@ function DynamicRequestForm({ template, onBack, onSuccess }: { template: TQuyTri
 
             notifications.show({ title: "Gửi yêu cầu thành công 🛰️", message: "Hồ sơ của bạn đang được truyền tải.", color: "indigo" });
             onSuccess();
-        } catch (error: any) {
-            notifications.show({ title: "Lỗi kết nối", message: error?.response?.data?.message || "Không thể khởi tạo hồ sơ.", color: "red" });
+        } catch (error: unknown) {
+            const errorMsg = (error as any)?.response?.data?.message || "Không thể khởi tạo hồ sơ.";
+            notifications.show({ title: "Lỗi kết nối", message: errorMsg, color: "red" });
         }
     };
 
@@ -497,11 +497,11 @@ function DynamicRequestForm({ template, onBack, onSuccess }: { template: TQuyTri
                             </Box>
 
                             <Stack gap="xl">
-                                {fields && fields.length > 0 ? fields.map((field: any) => {
+                                {fields && fields.length > 0 ? fields.map((field: TTruongFormQuyTrinh) => {
                                     const commonProps = {
                                         label: <Text fw={850} size="xs" mb={8} className="uppercase tracking-widest text-gray-500">{field.nhan} {field.batBuoc && <span className="text-red-500">*</span>}</Text>,
                                         required: field.batBuoc,
-                                        placeholder: field.moTa || `Nhập ${field.nhan.toLowerCase()}...`,
+                                        placeholder: `Nhập ${field.nhan.toLowerCase()}...`,
                                         size: "md",
                                         radius: "8px",
                                         styles: {
@@ -513,13 +513,15 @@ function DynamicRequestForm({ template, onBack, onSuccess }: { template: TQuyTri
                                         }
                                     };
 
-                                    const handleChange = (val: any) => setFormData(prev => ({ ...prev, [field.id]: val }));
+                                    const handleChange = (val: string | number | boolean | null) => setFormData(prev => ({ ...prev, [field.id]: val }));
 
                                     switch (field.loai) {
-                                        case 'LONG_TEXT': return <Textarea key={field.id} {...commonProps} minRows={4} onChange={(e) => handleChange(e.currentTarget.value)} radius="12px" />;
-                                        case 'NUMBER': return <NumberInput key={field.id} {...commonProps} onChange={handleChange} />;
-                                        case 'DATE': return <TextInput key={field.id} type="date" {...commonProps} onChange={(e) => handleChange(e.currentTarget.value)} />;
-                                        case 'SELECT': return <Select key={field.id} {...commonProps} data={field.tuyChon ? (typeof field.tuyChon === 'string' ? JSON.parse(field.tuyChon) : field.tuyChon) : []} onChange={handleChange} searchable clearable />;
+                                        case LoaiTruongForm.TEXTAREA:
+                                        case LoaiTruongForm.LONG_TEXT:
+                                            return <Textarea key={field.id} {...commonProps} minRows={4} onChange={(e) => handleChange(e.currentTarget.value)} radius="12px" />;
+                                        case LoaiTruongForm.NUMBER: return <NumberInput key={field.id} {...commonProps} onChange={handleChange} />;
+                                        case LoaiTruongForm.DATE: return <TextInput key={field.id} type="date" {...commonProps} onChange={(e) => handleChange(e.currentTarget.value)} />;
+                                        case LoaiTruongForm.SELECT: return <Select key={field.id} {...commonProps} data={field.tuyChon ? (typeof field.tuyChon === 'string' ? JSON.parse(field.tuyChon) : field.tuyChon) : []} onChange={handleChange} searchable clearable />;
                                         default: return <TextInput key={field.id} {...commonProps} onChange={(e) => handleChange(e.currentTarget.value)} />;
                                     }
                                 }) : (

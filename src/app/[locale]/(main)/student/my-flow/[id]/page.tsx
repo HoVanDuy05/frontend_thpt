@@ -14,7 +14,7 @@ import {
 } from "@tabler/icons-react";
 import { AppQuery } from "@/api/AppQuery";
 import { dayjs } from "@/shared/utils/date.util";
-import { TPhienQuyTrinh } from "@/shared/types/approval.type";
+import { TPhienQuyTrinh, TBuocQuyTrinh } from "@/shared/types/approval.type";
 
 export default function StudentFlowDetailPage() {
     const params = useParams();
@@ -217,7 +217,7 @@ export default function StudentFlowDetailPage() {
 
                                     <Paper withBorder radius="32px" p={32} className="border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm relative overflow-hidden">
                                         <Stack gap={0}>
-                                            {flow.quyTrinh?.cacBuoc?.map((buoc: any, index: number) => {
+                                            {flow.quyTrinh?.cacBuoc?.map((buoc: TBuocQuyTrinh, index: number) => {
                                                 const isActive = index === 0; // Simulated
                                                 const totalSteps = flow.quyTrinh?.cacBuoc?.length || 0;
                                                 return (
