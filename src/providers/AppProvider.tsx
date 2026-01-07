@@ -3,13 +3,11 @@
 import { MantineProvider, createTheme, rem } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { NavigationProgress } from "@mantine/nprogress";
 import { useState, Suspense } from "react";
 import { NextIntlClientProvider, AbstractIntlMessages } from "next-intl";
 import { SplashScreen } from "@/shared/components/SplashScreen";
 import { PWAProvider } from "@/providers/PWAProvider";
 import { GlobalSocketHandler } from "@/shared/components/GlobalSocketHandler";
-import "@mantine/nprogress/styles.css";
 
 interface AppProviderProps {
     children: React.ReactNode;
@@ -144,7 +142,6 @@ export function AppProvider({ children, messages, locale }: AppProviderProps) {
         >
             <QueryClientProvider client={queryClient}>
                 <MantineProvider defaultColorScheme="auto" theme={theme}>
-                    <NavigationProgress color="indigo" size={3} />
                     <Notifications position="top-right" zIndex={1000} />
                     <SplashScreen />
                     <PWAProvider>

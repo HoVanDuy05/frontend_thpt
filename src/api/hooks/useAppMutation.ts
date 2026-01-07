@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { nprogress } from "@mantine/nprogress";
 import axiosClient from "../axiosClient";
 import { ApiMutationType } from "../types/api.type";
 import { replaceDynamicValues } from "@/shared/utils/api.util";
@@ -39,7 +38,6 @@ export const useAppMutation = <T extends keyof ApiMutationType>({
                 mergedParams
             );
 
-            nprogress.start();
             try {
                 let response;
                 switch (method) {
@@ -62,7 +60,6 @@ export const useAppMutation = <T extends keyof ApiMutationType>({
                 onError?.(error);
                 return Promise.reject(error);
             } finally {
-                nprogress.complete();
             }
         },
     });
