@@ -1,5 +1,5 @@
 import createMiddleware from 'next-intl/middleware';
-import { routing } from './i18n/routing';
+import { routing } from '@/i18n/routing';
 
 export default async function middleware(request: any) {
     console.log('Middleware running:', request.nextUrl.pathname);
@@ -10,11 +10,8 @@ export default async function middleware(request: any) {
 export const config = {
     // Match only internationalized pathnames
     matcher: [
-        // Exclude internal paths
-        '/((?!api|_next|_vercel|socket\\.io|.*\\..*).*)',
-        // Support locale prefixes
-        '/(vi|en)/:path*',
-        // Match root
-        '/'
+        '/((?!api|_next|_vercel|socket\\.io|screenshots|\\.well-known|.*\\..*).*)',
+        '/',
+        '/(vi|en)/:path*'
     ]
 };
