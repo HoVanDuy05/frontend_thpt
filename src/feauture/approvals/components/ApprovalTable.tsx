@@ -44,22 +44,16 @@ export const ApprovalTable: React.FC<ApprovalTableProps> = ({ requests, onAction
                 </Group>
             </Table.Td>
             <Table.Td>
-                <Badge color={statusColors[req.trangThai]} variant="dot" size="lg" radius="sm">
+                <Badge color={statusColors[req.trangThai]} variant="light" size="sm">
                     {req.trangThai.replace('_', ' ')}
                 </Badge>
             </Table.Td>
             <Table.Td>
-                <Stack gap={2}>
-                    <Text size="sm" fw={700} c="blue">Giai đoạn {req.buocHienTai}</Text>
-                    <Box className="flex items-center gap-1">
-                        <Box className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                        <Text size="xs" c="dimmed">Đang xử lý</Text>
-                    </Box>
-                </Stack>
+                <Text size="sm" fw={600}>Giai đoạn {req.buocHienTai}</Text>
+                <Text size="xs" c="dimmed">Đang xử lý</Text>
             </Table.Td>
             <Table.Td>
-                <Text size="sm" fw={500}>{dayjs(req.ngayTao).format('DD/MM/YYYY')}</Text>
-                <Text size="xs" c="dimmed">{dayjs(req.ngayTao).format('HH:mm')}</Text>
+                <Text size="sm" fw={500}>{dayjs(req.ngayTao).format('DD/MM HH:mm')}</Text>
             </Table.Td>
             <Table.Td>
                 <Group gap="xs" justify="flex-end">

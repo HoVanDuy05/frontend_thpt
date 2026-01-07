@@ -15,9 +15,10 @@ interface FlowBuilderDrawerProps {
     initialData?: any;
     onSave: (data: any) => void;
     loading?: boolean;
+    defaultCategoryId?: string | null;
 }
 
-export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loading }: FlowBuilderDrawerProps) {
+export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loading, defaultCategoryId }: FlowBuilderDrawerProps) {
     const t = useTranslations('approvals.builder');
     const tRoles = useTranslations('approvals.roles');
     const tFields = useTranslations('approvals.fields');
@@ -32,6 +33,7 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
     const [desc, setDesc] = React.useState('');
     const [categoryId, setCategoryId] = React.useState<string | null>(null);
     const [activeTab, setActiveTab] = React.useState<string | null>('design');
+    const [isActive, setIsActive] = React.useState(true);
 
     // Category Creation State
     const [searchValue, setSearchValue] = useState('');
@@ -52,6 +54,7 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                 setName(initialData.ten || '');
                 setDesc(initialData.moTa || '');
                 setCategoryId(initialData.danhMucId ? initialData.danhMucId.toString() : null);
+                setIsActive(initialData.trangThai === 'HOAT_DONG');
 
                 // Map Steps
                 if (initialData.cacBuoc && initialData.cacBuoc.length > 0) {
@@ -65,14 +68,18 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                     setSteps([{ id: Date.now(), name: "Duyệt lần 1", rule: 'any', approverType: 'ROLE_GVCN' }]);
                 }
 
-                // Map Fields
-                if (initialData.truongDuLieus && initialData.truongDuLieus.length > 0) {
-                    setFormFields(initialData.truongDuLieus.map((field: any) => ({
-                        id: field.id, // Keep ID
-                        label: field.nhan,
-                        required: field.batBuoc,
-                        type: field.loai
-                    })));
+                if (initialData.truongDuLieus || initialData.cacTruong) {
+                    const fieldsSource = initialData.truongDuLieus || initialData.cacTruong;
+                    if (fieldsSource.length > 0) {
+                        setFormFields(fieldsSource.map((field: any) => ({
+                            id: field.id, // Keep ID
+                            label: field.nhan,
+                            required: field.batBuoc,
+                            type: field.loai
+                        })));
+                    } else {
+                        setFormFields([{ id: Date.now(), label: "Lý do", required: true, type: 'TEXTAREA' }]);
+                    }
                 } else {
                     setFormFields([{ id: Date.now(), label: "Lý do", required: true, type: 'TEXTAREA' }]);
                 }
@@ -82,9 +89,10 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                 // Reset for create
                 setName('');
                 setDesc('');
-                setCategoryId(null);
+                setCategoryId(defaultCategoryId || null);
                 setSteps([{ id: Date.now(), name: "Duyệt lần 1", rule: 'any', approverType: 'ROLE_GVCN' }]);
                 setFormFields([{ id: Date.now(), label: "Lý do", required: true, type: 'LONG_TEXT' }]);
+                setIsActive(true);
                 setActiveTab('info');
             }
         }
@@ -143,7 +151,7 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
     const handleCreateCategory = async (query: string) => {
         setIsCreatingCategory(true);
         try {
-            const res = await createCategoryMutation.mutateAsync({ ten: query, moTa: '' });
+            const res = await createCategoryMutation.mutateAsync({ name: query, description: '' });
             notifications.show({ title: 'Thành công', message: 'Đã tạo danh mục mới', color: 'green' });
             await refetchCategories();
             setCategoryId(res.id.toString());
@@ -163,6 +171,7 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
             name,
             description: desc,
             category_id: categoryId ? Number(categoryId) : null,
+            status: isActive ? 'HOAT_DONG' : 'NHAP',
             steps,
             fields: formFields
         });
@@ -275,6 +284,16 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                         <Text size="xs" c="dimmed" mt={-8}>
                             * Nhập tên danh mục mới và chọn "Tạo mới..." để tạo nhanh.
                         </Text>
+
+                        <Switch
+                            label="Kích hoạt quy trình ngay"
+                            description="Quy trình sẽ được áp dụng ngay sau khi lưu"
+                            checked={isActive}
+                            onChange={(e) => setIsActive(e.currentTarget.checked)}
+                            size="md"
+                            color="teal"
+                            className="mt-2"
+                        />
                     </Stack>
                 </Box>
 
@@ -384,19 +403,6 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
     const renderDesignPanel = () => (
         <Box className="h-full flex flex-col relative overflow-hidden bg-gray-50/50 dark:bg-zinc-900/50">
             <Box className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #6366f1 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
-
-            <Box p="md" className="border-b border-gray-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm z-10 flex justify-between items-center shrink-0">
-                <Group>
-                    <ThemeIcon variant="gradient" gradient={{ from: 'indigo', to: 'cyan' }} radius="lg">
-                        <IconGitPullRequest size={18} />
-                    </ThemeIcon>
-                    <Stack gap={0}>
-                        <Text fw={700} size="sm">Thiết kế luồng duyệt</Text>
-                        <Text size="xs" c="dimmed">Kéo thả hoặc thêm bước để cấu hình</Text>
-                    </Stack>
-                </Group>
-                <Button size="xs" variant="filled" color="indigo" leftSection={<IconPlus size={14} />} onClick={addStep}>Thêm bước duyệt</Button>
-            </Box>
 
             <Box className="flex-1 overflow-auto">
                 <Box className="min-w-[800px] min-h-full relative bg-gray-50/30 dark:bg-zinc-900/30">
@@ -542,18 +548,19 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
             }}
         >
             {/* Custom Header */}
-            <Box px="xl" py="md" className="border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0">
-                <Group justify="space-between">
-                    <Group>
-                        <ThemeIcon size="xl" radius="md" color="indigo" variant="gradient" gradient={{ from: 'indigo', to: 'violet', deg: 45 }}>
-                            <IconTemplate size={24} stroke={2} color="white" />
+            {/* Custom Header */}
+            <Box px="lg" py="md" className="border-b border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0">
+                <Group justify="space-between" wrap="nowrap" align="center">
+                    <Group gap="sm" wrap="nowrap" className="overflow-hidden">
+                        <ThemeIcon size={isMobile ? "lg" : "xl"} radius="md" color="indigo" variant="gradient" gradient={{ from: 'indigo', to: 'violet', deg: 45 }} className="shrink-0">
+                            <IconTemplate size={isMobile ? 18 : 24} stroke={2} color="white" />
                         </ThemeIcon>
-                        <Stack gap={0}>
-                            <Text fw={800} size="lg" className="text-gray-900 dark:text-gray-100">{t('title') || "Trình tạo quy trình"}</Text>
-                            <Text size="xs" c="dimmed" fw={600} tt="uppercase" lts={1}>{t('subtitle') || "Thiết kế luồng & biểu mẫu"}</Text>
+                        <Stack gap={0} className="overflow-hidden">
+                            <Text fw={800} size={isMobile ? "md" : "lg"} truncate="end" className="text-gray-900 dark:text-gray-100 block">{t('title') || "Trình tạo quy trình"}</Text>
+                            <Text size="xs" c="dimmed" fw={600} tt="uppercase" lts={0.5} truncate="end" className="block">{t('subtitle') || "Thiết kế luồng & biểu mẫu"}</Text>
                         </Stack>
                     </Group>
-                    <ActionIcon variant="subtle" color="gray" onClick={onClose} size="lg" radius="xl">
+                    <ActionIcon variant="subtle" color="gray" onClick={onClose} size="lg" radius="xl" className="shrink-0">
                         <IconX size={24} />
                     </ActionIcon>
                 </Group>
@@ -562,7 +569,15 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
             <form className="flex flex-col flex-1 overflow-hidden" onSubmit={handleSubmit}>
 
                 {isMobile ? (
-                    <Tabs value={activeTab} onChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden" styles={{ panel: { flex: 1, overflow: 'hidden' } }}>
+                    <Tabs
+                        value={activeTab}
+                        onChange={setActiveTab}
+                        className="flex-1 flex flex-col overflow-hidden"
+                        styles={{
+                            root: { display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' },
+                            panel: { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }
+                        }}
+                    >
                         <Tabs.List grow>
                             <Tabs.Tab value="info" leftSection={<IconInfoCircle size={16} />}>Thông tin</Tabs.Tab>
                             <Tabs.Tab value="design" leftSection={<IconGitPullRequest size={16} />}>Quy trình</Tabs.Tab>
@@ -588,20 +603,39 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                 )}
 
                 <Box p="md" className="border-t border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 z-50 shrink-0">
-                    <Group justify="flex-end">
-                        <Button variant="default" onClick={onClose} disabled={loading} radius="md">{t('cancel') || "Hủy"}</Button>
-                        <Button
-                            color="indigo"
-                            loading={loading}
-                            type="submit"
-                            size="md"
-                            radius="md"
-                            leftSection={<IconDeviceFloppy size={18} />}
-                            className="bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-100 dark:shadow-none transition-all"
-                        >
-                            {t('submit') || "Lưu quy trình"}
-                        </Button>
-                    </Group>
+                    {isMobile ? (
+                        <Group justify="flex-end" gap="sm">
+                            <Button variant="default" onClick={onClose} disabled={loading} radius="md">
+                                Hủy
+                            </Button>
+                            <Button
+                                color="indigo"
+                                loading={loading}
+                                type="submit"
+                                size="md"
+                                radius="md"
+                                leftSection={<IconDeviceFloppy size={18} />}
+                                className="bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-100 dark:shadow-none transition-all"
+                            >
+                                Lưu
+                            </Button>
+                        </Group>
+                    ) : (
+                        <Group justify="flex-end">
+                            <Button variant="default" onClick={onClose} disabled={loading} radius="md">Hủy</Button>
+                            <Button
+                                color="indigo"
+                                loading={loading}
+                                type="submit"
+                                size="md"
+                                radius="md"
+                                leftSection={<IconDeviceFloppy size={18} />}
+                                className="bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-100 dark:shadow-none transition-all"
+                            >
+                                Lưu
+                            </Button>
+                        </Group>
+                    )}
                 </Box>
             </form >
         </Drawer >

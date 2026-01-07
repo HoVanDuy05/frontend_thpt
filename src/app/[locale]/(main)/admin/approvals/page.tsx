@@ -10,7 +10,7 @@ import { FlowBuilderDrawer } from '@/feauture/approvals/components/FlowBuilderDr
 import { AppQuery } from '@/api/AppQuery';
 import { AppMutation } from '@/api/AppMutation';
 import { notifications } from '@mantine/notifications';
-import { IconPlus, IconStack, IconSchool, IconSettings, IconClipboardList, IconClock, IconCheckbox, IconX, IconTrendingUp, IconFilter, IconFileDescription, IconTrash } from '@tabler/icons-react';
+import { IconPlus, IconStack, IconSchool, IconCategory2, IconClipboardList, IconClock, IconCheckbox, IconX, IconTrendingUp, IconFilter, IconFileDescription, IconTrash } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 import { dayjs } from "@/shared/utils/date.util";
 
@@ -24,7 +24,7 @@ export default function ApprovalsPage() {
 
     // Queries
     const { data: flows, isLoading: loadingFlows } = AppQuery.approvals.useFlows();
-    const { data: categoriesData } = AppQuery.approvals.useCategories();
+    const { data: categoriesData, refetch: refetchCategories } = AppQuery.approvals.useCategories();
     const { data: myRequests, isLoading: loadingMy } = AppQuery.approvals.useMyFlows();
     const [activeTab, setActiveTab] = useState<string | null>('flows');
 
@@ -89,6 +89,7 @@ export default function ApprovalsPage() {
                 ten: data.name,
                 moTa: data.description,
                 danhMucId: data.category_id,
+                trangThai: data.status,
                 // We might need to handle steps/fields update separately if backend doesn't support nested update
                 // For this UI demo, let's assume simple property updates work or just notify "Feature pending" for complex parts if needed.
                 // Re-sending steps/fields might be required.
@@ -155,37 +156,48 @@ export default function ApprovalsPage() {
     ];
 
     return (
-        <Box h="calc(100vh - 60px)" className="overflow-hidden flex flex-col bg-[#F8FAFC] dark:bg-zinc-950">
-            {/* Premium Header */}
-            <Box className="bg-white dark:bg-zinc-900 border-b border-gray-100 dark:border-zinc-800 px-6 py-5 shrink-0 shadow-sm relative z-20">
-                <Group justify="space-between" align="center">
-                    <Group gap="md">
+        <Box h="calc(100vh - 60px)" className="overflow-hidden flex flex-col bg-gray-50 dark:bg-zinc-950">
+            {/* Clean Header */}
+            <Box className="bg-white dark:bg-zinc-900 border-b border-gray-200 dark:border-zinc-800 px-3 md:px-6 py-3 md:py-4 shrink-0">
+                <Group justify="space-between" align="center" wrap="nowrap" gap="xs">
+                    <Group gap="xs" className="overflow-hidden min-w-0">
                         {isMobile && (
-                            <ActionIcon variant="light" onClick={toggleSidebar} color="indigo" size="lg" radius="md">
-                                <IconSettings size={20} />
+                            <ActionIcon variant="subtle" onClick={toggleSidebar} color="gray" size="md" radius="md">
+                                <IconCategory2 size={20} />
                             </ActionIcon>
                         )}
-                        <ThemeIcon size={42} radius="12" variant="gradient" gradient={{ from: 'blue', to: 'cyan', deg: 135 }}>
-                            <IconStack size={24} stroke={1.5} />
-                        </ThemeIcon>
-                        <div>
-                            <Title order={2} fw={800} className="text-gray-900 dark:text-white tracking-tight leading-none">
-                                {t('page_title')}
+                        {!isMobile && (
+                            <Box className="w-10 h-10 rounded-lg bg-indigo-500 flex items-center justify-center shrink-0">
+                                <IconStack size={20} stroke={2} className="text-white" />
+                            </Box>
+                        )}
+                        <Box className="overflow-hidden min-w-0">
+                            <Title order={isMobile ? 5 : 4} fw={600} className="text-gray-900 dark:text-white truncate" style={{ fontSize: isMobile ? '14px' : '18px' }}>
+                                Quản lý quy trình
                             </Title>
-                            <Text size="sm" c="dimmed" mt={2} fw={500}>
-                                {t('page_subtitle')}
-                            </Text>
-                        </div>
+                        </Box>
                     </Group>
-                    <Button
-                        leftSection={<IconPlus size={18} />}
-                        onClick={() => { setSelectedFlow(null); openBuilder(); }}
-                        size="md"
-                        radius="md"
-                        className="bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-200 dark:shadow-none transition-all"
-                    >
-                        {isMobile ? t('create_new_short') : t('create_new')}
-                    </Button>
+                    {isMobile ? (
+                        <Button
+                            leftSection={<IconPlus size={18} />}
+                            onClick={() => { setSelectedFlow(null); openBuilder(); }}
+                            size="sm"
+                            radius="md"
+                            color="indigo"
+                        >
+                            Tạo mới
+                        </Button>
+                    ) : (
+                        <Button
+                            leftSection={<IconPlus size={16} />}
+                            onClick={() => { setSelectedFlow(null); openBuilder(); }}
+                            size="sm"
+                            radius="md"
+                            color="indigo"
+                        >
+                            Tạo mới
+                        </Button>
+                    )}
                 </Group>
             </Box>
 
@@ -216,59 +228,62 @@ export default function ApprovalsPage() {
                             if (isMobile) toggleSidebar();
                         }}
                         categories={categories}
+                        onRefetch={refetchCategories}
                     />
                 </Box>
 
                 {/* Main content */}
-                <Box className="flex-1 overflow-auto bg-[#F8FAFC] dark:bg-zinc-950 p-6 relative">
-                    {/* Decorative background blobs */}
-                    <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-indigo-50/50 to-transparent dark:from-indigo-950/20 pointer-events-none" />
-
-                    <Stack gap="xl" className="relative z-10 max-w-7xl mx-auto">
+                <Box className="flex-1 overflow-auto bg-gray-50 dark:bg-zinc-950 p-4 md:p-6">
+                    <Stack gap="lg" className="max-w-7xl mx-auto">
                         {/* Stats Grid */}
-                        <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
+                        <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="md">
                             {stats.map((stat) => (
                                 <Paper
                                     key={stat.label}
                                     p="md"
-                                    radius="lg"
-                                    className="border border-white/60 dark:border-white/5 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm shadow-sm hover:shadow-md transition-all group"
+                                    radius="md"
+                                    className="border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900"
+                                    withBorder
                                 >
-                                    <Group justify="space-between" align="flex-start" mb="xs">
-                                        <div>
-                                            <Text size="xs" c="dimmed" fw={700} tt="uppercase" lts={0.5}>{stat.label}</Text>
-                                            <Text size="2xl" fw={800} className="text-gray-900 dark:text-white mt-1 group-hover:scale-105 transition-transform origin-left">{stat.value}</Text>
-                                        </div>
-                                        <RingProgress
-                                            size={48}
-                                            thickness={4}
-                                            roundCaps
-                                            sections={[{ value: stat.progress, color: stat.color }]}
-                                            label={
-                                                <Center>
-                                                    <stat.icon size={16} className={`text-${stat.color}-600 dark:text-${stat.color}-400`} />
-                                                </Center>
-                                            }
-                                        />
+                                    <Group justify="apart" mb="xs">
+                                        <Text size="xs" c="dimmed" tt="uppercase" fw={600}>
+                                            {stat.label}
+                                        </Text>
+                                        <ThemeIcon size={36} radius="md" variant="light" color={stat.color}>
+                                            <stat.icon size={20} stroke={1.5} />
+                                        </ThemeIcon>
                                     </Group>
-                                    <Text size="xs" c="dimmed" className="flex items-center gap-1">
-                                        <IconTrendingUp size={12} className="text-green-500" />
-                                        <span className="text-green-600 font-medium">+12%</span> so với tháng trước
+                                    <Text size="xl" fw={700} className="text-gray-900 dark:text-white">
+                                        {stat.value}
                                     </Text>
+                                    <Group gap={4} mt="xs">
+                                        <IconTrendingUp size={12} className="text-green-500" />
+                                        <Text size="xs" c="dimmed">+12% so với tháng trước</Text>
+                                    </Group>
                                 </Paper>
                             ))}
                         </SimpleGrid>
 
-                        {/* Management Section: Created Flows & Requests */}
+                        {/* Management Section */}
                         <Stack gap="md">
                             <Group justify="space-between" align="center">
-                                <Tabs value={activeTab} onChange={setActiveTab} variant="pills" radius="xl">
+                                <Tabs
+                                    value={activeTab}
+                                    onChange={setActiveTab}
+                                    variant="default"
+                                >
                                     <Tabs.List>
-                                        <Tabs.Tab value="flows">Quy trình ({filteredFlows.length})</Tabs.Tab>
-                                        <Tabs.Tab value="requests">Yêu cầu cần duyệt ({myRequests?.length || 0})</Tabs.Tab>
+                                        <Tabs.Tab value="flows" leftSection={<IconStack size={16} />}>
+                                            Quy trình ({filteredFlows.length})
+                                        </Tabs.Tab>
+                                        <Tabs.Tab value="requests" leftSection={<IconClipboardList size={16} />}>
+                                            Yêu cầu ({myRequests?.length || 0})
+                                        </Tabs.Tab>
                                     </Tabs.List>
                                 </Tabs>
-                                <Button variant="subtle" size="sm" rightSection={<IconFilter size={16} />}>Bộ lọc</Button>
+                                <Button variant="default" size="sm" leftSection={<IconFilter size={16} />}>
+                                    Bộ lọc
+                                </Button>
                             </Group>
 
                             <Box>
@@ -276,12 +291,14 @@ export default function ApprovalsPage() {
                                     <Paper radius="lg" className="overflow-hidden shadow-sm border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900">
                                         <LoadingOverlay visible={loadingFlows} overlayProps={{ blur: 1 }} />
                                         {filteredFlows.length > 0 ? (
-                                            <FlowManagementTable
-                                                flows={filteredFlows}
-                                                onEdit={handleEditFlow}
-                                                onDelete={handleDeleteFlow}
-                                                onToggleStatus={handleToggleStatus}
-                                            />
+                                            <div className="overflow-x-auto">
+                                                <FlowManagementTable
+                                                    flows={filteredFlows}
+                                                    onEdit={handleEditFlow}
+                                                    onDelete={handleDeleteFlow}
+                                                    onToggleStatus={handleToggleStatus}
+                                                />
+                                            </div>
                                         ) : (
                                             <Stack align="center" justify="center" h={200} gap="sm">
                                                 <Text c="dimmed">Chưa có quy trình nào.</Text>
@@ -326,6 +343,7 @@ export default function ApprovalsPage() {
                 initialData={selectedFlow}
                 onSave={handleSaveFlow}
                 loading={createFlowMutation.isPending || updateFlowMutation.isPending}
+                defaultCategoryId={activeCategory === 'all' ? null : activeCategory}
             />
         </Box>
     );

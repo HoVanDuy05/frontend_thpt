@@ -535,7 +535,7 @@ export type ApiMutationType = {
     };
     createCategory: {
         url: { baseUrl: "/categories" };
-        payload: { ten: string; moTa?: string };
+        payload: { name: string; description?: string };
         response: any;
     };
 

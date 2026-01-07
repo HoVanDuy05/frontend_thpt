@@ -27,7 +27,7 @@ const DEFAULT_CATEGORIES: Category[] = [
     { id: 'academic', label: 'Học vụ & Đào tạo', icon: IconSchool, count: 0 },
 ];
 
-export function FlowCategorySidebar({ activeCategory, onCategoryChange, categories }: FlowCategorySidebarProps) {
+export function FlowCategorySidebar({ activeCategory, onCategoryChange, categories, onRefetch }: FlowCategorySidebarProps & { onRefetch?: () => void }) {
     const [popoverOpened, setPopoverOpened] = useState(false);
     const [newCategoryName, setNewCategoryName] = useState('');
 
@@ -43,11 +43,12 @@ export function FlowCategorySidebar({ activeCategory, onCategoryChange, categori
             return;
         }
 
-        createCategoryMutation.mutate({ ten: newCategoryName }, {
+        createCategoryMutation.mutate({ name: newCategoryName, description: '' }, {
             onSuccess: () => {
                 notifications.show({ title: 'Thành công', message: 'Đã tạo danh mục mới', color: 'green' });
                 setNewCategoryName('');
                 setPopoverOpened(false);
+                onRefetch?.();
             },
             onError: () => {
                 notifications.show({ title: 'Thất bại', message: 'Không thể tạo danh mục', color: 'red' });
@@ -58,98 +59,109 @@ export function FlowCategorySidebar({ activeCategory, onCategoryChange, categori
     return (
         <Box
             component="aside"
-            className="w-full sm:w-[280px] shrink-0 border-r border-gray-200/50 dark:border-zinc-700/50 h-full bg-white dark:bg-zinc-900 transition-all"
+            className="w-full sm:w-[280px] shrink-0 border-r border-gray-200 dark:border-zinc-800 h-full bg-white dark:bg-zinc-900 flex flex-col"
         >
-            <Stack gap={4} p="md">
-                <Group justify="space-between" mb="xs" px="md">
-                    <Text size="xs" fw={800} c="dimmed" tt="uppercase" lts={1} className="text-gray-500 dark:text-gray-400">
-                        Danh mục quy trình
-                    </Text>
-                    <Popover opened={popoverOpened} onChange={setPopoverOpened} position="bottom-end" withArrow shadow="lg">
-                        <Popover.Target>
-                            <Tooltip label="Tạo danh mục mới">
-                                <ActionIcon
-                                    variant="light"
-                                    color="indigo"
-                                    size="sm"
-                                    onClick={() => setPopoverOpened((o) => !o)}
-                                    className="hover:bg-indigo-100 dark:hover:bg-indigo-900/30"
-                                >
-                                    <IconPlus size={14} />
-                                </ActionIcon>
-                            </Tooltip>
-                        </Popover.Target>
-                        <Popover.Dropdown>
-                            <Stack gap="xs" style={{ width: 250 }}>
-                                <Text size="sm" fw={600}>Tạo danh mục mới</Text>
-                                <TextInput
-                                    placeholder="Tên danh mục..."
-                                    value={newCategoryName}
-                                    onChange={(e) => setNewCategoryName(e.target.value)}
-                                    onKeyPress={(e) => {
-                                        if (e.key === 'Enter') handleCreateCategory();
-                                    }}
-                                    size="sm"
-                                />
-                                <Group justify="flex-end" gap="xs">
-                                    <Button
+            <Stack gap={0} className="flex-1">
+                <Box p="md" className="border-b border-gray-100 dark:border-zinc-800/50">
+                    <Group justify="space-between" align="center">
+                        <Text size="xs" fw={700} c="dimmed" tt="uppercase" lts={0.5}>
+                            Danh mục quy trình
+                        </Text>
+                        <Popover opened={popoverOpened} onChange={setPopoverOpened} position="bottom-end" withArrow shadow="md">
+                            <Popover.Target>
+                                <Tooltip label="Tạo danh mục mới">
+                                    <ActionIcon
                                         variant="subtle"
-                                        size="xs"
-                                        onClick={() => {
-                                            setNewCategoryName('');
-                                            setPopoverOpened(false);
+                                        color="gray"
+                                        size="sm"
+                                        onClick={() => setPopoverOpened((o) => !o)}
+                                    >
+                                        <IconPlus size={16} />
+                                    </ActionIcon>
+                                </Tooltip>
+                            </Popover.Target>
+                            <Popover.Dropdown p="xs">
+                                <Stack gap="xs" style={{ width: 220 }}>
+                                    <Text size="xs" fw={600}>Tên danh mục mới</Text>
+                                    <TextInput
+                                        placeholder="Ví dụ: Nhân sự"
+                                        value={newCategoryName}
+                                        onChange={(e) => setNewCategoryName(e.target.value)}
+                                        onKeyPress={(e) => {
+                                            if (e.key === 'Enter') handleCreateCategory();
                                         }}
-                                        leftSection={<IconX size={14} />}
-                                    >
-                                        Hủy
-                                    </Button>
-                                    <Button
                                         size="xs"
-                                        onClick={handleCreateCategory}
-                                        loading={createCategoryMutation.isPending}
-                                        leftSection={<IconCheck size={14} />}
-                                    >
-                                        Tạo
-                                    </Button>
-                                </Group>
-                            </Stack>
-                        </Popover.Dropdown>
-                    </Popover>
-                </Group>
-                {displayCategories.map((cat) => {
-                    const isActive = activeCategory === cat.id;
-                    const Icon = cat.icon;
-                    return (
-                        <UnstyledButton
-                            key={cat.id}
-                            onClick={() => onCategoryChange(cat.id)}
-                            className={`px-4 py-3 rounded-xl transition-all flex items-center justify-between group ${isActive
-                                ? 'bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 text-indigo-700 dark:text-indigo-300 shadow-sm'
-                                : 'hover:bg-gray-100/80 dark:hover:bg-zinc-800/80 text-gray-700 dark:text-gray-300'
-                                }`}
-                        >
-                            <Group gap="sm">
-                                <Icon
-                                    size={20}
-                                    stroke={isActive ? 2.5 : 1.5}
-                                    className={`transition-transform duration-200 ${isActive ? 'scale-110 text-indigo-600 dark:text-indigo-400' : 'group-hover:scale-105 text-gray-500 dark:text-gray-400'}`}
-                                />
-                                <Text size="sm" fw={isActive ? 700 : 500} className={isActive ? 'text-indigo-700 dark:text-indigo-300' : ''}>
-                                    {cat.label}
-                                </Text>
-                            </Group>
-                            <Badge
-                                variant={isActive ? "filled" : "light"}
-                                color={isActive ? "indigo" : "gray"}
-                                size="sm"
-                                radius="sm"
-                                className={isActive ? 'bg-indigo-600 text-white' : ''}
-                            >
-                                {cat.count}
-                            </Badge>
-                        </UnstyledButton>
-                    );
-                })}
+                                        autoFocus
+                                    />
+                                    <Group justify="flex-end" gap="xs">
+                                        <Button
+                                            variant="subtle"
+                                            size="xs"
+                                            color="gray"
+                                            onClick={() => {
+                                                setNewCategoryName('');
+                                                setPopoverOpened(false);
+                                            }}
+                                        >
+                                            Hủy
+                                        </Button>
+                                        <Button
+                                            size="xs"
+                                            color="indigo"
+                                            onClick={handleCreateCategory}
+                                            loading={createCategoryMutation.isPending}
+                                        >
+                                            Tạo
+                                        </Button>
+                                    </Group>
+                                </Stack>
+                            </Popover.Dropdown>
+                        </Popover>
+                    </Group>
+                </Box>
+
+                <Box p="xs" className="flex-1 overflow-auto">
+                    <Stack gap={2}>
+                        {displayCategories.map((cat) => {
+                            const isActive = activeCategory === cat.id;
+                            const Icon = cat.icon;
+                            return (
+                                <UnstyledButton
+                                    key={cat.id}
+                                    onClick={() => onCategoryChange(cat.id)}
+                                    className={`
+                                        w-full px-3 py-2.5 rounded-lg transition-all flex items-center justify-between group
+                                        ${isActive
+                                            ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
+                                            : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                                        }
+                                    `}
+                                >
+                                    <Group gap="sm">
+                                        <Icon
+                                            size={18}
+                                            stroke={isActive ? 2 : 1.5}
+                                            className="shrink-0"
+                                        />
+                                        <Text size="sm" fw={isActive ? 600 : 500} className="truncate">
+                                            {cat.label}
+                                        </Text>
+                                    </Group>
+                                    {cat.count > 0 && (
+                                        <Badge
+                                            variant={isActive ? "filled" : "light"}
+                                            color={isActive ? "indigo" : "gray"}
+                                            size="xs"
+                                            radius="sm"
+                                        >
+                                            {cat.count}
+                                        </Badge>
+                                    )}
+                                </UnstyledButton>
+                            );
+                        })}
+                    </Stack>
+                </Box>
             </Stack>
         </Box>
     );

@@ -20,8 +20,8 @@ export function FlowManagementTable({ flows, onEdit, onDelete, onToggleStatus }:
                 </Group>
             </Table.Td>
             <Table.Td>
-                <Badge variant="dot" color={flow.danhMuc ? 'blue' : 'gray'}>
-                    {flow.danhMuc?.ten || 'Chưa phân loại'}
+                <Badge variant="light" color={flow.danhMuc ? 'indigo' : 'gray'} size="sm">
+                    {flow.danhMuc?.ten || 'N/A'}
                 </Badge>
             </Table.Td>
             <Table.Td>
