@@ -19,6 +19,7 @@ export enum LoaiTruongForm {
     TEXT = 'TEXT',
     NUMBER = 'NUMBER',
     TEXTAREA = 'TEXTAREA',
+    LONG_TEXT = 'LONG_TEXT',
     SELECT = 'SELECT',
     DATE = 'DATE',
     DATETIME = 'DATETIME'
@@ -44,6 +45,15 @@ export enum HanhDongPheDuyet {
     YEU_CAU_CHINH_SUA = 'YEU_CAU_CHINH_SUA'
 }
 
+export interface TDanhMucQuyTrinh {
+    id: number;
+    ten: string;
+    moTa?: string;
+    _count?: {
+        quyTrinhs: number;
+    };
+}
+
 export interface TQuyTrinh {
     id: number;
     ten: string;
@@ -53,6 +63,7 @@ export interface TQuyTrinh {
     ngayTao: string;
     cacBuoc?: TBuocQuyTrinh[];
     cacTruong?: TTruongFormQuyTrinh[];
+    danhMuc?: TDanhMucQuyTrinh;
     _count?: {
         cacBuoc: number;
     };
@@ -71,7 +82,14 @@ export interface TNguoiPheDuyetBuoc {
     id: number;
     buocId: number;
     loaiNguoiPheDuyet: LoaiNguoiPheDuyet;
-    approverId: string; // ID of user/role/group
+    approverId?: number; // ID of user
+    approverRole?: string; // "GVCN", "ADMIN"...
+    user?: {
+        id: number;
+        taiKhoan: string;
+        hoTen?: string;
+        email?: string;
+    };
 }
 
 export interface TTruongFormQuyTrinh {
@@ -93,7 +111,15 @@ export interface TPhienQuyTrinh {
     trangThai: TrangThaiPhien;
     buocHienTai: number;
     nguoiTaoId: number;
+    nguoiTao?: {
+        id: number;
+        taiKhoan: string;
+        hoTen?: string;
+        email?: string;
+        avatar?: string;
+    };
     ngayTao: string;
+    ngayCapNhat?: string;
     buocPhiens?: TBuocPhienQuyTrinh[];
     nhatKy?: TNhatKyPheDuyetQuyTrinh[];
 }
