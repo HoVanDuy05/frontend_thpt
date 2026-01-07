@@ -10,7 +10,8 @@ import {
 import {
     IconPlus, IconFileDescription, IconClock, IconCheck, IconX,
     IconChevronRight, IconCalendar, IconChevronLeft, IconFiles,
-    IconActivity, IconExternalLink, IconSearch
+    IconActivity, IconExternalLink, IconSearch, IconArrowRight,
+    IconTrendingUp, IconBriefcase, IconHistory
 } from "@tabler/icons-react";
 import { AppQuery } from "@/api/AppQuery";
 import { AppMutation } from "@/api/AppMutation";
@@ -52,50 +53,59 @@ export default function MyFlowPage() {
         return matchesTab && matchesSearch;
     });
 
-    const rows = filteredFlows?.map((flow: TPhienQuyTrinh) => {
+    const rows = filteredFlows?.map((flow: TPhienQuyTrinh, index: number) => {
         const config = getStatusConfig(flow.trangThai);
         return (
             <Table.Tr
                 key={flow.id}
-                className="hover:bg-gray-50/50 dark:hover:bg-zinc-800/30 cursor-pointer transition-colors group"
+                className="hover:bg-indigo-50/10 dark:hover:bg-indigo-500/5 cursor-pointer transition-all duration-300 group border-b border-gray-50 dark:border-zinc-800/50"
                 onClick={() => router.push(`./my-flow/${flow.id}`)}
             >
                 <Table.Td>
-                    <Text fw={750} size="sm" className="text-gray-400 font-mono">#{flow.id}</Text>
+                    <Box className="flex items-center gap-4">
+                        <Box className="w-8 h-8 rounded-lg bg-gray-50 dark:bg-zinc-800 flex items-center justify-center text-[10px] fw-900 text-gray-400 font-mono group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                            {index + 1}
+                        </Box>
+                        <Text fw={850} size="xs" className="text-gray-400 font-mono tracking-tighter">CF-{flow.id.toString().padStart(6, '0')}</Text>
+                    </Box>
                 </Table.Td>
                 <Table.Td>
                     <Stack gap={2}>
-                        <Text fw={850} size="sm" className="text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 transition-colors uppercase tracking-tight">
+                        <Text fw={900} size="sm" className="text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-none">
                             {flow.quyTrinh?.ten || "Yêu cầu hành chính"}
                         </Text>
-                        <Text size="xs" c="dimmed" fw={600} className="line-clamp-1">
-                            {flow.quyTrinh?.danhMuc?.ten || "Dịch vụ công"}
-                        </Text>
+                        <Group gap={6} mt={4}>
+                            <Badge variant="dot" color="gray" size="xs" radius="sm" fw={800} className="border-none bg-transparent px-0">{flow.quyTrinh?.danhMuc?.ten || "Hành chính"}</Badge>
+                            <Text size="10px" c="dimmed" fw={700}>•</Text>
+                            <Text size="10px" c="dimmed" fw={750} tt="uppercase" lts={0.5}>Mã: HS-{flow.id}</Text>
+                        </Group>
                     </Stack>
                 </Table.Td>
                 <Table.Td>
-                    <Badge variant="dot" color={config.color} size="md" radius="sm" fw={850} tt="uppercase" lts={0.5} className="h-7 px-3">
+                    <Badge variant="light" color={config.color} size="md" radius="sm" fw={900} tt="uppercase" lts={1} className="h-8 px-4 border border-current/10">
                         {config.label}
                     </Badge>
                 </Table.Td>
                 <Table.Td>
-                    <Group gap="xs">
-                        <IconCalendar size={14} className="text-gray-400" />
-                        <Text size="sm" fw={650} className="text-gray-600 dark:text-gray-400">
-                            {dayjs(flow.ngayTao).format("DD/MM/YYYY")}
+                    <Stack gap={2}>
+                        <Text size="sm" fw={850} className="text-gray-800 dark:text-gray-200 tabular-nums">
+                            {dayjs(flow.ngayTao).format("HH:mm")}
                         </Text>
-                    </Group>
+                        <Text size="11px" fw={700} c="dimmed">
+                            {dayjs(flow.ngayTao).format("DD MMM, YYYY")}
+                        </Text>
+                    </Stack>
                 </Table.Td>
                 <Table.Td>
-                    <Text size="xs" fw={700} c="dimmed" ta="right">
-                        {dayjs(flow.ngayCapNhat || flow.ngayTao).fromNow()}
+                    <Text size="xs" fw={850} className="text-indigo-600 uppercase tracking-widest text-right">
+                        {dayjs(flow.ngayTao).fromNow()}
                     </Text>
                 </Table.Td>
                 <Table.Td>
                     <Group justify="flex-end">
-                        <ActionIcon variant="subtle" color="gray" radius="xl" className="group-hover:text-indigo-600 group-hover:bg-indigo-50/50">
-                            <IconExternalLink size={18} stroke={2.5} />
-                        </ActionIcon>
+                        <Box className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-zinc-800 flex items-center justify-center text-gray-400 group-hover:bg-indigo-600 group-hover:text-white group-hover:rotate-45 transition-all">
+                            <IconArrowRight size={18} stroke={3} />
+                        </Box>
                     </Group>
                 </Table.Td>
             </Table.Tr>
@@ -104,56 +114,63 @@ export default function MyFlowPage() {
 
     return (
         <Box h="calc(100vh - 60px)" className="flex flex-col bg-[#fcfcfd] dark:bg-[#09090b] translate-z-0">
-            {/* Ultra-Slim Navigation Bar */}
-            <Box h={72} className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-zinc-800/50 px-6 md:px-10 flex items-center shrink-0 z-40">
+            {/* Ultra-Premium Navigation Bar */}
+            <Box h={100} className="bg-white/90 dark:bg-zinc-950/90 backdrop-blur-2xl border-b border-gray-100 dark:border-zinc-800 px-6 md:px-12 flex items-center shrink-0 z-40 relative">
+                <Box className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent" />
                 <Group justify="space-between" className="w-full max-w-7xl mx-auto">
                     <Group gap="xl">
-                        <Group gap="sm">
-                            <Box className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-[0_4px_12px_rgba(79,70,229,0.3)]">
-                                <IconFiles size={20} stroke={2} />
-                            </Box>
-                            <div>
-                                <Title order={4} fw={850} className="tracking-tight text-gray-900 dark:text-gray-50 leading-none">Smart Portal</Title>
-                                <Text size="10px" fw={750} tt="uppercase" lts={1.2} className="text-indigo-600 dark:text-indigo-400 mt-0.5">Hệ thống hồ sơ</Text>
-                            </div>
-                        </Group>
+                        <Box className="relative group">
+                            <Box className="absolute -inset-2 bg-indigo-500/20 rounded-2xl blur-xl group-hover:bg-indigo-500/30 transition-all opacity-0 group-hover:opacity-100" />
+                            <Group gap="md" className="relative">
+                                <Box className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-200">
+                                    <IconFiles size={24} stroke={2.5} />
+                                </Box>
+                                <div>
+                                    <Title order={3} fw={900} className="tracking-tighter text-gray-900 dark:text-gray-50 leading-none">Smart Portal</Title>
+                                    <Text size="xs" fw={800} tt="uppercase" lts={1.5} className="text-indigo-600 mt-1">Dịch vụ một cửa số</Text>
+                                </div>
+                            </Group>
+                        </Box>
                     </Group>
 
                     <Group gap="md">
                         <Button
-                            leftSection={<IconPlus size={18} stroke={2.5} />}
+                            leftSection={<IconPlus size={20} stroke={3} />}
                             variant="filled"
                             color="indigo"
                             radius="100px"
-                            h={42}
-                            px={24}
+                            h={52}
+                            px={32}
                             onClick={() => setIsDrawerOpen(true)}
-                            className="shadow-[0_8px_16px_-4px_rgba(79,70,229,0.3)] hover:shadow-[0_12px_20px_-4px_rgba(79,70,229,0.4)] transition-all active:scale-95 fw-800"
+                            className="shadow-2xl shadow-indigo-200 hover:shadow-indigo-300 transition-all active:scale-95 fw-900 text-sm uppercase tracking-wider"
                         >
-                            Tạo yêu cầu
+                            Tạo đề xuất mới
                         </Button>
                     </Group>
                 </Group>
             </Box>
 
             <ScrollArea className="flex-1" type="scroll">
-                <Box className="max-w-7xl mx-auto p-6 md:p-10 pb-32">
-                    <Stack gap={40}>
-                        {/* Summary Section */}
+                <Box className="max-w-7xl mx-auto p-6 md:p-12 pb-32">
+                    <Stack gap={56}>
+                        {/* Summary Section - Masterpiece Edition */}
                         {!isLoadingFlows && myFlows && (
-                            <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="lg">
+                            <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="xl">
                                 {[
-                                    { label: 'Tất cả hồ sơ', value: myFlows.length, color: 'gray', trend: 'Lưu trữ' },
-                                    { label: 'Đang xử lý', value: myFlows.filter((f: TPhienQuyTrinh) => f.trangThai === 'CHO_DUYET').length, color: 'blue', trend: 'Hành động' },
-                                    { label: 'Đã hoàn tất', value: myFlows.filter((f: TPhienQuyTrinh) => f.trangThai === 'DA_DUYET').length, color: 'teal', trend: 'Kết thúc' },
-                                    { label: 'Bị từ chối', value: myFlows.filter((f: TPhienQuyTrinh) => f.trangThai === 'TU_CHOI').length, color: 'red', trend: 'Kiểm tra' },
+                                    { label: 'Tổng số hồ sơ', value: myFlows.length, color: 'indigo', icon: IconBriefcase, trend: '+2 hôm nay' },
+                                    { label: 'Đang chờ xử lý', value: myFlows.filter((f: TPhienQuyTrinh) => f.trangThai === 'CHO_DUYET').length, color: 'blue', icon: IconClock, trend: 'Ưu tiên' },
+                                    { label: 'Đã được duyệt', value: myFlows.filter((f: TPhienQuyTrinh) => f.trangThai === 'DA_DUYET').length, color: 'teal', icon: IconCheck, trend: 'Hoàn tất' },
+                                    { label: 'Cần xem lại', value: myFlows.filter((f: TPhienQuyTrinh) => f.trangThai === 'TU_CHOI').length, color: 'red', icon: IconHistory, trend: 'Lưu ý' },
                                 ].map((s, i) => (
-                                    <Paper key={i} withBorder radius="16px" p="xl" className="border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 group">
-                                        <Text size="xs" fw={750} c="dimmed" tt="uppercase" lts={1} mb={4}>{s.label}</Text>
-                                        <Group align="flex-end" gap="xs">
-                                            <Text size="32px" fw={900} className="text-gray-900 dark:text-white tabular-nums leading-none">{s.value}</Text>
-                                            <Badge variant="light" color={s.color} size="xs" radius="sm" fw={800} px={6} className="h-5 leading-none">{s.trend}</Badge>
+                                    <Paper key={i} withBorder radius="32px" p={32} className="border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 group hover:border-indigo-200 transition-all duration-500 shadow-sm hover:shadow-xl">
+                                        <Group justify="space-between" mb={24}>
+                                            <ThemeIcon variant="light" color={s.color} size={48} radius="xl" className="group-hover:scale-110 transition-transform">
+                                                <s.icon size={24} stroke={2} />
+                                            </ThemeIcon>
+                                            <Badge variant="light" color={s.color} size="xs" radius="sm" fw={900}>{s.trend}</Badge>
                                         </Group>
+                                        <Text size="xs" fw={850} c="dimmed" tt="uppercase" lts={1.5} mb={4}>{s.label}</Text>
+                                        <Text size="36px" fw={950} className="text-gray-900 dark:text-white leading-none tracking-tight">{s.value}</Text>
                                     </Paper>
                                 ))}
                             </SimpleGrid>
@@ -163,17 +180,17 @@ export default function MyFlowPage() {
                             <Stack gap="xl">
                                 <Group justify="space-between" align="center">
                                     <Tabs value={activeTab} onChange={setActiveTab} variant="unstyled">
-                                        <Tabs.List className="bg-gray-100/60 dark:bg-zinc-800/50 p-1.2 rounded-14px flex gap-1">
+                                        <Tabs.List className="bg-gray-100/40 dark:bg-zinc-800/40 p-1.5 rounded-20px flex gap-1.5 backdrop-blur-sm">
                                             {[
-                                                { value: 'all', label: 'Tất cả' },
-                                                { value: 'pending', label: 'Đang xử lý' },
-                                                { value: 'approved', label: 'Đã duyệt' },
-                                                { value: 'rejected', label: 'Từ chối' },
+                                                { value: 'all', label: 'Tất cả hồ sơ' },
+                                                { value: 'pending', label: 'Đang chờ xử lý' },
+                                                { value: 'approved', label: 'Đã phê duyệt' },
+                                                { value: 'rejected', label: 'Bị từ chối' },
                                             ].map((t) => (
                                                 <Tabs.Tab
                                                     key={t.value}
                                                     value={t.value}
-                                                    className={`px-6 py-2 rounded-10px text-sm fw-750 transition-all ${activeTab === t.value ? 'bg-white dark:bg-zinc-700 shadow-sm text-gray-900 dark:text-white' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                                                    className={`px-8 py-2.5 rounded-16px text-xs fw-900 transition-all uppercase tracking-widest ${activeTab === t.value ? 'bg-white dark:bg-zinc-700 shadow-xl shadow-gray-200/50 text-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}
                                                 >
                                                     {t.label}
                                                 </Tabs.Tab>
@@ -181,28 +198,29 @@ export default function MyFlowPage() {
                                         </Tabs.List>
                                     </Tabs>
 
-                                    <Box w={{ base: '100%', sm: 300 }}>
+                                    <Box w={{ base: '100%', sm: 360 }}>
                                         <TextInput
-                                            placeholder="Tìm kiếm theo tên, mã..."
-                                            leftSection={<IconSearch size={18} className="text-gray-400" />}
+                                            placeholder="Tìm kiếm thông tin hồ sơ..."
+                                            leftSection={<IconSearch size={22} stroke={2.5} className="text-gray-400" />}
                                             radius="100px"
+                                            size="md"
                                             value={searchQuery}
                                             onChange={(e) => setSearchQuery(e.currentTarget.value)}
-                                            styles={{ input: { background: 'white', border: '1px solid var(--mantine-color-gray-100)' } }}
+                                            styles={{ input: { background: 'white', border: '1px solid var(--mantine-color-gray-100)', height: '52px', fontWeight: 700 } }}
                                         />
                                     </Box>
                                 </Group>
 
-                                <Paper withBorder radius="24px" className="border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-sm">
+                                <Paper withBorder radius="32px" className="border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-2xl shadow-gray-200/20 mb-20">
                                     <div className="overflow-x-auto">
-                                        <Table verticalSpacing="lg" horizontalSpacing="xl" highlightOnHover={false}>
-                                            <Table.Thead className="bg-gray-50/50 dark:bg-zinc-800/50 border-b border-gray-100 dark:border-zinc-800">
+                                        <Table verticalSpacing={24} horizontalSpacing={40} highlightOnHover={false}>
+                                            <Table.Thead className="bg-gray-50/30 dark:bg-zinc-800/30 border-b border-gray-100 dark:border-zinc-800">
                                                 <Table.Tr>
-                                                    <Table.Th className="text-xs fw-850 uppercase lts={1} text-gray-400">Mã số</Table.Th>
-                                                    <Table.Th className="text-xs fw-850 uppercase lts={1} text-gray-400">Tên yêu cầu</Table.Th>
-                                                    <Table.Th className="text-xs fw-850 uppercase lts={1} text-gray-400">Trạng thái</Table.Th>
-                                                    <Table.Th className="text-xs fw-850 uppercase lts={1} text-gray-400">Ngày tạo</Table.Th>
-                                                    <Table.Th className="text-xs fw-850 uppercase lts={1} text-gray-400 text-right">Cập nhật</Table.Th>
+                                                    <Table.Th className="text-[10px] fw-900 uppercase lts={2} text-gray-400 py-6">Định danh hồ sơ</Table.Th>
+                                                    <Table.Th className="text-[10px] fw-900 uppercase lts={2} text-gray-400 py-6">Thông tin dịch vụ</Table.Th>
+                                                    <Table.Th className="text-[10px] fw-900 uppercase lts={2} text-gray-400 py-6">Tiến độ</Table.Th>
+                                                    <Table.Th className="text-[10px] fw-900 uppercase lts={2} text-gray-400 py-6">Ngày khởi tạo</Table.Th>
+                                                    <Table.Th className="text-[10px] fw-900 uppercase lts={2} text-gray-400 py-6 text-right">Hoạt động</Table.Th>
                                                     <Table.Th />
                                                 </Table.Tr>
                                             </Table.Thead>
@@ -210,7 +228,7 @@ export default function MyFlowPage() {
                                                 {isLoadingFlows ? (
                                                     <Table.Tr>
                                                         <Table.Td colSpan={6} p={0}>
-                                                            <Box h={200} className="relative">
+                                                            <Box h={300} className="relative">
                                                                 <LoadingOverlay visible={true} overlayProps={{ blur: 0 }} loaderProps={{ color: 'indigo', type: 'bars' }} />
                                                             </Box>
                                                         </Table.Td>
@@ -218,10 +236,13 @@ export default function MyFlowPage() {
                                                 ) : rows && rows.length > 0 ? rows : (
                                                     <Table.Tr>
                                                         <Table.Td colSpan={6}>
-                                                            <Stack align="center" justify="center" py={100} className="opacity-60">
-                                                                <IconFiles size={80} stroke={0.5} className="text-gray-300" />
-                                                                <Text fw={750} size="xl" className="text-gray-400">Không tìm thấy hồ sơ nào</Text>
-                                                                <Button variant="subtle" color="indigo" radius="xl" onClick={() => setIsDrawerOpen(true)}>Khởi tạo yêu cầu đầu tiên</Button>
+                                                            <Stack align="center" justify="center" py={120} className="opacity-60">
+                                                                <Box className="w-24 h-24 rounded-3xl bg-gray-50 flex items-center justify-center text-gray-300">
+                                                                    <IconFiles size={48} stroke={1} />
+                                                                </Box>
+                                                                <Text fw={900} size="xl" className="text-gray-400 tracking-tight mt-6">Hộp thư hồ sơ trống</Text>
+                                                                <Text size="sm" c="dimmed" maxW={300} ta="center">Bạn chưa có bất kỳ yêu cầu phê duyệt nào được khởi tạo trong hệ thống.</Text>
+                                                                <Button variant="light" color="indigo" radius="xl" size="md" mt={24} onClick={() => setIsDrawerOpen(true)}>Khởi tạo ngay</Button>
                                                             </Stack>
                                                         </Table.Td>
                                                     </Table.Tr>
