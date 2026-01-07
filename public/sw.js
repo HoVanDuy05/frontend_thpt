@@ -1,5 +1,6 @@
-const CACHE_NAME = 'pms-cache-v4';
+const CACHE_NAME = 'pms-cache-v5';
 const ASSETS_TO_CACHE = [
+    '/offline.html',
     '/manifest.json',
     '/favicon.png',
     '/icons/icon-192x192.png',
@@ -10,10 +11,10 @@ const ASSETS_TO_CACHE = [
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            // Thêm tất cả assets vào cache
             return cache.addAll(ASSETS_TO_CACHE);
         })
     );
+    self.skipWaiting();
 });
 
 // Sự kiện Activate: Dọn dẹp cache cũ khi có phiên bản mới
@@ -25,7 +26,6 @@ self.addEventListener('activate', (event) => {
             );
         })
     );
-    // Yêu cầu các tab đang mở sử dụng SW mới ngay lập tức
     return self.clients.claim();
 });
 
@@ -33,7 +33,7 @@ self.addEventListener('fetch', (event) => {
     const { request } = event;
     const url = new URL(request.url);
 
-    // Chỉ xử lý các yêu cầu GET cùng origin (nội bộ)
+    // Chỉ xử lý các yêu cầu GET cùng origin
     if (request.method !== 'GET' || url.origin !== self.location.origin) {
         return;
     }
@@ -43,17 +43,16 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Chiến lược Caching: Network First cho HTML (trang web), Cache First cho Tài nguyên (Assets)
     const isHtml = request.headers.get('accept')?.includes('text/html');
 
     if (isHtml) {
-        // Network First cho HTML: Ưu tiên tải từ mạng để đảm bảo dữ liệu mới nhất
+        // Network First cho HTML
         event.respondWith(
             fetch(request)
                 .then((networkResponse) => {
                     if (networkResponse && networkResponse.status === 200) {
-                        const responseClone = networkResponse.clone();
-                        caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone));
+                        const responseToCache = networkResponse.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
                     }
                     return networkResponse;
                 })
@@ -61,32 +60,25 @@ self.addEventListener('fetch', (event) => {
                     const cachedResponse = await caches.match(request, { ignoreSearch: true });
                     if (cachedResponse) return cachedResponse;
 
-                    // Nếu không có mạng và không có cache, có thể trả về một trang offline lỗi
-                    // Hoặc ném lỗi để trình duyệt tự xử lý (nhưng nếu đã respondWith thì nên trả về Response)
-                    return new Response("Bạn đang ngoại tuyến và trang này chưa được lưu. Vui lòng kết nối mạng để tiếp tục.", {
-                        status: 503,
-                        statusText: "Service Unavailable",
-                        headers: new Headers({ "Content-Type": "text/plain; charset=utf-8" })
-                    });
+                    // Fallback sang trang offline chuẩn
+                    return caches.match('/offline.html');
                 })
         );
     } else {
-        // Stale-while-revalidate cho tài nguyên (ảnh, js, css, etc.)
+        // Cache First cho tài nguyên (Assets)
         event.respondWith(
-            caches.open(CACHE_NAME).then((cache) => {
-                return cache.match(request, { ignoreSearch: true }).then((cachedResponse) => {
-                    const fetchPromise = fetch(request).then((networkResponse) => {
-                        if (networkResponse && networkResponse.status === 200) {
-                            cache.put(request, networkResponse.clone());
-                        }
-                        return networkResponse;
-                    }).catch(() => {
-                        // Lỗi mạng, trả về null để sau đó dùng || cachedResponse
-                        return null;
-                    });
-
-                    return cachedResponse || fetchPromise;
-                });
+            caches.match(request, { ignoreSearch: true }).then((cachedResponse) => {
+                if (cachedResponse) {
+                    return cachedResponse;
+                }
+                // Nếu không có trong cache, thử tải từ mạng
+                return fetch(request).then((networkResponse) => {
+                    if (networkResponse && networkResponse.status === 200) {
+                        const responseToCache = networkResponse.clone();
+                        caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
+                    }
+                    return networkResponse;
+                }).catch(() => null);
             })
         );
     }

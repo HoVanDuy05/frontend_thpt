@@ -1,0 +1,68 @@
+{
+  "packageId": "app.thpt.nguyenhue.student",
+  "host": "thpt-nguyen-hue.vercel.app",
+  "name": "NHers - Social",
+  "launcherName": "NHers Social",
+  "display": "standalone",
+  "themeColor": "#4F46E5",
+  "themeColorDark": "#000000",
+  "navigationColor": "#000000",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#FFFFFF",
+  "enableNotifications": true,
+  "startUrl": "/?utm_source=pwa",
+  "iconUrl": "https://thpt-nguyen-hue.vercel.app/icons/icon-512x512.png",
+  "maskableIconUrl": "https://thpt-nguyen-hue.vercel.app/icons/icon-512x512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "D:\\pms\\frontend\\android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "1",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "Lịch học",
+      "shortName": "Schedule",
+      "url": "https://thpt-nguyen-hue.vercel.app/student/schedule",
+      "chosenIconUrl": "https://thpt-nguyen-hue.vercel.app/icons/icon-192x192.png"
+    },
+    {
+      "name": "Điểm số",
+      "shortName": "Grades",
+      "url": "https://thpt-nguyen-hue.vercel.app/student/grades",
+      "chosenIconUrl": "https://thpt-nguyen-hue.vercel.app/icons/icon-192x192.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://thpt-nguyen-hue.vercel.app/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": true
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://thpt-nguyen-hue.vercel.app/",
+  "minSdkVersion": 21,
+  "orientation": "portrait",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": [],
+  "launchHandlerClientMode": "",
+  "displayOverride": [
+    "standalone",
+    "fullscreen",
+    "window-controls-overlay"
+  ],
+  "appVersion": "1"
+}

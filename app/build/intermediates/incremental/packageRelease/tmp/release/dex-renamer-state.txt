@@ -1,0 +1,4 @@
+#Wed Jan 07 23:37:59 ICT 2026
+base.0=D\:\\pms\\frontend\\app\\build\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
+renamed.0=classes.dex
+path.0=classes.dex

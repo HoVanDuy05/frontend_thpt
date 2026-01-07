@@ -1,7 +1,7 @@
 "use client";
 
 import { Box, Stack, Text, Center } from "@mantine/core";
-import { IconSchool } from "@tabler/icons-react";
+import { IconSchool, IconBus } from "@tabler/icons-react";
 
 interface BrandLoaderProps {
     size?: "sm" | "md" | "lg";
@@ -15,7 +15,7 @@ export function BrandLoader({ size = "md", message, fullscreen = false, minHeigh
     const boxSize = size === "sm" ? 32 : size === "lg" ? 60 : 48;
 
     const loader = (
-        <Stack align="center" gap="md">
+        <Stack align="center" gap="lg" className="relative">
             <Box className="relative">
                 {/* Background Pulsing Ring */}
                 <Box
@@ -34,6 +34,19 @@ export function BrandLoader({ size = "md", message, fullscreen = false, minHeigh
                     />
                 </Box>
             </Box>
+
+            {/* School Bus Animation Layer */}
+            <Box className="relative w-[120px] h-[30px] flex flex-col items-center justify-end overflow-hidden mb-2">
+                <Box className="animate-bus-premium">
+                    <IconBus
+                        size={22}
+                        color="var(--mantine-color-indigo-6)"
+                        stroke={1.5}
+                    />
+                </Box>
+                <Box className="road-track mt-1" />
+            </Box>
+
             {message && (
                 <Text size="xs" fw={800} className="uppercase tracking-[0.2em] text-indigo-600/60 dark:text-indigo-400/60 animate-pulse">
                     {message}

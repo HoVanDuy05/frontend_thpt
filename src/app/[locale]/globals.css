@@ -159,3 +159,69 @@ select {
 #nprogress .peg {
   box-shadow: 0 0 10px var(--brand-600), 0 0 5px var(--brand-600) !important;
 }
+
+/* School Bus Loading Animation - Premium Version */
+@keyframes bus-rocking {
+  0% {
+    transform: translateX(-120%) translateY(0) rotate(0deg);
+  }
+
+  25% {
+    transform: translateX(-40%) translateY(-2px) rotate(1deg);
+  }
+
+  50% {
+    transform: translateX(0) translateY(0) rotate(-1deg);
+  }
+
+  75% {
+    transform: translateX(40%) translateY(-2px) rotate(1deg);
+  }
+
+  100% {
+    transform: translateX(120%) translateY(0) rotate(0deg);
+  }
+}
+
+@keyframes road-slide-premium {
+  0% {
+    background-position: 0 0;
+  }
+
+  100% {
+    background-position: -60px 0;
+  }
+}
+
+@keyframes speed-line {
+  0% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scaleX(1.1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+}
+
+.animate-bus-premium {
+  animation: bus-rocking 2.2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.road-track {
+  height: 2px;
+  width: 80px;
+  background: repeating-linear-gradient(90deg,
+      var(--brand-600),
+      var(--brand-600) 10px,
+      transparent 10px,
+      transparent 20px);
+  animation: road-slide-premium 1s linear infinite;
+  opacity: 0.3;
+}

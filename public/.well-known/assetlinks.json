@@ -1,0 +1,14 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.nguyenhue.school.student",
+            "sha256_cert_fingerprints": [
+                "6A:8C:D1:B5:D0:3D:CA:4A:92:1B:A9:B6:B7:7F:BE:C2:9D:FB:34:0E:0E:76:3D:47:0D:43:77:EA:3A:E5:EB:7B"
+            ]
+        }
+    }
+]
