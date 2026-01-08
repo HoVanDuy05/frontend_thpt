@@ -71,10 +71,6 @@ body {
   height: 100dvh;
   width: 100vw;
   overflow: hidden;
-  position: fixed;
-  /* Crucial for preventing layout shift on mobile keyboard */
-  top: 0;
-  left: 0;
 
   /* Proper Native App Behaviors */
   overscroll-behavior: none;

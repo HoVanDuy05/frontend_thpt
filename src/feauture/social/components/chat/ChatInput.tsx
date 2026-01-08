@@ -158,8 +158,14 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            handleSend();
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (!isMobile) {
+                e.preventDefault();
+                handleSend();
+            }
+            // On mobile, let Enter be Enter (line break) and use Send button to send explicitly if they have issues
+            // Actually, most mobile users expect Send on Enter, but the user complained.
+            // I'll keep default behavior for mobile to allow line breaks if they want.
         }
     };
 
@@ -258,53 +264,49 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
     };
 
     return (
-        <div className="px-2 py-3 bg-white dark:bg-[#1c1e21] border-t border-gray-100 dark:border-white/5">
+        <div className="px-2 py-2 sm:py-3 bg-white dark:bg-[#1c1e21] border-t border-gray-100 dark:border-white/5 shrink-0">
             <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
 
             {replyingTo && (
-                <div className="px-4 py-1.5 bg-gray-50/90 dark:bg-white/5 border-b border-gray-100 dark:border-white/5 flex gap-2 items-center animate-in slide-in-from-bottom-2 duration-200">
-                    <div className="w-1 bg-[#6366f1] h-6 rounded-full shrink-0" />
+                <div className="px-3 py-1 bg-gray-50/95 dark:bg-white/5 border-b border-gray-100 dark:border-white/5 flex gap-2 items-center animate-in slide-in-from-bottom-2 duration-200">
+                    <div className="w-0.5 bg-indigo-500 h-6 shrink-0" />
                     <div className="flex-1 min-w-0">
-                        <Text size="11px" fw={700} c="indigo" className="truncate leading-tight">
+                        <Text size="10px" fw={700} c="indigo" className="truncate uppercase tracking-wider">
                             {t('replying_to', { name: replyingTo.nguoiGui?.hoTen || replyingTo.nguoiGui?.taiKhoan })}
                         </Text>
-                        <Text size="11px" c="dimmed" className="truncate leading-tight max-w-full">
+                        <Text size="11px" c="dimmed" className="truncate block leading-tight">
                             {replyingTo.loai === 'VAN_BAN' ? replyingTo.noiDung : t('attachment')}
                         </Text>
                     </div>
                     <ActionIcon variant="subtle" color="gray" size="xs" radius="xl" onClick={() => onReply(null)}>
-                        <IconX size={14} />
+                        <IconX size={12} />
                     </ActionIcon>
                 </div>
             )}
 
-            <div className="flex items-end gap-2 w-full mx-auto min-h-[36px]">
+            <div className="flex items-end gap-1.5 w-full min-h-[40px]">
                 {isRecording ? (
                     <VoiceRecorder onSend={handleVoiceSend} onCancel={() => setIsRecording(false)} />
                 ) : (
                     <>
-                        {/* Left Actions */}
-                        <div className="flex items-center shrink-0 mb-[6px] gap-0.5">
+                        <div className="flex items-center shrink-0 h-10 gap-0.5">
                             {!isActive ? (
-                                <div className="flex items-center gap-0.5 animate-in fade-in slide-in-from-left-2 duration-300">
-                                    <ActionIcon variant="subtle" radius="xl" size={32} className="hover:bg-gray-100 dark:hover:bg-white/10 text-[#6366f1]">
-                                        <IconPlus size={22} stroke={2.5} />
+                                <div className="flex items-center gap-0.5">
+                                    <ActionIcon variant="subtle" radius="xl" size={32} className="text-indigo-500">
+                                        <IconPlus size={20} />
                                     </ActionIcon>
-                                    <ActionIcon variant="subtle" radius="xl" size={32} onClick={handleImageClick} className="hover:bg-gray-100 dark:hover:bg-white/10 text-[#6366f1]">
-                                        <IconPhoto size={22} stroke={2.5} />
+                                    <ActionIcon variant="subtle" radius="xl" size={32} onClick={handleImageClick} className="text-indigo-500">
+                                        <IconPhoto size={20} />
                                     </ActionIcon>
                                 </div>
                             ) : (
-                                <div className="animate-in fade-in zoom-in duration-300">
-                                    <ActionIcon variant="subtle" radius="xl" size={32} className="hover:bg-gray-100 dark:hover:bg-white/10 text-[#6366f1]">
-                                        <IconPlus size={22} stroke={3} />
-                                    </ActionIcon>
-                                </div>
+                                <ActionIcon variant="subtle" radius="xl" size={32} className="text-indigo-500">
+                                    <IconPlus size={20} />
+                                </ActionIcon>
                             )}
                         </div>
 
-                        {/* Input Pill */}
-                        <div className="flex-1 relative flex items-center bg-[#f0f2f5] dark:bg-[#3A3B3C] rounded-[22px] px-3.5 py-1 mb-[2px] min-w-0">
+                        <div className="flex-1 bg-[#f0f2f5] dark:bg-[#3A3B3C] rounded-[20px] px-3.5 flex items-end">
                             <Textarea
                                 value={message}
                                 onChange={(e) => {
@@ -319,38 +321,35 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
                                 minRows={1}
                                 maxRows={5}
                                 variant="unstyled"
-                                className="w-full"
+                                className="flex-1"
                                 classNames={{
                                     input: "py-2 text-[15px] leading-[1.4] text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
                                 }}
                             />
                         </div>
 
-                        {/* Right Action (Send/Like/Voice) */}
-                        <div className="shrink-0 flex items-center pl-1 mb-[3px]">
+                        <div className="shrink-0 flex items-center h-10">
                             {message.trim() ? (
                                 <ActionIcon
                                     radius="xl"
-                                    size={36}
+                                    size={34}
                                     variant="transparent"
-                                    className="transition-all hover:scale-110 active:scale-90 text-[#6366f1]"
+                                    className="text-indigo-500 hover:scale-110 active:scale-95 transition-transform"
                                     onClick={() => handleSend()}
-                                    loading={sendMessageMutation.isPending || uploadImageMutation.isPending || uploadAudioMutation.isPending}
+                                    loading={sendMessageMutation.isPending}
                                 >
                                     <IconSend size={24} fill="currentColor" stroke={1} />
                                 </ActionIcon>
                             ) : (
-                                <div className="flex items-center gap-1">
-                                    <ActionIcon
-                                        radius="xl"
-                                        size={36}
-                                        variant="transparent"
-                                        className="transition-all hover:scale-110 active:scale-90 text-[#6366f1]"
-                                        onClick={() => setIsRecording(true)}
-                                    >
-                                        <IconMicrophone size={24} stroke={2} />
-                                    </ActionIcon>
-                                </div>
+                                <ActionIcon
+                                    radius="xl"
+                                    size={34}
+                                    variant="transparent"
+                                    className="text-indigo-500"
+                                    onClick={() => setIsRecording(true)}
+                                >
+                                    <IconMicrophone size={24} />
+                                </ActionIcon>
                             )}
                         </div>
                     </>
