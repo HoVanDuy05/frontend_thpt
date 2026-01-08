@@ -249,18 +249,16 @@ export default function ChatPage() {
     }, [normalizedChannels, selectedChannelId]);
 
     const handleSelectChannel = useCallback((id: number) => {
-        const params = new URLSearchParams(window.location.search);
+        const params = new URLSearchParams(searchParams.toString());
         params.set('id', id.toString());
-        // Use router.replace to avoid clogging history on frequent switches
-        // or router.push based on preference. Next.js router.push is better for 'Back' behavior.
         router.push(`${pathname}?${params.toString()}`);
-    }, [pathname, router]);
+    }, [pathname, router, searchParams]);
 
     const handleBack = useCallback(() => {
-        const params = new URLSearchParams(window.location.search);
+        const params = new URLSearchParams(searchParams.toString());
         params.delete('id');
         router.push(`${pathname}?${params.toString()}`);
-    }, [pathname, router]);
+    }, [pathname, router, searchParams]);
 
     // Helper functions
     const getChannelName = useCallback((channel: TChannel, currentUserId?: number) => {

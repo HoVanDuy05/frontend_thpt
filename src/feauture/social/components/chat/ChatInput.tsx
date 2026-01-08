@@ -270,11 +270,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
             {replyingTo && (
                 <div className="px-3 py-1.5 bg-gray-50/95 dark:bg-white/5 border-b border-gray-100 dark:border-white/5 flex gap-2 items-center animate-in slide-in-from-bottom-2 duration-200 overflow-hidden">
                     <div className="w-0.5 bg-indigo-500 h-6 shrink-0" />
-                    <div className="flex-1 min-w-0 flex flex-col justify-center">
-                        <Text size="10px" fw={700} c="indigo" className="truncate uppercase tracking-wider leading-none mb-0.5">
+                    <div className="flex-1 min-w-0 flex flex-col justify-center py-1">
+                        <Text size="10px" fw={700} c="indigo" className="uppercase tracking-wider leading-none mb-1">
                             {t('replying_to', { name: replyingTo.nguoiGui?.hoTen || replyingTo.nguoiGui?.taiKhoan })}
                         </Text>
-                        <Text size="11px" c="dimmed" truncate className="leading-tight block max-w-full">
+                        <Text size="11px" c="dimmed" className="leading-tight block break-words">
                             {replyingTo.loai === 'VAN_BAN' ? replyingTo.noiDung : t('attachment')}
                         </Text>
                     </div>

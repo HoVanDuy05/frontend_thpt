@@ -70,9 +70,8 @@ body {
 
   height: 100vh;
   width: 100vw;
-  overflow: hidden;
 
-  /* Prevent browser from scrolling the body when keyboard is open on some devices */
+  /* Proper Native App Behaviors */
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
   -webkit-tap-highlight-color: transparent;

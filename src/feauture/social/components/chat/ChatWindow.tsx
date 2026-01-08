@@ -146,18 +146,20 @@ const MessageBubble = React.memo(({ msg, isMe, isLastInGroup, isFirstInGroup, da
                     {msg.tinNhanGoc && (
                         <Paper
                             px="12px" py="4px" withBorder
-                            className="bg-gray-50/50 dark:bg-white/5 mb-[-12px] pb-[16px] opacity-70 scale-[0.95]"
+                            className="bg-gray-50/50 dark:bg-white/5 mb-[-12px] pb-[16px] opacity-70 scale-[0.95] min-w-[100px]"
                             style={{
                                 borderRadius: '14px',
                                 borderBottomLeftRadius: 0,
                                 borderBottomRightRadius: 0,
-                                transformOrigin: isMe ? 'right' : 'left'
+                                transformOrigin: isMe ? 'right' : 'left',
+                                width: 'fit-content',
+                                maxWidth: '100%'
                             }}
                         >
-                            <Text size="12px" fw={600} className="truncate" maw={200}>
+                            <Text size="12px" fw={600} className="break-words">
                                 {msg.tinNhanGoc.nguoiGui?.hoTen || msg.tinNhanGoc.nguoiGui?.taiKhoan}
                             </Text>
-                            <Text size="11px" className="truncate" maw={200}>
+                            <Text size="11px" className="break-words leading-tight">
                                 {msg.tinNhanGoc.loai === 'VAN_BAN' ? msg.tinNhanGoc.noiDung : t('attachment')}
                             </Text>
                         </Paper>
@@ -573,8 +575,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
 
     return (
         <div className="h-full flex flex-col overflow-hidden bg-white dark:bg-[#1c1e21] relative isolate">
-            {/* Header - Fixed to top of VIEWPORT for absolute stability on mobile */}
-            <div className="shrink-0 border-b border-gray-100 dark:border-white/5 bg-white/95 dark:bg-[#1c1e21]/95 backdrop-blur-md z-[100] shadow-sm fixed top-0 left-0 right-0 md:relative md:top-auto">
+            {/* Header - Sticky for stability and natural flow */}
+            <div className="shrink-0 border-b border-gray-100 dark:border-white/5 bg-white/95 dark:bg-[#1c1e21]/95 backdrop-blur-md z-[100] shadow-sm sticky top-0">
                 <div className="h-[64px] px-3 sm:px-4 flex items-center justify-between gap-2">
                     <Group gap="xs" className="min-w-0 flex-1">
                         <ActionIcon variant="subtle" color="gray" onClick={onBack} className="md:hidden">
@@ -614,9 +616,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                     </Group>
                 </div>
             </div>
-
-            {/* Header Spacer for mobile fixed header */}
-            <div className="h-[64px] md:hidden shrink-0" />
 
             <ScrollArea
                 viewportRef={viewport}
