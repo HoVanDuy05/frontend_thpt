@@ -76,7 +76,7 @@ export default function RegisterPage() {
                     <Text fw={900} size="xs" className="tracking-[0.4em] uppercase text-indigo-600 dark:text-indigo-400 opacity-80 pl-2">
                         Nguyen Hue
                     </Text>
-                    <Title order={1} className="text-[38px] font-[900] tracking-tight text-zinc-900 dark:text-white leading-[1.1] text-center">
+                    <Title order={1} className="text-[28px] sm:text-[38px] font-[900] tracking-tight text-zinc-900 dark:text-white leading-[1.2] text-center px-4">
                         {t("title")}
                     </Title>
                     <Text size="sm" fw={600} className="text-zinc-400 dark:text-zinc-600">
@@ -103,7 +103,7 @@ export default function RegisterPage() {
                             leftSection={<IconMail size={18} stroke={2} className="text-zinc-400" />}
                             classNames={{
                                 label: "mb-2.5",
-                                input: "h-[56px] rounded-2xl border-zinc-200 dark:border-zinc-800 focus:border-indigo-500 bg-white dark:bg-zinc-900/50 shadow-sm text-[15px] font-bold transition-all placeholder:text-zinc-300 dark:placeholder:text-zinc-700 pl-12"
+                                input: "h-[54px] rounded-[18px] border-zinc-200 dark:border-zinc-800 focus:border-indigo-500 bg-white dark:bg-zinc-900/50 shadow-sm text-[15px] font-bold transition-all placeholder:text-zinc-300 dark:placeholder:text-zinc-700 pl-12"
                             }}
                         />
 
@@ -121,7 +121,7 @@ export default function RegisterPage() {
                             leftSection={<IconLock size={18} stroke={2} className="text-zinc-400" />}
                             classNames={{
                                 label: "mb-2.5",
-                                input: "h-[56px] rounded-2xl border-zinc-200 dark:border-zinc-800 focus:border-indigo-500 bg-white dark:bg-zinc-900/50 shadow-sm text-[15px] font-bold transition-all placeholder:text-zinc-300 dark:placeholder:text-zinc-700 pl-12",
+                                input: "h-[54px] rounded-[18px] border-zinc-200 dark:border-zinc-800 focus:border-indigo-500 bg-white dark:bg-zinc-900/50 shadow-sm text-[15px] font-bold transition-all placeholder:text-zinc-300 dark:placeholder:text-zinc-700 pl-12",
                                 innerInput: "h-full"
                             }}
                         />
@@ -140,7 +140,7 @@ export default function RegisterPage() {
                             leftSection={<IconCheck size={18} stroke={2} className="text-zinc-400" />}
                             classNames={{
                                 label: "mb-2.5",
-                                input: "h-[56px] rounded-2xl border-zinc-200 dark:border-zinc-800 focus:border-indigo-500 bg-white dark:bg-zinc-900/50 shadow-sm text-[15px] font-bold transition-all placeholder:text-zinc-300 dark:placeholder:text-zinc-700 pl-12",
+                                input: "h-[54px] rounded-[18px] border-zinc-200 dark:border-zinc-800 focus:border-indigo-500 bg-white dark:bg-zinc-900/50 shadow-sm text-[15px] font-bold transition-all placeholder:text-zinc-300 dark:placeholder:text-zinc-700 pl-12",
                                 innerInput: "h-full"
                             }}
                         />
@@ -149,8 +149,8 @@ export default function RegisterPage() {
                     <Button
                         type="submit"
                         fullWidth
-                        h={60}
-                        radius="22px"
+                        h={56}
+                        radius="18px"
                         loading={registerMutation.isPending}
                         className="bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-xl shadow-indigo-600/25 border-0 mt-4"
                         rightSection={<IconChevronRight size={18} stroke={3} />}

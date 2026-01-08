@@ -70,7 +70,7 @@ export default function ResetPasswordPage() {
         <Stack gap="xl">
             {/* Header */}
             <Box>
-                <Title order={1} size="h2" fw={900} className="text-gray-900 dark:text-white mb-2">
+                <Title order={1} className="text-[28px] sm:text-[38px] font-[900] tracking-tight text-zinc-900 dark:text-white leading-[1.2] mb-2">
                     {t("title")}
                 </Title>
                 <Text c="dimmed" size="sm">
@@ -82,36 +82,44 @@ export default function ResetPasswordPage() {
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack gap="md">
                     <PasswordInput
-                        label={t("password")}
+                        label={
+                            <Text component="span" size="xs" fw={900} className="uppercase tracking-[0.15em] text-zinc-700 dark:text-zinc-300 whitespace-nowrap mb-1 inline-block">
+                                {t("password")}
+                            </Text>
+                        }
                         placeholder="••••••••"
                         required
                         size="md"
-                        radius="md"
-                        leftSection={<IconLock size={18} className="text-gray-400" />}
+                        leftSection={<IconLock size={18} stroke={2} className="text-zinc-400" />}
                         {...form.getInputProps("matKhau")}
                         classNames={{
-                            input: "border-gray-300 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400"
+                            input: "h-[54px] rounded-[18px] border-zinc-200 dark:border-zinc-800 focus:border-indigo-500 bg-white dark:bg-zinc-900/50 shadow-sm text-[15px] font-bold transition-all placeholder:text-zinc-300 dark:placeholder:text-zinc-700 pl-12",
+                            innerInput: "h-full"
                         }}
                     />
 
                     <PasswordInput
-                        label={t("confirm_password")}
+                        label={
+                            <Text component="span" size="xs" fw={900} className="uppercase tracking-[0.15em] text-zinc-700 dark:text-zinc-300 whitespace-nowrap mb-1 inline-block">
+                                {t("confirm_password")}
+                            </Text>
+                        }
                         placeholder="••••••••"
                         required
                         size="md"
-                        radius="md"
-                        leftSection={<IconLock size={18} className="text-gray-400" />}
+                        leftSection={<IconLock size={18} stroke={2} className="text-zinc-400" />}
                         {...form.getInputProps("confirmPassword")}
                         classNames={{
-                            input: "border-gray-300 dark:border-zinc-700 focus:border-blue-500 dark:focus:border-blue-400"
+                            input: "h-[54px] rounded-[18px] border-zinc-200 dark:border-zinc-800 focus:border-indigo-500 bg-white dark:bg-zinc-900/50 shadow-sm text-[15px] font-bold transition-all placeholder:text-zinc-300 dark:placeholder:text-zinc-700 pl-12",
+                            innerInput: "h-full"
                         }}
                     />
 
                     <Button
                         type="submit"
                         fullWidth
-                        size="md"
-                        radius="md"
+                        h={56}
+                        radius="18px"
                         loading={resetMutation.isPending}
                         className="bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 mt-4"
                         fw={600}
@@ -124,8 +132,8 @@ export default function ResetPasswordPage() {
                         href="/auth/login"
                         variant="subtle"
                         color="gray"
-                        size="md"
-                        radius="md"
+                        h={54}
+                        radius="18px"
                         fullWidth
                         leftSection={<IconArrowLeft size={18} />}
                         className="text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-800"

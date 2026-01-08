@@ -305,7 +305,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
                         </div>
 
                         {/* Input Pill */}
-                        <div className="flex-1 relative flex items-center bg-[#E4E6EB] dark:bg-[#3A3B3C] rounded-[20px] px-3 py-1 mb-[2px]">
+                        <div className="flex-1 relative flex items-center bg-[#f0f2f5] dark:bg-[#3A3B3C] rounded-[20px] px-3 py-1 mb-[2px]">
                             <Textarea
                                 value={message}
                                 onChange={(e) => {
@@ -318,11 +318,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
                                 placeholder={t('type_message')}
                                 autosize
                                 minRows={1}
-                                maxRows={6}
+                                maxRows={5}
                                 variant="unstyled"
                                 className="w-full flex-1"
                                 classNames={{
-                                    input: "py-1.5 text-[15px] leading-relaxed text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                                    input: "py-1.5 text-[15px] leading-[1.4] text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
                                 }}
                             />
                         </div>
