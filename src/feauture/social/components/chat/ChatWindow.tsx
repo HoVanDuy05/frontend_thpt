@@ -156,10 +156,10 @@ const MessageBubble = React.memo(({ msg, isMe, isLastInGroup, isFirstInGroup, da
                                 maxWidth: '100%'
                             }}
                         >
-                            <Text size="12px" fw={600} className="break-words">
+                            <Text size="12px" fw={600} className="break-words line-clamp-1">
                                 {msg.tinNhanGoc.nguoiGui?.hoTen || msg.tinNhanGoc.nguoiGui?.taiKhoan}
                             </Text>
-                            <Text size="11px" className="break-words leading-tight">
+                            <Text size="11px" className="break-words leading-tight whitespace-pre-wrap line-clamp-3">
                                 {msg.tinNhanGoc.loai === 'VAN_BAN' ? msg.tinNhanGoc.noiDung : t('attachment')}
                             </Text>
                         </Paper>
@@ -574,7 +574,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
     };
 
     return (
-        <div className="h-full flex flex-col overflow-hidden bg-white dark:bg-[#1c1e21] relative isolate">
+        <div className="h-full flex flex-col min-h-0 overflow-hidden bg-white dark:bg-[#1c1e21] relative isolate">
             {/* Header - Sticky for stability and natural flow */}
             <div className="shrink-0 border-b border-gray-100 dark:border-white/5 bg-white/95 dark:bg-[#1c1e21]/95 backdrop-blur-md z-[100] shadow-sm sticky top-0">
                 <div className="h-[64px] px-3 sm:px-4 flex items-center justify-between gap-2">
@@ -619,9 +619,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
 
             <ScrollArea
                 viewportRef={viewport}
-                className="flex-1 px-4 py-4 no-scrollbar"
+                className="flex-1 px-4 py-4 no-scrollbar min-h-0"
                 onScrollPositionChange={handleScroll}
-                type="scroll"
+                type="auto"
                 scrollbarSize={6}
             >
                 <Stack gap={0} className="min-h-full justify-end">
