@@ -290,7 +290,7 @@ export default function ChatPage() {
     }, []);
 
     return (
-        <Box className="flex w-full h-[100dvh] bg-white dark:bg-black overflow-hidden relative isolate">
+        <Box className="flex w-full h-[100dvh] bg-white dark:bg-black overflow-hidden fixed inset-0 isolate">
             <ChatSidebar
                 channels={sortedChannels || []}
                 isLoading={isLoadingChannels}
