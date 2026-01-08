@@ -1,5 +1,5 @@
 import { Paper, Group, ActionIcon, Avatar, Text, Stack, ScrollArea, Box, Loader, Center, Image, Drawer, Divider, Badge, Accordion, ThemeIcon, UnstyledButton, Modal, Button, useMantineColorScheme } from "@mantine/core";
-import { IconArrowLeft, IconPhone, IconVideo, IconInfoCircle, IconPhoto, IconFile, IconBell, IconSearch, IconMicrophone, IconSend, IconThumbUp, IconUsers } from "@tabler/icons-react";
+import { IconArrowLeft, IconPhone, IconVideo, IconUser, IconInfoCircle, IconPhoto, IconFile, IconBell, IconSearch, IconMicrophone, IconSend, IconThumbUp, IconUsers } from "@tabler/icons-react";
 import { TChannel } from "@/api/types/api.type";
 import { AppQuery } from "@/api/AppQuery";
 import { useAppStore } from "@/providers/store/useAppStore";
@@ -574,41 +574,31 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
     return (
         <div className="h-full flex flex-col overflow-hidden bg-white dark:bg-[#1c1e21] relative isolate">
             {/* Header - Fixed to top of VIEWPORT for absolute stability on mobile */}
-            <div className="shrink-0 border-b border-gray-100 dark:border-white/5 bg-white/95 dark:bg-[#1c1e21]/95 backdrop-blur-md z-[100] shadow-sm fixed top-0 left-0 right-0 md:relative">
+            <div className="shrink-0 border-b border-gray-100 dark:border-white/5 bg-white/95 dark:bg-[#1c1e21]/95 backdrop-blur-md z-[100] shadow-sm fixed top-0 left-0 right-0 md:relative md:top-auto">
                 <div className="h-[64px] px-3 sm:px-4 flex items-center justify-between gap-2">
                     <Group gap="xs" className="min-w-0 flex-1">
                         <ActionIcon variant="subtle" color="gray" onClick={onBack} className="md:hidden">
                             <IconArrowLeft size={24} stroke={2.5} />
                         </ActionIcon>
-
-                        <UnstyledButton
-                            className="flex items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-gray-100 dark:hover:bg-white/5 transition-all duration-200"
-                            onClick={onToggleInfo}
+                        <Avatar
+                            src={targetUser?.avatar}
+                            size={42}
+                            radius="xl"
+                            className="shrink-0 border-2 border-white dark:border-zinc-800 shadow-sm"
                         >
-                            <Box className="relative">
-                                <Avatar
-                                    src={channel.loaiKenh === 'NHOM' ? undefined : targetUser?.avatar || null}
-                                    radius={999}
-                                    size={44}
-                                    className="border border-gray-100 dark:border-white/10 shadow-sm"
-                                >
-                                    {channel.loaiKenh === 'NHOM' ? <IconUsers size={20} /> : null}
-                                </Avatar>
-                                {presence?.online && (
-                                    <Box className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-[#31A24C] border-[3px] border-white dark:border-[#1c1e21] rounded-full" />
-                                )}
-                            </Box>
-                            <div className="min-w-0 flex-1">
-                                <Text size="16px" fw={700} className="truncate text-gray-900 dark:text-gray-100 leading-tight block">
-                                    {channel.loaiKenh === 'NHOM' ? channel.tenKenh : (targetUser?.hoTen || targetUser?.taiKhoan)}
+                            <IconUser size={24} />
+                        </Avatar>
+                        <div className="flex flex-col min-w-0">
+                            <Text size="16px" fw={700} truncate className="text-gray-900 dark:text-white leading-tight">
+                                {channel.loaiKenh === 'NHOM' ? channel.tenKenh : (targetUser?.hoTen || targetUser?.taiKhoan)}
+                            </Text>
+                            <Group gap={4} wrap="nowrap">
+                                <Box className={`w-2 h-2 rounded-full ${presence?.online ? 'bg-green-500' : 'bg-gray-300 dark:bg-zinc-600'}`} />
+                                <Text size="11px" c="dimmed" fw={500} className="uppercase tracking-wider">
+                                    {presence?.online ? t('active') : t('offline')}
                                 </Text>
-                                <Text size="13px" c="dimmed" fw={400} className="truncate leading-tight mt-0.5 block">
-                                    {typingUsers.length > 0
-                                        ? t("typing")
-                                        : (presence?.online ? t("active") : t("offline"))}
-                                </Text>
-                            </div>
-                        </UnstyledButton>
+                            </Group>
+                        </div>
                     </Group>
 
                     <Group gap={8}>
@@ -617,6 +607,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                         </ActionIcon>
                         <ActionIcon variant="subtle" radius="xl" size={40} className="text-[#6366f1] hover:bg-gray-100 dark:hover:bg-white/5">
                             <IconVideo size={26} fill="currentColor" stroke={1.5} />
+                        </ActionIcon>
+                        <ActionIcon variant="subtle" color="gray" radius="xl" size="lg" onClick={onToggleInfo}>
+                            <IconInfoCircle size={20} />
                         </ActionIcon>
                     </Group>
                 </div>
@@ -697,6 +690,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
             <div className="shrink-0 border-t border-gray-200/70 dark:border-zinc-800 bg-white/90 dark:bg-[#1c1e21]/80 backdrop-blur pb-safe">
                 <ChatInput channelId={channel.id} onTyping={handleTyping} replyingTo={replyingTo} onReply={setReplyingTo} />
             </div>
-        </div>
+        </div >
     );
 };

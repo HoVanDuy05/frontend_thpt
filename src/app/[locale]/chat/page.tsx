@@ -155,6 +155,7 @@ export default function ChatPage() {
 
     useEffect(() => {
         if (!isConnected) return;
+
         const handleNewMessage = (message: any) => {
             const channelId = message?.kenhChatId;
             if (!channelId) return;
@@ -176,7 +177,6 @@ export default function ChatPage() {
                         updatedAt: new Date().toISOString()
                     };
                     const newItem = targetItem.kenhChat ? { ...targetItem, kenhChat: updatedChannel } : updatedChannel;
-
                     return [newItem, ...otherItems];
                 } else {
                     refetchChannels();
@@ -193,6 +193,7 @@ export default function ChatPage() {
                 });
             }
         };
+
         on('message:new', handleNewMessage);
         return () => off('message:new', handleNewMessage);
     }, [isConnected, on, off, refetchChannels, selectedChannelId, user?.id, queryClient]);
