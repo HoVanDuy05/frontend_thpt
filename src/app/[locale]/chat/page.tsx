@@ -115,7 +115,7 @@ export default function ChatPage() {
 
     useEffect(() => {
         if (!selectedChannelId || !sortedChannels) return;
-        const ch = sortedChannels.find((c) => c.id === selectedChannelId);
+        const ch = sortedChannels.find((c) => c.id === Number(selectedChannelId));
         const latestId = ch?.tinNhans?.[0]?.id;
         if (latestId) setLastRead(selectedChannelId, latestId);
     }, [selectedChannelId, sortedChannels]);
@@ -250,6 +250,8 @@ export default function ChatPage() {
     const handleSelectChannel = useCallback((id: number) => {
         const params = new URLSearchParams(window.location.search);
         params.set('id', id.toString());
+        // Use router.replace to avoid clogging history on frequent switches
+        // or router.push based on preference. Next.js router.push is better for 'Back' behavior.
         router.push(`${pathname}?${params.toString()}`);
     }, [pathname, router]);
 
