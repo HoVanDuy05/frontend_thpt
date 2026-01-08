@@ -114,10 +114,12 @@ export default function ChatPage() {
     };
 
     useEffect(() => {
-        if (!selectedChannelId || !sortedChannels) return;
+        if (!selectedChannelId || !sortedChannels || document.visibilityState !== 'visible') return;
         const ch = sortedChannels.find((c) => c.id === Number(selectedChannelId));
         const latestId = ch?.tinNhans?.[0]?.id;
-        if (latestId) setLastRead(selectedChannelId, latestId);
+        if (latestId) {
+            setLastRead(selectedChannelId, latestId);
+        }
     }, [selectedChannelId, sortedChannels]);
 
     const [presenceMap, setPresenceMap] = useState<Record<number, boolean>>({});
@@ -163,25 +165,23 @@ export default function ChatPage() {
             }, (oldData: any) => {
                 if (!Array.isArray(oldData)) return oldData;
 
-                let found = false;
-                const nextData = oldData.map((item: any) => {
-                    const ch = item.kenhChat || item;
-                    if (ch.id === channelId) {
-                        found = true;
-                        const updatedChannel = {
-                            ...ch,
-                            tinNhans: [message],
-                            updatedAt: new Date().toISOString()
-                        };
-                        return item.kenhChat ? { ...item, kenhChat: updatedChannel } : updatedChannel;
-                    }
-                    return item;
-                });
+                const targetItem = oldData.find((item: any) => (item.kenhChat?.id || item.id) === channelId);
+                const otherItems = oldData.filter((item: any) => (item.kenhChat?.id || item.id) !== channelId);
 
-                // If not found (new channel), refetching is safer, but normally it should be there
-                if (!found) refetchChannels();
+                if (targetItem) {
+                    const ch = targetItem.kenhChat || targetItem;
+                    const updatedChannel = {
+                        ...ch,
+                        tinNhans: [message],
+                        updatedAt: new Date().toISOString()
+                    };
+                    const newItem = targetItem.kenhChat ? { ...targetItem, kenhChat: updatedChannel } : updatedChannel;
 
-                return nextData;
+                    return [newItem, ...otherItems];
+                } else {
+                    refetchChannels();
+                    return oldData;
+                }
             });
 
             // Mark as unread if not current channel and not sent by me
