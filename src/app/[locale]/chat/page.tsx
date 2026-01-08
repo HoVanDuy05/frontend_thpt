@@ -247,18 +247,17 @@ export default function ChatPage() {
         return normalizedChannels?.find(c => c.id === selectedChannelId);
     }, [normalizedChannels, selectedChannelId]);
 
-    const handleSelectChannel = (id: number) => {
-        const params = new URLSearchParams(searchParams);
+    const handleSelectChannel = useCallback((id: number) => {
+        const params = new URLSearchParams(window.location.search);
         params.set('id', id.toString());
-        // Use replace instead of push to avoid history bloat if preferred, but push is fine.
         router.push(`${pathname}?${params.toString()}`);
-    };
+    }, [pathname, router]);
 
-    const handleBack = () => {
-        const params = new URLSearchParams(searchParams);
+    const handleBack = useCallback(() => {
+        const params = new URLSearchParams(window.location.search);
         params.delete('id');
         router.push(`${pathname}?${params.toString()}`);
-    };
+    }, [pathname, router]);
 
     // Helper functions
     const getChannelName = useCallback((channel: TChannel, currentUserId?: number) => {

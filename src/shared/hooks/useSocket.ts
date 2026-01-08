@@ -7,6 +7,10 @@ import { useAppStore } from "@/providers/store/useAppStore";
 const SOCKET_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/")
     .replace(/\/api\/?$/, "");
 
+// Helper to check if we are in a secure context
+const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:';
+const finalSocketUrl = isSecure ? SOCKET_URL.replace(/^http:/, 'https:') : SOCKET_URL;
+
 let socketInstance: Socket | null = null;
 
 export function useSocket() {
@@ -16,6 +20,7 @@ export function useSocket() {
     useEffect(() => {
         if (!token) {
             if (socketInstance) {
+                console.log('No token, disconnecting socket...');
                 socketInstance.disconnect();
                 socketInstance = null;
             }
@@ -24,16 +29,17 @@ export function useSocket() {
         }
 
         if (!socketInstance) {
-            socketInstance = io(SOCKET_URL, {
+            console.log('Initializing socket with URL:', finalSocketUrl);
+            socketInstance = io(finalSocketUrl, {
                 auth: {
                     token: token
                 },
                 transports: ['websocket', 'polling'],
                 reconnection: true,
-                reconnectionAttempts: Infinity,
-                reconnectionDelay: 1000,
-                reconnectionDelayMax: 5000,
+                reconnectionAttempts: 5,
+                reconnectionDelay: 2000,
                 timeout: 20000,
+                secure: isSecure
             });
         }
 
@@ -59,7 +65,14 @@ export function useSocket() {
 
         socketInstance.on('connect', handleConnect);
         socketInstance.on('disconnect', handleDisconnect);
-        socketInstance.on('connect_error', handleConnectError);
+        socketInstance.on('connect_error', (error) => {
+            console.error('Socket error details:', {
+                message: error.message,
+                description: (error as any).description,
+                context: (error as any).context
+            });
+            handleConnectError(error);
+        });
 
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible' && socketInstance && !socketInstance.connected) {
