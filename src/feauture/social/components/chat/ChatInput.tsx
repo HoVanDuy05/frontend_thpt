@@ -262,18 +262,18 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
             <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
 
             {replyingTo && (
-                <div className="px-4 py-2 bg-gray-50/80 dark:bg-white/5 border-b border-gray-100 dark:border-white/5 flex gap-3 items-center animate-in slide-in-from-bottom-2 duration-200">
-                    <div className="w-1 bg-[#6366f1] h-8 rounded-full shrink-0" />
+                <div className="px-4 py-1.5 bg-gray-50/90 dark:bg-white/5 border-b border-gray-100 dark:border-white/5 flex gap-2 items-center animate-in slide-in-from-bottom-2 duration-200">
+                    <div className="w-1 bg-[#6366f1] h-6 rounded-full shrink-0" />
                     <div className="flex-1 min-w-0">
-                        <Text size="xs" fw={700} c="blue" className="mb-0.5">
+                        <Text size="11px" fw={700} c="indigo" className="truncate leading-tight">
                             {t('replying_to', { name: replyingTo.nguoiGui?.hoTen || replyingTo.nguoiGui?.taiKhoan })}
                         </Text>
-                        <Text size="xs" c="dimmed" className="truncate">
+                        <Text size="11px" c="dimmed" className="truncate leading-tight max-w-full">
                             {replyingTo.loai === 'VAN_BAN' ? replyingTo.noiDung : t('attachment')}
                         </Text>
                     </div>
-                    <ActionIcon variant="subtle" color="gray" size="sm" radius="xl" onClick={() => onReply(null)}>
-                        <IconX size={16} />
+                    <ActionIcon variant="subtle" color="gray" size="xs" radius="xl" onClick={() => onReply(null)}>
+                        <IconX size={14} />
                     </ActionIcon>
                 </div>
             )}
@@ -284,28 +284,27 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
                 ) : (
                     <>
                         {/* Left Actions */}
-                        <div className="flex items-center shrink-0 mb-[5px] gap-1 transition-all duration-300">
+                        <div className="flex items-center shrink-0 mb-[6px] gap-0.5">
                             {!isActive ? (
-                                <div className="flex items-center gap-1 animate-in fade-in slide-in-from-left-2 duration-300">
+                                <div className="flex items-center gap-0.5 animate-in fade-in slide-in-from-left-2 duration-300">
                                     <ActionIcon variant="subtle" radius="xl" size={32} className="hover:bg-gray-100 dark:hover:bg-white/10 text-[#6366f1]">
-                                        <IconPlus size={24} stroke={2.5} />
+                                        <IconPlus size={22} stroke={2.5} />
                                     </ActionIcon>
                                     <ActionIcon variant="subtle" radius="xl" size={32} onClick={handleImageClick} className="hover:bg-gray-100 dark:hover:bg-white/10 text-[#6366f1]">
-                                        <IconPhoto size={24} stroke={2.5} />
+                                        <IconPhoto size={22} stroke={2.5} />
                                     </ActionIcon>
-
                                 </div>
                             ) : (
                                 <div className="animate-in fade-in zoom-in duration-300">
                                     <ActionIcon variant="subtle" radius="xl" size={32} className="hover:bg-gray-100 dark:hover:bg-white/10 text-[#6366f1]">
-                                        <IconPlus size={24} stroke={3} />
+                                        <IconPlus size={22} stroke={3} />
                                     </ActionIcon>
                                 </div>
                             )}
                         </div>
 
                         {/* Input Pill */}
-                        <div className="flex-1 relative flex items-center bg-[#f0f2f5] dark:bg-[#3A3B3C] rounded-[20px] px-3 py-1 mb-[2px]">
+                        <div className="flex-1 relative flex items-center bg-[#f0f2f5] dark:bg-[#3A3B3C] rounded-[22px] px-3.5 py-1 mb-[2px] min-w-0">
                             <Textarea
                                 value={message}
                                 onChange={(e) => {
@@ -320,9 +319,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
                                 minRows={1}
                                 maxRows={5}
                                 variant="unstyled"
-                                className="w-full flex-1"
+                                className="w-full"
                                 classNames={{
-                                    input: "py-1.5 text-[15px] leading-[1.4] text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                                    input: "py-2 text-[15px] leading-[1.4] text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
                                 }}
                             />
                         </div>
