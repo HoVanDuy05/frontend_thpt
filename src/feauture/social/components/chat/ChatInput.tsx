@@ -268,18 +268,18 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
             <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
 
             {replyingTo && (
-                <div className="px-3 py-1 bg-gray-50/95 dark:bg-white/5 border-b border-gray-100 dark:border-white/5 flex gap-2 items-center animate-in slide-in-from-bottom-2 duration-200">
+                <div className="px-3 py-1.5 bg-gray-50/95 dark:bg-white/5 border-b border-gray-100 dark:border-white/5 flex gap-2 items-center animate-in slide-in-from-bottom-2 duration-200 overflow-hidden">
                     <div className="w-0.5 bg-indigo-500 h-6 shrink-0" />
-                    <div className="flex-1 min-w-0">
-                        <Text size="10px" fw={700} c="indigo" className="truncate uppercase tracking-wider">
+                    <div className="flex-1 min-w-0 flex flex-col justify-center">
+                        <Text size="10px" fw={700} c="indigo" className="truncate uppercase tracking-wider leading-none mb-0.5">
                             {t('replying_to', { name: replyingTo.nguoiGui?.hoTen || replyingTo.nguoiGui?.taiKhoan })}
                         </Text>
-                        <Text size="11px" c="dimmed" className="truncate block leading-tight">
+                        <Text size="11px" c="dimmed" truncate className="leading-tight block max-w-full">
                             {replyingTo.loai === 'VAN_BAN' ? replyingTo.noiDung : t('attachment')}
                         </Text>
                     </div>
-                    <ActionIcon variant="subtle" color="gray" size="xs" radius="xl" onClick={() => onReply(null)}>
-                        <IconX size={12} />
+                    <ActionIcon variant="subtle" color="gray" size="xs" radius="xl" onClick={() => onReply(null)} className="shrink-0">
+                        <IconX size={14} />
                     </ActionIcon>
                 </div>
             )}

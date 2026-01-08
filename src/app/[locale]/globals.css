@@ -68,7 +68,7 @@ body {
   font-family: var(--font-be-vietnam), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   font-size: var(--font-size-base);
 
-  height: 100dvh;
+  height: 100vh;
   width: 100vw;
   overflow: hidden;
   position: fixed;
