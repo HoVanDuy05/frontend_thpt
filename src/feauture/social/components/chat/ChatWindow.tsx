@@ -574,7 +574,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
     return (
         <div className="h-full flex flex-col overflow-hidden bg-white dark:bg-[#1c1e21] relative">
             {/* Header */}
-            <div className="shrink-0 border-b border-gray-100 dark:border-white/5 bg-white/80 dark:bg-[#1c1e21]/80 backdrop-blur-md z-30 shadow-sm sticky top-0">
+            <div className="shrink-0 border-b border-gray-100 dark:border-white/5 bg-white/80 dark:bg-[#1c1e21]/80 backdrop-blur-md z-30 shadow-sm">
                 <div className="h-[68px] px-4 flex items-center justify-between gap-2">
                     <Group gap="xs" className="min-w-0 flex-1">
                         <ActionIcon variant="subtle" color="gray" onClick={onBack} className="md:hidden">
