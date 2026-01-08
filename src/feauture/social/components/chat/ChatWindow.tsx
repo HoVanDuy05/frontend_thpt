@@ -18,7 +18,7 @@ interface ChatWindowProps {
     onToggleInfo?: () => void;
 }
 
-const CustomVoicePlayer = ({ url, isMe, dark }: { url: string; isMe: boolean; dark: boolean }) => {
+const CustomVoicePlayer = ({ url, isMe, dark, isFirstInGroup, isLastInGroup }: { url: string; isMe: boolean; dark: boolean; isFirstInGroup?: boolean; isLastInGroup?: boolean }) => {
     const [playing, setPlaying] = useState(false);
     const [duration, setDuration] = useState(0);
     const [currentTime, setCurrentTime] = useState(0);
@@ -58,9 +58,11 @@ const CustomVoicePlayer = ({ url, isMe, dark }: { url: string; isMe: boolean; da
             style={{
                 backgroundColor: isMe ? '#6366f1' : (dark ? '#3a3b3c' : '#E4E6EB'),
                 width: 'fit-content',
-                minWidth: '240px',
-                borderTopRightRadius: isMe ? '4px' : '20px',
-                borderTopLeftRadius: isMe ? '20px' : '4px',
+                minWidth: '220px',
+                borderTopRightRadius: isMe ? (isFirstInGroup ? '20px' : '4px') : '20px',
+                borderBottomRightRadius: isMe ? (isLastInGroup ? '20px' : '4px') : '20px',
+                borderTopLeftRadius: !isMe ? (isFirstInGroup ? '20px' : '4px') : '20px',
+                borderBottomLeftRadius: !isMe ? (isLastInGroup ? '20px' : '4px') : '20px',
             }}
         >
             <Group gap="sm" wrap="nowrap">
@@ -81,7 +83,7 @@ const CustomVoicePlayer = ({ url, isMe, dark }: { url: string; isMe: boolean; da
                     )}
                 </ActionIcon>
 
-                <div className="flex-1 flex flex-col gap-1.5 min-w-[140px]">
+                <div className="flex-1 flex flex-col gap-1.5 min-w-[120px]">
                     <div className="flex items-end gap-[2px] h-8 px-1">
                         {waveformBars.map((bar, i) => {
                             const progress = (currentTime / (duration || 1)) * waveformBars.length;
@@ -120,79 +122,130 @@ const CustomVoicePlayer = ({ url, isMe, dark }: { url: string; isMe: boolean; da
     );
 };
 
-const MessageBubble = React.memo(({ msg, isMe, isLastInGroup, isFirstInGroup, dark, setPreviewImage, t, targetUser, lastSeenMessageId, newestOutgoingId, getReceiptLabel }: any) => {
+const MessageBubble = React.memo(({ msg, isMe, isLastInGroup, isFirstInGroup, dark, setPreviewImage, t, targetUser, lastSeenMessageId, newestOutgoingId, getReceiptLabel, onReply }: any) => {
     return (
-        <div className={`flex flex-col ${isMe ? 'items-end ml-auto' : 'items-start'} mb-[2px] group max-w-[85%] sm:max-w-[70%]`}>
-            <div className="flex items-end gap-2">
+        <div className={`flex flex-col ${isMe ? 'items-end ml-auto' : 'items-start'} ${isLastInGroup ? 'mb-3' : 'mb-[3px]'} group w-full`}>
+            {/* Show Date Divider if first in group and from long ago (optional, but good for "chuẩn" UI) */}
+
+            <div className={`flex items-end gap-2 max-w-[85%] sm:max-w-[75%] ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
                 {!isMe && (
-                    <Avatar
-                        src={targetUser?.avatar || msg.nguoiGui?.avatar || msg.nguoiGui?.hoSoHocSinh?.avatar || msg.nguoiGui?.hoSoGiaoVien?.avatar}
-                        size={28}
-                        radius="xl"
-                        className="mb-0.5 shadow-sm"
-                    />
+                    <div className="w-[32px] shrink-0">
+                        {isLastInGroup ? (
+                            <Avatar
+                                src={targetUser?.avatar || msg.nguoiGui?.avatar || msg.nguoiGui?.hoSoHocSinh?.avatar || msg.nguoiGui?.hoSoGiaoVien?.avatar}
+                                size={32}
+                                radius="xl"
+                                className="shadow-sm border border-white/10"
+                            />
+                        ) : null}
+                    </div>
                 )}
 
-                <div className={`relative transition-all duration-200 ${isMe ? 'hover:brightness-105' : ''}`}>
-                    {msg.loai === 'VAN_BAN' ? (
+                <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} min-w-0`}>
+                    {/* Reply Preview */}
+                    {msg.tinNhanGoc && (
                         <Paper
-                            px="14px" py="8px" withBorder={false}
-                            className={`shadow-none ${isMe ? 'text-white' : 'text-black dark:text-white'}`}
+                            px="12px" py="4px" withBorder
+                            className="bg-gray-50/50 dark:bg-white/5 mb-[-12px] pb-[16px] opacity-70 scale-[0.95]"
                             style={{
-                                backgroundColor: isMe ? '#6366f1' : undefined,
-                                borderTopRightRadius: isMe ? (isFirstInGroup ? 18 : 4) : 18,
-                                borderBottomRightRadius: isMe ? (isLastInGroup ? 18 : 4) : 18,
-                                borderTopLeftRadius: !isMe ? (isFirstInGroup ? 18 : 4) : 18,
-                                borderBottomLeftRadius: !isMe ? (isLastInGroup ? 18 : 4) : 18,
-                                maxWidth: 'fit-content',
-                                overflowWrap: 'anywhere',
-                                wordBreak: 'break-word'
+                                borderRadius: '14px',
+                                borderBottomLeftRadius: 0,
+                                borderBottomRightRadius: 0,
+                                transformOrigin: isMe ? 'right' : 'left'
                             }}
-                            bg={!isMe ? (dark ? '#3e4042' : '#E4E6EB') : undefined}
                         >
-                            <Text size="15px" className="leading-snug whitespace-pre-wrap">{msg.noiDung}</Text>
-                        </Paper>
-                    ) : msg.loai === 'HINH_ANH' ? (
-                        <Box
-                            className="cursor-pointer overflow-hidden rounded-[18px] transition-all hover:brightness-95 active:scale-[0.98]"
-                            onClick={() => setPreviewImage(msg.duongDanTep || msg.noiDung || null)}
-                            style={{ maxWidth: '300px' }}
-                        >
-                            <Image src={msg.duongDanTep || msg.noiDung} alt="Image" radius={18} fit="contain" style={{ width: '100%', height: 'auto', display: 'block' }} />
-                        </Box>
-                    ) : msg.loai === 'GHI_AM' ? (
-                        <CustomVoicePlayer url={msg.duongDanTep || msg.noiDung} isMe={isMe} dark={dark} />
-                    ) : (
-                        <Paper
-                            px="14px" py="8px" withBorder={false}
-                            className={`shadow-none ${isMe ? 'text-white' : 'text-black dark:text-white'}`}
-                            style={{ backgroundColor: isMe ? '#6366f1' : undefined, borderRadius: 18, maxWidth: 'fit-content' }}
-                            bg={!isMe ? (dark ? '#3e4042' : '#E4E6EB') : undefined}
-                        >
-                            <Group gap="xs" wrap="nowrap" className="py-0.5">
-                                <Box className="bg-white/20 p-2 rounded-full"><IconFile size={16} fill="white" /></Box>
-                                <Text size="sm" className="font-medium cursor-pointer" onClick={() => window.open(msg.duongDanTep, '_blank')}>{t('attachment')}</Text>
-                            </Group>
+                            <Text size="12px" fw={600} className="truncate" maw={200}>
+                                {msg.tinNhanGoc.nguoiGui?.hoTen || msg.tinNhanGoc.nguoiGui?.taiKhoan}
+                            </Text>
+                            <Text size="11px" className="truncate" maw={200}>
+                                {msg.tinNhanGoc.loai === 'VAN_BAN' ? msg.tinNhanGoc.noiDung : t('attachment')}
+                            </Text>
                         </Paper>
                     )}
+
+                    <div className="flex items-center gap-1 group/row">
+                        {isMe && (
+                            <ActionIcon
+                                variant="subtle" color="gray" size="sm" radius="xl"
+                                className="opacity-0 group-hover/row:opacity-100 transition-opacity order-first"
+                                onClick={() => onReply(msg)}
+                            >
+                                <IconArrowLeft size={16} />
+                            </ActionIcon>
+                        )}
+
+                        <div className={`relative transition-all duration-200 ${isMe ? 'hover:brightness-105' : ''}`}>
+                            {msg.loai === 'VAN_BAN' ? (
+                                <Paper
+                                    px="14px" py="10px" withBorder={false}
+                                    className={`shadow-none ${isMe ? 'text-white' : 'text-black dark:text-white'}`}
+                                    style={{
+                                        backgroundColor: isMe ? '#6366f1' : undefined,
+                                        borderTopRightRadius: isMe ? (isFirstInGroup ? 20 : 4) : 20,
+                                        borderBottomRightRadius: isMe ? (isLastInGroup ? 20 : 4) : 20,
+                                        borderTopLeftRadius: !isMe ? (isFirstInGroup ? 20 : 4) : 20,
+                                        borderBottomLeftRadius: !isMe ? (isLastInGroup ? 20 : 4) : 20,
+                                        maxWidth: 'fit-content',
+                                        overflowWrap: 'anywhere',
+                                        wordBreak: 'break-word'
+                                    }}
+                                    bg={!isMe ? (dark ? '#3e4042' : '#E4E6EB') : undefined}
+                                >
+                                    <Text size="15px" className="leading-[1.4] whitespace-pre-wrap">{msg.noiDung}</Text>
+                                </Paper>
+                            ) : msg.loai === 'HINH_ANH' ? (
+                                <Box
+                                    className="cursor-pointer overflow-hidden rounded-[18px] transition-all hover:brightness-95 active:scale-[0.98]"
+                                    onClick={() => setPreviewImage(msg.duongDanTep || msg.noiDung || null)}
+                                    style={{ maxWidth: '300px' }}
+                                >
+                                    <Image src={msg.duongDanTep || msg.noiDung} alt="Image" radius={18} fit="contain" style={{ width: '100%', height: 'auto', display: 'block' }} />
+                                </Box>
+                            ) : msg.loai === 'GHI_AM' ? (
+                                <CustomVoicePlayer url={msg.duongDanTep || msg.noiDung} isMe={isMe} dark={dark} isFirstInGroup={isFirstInGroup} isLastInGroup={isLastInGroup} />
+                            ) : (
+                                <Paper
+                                    px="14px" py="10px" withBorder={false}
+                                    className={`shadow-none ${isMe ? 'text-white' : 'text-black dark:text-white'}`}
+                                    style={{ backgroundColor: isMe ? '#6366f1' : undefined, borderRadius: 20, maxWidth: 'fit-content' }}
+                                    bg={!isMe ? (dark ? '#3e4042' : '#E4E6EB') : undefined}
+                                >
+                                    <Group gap="xs" wrap="nowrap" className="py-0.5">
+                                        <Box className="bg-white/20 p-2 rounded-full"><IconFile size={16} fill="white" /></Box>
+                                        <Text size="sm" className="font-medium cursor-pointer" onClick={() => window.open(msg.duongDanTep, '_blank')}>{t('attachment')}</Text>
+                                    </Group>
+                                </Paper>
+                            )}
+                        </div>
+
+                        {!isMe && (
+                            <ActionIcon
+                                variant="subtle" color="gray" size="sm" radius="xl"
+                                className="opacity-0 group-hover/row:opacity-100 transition-opacity"
+                                onClick={() => onReply(msg)}
+                            >
+                                <IconArrowLeft size={16} />
+                            </ActionIcon>
+                        )}
+                    </div>
                 </div>
             </div>
 
             {isLastInGroup && (
-                <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} w-full mt-1`}>
+                <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'} w-full mt-1.5`}>
                     {/* Show recipient avatar if message is seen */}
                     {isMe && lastSeenMessageId >= msg.id && (
                         <Group gap={4} mr={4}>
-                            <Avatar src={targetUser?.avatar} size={16} radius="xl" className="opacity-90" />
-                            <Text size="11px" fw={600} c="dimmed" className="opacity-70">{t('seen')}</Text>
+                            <Avatar src={targetUser?.avatar} size={14} radius="xl" className="opacity-80" />
+                            <Text size="11px" fw={600} c="dimmed" className="opacity-60">{t('seen')}</Text>
                         </Group>
                     )}
                     {/* Show delivery status if not seen yet */}
                     {isMe && (!lastSeenMessageId || lastSeenMessageId < msg.id) && (
-                        <Text size="11px" fw={600} c="dimmed" pr={4} className="opacity-70">{getReceiptLabel(msg.id)}</Text>
+                        <Text size="11px" fw={600} c="dimmed" pr={12} className="opacity-60">{getReceiptLabel(msg.id)}</Text>
                     )}
                     {/* Timestamp */}
-                    <Text size="11px" fw={500} c="dimmed" px={isMe ? 4 : 42} className="opacity-40">{dayjs(msg.ngayGui).format('HH:mm')}</Text>
+                    <Text size="11px" fw={500} c="dimmed" px={isMe ? 12 : 44} className="opacity-40">{dayjs(msg.ngayGui).format('HH:mm')}</Text>
                 </div>
             )}
         </div>
@@ -595,8 +648,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                             const prevMsg = arr[idx - 1];
                             const nextMsg = arr[idx + 1];
 
-                            const isFirstInGroup = !prevMsg || Number(prevMsg.nguoiGuiId) !== Number(msg.nguoiGuiId) || (dayjs(msg.ngayGui).diff(dayjs(prevMsg.ngayGui), 'minute') > 20);
-                            const isLastInGroup = !nextMsg || Number(nextMsg.nguoiGuiId) !== Number(msg.nguoiGuiId) || (dayjs(nextMsg.ngayGui).diff(dayjs(msg.ngayGui), 'minute') > 20);
+                            const isFirstInGroup = !prevMsg || Number(prevMsg.nguoiGuiId) !== Number(msg.nguoiGuiId) || (dayjs(msg.ngayGui).diff(dayjs(prevMsg.ngayGui), 'minute') > 5);
+                            const isLastInGroup = !nextMsg || Number(nextMsg.nguoiGuiId) !== Number(msg.nguoiGuiId) || (dayjs(nextMsg.ngayGui).diff(dayjs(msg.ngayGui), 'minute') > 5);
 
                             return (
                                 <MessageBubble
@@ -612,6 +665,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                                     lastSeenMessageId={lastSeenMessageId}
                                     newestOutgoingId={newestOutgoingId}
                                     getReceiptLabel={getReceiptLabel}
+                                    onReply={setReplyingTo}
                                 />
                             );
                         })

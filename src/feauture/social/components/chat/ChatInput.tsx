@@ -1,4 +1,4 @@
-import { ActionIcon, Textarea, useMantineColorScheme, TextInput } from "@mantine/core";
+import { ActionIcon, Textarea, useMantineColorScheme, TextInput, Text } from "@mantine/core";
 import {
     IconSend,
     IconPaperclip,
@@ -262,12 +262,18 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
             <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleFileChange} />
 
             {replyingTo && (
-                <div className="px-4 py-2 bg-gray-50 dark:bg-zinc-800 border-t border-gray-100 dark:border-zinc-700 flex justify-between items-center text-xs text-gray-500">
-                    <span>
-                        {t('replying_to', { name: replyingTo.nguoiGui?.hoTen || replyingTo.nguoiGui?.taiKhoan })}
-                    </span>
-                    <ActionIcon variant="transparent" size="xs" onClick={() => onReply(null)}>
-                        <IconX size={14} />
+                <div className="px-4 py-2 bg-gray-50/80 dark:bg-white/5 border-b border-gray-100 dark:border-white/5 flex gap-3 items-center animate-in slide-in-from-bottom-2 duration-200">
+                    <div className="w-1 bg-[#6366f1] h-8 rounded-full shrink-0" />
+                    <div className="flex-1 min-w-0">
+                        <Text size="xs" fw={700} c="blue" className="mb-0.5">
+                            {t('replying_to', { name: replyingTo.nguoiGui?.hoTen || replyingTo.nguoiGui?.taiKhoan })}
+                        </Text>
+                        <Text size="xs" c="dimmed" className="truncate">
+                            {replyingTo.loai === 'VAN_BAN' ? replyingTo.noiDung : t('attachment')}
+                        </Text>
+                    </div>
+                    <ActionIcon variant="subtle" color="gray" size="sm" radius="xl" onClick={() => onReply(null)}>
+                        <IconX size={16} />
                     </ActionIcon>
                 </div>
             )}
