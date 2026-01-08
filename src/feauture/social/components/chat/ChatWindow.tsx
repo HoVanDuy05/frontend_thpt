@@ -1,4 +1,4 @@
-import { Paper, Group, ActionIcon, Avatar, Text, Stack, ScrollArea, Box, Loader, Center, Image, Drawer, Divider, Badge, Accordion, ThemeIcon, UnstyledButton, Modal, Button, useMantineColorScheme } from "@mantine/core";
+import { Paper, Group, ActionIcon, Avatar, Text, Stack, Box, Loader, Center, Image, Drawer, Divider, Badge, Accordion, ThemeIcon, UnstyledButton, Modal, Button, useMantineColorScheme } from "@mantine/core";
 import { IconArrowLeft, IconPhone, IconVideo, IconUser, IconInfoCircle, IconPhoto, IconFile, IconBell, IconSearch, IconMicrophone, IconSend, IconThumbUp, IconUsers } from "@tabler/icons-react";
 import { TChannel } from "@/api/types/api.type";
 import { AppQuery } from "@/api/AppQuery";
@@ -576,7 +576,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
     return (
         <div className="h-full flex flex-col min-h-0 overflow-hidden bg-white dark:bg-[#1c1e21] relative isolate">
             {/* Header - Sticky for stability and natural flow */}
-            <div className="shrink-0 border-b border-gray-100 dark:border-white/5 bg-white/95 dark:bg-[#1c1e21]/95 backdrop-blur-md z-[100] shadow-sm sticky top-0 transition-transform duration-200">
+            <div className="shrink-0 border-b border-gray-100 dark:border-white/5 bg-white/95 dark:bg-[#1c1e21]/95 backdrop-blur-md z-[100] shadow-sm relative">
                 <div className="h-[64px] px-3 sm:px-4 flex items-center justify-between gap-2">
                     <Group gap="xs" className="min-w-0 flex-1">
                         <ActionIcon variant="subtle" color="gray" onClick={onBack} className="md:hidden">
@@ -617,12 +617,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                 </div>
             </div>
 
-            <ScrollArea
-                viewportRef={viewport}
-                className="flex-1 px-4 py-4 no-scrollbar min-h-0"
-                onScrollPositionChange={handleScroll}
-                type="auto"
-                scrollbarSize={6}
+            <div
+                ref={viewport}
+                className="flex-1 px-4 py-4 overflow-y-auto min-h-0"
+                onScroll={handleScroll}
             >
                 <Stack gap={0} className="min-h-full justify-end">
                     {isFetching && page > 1 && (
@@ -677,7 +675,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                         </div>
                     )}
                 </Stack>
-            </ScrollArea>
+            </div>
 
             <Modal
                 opened={!!previewImage} onClose={() => setPreviewImage(null)} size="xl" centered withCloseButton={false} padding={0}
