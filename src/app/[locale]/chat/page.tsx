@@ -1,7 +1,7 @@
 "use client";
 
-import { Box, Center, Text, Drawer, ActionIcon, Group } from "@mantine/core";
-import { IconMessagePlus, IconArrowLeft } from "@tabler/icons-react";
+import { Box, Stack, Avatar, Text, Group, Divider, Accordion, UnstyledButton, Button, ActionIcon, ScrollArea, ThemeIcon, Center, Loader, Drawer } from "@mantine/core";
+import { IconBell, IconSearch, IconUser, IconPalette, IconMoodSmile, IconPhoto, IconFile, IconLink, IconShieldLock, IconBlockquote, IconBan, IconInfoCircle, IconArrowLeft, IconMessagePlus } from "@tabler/icons-react";
 import { AppQuery } from "@/api/AppQuery";
 import { TChannel } from "@/api/types/api.type";
 import { TUser } from "@/shared/types/user.type";
@@ -12,7 +12,7 @@ import { ChannelInfoSidebar } from "@/feauture/social/components/chat/ChannelInf
 import { SettingsDrawer } from "@/feauture/social/components/chat/SettingsDrawer";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useAppStore } from "@/providers/store/useAppStore";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useAppMutation } from "@/api/hooks/useAppMutation";
 import { notifications } from "@mantine/notifications";
 import { useSocket } from "@/shared/hooks/useSocket";
@@ -66,12 +66,19 @@ export default function ChatPage() {
     }, [channels]);
 
     const sortedChannels = useMemo(() => {
-        return normalizedChannels?.slice().sort((a, b) => {
-            return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-        });
-    }, [normalizedChannels]);
+        if (!normalizedChannels) return [];
+        return normalizedChannels
+            .filter(c => {
+                // Only show channels that have messages OR the one currently selected (ghost channel case)
+                if (c.id === selectedChannelId) return true;
+                return c.tinNhans && c.tinNhans.length > 0;
+            })
+            .sort((a, b) => {
+                return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+            });
+    }, [normalizedChannels, selectedChannelId]);
 
-    const selectedChannel = sortedChannels?.find(c => c.id === selectedChannelId);
+
 
     const readStateKey = (userId?: number | null) => `chat_last_read_${userId ?? 'anonymous'}`;
 
@@ -177,9 +184,7 @@ export default function ChatPage() {
                 return nextData;
             });
 
-            // Fallback: sync with server
-            refetchChannels();
-
+            // Mark as unread if not current channel and not sent by me
             if (selectedChannelId !== channelId && message?.nguoiGuiId !== user?.id) {
                 setUnreadChannelIds((prev) => {
                     const next = new Set(prev);
@@ -238,9 +243,14 @@ export default function ChatPage() {
         }
     };
 
+    const selectedChannel = useMemo(() => {
+        return normalizedChannels?.find(c => c.id === selectedChannelId);
+    }, [normalizedChannels, selectedChannelId]);
+
     const handleSelectChannel = (id: number) => {
         const params = new URLSearchParams(searchParams);
         params.set('id', id.toString());
+        // Use replace instead of push to avoid history bloat if preferred, but push is fine.
         router.push(`${pathname}?${params.toString()}`);
     };
 
@@ -250,6 +260,35 @@ export default function ChatPage() {
         router.push(`${pathname}?${params.toString()}`);
     };
 
+    // Helper functions
+    const getChannelName = useCallback((channel: TChannel, currentUserId?: number) => {
+        if (!channel) return "Người dùng";
+        if (channel.loaiKenh === 'NHOM') return channel.tenKenh || "Nhóm";
+        if (!channel.thanhViens || channel.thanhViens.length === 0) return "Người dùng";
+        const member = channel.thanhViens.find(m => Number(m.nguoiDungId) !== Number(currentUserId));
+        return member?.nguoiDung?.hoTen || member?.nguoiDung?.taiKhoan || "Người dùng";
+    }, []);
+
+    const getChannelAvatar = useCallback((channel: TChannel, currentUserId?: number) => {
+        if (!channel || channel.loaiKenh === 'NHOM') return null;
+        const member = channel.thanhViens?.find(m => Number(m.nguoiDungId) !== Number(currentUserId));
+        return member?.nguoiDung?.avatar;
+    }, []);
+
+    const formatTime = useCallback((dateStr: string) => {
+        if (!dateStr) return "";
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diff = now.getTime() - date.getTime();
+        if (diff < 24 * 60 * 60 * 1000 && now.getDate() === date.getDate()) {
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        if (diff < 7 * 24 * 60 * 60 * 1000) {
+            return date.toLocaleDateString([], { weekday: 'short' });
+        }
+        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+    }, []);
+
     return (
         <Box className="flex w-full h-full bg-white dark:bg-black overflow-hidden relative">
             <ChatSidebar
@@ -257,9 +296,6 @@ export default function ChatPage() {
                 isLoading={isLoadingChannels}
                 selectedChannelId={selectedChannelId}
                 onSelectChannel={(id) => {
-                    const ch = sortedChannels?.find(c => c.id === id);
-                    const latestId = ch?.tinNhans?.[0]?.id;
-                    if (latestId) setLastRead(id, latestId);
                     handleSelectChannel(id);
                 }}
                 currentUserId={user?.id}
@@ -278,23 +314,30 @@ export default function ChatPage() {
             />
 
             <Box className={`flex-1 h-full flex flex-col bg-white dark:bg-black ${!selectedChannelId ? 'hidden md:flex' : 'flex'}`}>
-                {selectedChannel ? (
+                {selectedChannel || selectedChannelId ? (
                     <Box className="flex h-full">
                         <Box className="flex-1 flex flex-col min-w-0">
-                            <ChatWindow
-                                channel={selectedChannel}
-                                onBack={handleBack}
-                                onToggleInfo={() => setShowInfo(!showInfo)}
-                            />
+                            {selectedChannel ? (
+                                <ChatWindow
+                                    channel={selectedChannel as TChannel}
+                                    onBack={handleBack}
+                                    onToggleInfo={() => setShowInfo(!showInfo)}
+                                />
+                            ) : (
+                                <Center className="h-full">
+                                    <Loader size="md" color="blue" />
+                                </Center>
+                            )}
                         </Box>
 
-                        {showInfo && !isMobile && (
+                        {showInfo && !isMobile && selectedChannel && (
                             <Box className="hidden lg:flex w-[340px] flex-col h-full bg-white dark:bg-black overflow-y-auto border-l border-gray-100 dark:border-zinc-900 animate-in slide-in-from-right duration-300">
                                 <ChannelInfoSidebar
-                                    channel={selectedChannel}
+                                    channel={selectedChannel as TChannel}
                                     currentUserId={user?.id}
                                     getChannelName={getChannelName}
                                     getChannelAvatar={getChannelAvatar}
+                                    presenceMap={presenceMap}
                                 />
                             </Box>
                         )}
@@ -331,10 +374,11 @@ export default function ChatPage() {
                     <Box className="flex-1 overflow-y-auto pb-10">
                         {selectedChannel && (
                             <ChannelInfoSidebar
-                                channel={selectedChannel}
+                                channel={selectedChannel as TChannel}
                                 currentUserId={user?.id}
                                 getChannelName={getChannelName}
                                 getChannelAvatar={getChannelAvatar}
+                                presenceMap={presenceMap}
                             />
                         )}
                     </Box>
@@ -362,40 +406,16 @@ export default function ChatPage() {
                 onClose={() => setShowSettings(false)}
                 user={user}
                 onLogout={() => {
-                    // Logic for logout
                     localStorage.clear();
-                    window.location.href = '/login';
+                    document.cookie.split(";").forEach((c) => {
+                        document.cookie = c
+                            .replace(/^ +/, "")
+                            .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                    });
+                    const locale = pathname?.split('/')[1] || 'vi';
+                    window.location.assign(`/${locale}/auth/login`);
                 }}
             />
         </Box>
     );
-}
-
-// Helpers
-function getChannelName(channel: TChannel, currentUserId?: number) {
-    if (!channel) return "Người dùng";
-    if (channel.loaiKenh === 'NHOM') return channel.tenKenh || "Nhóm";
-    if (!channel.thanhViens || channel.thanhViens.length === 0) return "Người dùng";
-    const member = channel.thanhViens.find(m => Number(m.nguoiDungId) !== Number(currentUserId));
-    return member?.nguoiDung?.hoTen || member?.nguoiDung?.taiKhoan || "Người dùng";
-}
-
-function getChannelAvatar(channel: TChannel, currentUserId?: number) {
-    if (!channel || channel.loaiKenh === 'NHOM') return null;
-    const member = channel.thanhViens?.find(m => Number(m.nguoiDungId) !== Number(currentUserId));
-    return member?.nguoiDung?.avatar;
-}
-
-function formatTime(dateStr: string) {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    if (diff < 24 * 60 * 60 * 1000 && now.getDate() === date.getDate()) {
-        return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-    if (diff < 7 * 24 * 60 * 60 * 1000) {
-        return date.toLocaleDateString([], { weekday: 'short' });
-    }
-    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
 }

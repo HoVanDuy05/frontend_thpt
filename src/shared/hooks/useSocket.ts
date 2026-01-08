@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAppStore } from "@/providers/store/useAppStore";
 
-const SOCKET_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000")
+const SOCKET_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/")
     .replace(/\/api\/?$/, "");
 
 let socketInstance: Socket | null = null;

@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { usePathname, useSearchParams } from "next/navigation";
 import { notifications as mantineNotifications } from "@mantine/notifications";
 import { IconBellRinging } from "@tabler/icons-react";
+import { usePWA } from "@/providers/PWAProvider";
 
 export function GlobalSocketHandler() {
     const { on, off, isConnected } = useSocket();
@@ -14,6 +15,14 @@ export function GlobalSocketHandler() {
     const t = useTranslations('chat');
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const { subscribeToPush, notificationPermission } = usePWA();
+
+    // Auto subscribe to push when logged in and permission granted
+    useEffect(() => {
+        if (user && notificationPermission === 'granted') {
+            subscribeToPush();
+        }
+    }, [user, notificationPermission, subscribeToPush]);
 
     useEffect(() => {
         if (!isConnected || !user) return;

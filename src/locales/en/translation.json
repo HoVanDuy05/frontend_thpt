@@ -627,14 +627,17 @@
             "mute": "Mute notifications",
             "search": "Search in conversation",
             "chat_info": "Chat Info",
-            "encryption_notice": "This conversation is end-to-end encrypted for your privacy.",
+            "encryption_notice": "End-to-End Encryption",
             "customize_chat": "Customize Chat",
             "theme": "Theme",
             "quick_emoji": "Quick Emoji",
             "media_files": "Media, files and links",
+            "media_files_links": "Media, files and links",
             "view_all": "View all",
             "privacy_support": "Privacy & Support",
-            "block": "Block"
+            "block": "Block",
+            "report": "Report",
+            "delete_chat": "Delete conversation"
         },
         "settings": {
             "title": "Settings",

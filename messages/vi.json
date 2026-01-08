@@ -70,5 +70,53 @@
             "chatError": "Không thể mở cuộc trò chuyện. Vui lòng kết bạn trước.",
             "actionError": "Không thể thực hiện thao tác. Vui lòng thử lại."
         }
+    },
+    "chat": {
+        "sidebar": {
+            "profile": "Trang cá nhân",
+            "mute": "Tắt thông báo",
+            "search": "Tìm kiếm",
+            "chat_info": "Thông tin về đoạn chat",
+            "encryption_notice": "Mã hóa đầu cuối",
+            "customize_chat": "Tùy chỉnh đoạn chat",
+            "theme": "Chủ đề",
+            "quick_emoji": "Biểu tượng cảm xúc nhanh",
+            "media_files_links": "File phương tiện, file & liên kết",
+            "privacy_support": "Quyền riêng tư & hỗ trợ",
+            "block": "Chặn",
+            "report": "Báo cáo",
+            "delete_chat": "Xóa cuộc trò chuyện"
+        },
+        "typing": "Đang soạn tin...",
+        "active_now": "Đang hoạt động",
+        "active": "Đang hoạt động",
+        "offline": "Ngoại tuyến",
+        "sent": "Đã gửi",
+        "delivered": "Đã nhận",
+        "seen": "Đã xem",
+        "read": "Đã xem",
+        "details": "Chi tiết",
+        "start_conversation": "Bắt đầu cuộc trò chuyện",
+        "you": "Bạn",
+        "conversations": "Đoạn chat",
+        "new_message": "Tin nhắn mới",
+        "search_placeholder": "Tìm kiếm trên Messenger",
+        "no_conversations_title": "Chưa có cuộc trò chuyện nào",
+        "no_conversations_subtitle": "Kết nối và trò chuyện với bạn bè ngay bây giờ.",
+        "replying_to": "Đang trả lời {name}",
+        "type_message": "Nhập tin nhắn...",
+        "settings": {
+            "title": "Cài đặt",
+            "navigation": "Điều hướng",
+            "social": "Mạng xã hội",
+            "pms": "Hệ thống PMS",
+            "general": "Chung",
+            "profile": "Trang cá nhân",
+            "privacy_security": "Quyền riêng tư & Bảo mật",
+            "notifications": "Thông báo & Âm thanh",
+            "preferences": "Tùy chỉnh",
+            "dark_mode": "Chế độ tối",
+            "language": "Ngôn ngữ"
+        }
     }
 }

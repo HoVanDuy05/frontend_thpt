@@ -5,6 +5,7 @@ import { notifications } from "@mantine/notifications";
 import { Button, Group, Text, Stack } from "@mantine/core";
 import { IconDownload, IconRefresh } from "@tabler/icons-react";
 import { useTranslations } from "next-intl";
+import axiosClient from "@/api/axiosClient";
 
 interface PWAContextType {
     isInstallable: boolean;
@@ -198,15 +199,9 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
                 applicationServerKey: convertedVapidKey
             });
 
-            const response = await fetch('/api/communication/push/subscribe', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(subscription)
-            });
+            const response = await axiosClient.post('/communication/push/subscribe', subscription); // axiosClient likely prepends /api or base url, and handles headers
 
-            return response.ok;
+            return response.status === 200 || response.status === 201;
         } catch (error) {
             console.error("Error subscribing to push:", error);
             return false;

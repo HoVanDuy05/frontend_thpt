@@ -78,7 +78,7 @@ export const ChatSidebar = ({
         >
             {/* Header */}
             <Group justify="space-between" px="md" py="xs" className="shrink-0 h-[68px]">
-                <Text fw={800} size="24px" className="text-black dark:text-white" style={{ fontFamily: 'var(--font-be-vietnam), sans-serif', letterSpacing: '-0.5px' }}>
+                <Text fw={800} className="text-black dark:text-white" style={{ fontFamily: 'var(--font-be-vietnam), sans-serif', letterSpacing: '-0.5px', fontSize: 'var(--font-size-2xl)' }}>
                     {t('conversations')}
                 </Text>
                 <Group gap="xs">
@@ -221,7 +221,10 @@ export const ChatSidebar = ({
                                             <Text size="13px" c={isUnread ? (dark ? "white" : "black") : "dimmed"} truncate style={{ flex: 1 }} fw={isUnread ? 700 : 400}>
                                                 {channel.tinNhans?.[0]
                                                     ? (channel.tinNhans[0].nguoiGuiId === currentUserId ? "Bạn: " : "") +
-                                                    (channel.tinNhans[0].loai === 'HINH_ANH' ? 'Đã gửi một ảnh' : channel.tinNhans[0].noiDung)
+                                                    (channel.tinNhans[0].loai === 'HINH_ANH' ? 'Đã gửi một ảnh' :
+                                                        channel.tinNhans[0].loai === 'GHI_AM' ? 'Đã gửi một đoạn ghi âm' :
+                                                            channel.tinNhans[0].loai === 'TEP' ? 'Đã gửi một tệp đính kèm' :
+                                                                channel.tinNhans[0].noiDung)
                                                     : "Bắt đầu cuộc trò chuyện"}
                                             </Text>
                                             <Text size="12px" c="dimmed" style={{ whiteSpace: 'nowrap' }} fw={isUnread ? 600 : 400}>

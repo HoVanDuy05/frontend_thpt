@@ -69,8 +69,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
             nguoiGui: {
                 id: user?.id,
                 taiKhoan: user?.taiKhoan || 'Me',
-                avatar: user?.avatar,
-                hoTen: user?.hoTen
+                avatar: user?.avatar || null,
+                hoTen: user?.hoTen || user?.taiKhoan || 'User',
+                hoSoHocSinh: user?.hoSoHocSinh || null,
+                hoSoGiaoVien: user?.hoSoGiaoVien || null
             },
             tinNhanGoc: replyingTo,
             isPending: true // Flag for UI if needed
@@ -87,12 +89,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
             }
         }, (oldData: any) => {
             if (!Array.isArray(oldData)) return [optimisticMessage];
-            // If the API returns newest first, we should prepend. 
-            // If oldest first, we append.
-            // Based on ChatWindow's sort, we probably want oldest at start of array for the cache too, 
-            // but usually ChatWindow sorts everything itself. 
-            // Let's prepend to match the "newest first" pattern common in caches.
-            return [optimisticMessage, ...oldData];
+            // API returns chronological (Oldest -> Newest) based on ChatWindow rendering.
+            return [...oldData, optimisticMessage];
         });
 
         // Update Channel List Preview
@@ -131,8 +129,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
                 return oldData.map(m => m.id === tempId ? newMessage : m);
             });
 
-            // Re-sync channel list to be sure
-            queryClient.invalidateQueries({ queryKey: ["chat", "channels"] as any });
+            // Channel list already updated via optimistic update + socket events
+            // No need to invalidate/refetch here
         } catch (error: any) {
             console.error('Failed to send message:', error);
 
@@ -193,14 +191,67 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
         const formData = new FormData();
         formData.append('file', audioBlob, 'voice.webm');
 
+        // 1. Create optimistic message IMMEDIATELY with placeholder
+        const tempId = -Date.now();
+        const optimisticMessage = {
+            id: tempId,
+            kenhChatId: channelId,
+            nguoiGuiId: user?.id,
+            noiDung: 'Đang tải lên...',
+            loai: 'GHI_AM',
+            duongDanTep: URL.createObjectURL(audioBlob), // Temporary local URL
+            ngayGui: new Date().toISOString(),
+            nguoiGui: {
+                id: user?.id,
+                taiKhoan: user?.taiKhoan || 'Me',
+                avatar: user?.avatar || null,
+                hoTen: user?.hoTen || user?.taiKhoan || 'User',
+                hoSoHocSinh: user?.hoSoHocSinh || null,
+                hoSoGiaoVien: user?.hoSoGiaoVien || null
+            },
+            isPending: true
+        };
+
+        // 2. Show optimistic message immediately
+        queryClient.setQueriesData({
+            predicate: (query) => {
+                const key = query.queryKey;
+                return Array.isArray(key) && key[0] === 'chat' && key[1] === 'messages' && key[2] === channelId;
+            }
+        }, (oldData: any) => {
+            if (!Array.isArray(oldData)) return [optimisticMessage];
+            return [...oldData, optimisticMessage];
+        });
+
         try {
-            notifications.show({ id: 'uploading-voice', title: t('uploading_voice_title'), message: t('uploading_voice_message'), loading: true, autoClose: false });
+            // 3. Upload in background
             const res = await uploadAudioMutation.mutateAsync(formData as any);
-            notifications.update({ id: 'uploading-voice', title: t('upload_success_title'), message: t('upload_success_message'), color: 'green', autoClose: 2000, loading: false });
+
+            // 4. Send real message
             await handleSend(res.url, 'GHI_AM', res.url);
+
+            // 5. Remove optimistic message (real one will replace it)
+            queryClient.setQueriesData({
+                predicate: (query) => {
+                    const key = query.queryKey;
+                    return Array.isArray(key) && key[0] === 'chat' && key[1] === 'messages' && key[2] === channelId;
+                }
+            }, (oldData: any) => {
+                if (!Array.isArray(oldData)) return oldData;
+                return oldData.filter(m => m.id !== tempId);
+            });
         } catch (error) {
-            console.error(error);
-            notifications.update({ id: 'uploading-voice', title: t('upload_error_title'), message: t('upload_error_message'), color: 'red', autoClose: 3000, loading: false });
+            console.error('Voice upload error:', error);
+            // Remove failed optimistic message
+            queryClient.setQueriesData({
+                predicate: (query) => {
+                    const key = query.queryKey;
+                    return Array.isArray(key) && key[0] === 'chat' && key[1] === 'messages' && key[2] === channelId;
+                }
+            }, (oldData: any) => {
+                if (!Array.isArray(oldData)) return oldData;
+                return oldData.filter(m => m.id !== tempId);
+            });
         } finally {
             setIsRecording(false);
         }
@@ -221,104 +272,78 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
                 </div>
             )}
 
-            <div className="flex items-end gap-1 sm:gap-1 max-w-[1244px] mx-auto min-h-[36px]">
+            <div className="flex items-end gap-2 w-full mx-auto min-h-[36px]">
                 {isRecording ? (
                     <VoiceRecorder onSend={handleVoiceSend} onCancel={() => setIsRecording(false)} />
                 ) : (
                     <>
                         {/* Left Actions */}
-                        <div className="flex items-center shrink-0 mb-[2px]">
+                        <div className="flex items-center shrink-0 mb-[5px] gap-1 transition-all duration-300">
                             {!isActive ? (
-                                <div className="flex items-center gap-0.5 animate-in fade-in slide-in-from-left-2 duration-300">
-                                    <ActionIcon variant="subtle" radius="xl" size="lg" className="hover:bg-gray-100 dark:hover:bg-white/10 text-[#0084FF]">
+                                <div className="flex items-center gap-1 animate-in fade-in slide-in-from-left-2 duration-300">
+                                    <ActionIcon variant="subtle" radius="xl" size={32} className="hover:bg-gray-100 dark:hover:bg-white/10 text-[#6366f1]">
                                         <IconPlus size={24} stroke={2.5} />
                                     </ActionIcon>
-                                    <ActionIcon variant="subtle" radius="xl" size="lg" onClick={handleImageClick} className="hover:bg-gray-100 dark:hover:bg-white/10 text-[#0084FF]">
+                                    <ActionIcon variant="subtle" radius="xl" size={32} onClick={handleImageClick} className="hover:bg-gray-100 dark:hover:bg-white/10 text-[#6366f1]">
                                         <IconPhoto size={24} stroke={2.5} />
                                     </ActionIcon>
-                                    <ActionIcon variant="subtle" radius="xl" size="lg" className="hover:bg-gray-100 dark:hover:bg-white/10 text-[#0084FF]">
-                                        <IconMoodSmile size={24} stroke={2.5} />
-                                    </ActionIcon>
+
                                 </div>
                             ) : (
                                 <div className="animate-in fade-in zoom-in duration-300">
-                                    <ActionIcon variant="subtle" radius="xl" size="lg" className="hover:bg-gray-100 dark:hover:bg-white/10 text-[#0084FF]">
-                                        <IconPaperclip size={24} stroke={3} />
+                                    <ActionIcon variant="subtle" radius="xl" size={32} className="hover:bg-gray-100 dark:hover:bg-white/10 text-[#6366f1]">
+                                        <IconPlus size={24} stroke={3} />
                                     </ActionIcon>
                                 </div>
                             )}
                         </div>
 
                         {/* Input Pill */}
-                        <div className="flex-1 min-w-0 flex items-end bg-[#F0F2F5] dark:bg-[#3A3B3C] rounded-[20px] px-3 py-[3px] mb-[2px]">
-                            <div className="flex-1 overflow-hidden">
-                                <Textarea
-                                    value={message}
-                                    onChange={(e) => {
-                                        setMessage(e.currentTarget.value);
-                                        onTyping();
-                                    }}
-                                    onFocus={() => setIsFocused(true)}
-                                    onBlur={() => setIsFocused(false)}
-                                    onKeyDown={handleKeyDown}
-                                    placeholder={t('type_message')}
-                                    autosize
-                                    minRows={1}
-                                    maxRows={8}
-                                    variant="unstyled"
-                                    className="w-full"
-                                    classNames={{
-                                        input: "text-[15px] leading-tight text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400 py-1.5 min-h-[20px]"
-                                    }}
-                                    styles={{
-                                        input: {
-                                            border: 0,
-                                            width: '100%',
-                                            '&::placeholder': {
-                                                whiteSpace: 'nowrap',
-                                                overflow: 'hidden'
-                                            }
-                                        }
-                                    }}
-                                />
-                            </div>
-                            <ActionIcon variant="subtle" radius="xl" size="md" className="shrink-0 hover:bg-transparent text-[#0084FF] mb-[2px]">
-                                <IconMoodSmile size={24} stroke={2} />
-                            </ActionIcon>
+                        <div className="flex-1 relative flex items-center bg-[#E4E6EB] dark:bg-[#3A3B3C] rounded-[20px] px-3 py-1 mb-[2px]">
+                            <Textarea
+                                value={message}
+                                onChange={(e) => {
+                                    setMessage(e.currentTarget.value);
+                                    onTyping();
+                                }}
+                                onFocus={() => setIsFocused(true)}
+                                onBlur={() => setIsFocused(false)}
+                                onKeyDown={handleKeyDown}
+                                placeholder={t('type_message')}
+                                autosize
+                                minRows={1}
+                                maxRows={6}
+                                variant="unstyled"
+                                className="w-full flex-1"
+                                classNames={{
+                                    input: "py-1.5 text-[15px] leading-relaxed text-gray-900 dark:text-gray-100 placeholder:text-gray-500 dark:placeholder:text-gray-400"
+                                }}
+                            />
                         </div>
 
                         {/* Right Action (Send/Like/Voice) */}
-                        <div className="shrink-0 flex items-center pl-1 mb-[2px]">
+                        <div className="shrink-0 flex items-center pl-1 mb-[3px]">
                             {message.trim() ? (
                                 <ActionIcon
                                     radius="xl"
-                                    size="lg"
+                                    size={36}
                                     variant="transparent"
-                                    className="transition-all hover:scale-110 active:scale-90 text-[#0084FF]"
+                                    className="transition-all hover:scale-110 active:scale-90 text-[#6366f1]"
                                     onClick={() => handleSend()}
                                     loading={sendMessageMutation.isPending || uploadImageMutation.isPending || uploadAudioMutation.isPending}
                                 >
-                                    <IconSend size={26} fill="currentColor" stroke={1} />
+                                    <IconSend size={24} fill="currentColor" stroke={1} />
                                 </ActionIcon>
                             ) : (
                                 <div className="flex items-center gap-1">
                                     <ActionIcon
                                         radius="xl"
-                                        size="lg"
+                                        size={36}
                                         variant="transparent"
-                                        className="transition-all hover:scale-110 active:scale-90 text-[#0084FF]"
+                                        className="transition-all hover:scale-110 active:scale-90 text-[#6366f1]"
                                         onClick={() => setIsRecording(true)}
                                     >
-                                        <IconMicrophone size={26} stroke={2} />
-                                    </ActionIcon>
-                                    <ActionIcon
-                                        radius="xl"
-                                        size="lg"
-                                        variant="transparent"
-                                        className="transition-all hover:scale-110 active:scale-90 text-[#0084FF]"
-                                        onClick={() => handleSend("👍")}
-                                    >
-                                        <IconThumbUp size={26} fill="currentColor" stroke={1} />
+                                        <IconMicrophone size={24} stroke={2} />
                                     </ActionIcon>
                                 </div>
                             )}
@@ -326,6 +351,6 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
                     </>
                 )}
             </div>
-        </div>
+        </div >
     );
 };

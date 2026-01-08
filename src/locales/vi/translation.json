@@ -626,14 +626,17 @@
             "mute": "Tắt thông báo",
             "search": "Tìm kiếm",
             "chat_info": "Thông tin về đoạn chat",
-            "encryption_notice": "Cuộc trò chuyện này được mã hóa đầu cuối để đảm bảo tính riêng tư của bạn.",
+            "encryption_notice": "Mã hóa đầu cuối",
             "customize_chat": "Tùy chỉnh đoạn chat",
             "theme": "Chủ đề",
             "quick_emoji": "Biểu tượng cảm xúc nhanh",
             "media_files": "File phương tiện, file và liên kết",
+            "media_files_links": "File phương tiện, file và liên kết",
             "view_all": "Xem tất cả",
             "privacy_support": "Quyền riêng tư & hỗ trợ",
-            "block": "Chặn"
+            "block": "Chặn",
+            "report": "Báo cáo",
+            "delete_chat": "Xóa cuộc trò chuyện"
         },
         "settings": {
             "title": "Cài đặt",
