@@ -34,11 +34,11 @@ export function useSocket() {
                 auth: {
                     token: token
                 },
-                transports: ['websocket', 'polling'],
+                transports: ['websocket'], // Force websocket only for better mobile stability
                 reconnection: true,
-                reconnectionAttempts: 5,
-                reconnectionDelay: 2000,
-                timeout: 20000,
+                reconnectionAttempts: 10, // Increase attempts
+                reconnectionDelay: 1000, // Faster retry
+                timeout: 10000,
                 secure: isSecure
             });
         }
@@ -75,9 +75,17 @@ export function useSocket() {
         });
 
         const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible' && socketInstance && !socketInstance.connected) {
-                console.log('App foregrounded, reconnecting socket...');
-                socketInstance.connect();
+            if (document.visibilityState === 'visible') {
+                console.log('App foregrounded, checking socket status...');
+                if (socketInstance) {
+                    if (!socketInstance.connected) {
+                        console.log('Socket disconnected, reconnecting...');
+                        socketInstance.connect();
+                    } else {
+                        // Optional: Ping to ensure connection is actually alive
+                        console.log('Socket appears connected.');
+                    }
+                }
             }
         };
 

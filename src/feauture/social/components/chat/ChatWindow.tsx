@@ -1,4 +1,4 @@
-import { Paper, Group, ActionIcon, Avatar, Text, Stack, Box, Loader, Center, Image, Drawer, Divider, Badge, Accordion, ThemeIcon, UnstyledButton, Modal, Button, useMantineColorScheme } from "@mantine/core";
+import { Paper, Group, ActionIcon, Avatar, Text, Stack, Box, Loader, Center, Image, Drawer, Divider, Badge, Accordion, ThemeIcon, UnstyledButton, Modal, Button, useMantineColorScheme, Skeleton } from "@mantine/core";
 import { IconArrowLeft, IconPhone, IconVideo, IconUser, IconInfoCircle, IconPhoto, IconFile, IconBell, IconSearch, IconMicrophone, IconSend, IconThumbUp, IconUsers } from "@tabler/icons-react";
 import { TChannel } from "@/api/types/api.type";
 import { AppQuery } from "@/api/AppQuery";
@@ -17,6 +17,21 @@ interface ChatWindowProps {
     onBack?: () => void;
     onToggleInfo?: () => void;
 }
+
+const ChatSkeleton = () => {
+    return (
+        <Stack gap="lg" p="md" className="w-full h-full justify-end pb-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+                <Group key={i} justify={i % 2 === 0 ? 'flex-end' : 'flex-start'} align="flex-end" gap="xs">
+                    {i % 2 !== 0 && <Skeleton height={32} width={32} circle />}
+                    <Stack gap={4} className="max-w-[70%]">
+                        <Skeleton height={40} width={Math.random() * 100 + 100} radius="xl" />
+                    </Stack>
+                </Group>
+            ))}
+        </Stack>
+    );
+};
 
 const CustomVoicePlayer = ({ url, isMe, dark, isFirstInGroup, isLastInGroup }: { url: string; isMe: boolean; dark: boolean; isFirstInGroup?: boolean; isLastInGroup?: boolean }) => {
     const [playing, setPlaying] = useState(false);
@@ -315,7 +330,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
             }
 
             setAllMessages(prev => {
-                if (prev.some(m => m.id === message.id)) return prev;
+                // Log state before update
+                const exists = prev.some(m => m.id === message.id);
+                console.log('Update State: New Message', { id: message.id, exists, prevLen: prev.length });
+                if (exists) return prev;
+
                 if (isFromMe) {
                     const optimisticIdx = prev.findIndex(m => m.id < 0 && (m.noiDung === message.noiDung || m.duongDanTep === message.duongDanTep));
                     if (optimisticIdx !== -1) {
@@ -325,10 +344,10 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                     }
                 }
                 const updated = [...prev, message];
-                return updated.sort((a, b) => dayjs(a.ngayGui).valueOf() - dayjs(b.ngayGui).valueOf());
+                const sorted = updated.sort((a, b) => dayjs(a.ngayGui).valueOf() - dayjs(b.ngayGui).valueOf());
+                console.log('Update State: Result', { newLen: sorted.length });
+                return sorted;
             });
-
-            // No need to invalidate - optimistic update already handled it
         };
 
         const handleTypingStart = ({ userName }: { userName: string }) => {
@@ -366,6 +385,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
     }, [channel.id]);
 
     useEffect(() => {
+        console.log('Syncing pageMessages', { len: pageMessages?.length, page });
         if (pageMessages) {
             if (pageMessages.length < 20) hasMoreRef.current = false;
 
@@ -631,7 +651,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                         <Center py="xs"><Loader size="xs" color="blue" /></Center>
                     )}
 
-                    {allMessages.length === 0 ? (
+                    {(isLoading && page === 1 && allMessages.length === 0) ? (
+                        <ChatSkeleton />
+                    ) : allMessages.length === 0 ? (
                         <Center h={400} className="flex-col animate-in fade-in zoom-in duration-500">
                             <Avatar src={targetUser?.avatar || null} size={100} radius={999} mb="md" />
                             <Text fw={700} size="xl">{channel.loaiKenh === 'NHOM' ? channel.tenKenh : (targetUser?.hoTen || targetUser?.taiKhoan)}</Text>
