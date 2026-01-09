@@ -228,7 +228,7 @@ export const ChatSidebar = ({
                                                                     channel.tinNhans[0].noiDung)
                                                         : "Bắt đầu cuộc trò chuyện"}
                                                 </Text>
-                                                <Text size="12px" c="dimmed" style={{ whiteSpace: 'nowrap' }} fw={isUnread ? 600 : 400}>
+                                                <Text size="12px" c="dimmed" style={{ whiteSpace: 'nowrap' }} fw={isUnread ? 600 : 400} suppressHydrationWarning>
                                                     · {formatTime(channel.updatedAt)}
                                                 </Text>
                                             </Group>

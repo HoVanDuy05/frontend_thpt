@@ -41,11 +41,13 @@ const CustomVoicePlayer = ({ url, isMe, dark, isFirstInGroup, isLastInGroup }: {
     };
 
     // Generate random bars for waveform effect
-    const waveformBars = useMemo(() => {
-        return Array.from({ length: 25 }).map((_, i) => ({
+    const [waveformBars, setWaveformBars] = useState<{ height: number; delay: number }[]>([]);
+
+    useEffect(() => {
+        setWaveformBars(Array.from({ length: 25 }).map((_, i) => ({
             height: Math.floor(Math.random() * 60) + 20,
             delay: i * 0.05
-        }));
+        })));
     }, []);
 
     return (
