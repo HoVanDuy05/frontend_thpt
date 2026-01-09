@@ -179,7 +179,7 @@ export const ChatSidebar = ({
             </Box>
 
             <ScrollArea className="flex-1 px-6">
-                <Stack gap={2} pb="xl">
+                <Stack gap={4} pb="xl">
                     {channels && channels.length > 0 ? (
                         <>
                             {filteredChannels.map((channel: TChannel) => {

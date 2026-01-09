@@ -4,8 +4,29 @@ import { useEffect, useState } from "react";
 import { io, Socket } from "socket.io-client";
 import { useAppStore } from "@/providers/store/useAppStore";
 
-const SOCKET_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/")
-    .replace(/\/api\/?$/, "");
+const getSocketUrl = () => {
+    if (typeof window === 'undefined') {
+        return (process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/").replace(/\/api\/?$/, "");
+    }
+
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/";
+
+    // If API URL is already configured (production or custom), use it directly
+    if (!apiUrl.includes('localhost')) {
+        return apiUrl.replace(/\/api\/?$/, "");
+    }
+
+    // For localhost development: if accessing via LAN IP, use that IP for socket too
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        const protocol = window.location.protocol;
+        return `${protocol}//${window.location.hostname}:8000/`;
+    }
+
+    // Default localhost
+    return apiUrl.replace(/\/api\/?$/, "");
+};
+
+const SOCKET_URL = getSocketUrl();
 
 // Helper to check if we are in a secure context
 const isSecure = typeof window !== 'undefined' && window.location.protocol === 'https:';

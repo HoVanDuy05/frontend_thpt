@@ -19,7 +19,7 @@ interface ChatWindowProps {
     onToggleInfo?: () => void;
 }
 
-const ChatSkeleton = () => {
+export const ChatSkeleton = () => {
     return (
         <Stack gap="lg" p="md" className="w-full h-full justify-end pb-4">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -334,6 +334,33 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
     const viewport = useRef<HTMLDivElement>(null);
     const isMobile = useMediaQuery('(max-width: 48em)');
     const firstLoadRef = useRef(true);
+
+    // Swipe handlers
+    const touchStartRef = useRef<number | null>(null);
+    const touchEndRef = useRef<number | null>(null);
+
+    const onTouchStart = (e: React.TouchEvent) => {
+        touchEndRef.current = null;
+        touchStartRef.current = e.targetTouches[0].clientX;
+    };
+
+    const onTouchMove = (e: React.TouchEvent) => {
+        touchEndRef.current = e.targetTouches[0].clientX;
+    };
+
+    const onTouchEnd = () => {
+        if (!touchStartRef.current || !touchEndRef.current) return;
+        const distance = touchStartRef.current - touchEndRef.current;
+        const isLeftSwipe = distance > 50;
+        const isRightSwipe = distance < -50;
+
+        if (isLeftSwipe) {
+            handleNextImage();
+        }
+        if (isRightSwipe) {
+            handlePrevImage();
+        }
+    };
 
     useEffect(() => {
         dayjs.extend(relativeTime);
@@ -769,12 +796,12 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
             <Transition mounted={!!previewImage} transition="fade" duration={200} timingFunction="ease">
                 {(styles) => (
                     <Portal>
-                        <div style={{ ...styles, zIndex: 9999 }} className="fixed inset-0 bg-black/95 backdrop-blur-sm flex flex-col pt-safe">
-                            {/* Toolbar */}
-                            <div className="absolute top-4 right-4 z-[10000] flex items-center gap-3">
+                        <div style={{ ...styles, zIndex: 9999 }} className="fixed inset-0 bg-black/95 backdrop-blur-sm flex flex-col">
+                            {/* Toolbar - Fixed at top, outside image area */}
+                            <div className="shrink-0 h-16 flex items-center justify-end px-4 gap-3 z-[10000]">
                                 <ActionIcon
                                     variant="filled" color="gray" size="xl" radius="xl"
-                                    className="bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-md"
+                                    className="bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-md shadow-lg"
                                     onClick={() => {
                                         if (previewImage) {
                                             const link = document.createElement('a');
@@ -786,21 +813,24 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                                         }
                                     }}
                                 >
-                                    <IconDownload size={24} />
+                                    <IconDownload size={22} />
                                 </ActionIcon>
                                 <ActionIcon
                                     variant="filled" color="gray" size="xl" radius="xl"
-                                    className="bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-md"
+                                    className="bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-md shadow-lg"
                                     onClick={() => setPreviewImage(null)}
                                 >
-                                    <IconX size={24} />
+                                    <IconX size={22} />
                                 </ActionIcon>
                             </div>
 
                             {/* Image Container */}
                             <div
-                                className="flex-1 flex items-center justify-center p-4 overflow-hidden relative group/nav"
+                                className="flex-1 flex items-center justify-center px-4 overflow-hidden relative group/nav"
                                 onClick={() => setPreviewImage(null)}
+                                onTouchStart={onTouchStart}
+                                onTouchMove={onTouchMove}
+                                onTouchEnd={onTouchEnd}
                             >
                                 {/* Nav Buttons */}
                                 {imagesList.length > 1 && (
@@ -827,7 +857,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                                 <img
                                     src={previewImage || ''}
                                     alt="Full preview"
-                                    className="max-w-full max-h-[80vh] object-contain shadow-2xl animate-in zoom-in-95 duration-300 rounded-md select-none"
+                                    className="max-w-full max-h-full object-contain shadow-2xl animate-in zoom-in-95 duration-300 select-none"
+                                    style={{ maxHeight: 'calc(100vh - 180px)' }}
                                     onClick={(e) => e.stopPropagation()} // Prevent close when clicking image
                                 />
                             </div>
