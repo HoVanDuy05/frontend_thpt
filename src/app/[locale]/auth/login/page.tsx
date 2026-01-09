@@ -187,7 +187,7 @@ export default function LoginPage() {
                             leftSection={<IconLock size={18} stroke={2} className="text-zinc-400" />}
                             classNames={{
                                 label: "w-full mb-2.5 leading-none",
-                                input: "h-[54px] rounded-[18px] border-zinc-200 dark:border-zinc-800 focus:border-indigo-500 bg-white dark:bg-zinc-900/50 shadow-sm text-[15px] font-bold transition-all placeholder:text-zinc-300 dark:placeholder:text-zinc-700 pl-12",
+                                input: "h-[54px] rounded-[18px] border-zinc-200 dark:border-zinc-800 focus:border-indigo-500 bg-white dark:bg-zinc-900/50 shadow-sm text-[15px] font-bold transition-all placeholder:text-zinc-300 dark:placeholder:text-zinc-700 pl-12 overflow-hidden",
                                 innerInput: "h-full"
                             }}
                         />
