@@ -255,7 +255,7 @@ export type ApiMutationType = {
     };
     forgotPassword: {
         url: { baseUrl: "/auth/forgot-password" };
-        payload: { email: string };
+        payload: { email: string; locale?: string };
         response: { message: string; resetToken?: string };
     };
     resetPassword: {

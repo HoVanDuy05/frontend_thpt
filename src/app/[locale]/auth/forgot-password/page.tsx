@@ -2,7 +2,7 @@
 
 import { TextInput, Button, Title, Text, Stack, Box } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/routing";
 import { AppMutation } from "@/api/AppMutation";
 import { notifications } from "@mantine/notifications";
@@ -25,8 +25,10 @@ export default function ForgotPasswordPage() {
         },
     });
 
+    const locale = useLocale();
+
     const handleSubmit = (values: typeof form.values) => {
-        forgotMutation.mutate(values, {
+        forgotMutation.mutate({ ...values, locale }, {
             onSuccess: () => {
                 notifications.show({
                     title: t("success"),
