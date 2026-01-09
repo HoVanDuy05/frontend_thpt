@@ -1,5 +1,6 @@
-import { Paper, Group, ActionIcon, Avatar, Text, Stack, Box, Loader, Center, Image, Drawer, Divider, Badge, Accordion, ThemeIcon, UnstyledButton, Modal, Button, useMantineColorScheme, Skeleton, Portal, Transition } from "@mantine/core";
-import { IconArrowLeft, IconPhone, IconVideo, IconUser, IconInfoCircle, IconPhoto, IconFile, IconBell, IconSearch, IconMicrophone, IconSend, IconThumbUp, IconUsers, IconX, IconDownload } from "@tabler/icons-react";
+import { Paper, Group, ActionIcon, Avatar, Text, Stack, Box, Loader, Center, Image, Drawer, Divider, Badge, Accordion, ThemeIcon, UnstyledButton, Modal, Button, useMantineColorScheme, Skeleton, Portal, Transition, ScrollArea } from "@mantine/core";
+import { IconArrowLeft, IconPhone, IconVideo, IconUser, IconInfoCircle, IconPhoto, IconFile, IconBell, IconSearch, IconMicrophone, IconSend, IconThumbUp, IconUsers, IconX, IconDownload, IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import { RichLinkPreview } from "./RichLinkPreview";
 import { TChannel } from "@/api/types/api.type";
 import { AppQuery } from "@/api/AppQuery";
 import { useAppStore } from "@/providers/store/useAppStore";
@@ -241,6 +242,11 @@ const MessageBubble = React.memo(({ msg, isMe, isLastInGroup, isFirstInGroup, da
                                     <Text size="15px" className="leading-[1.4] whitespace-pre-wrap">
                                         <Linkify text={msg.noiDung} />
                                     </Text>
+                                    {/* Link Preview (if any URL is found) */}
+                                    {(() => {
+                                        const match = msg.noiDung?.match(/(https?:\/\/[^\s]+)/);
+                                        return match ? <RichLinkPreview url={match[0]} /> : null;
+                                    })()}
                                 </Paper>
                             ) : msg.loai === 'HINH_ANH' ? (
                                 <Box
@@ -611,6 +617,39 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
         return seenIds.length ? Math.max(...seenIds) : 0;
     }, [receiptByMessageId]);
 
+    const imagesList = useMemo(() => {
+        return allMessages
+            .filter(m => m.loai === 'HINH_ANH')
+            .map(m => ({
+                id: m.id,
+                url: m.duongDanTep || m.noiDung,
+                user: m.nguoiGui
+            }))
+            .reverse(); // Show oldest first for strict order, or keep render order. Actually rendering is chrono.
+        // Let's keep it consistent with display order (which is usually Newest at bottom visually, so filtered chrono list).
+        // allMessages is sorted by date ascending? Let's check.
+        // setAllMessages sorts by dayjs(a.ngayGui).valueOf(). So it's oldest first.
+        // So index 0 is oldest.
+    }, [allMessages]);
+
+    const handleNextImage = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        if (!previewImage) return;
+        const idx = imagesList.findIndex(img => img.url === previewImage);
+        if (idx < imagesList.length - 1) {
+            setPreviewImage(imagesList[idx + 1].url);
+        }
+    };
+
+    const handlePrevImage = (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        if (!previewImage) return;
+        const idx = imagesList.findIndex(img => img.url === previewImage);
+        if (idx > 0) {
+            setPreviewImage(imagesList[idx - 1].url);
+        }
+    };
+
     const newestOutgoingId = useMemo(() => {
         const myMessages = allMessages.filter(m => Number(m.nguoiGuiId) === Number(user?.id));
         return myMessages.length ? myMessages[myMessages.length - 1].id : 0;
@@ -760,15 +799,60 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
 
                             {/* Image Container */}
                             <div
-                                className="flex-1 flex items-center justify-center p-4 overflow-hidden"
+                                className="flex-1 flex items-center justify-center p-4 overflow-hidden relative group/nav"
                                 onClick={() => setPreviewImage(null)}
                             >
+                                {/* Nav Buttons */}
+                                {imagesList.length > 1 && (
+                                    <>
+                                        <ActionIcon
+                                            variant="filled" radius="xl" size={48}
+                                            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-md opacity-0 group-hover/nav:opacity-100 transition-opacity disabled:opacity-0"
+                                            onClick={handlePrevImage}
+                                            disabled={imagesList.findIndex(img => img.url === previewImage) <= 0}
+                                        >
+                                            <IconChevronLeft size={32} />
+                                        </ActionIcon>
+                                        <ActionIcon
+                                            variant="filled" radius="xl" size={48}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-md opacity-0 group-hover/nav:opacity-100 transition-opacity disabled:opacity-0"
+                                            onClick={handleNextImage}
+                                            disabled={imagesList.findIndex(img => img.url === previewImage) >= imagesList.length - 1}
+                                        >
+                                            <IconChevronRight size={32} />
+                                        </ActionIcon>
+                                    </>
+                                )}
+
                                 <img
                                     src={previewImage || ''}
                                     alt="Full preview"
-                                    className="max-w-full max-h-[90vh] object-contain shadow-2xl animate-in zoom-in-95 duration-300 rounded-md select-none"
+                                    className="max-w-full max-h-[80vh] object-contain shadow-2xl animate-in zoom-in-95 duration-300 rounded-md select-none"
                                     onClick={(e) => e.stopPropagation()} // Prevent close when clicking image
                                 />
+                            </div>
+
+                            {/* Thumbnail Strip */}
+                            <div className="h-20 shrink-0 bg-black/40 backdrop-blur-md border-t border-white/10 flex items-center justify-center">
+                                <ScrollArea type="never" viewportProps={{ style: { overflowX: 'auto', whiteSpace: 'nowrap' } }} className="w-full max-w-4xl px-4">
+                                    <div className="flex items-center justify-center gap-2 py-2 min-w-full">
+                                        {imagesList.map((img) => (
+                                            <div
+                                                key={img.id}
+                                                className={`relative w-12 h-12 rounded-lg overflow-hidden cursor-pointer transition-all ${img.url === previewImage
+                                                    ? 'ring-2 ring-white opacity-100 scale-110'
+                                                    : 'opacity-50 hover:opacity-100 hover:scale-105'
+                                                    }`}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setPreviewImage(img.url);
+                                                }}
+                                            >
+                                                <img src={img.url} className="w-full h-full object-cover" loading="lazy" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                </ScrollArea>
                             </div>
                         </div>
                     </Portal>

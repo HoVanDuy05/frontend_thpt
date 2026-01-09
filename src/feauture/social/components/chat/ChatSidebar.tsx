@@ -178,7 +178,7 @@ export const ChatSidebar = ({
                 </Group>
             </Box>
 
-            <ScrollArea className="flex-1 px-4">
+            <ScrollArea className="flex-1 px-6">
                 <Stack gap={2} pb="xl">
                     {channels && channels.length > 0 ? (
                         <>
