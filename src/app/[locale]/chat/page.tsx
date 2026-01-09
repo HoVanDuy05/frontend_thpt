@@ -104,7 +104,14 @@ export default function ChatPage() {
         });
     };
 
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
+
     const getIsUnread = (channel: TChannel) => {
+        if (!isMounted) return false;
         const latestId = channel.tinNhans?.[0]?.id;
         if (!latestId) return false;
         const lastRead = getLastReadMap()[String(channel.id)] || 0;

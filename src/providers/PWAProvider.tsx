@@ -98,30 +98,30 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
         window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
         window.addEventListener("appinstalled", handleAppInstalled);
 
-        // Service Worker Registration and Update Logic
+        // Service Worker Logic
         if (typeof window !== 'undefined' && "serviceWorker" in navigator) {
             navigator.serviceWorker.register("/sw.js").then((reg) => {
                 setRegistration(reg);
+
+                // Check for updates every hour
+                setInterval(() => {
+                    reg.update();
+                }, 60 * 60 * 1000);
+
+                // Check for updates on page focus
+                document.addEventListener("visibilitychange", () => {
+                    if (document.visibilityState === 'visible') {
+                        reg.update();
+                    }
+                });
 
                 reg.addEventListener("updatefound", () => {
                     const newWorker = reg.installing;
                     if (newWorker) {
                         newWorker.addEventListener("statechange", () => {
                             if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
-                                // New version available!
                                 setUpdateAvailable(true);
                                 showUpdateNotification(reg);
-
-                                // Show native notification if allowed
-                                if (Notification.permission === 'granted') {
-                                    const options: any = {
-                                        body: t('update_native_body'),
-                                        icon: '/icons/icon-192x192.png',
-                                        tag: 'pwa-update',
-                                        renotify: true
-                                    };
-                                    reg.showNotification(t('update_title'), options);
-                                }
                             }
                         });
                     }
