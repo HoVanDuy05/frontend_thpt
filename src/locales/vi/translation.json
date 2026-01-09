@@ -639,6 +639,9 @@
             "report": "Báo cáo",
             "delete_chat": "Xóa cuộc trò chuyện"
         },
+        "reply": "Trả lời",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
         "settings": {
             "title": "Cài đặt",
             "general": "Chung",

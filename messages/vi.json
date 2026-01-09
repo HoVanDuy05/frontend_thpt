@@ -105,6 +105,9 @@
         "no_conversations_subtitle": "Kết nối và trò chuyện với bạn bè ngay bây giờ.",
         "replying_to": "Đang trả lời {name}",
         "type_message": "Nhập tin nhắn...",
+        "reply": "Trả lời",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
         "settings": {
             "title": "Cài đặt",
             "navigation": "Điều hướng",

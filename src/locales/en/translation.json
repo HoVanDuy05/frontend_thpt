@@ -641,6 +641,9 @@
             "report": "Report",
             "delete_chat": "Delete conversation"
         },
+        "reply": "Reply",
+        "edit": "Edit",
+        "delete": "Delete",
         "settings": {
             "title": "Settings",
             "general": "General",

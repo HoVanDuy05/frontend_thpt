@@ -653,27 +653,42 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
 
     // Scroll handling
     useEffect(() => {
-        if (viewport.current) {
-            if (firstLoadRef.current && allMessages.length > 0) {
-                // Scroll to bottom on first load
-                setTimeout(() => {
-                    if (viewport.current) viewport.current.scrollTop = viewport.current.scrollHeight;
+        if (!viewport.current) return;
+
+        if (firstLoadRef.current && allMessages.length > 0) {
+            // Scroll to bottom on first load
+            requestAnimationFrame(() => {
+                if (viewport.current) {
+                    viewport.current.scrollTop = viewport.current.scrollHeight;
                     firstLoadRef.current = false;
-                }, 0);
-            } else if (page > 1 && scrollBeforeRef.current) {
-                viewport.current.scrollTop = viewport.current.scrollHeight - scrollBeforeRef.current;
-                scrollBeforeRef.current = 0;
-            } else if (allMessages.length > 0) {
-                // For new messages, scroll to bottom if already near bottom
-                const lastMsg = allMessages[allMessages.length - 1];
-                const isMe = Number(lastMsg?.nguoiGuiId) === Number(user?.id);
-                const isNearBottom = viewport.current.scrollHeight - viewport.current.scrollTop - viewport.current.clientHeight < 100; // Threshold
-                if (isMe || isNearBottom) {
-                    viewport.current.scrollTo({
-                        top: viewport.current.scrollHeight,
-                        behavior: isMe ? 'auto' : 'smooth'
-                    });
                 }
+            });
+        } else if (page > 1 && scrollBeforeRef.current > 0) {
+            // Restore scroll position when loading older messages
+            requestAnimationFrame(() => {
+                if (viewport.current && scrollBeforeRef.current > 0) {
+                    const newHeight = viewport.current.scrollHeight;
+                    const heightDiff = newHeight - scrollBeforeRef.current;
+                    viewport.current.scrollTop = heightDiff;
+                    scrollBeforeRef.current = 0;
+                }
+            });
+        } else if (allMessages.length > 0 && page === 1) {
+            // For new messages, only scroll if user is near bottom
+            const lastMsg = allMessages[allMessages.length - 1];
+            const isMe = Number(lastMsg?.nguoiGuiId) === Number(user?.id);
+            const scrollBottom = viewport.current.scrollHeight - viewport.current.scrollTop - viewport.current.clientHeight;
+            const isNearBottom = scrollBottom < 150;
+
+            if (isMe || isNearBottom) {
+                requestAnimationFrame(() => {
+                    if (viewport.current) {
+                        viewport.current.scrollTo({
+                            top: viewport.current.scrollHeight,
+                            behavior: isMe ? 'auto' : 'smooth'
+                        });
+                    }
+                });
             }
         }
     }, [allMessages, page, user?.id]);
