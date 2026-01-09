@@ -1,5 +1,5 @@
-import { Paper, Group, ActionIcon, Avatar, Text, Stack, Box, Loader, Center, Image, Drawer, Divider, Badge, Accordion, ThemeIcon, UnstyledButton, Modal, Button, useMantineColorScheme, Skeleton, Portal, Transition, ScrollArea } from "@mantine/core";
-import { IconArrowLeft, IconPhone, IconVideo, IconUser, IconInfoCircle, IconPhoto, IconFile, IconBell, IconSearch, IconMicrophone, IconSend, IconThumbUp, IconUsers, IconX, IconDownload, IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
+import { Paper, Group, ActionIcon, Avatar, Text, Stack, Box, Loader, Center, Image, Drawer, Divider, Badge, Accordion, ThemeIcon, UnstyledButton, Modal, Button, useMantineColorScheme, Skeleton, Portal, Transition, ScrollArea, Menu } from "@mantine/core";
+import { IconArrowLeft, IconPhone, IconVideo, IconUser, IconInfoCircle, IconPhoto, IconFile, IconBell, IconSearch, IconMicrophone, IconSend, IconThumbUp, IconUsers, IconX, IconDownload, IconChevronLeft, IconChevronRight, IconEdit, IconTrash, IconCornerDownLeft } from "@tabler/icons-react";
 import { RichLinkPreview } from "./RichLinkPreview";
 import { TChannel } from "@/api/types/api.type";
 import { AppQuery } from "@/api/AppQuery";
@@ -169,8 +169,53 @@ const CustomVoicePlayer = ({ url, isMe, dark, isFirstInGroup, isLastInGroup }: {
 };
 
 const MessageBubble = React.memo(({ msg, isMe, isLastInGroup, isFirstInGroup, dark, setPreviewImage, t, targetUser, lastSeenMessageId, newestOutgoingId, getReceiptLabel, onReply }: any) => {
+    const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+    const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+    const swipeStartX = useRef<number | null>(null);
+    const messageRef = useRef<HTMLDivElement>(null);
+    const [swipeOffset, setSwipeOffset] = useState(0);
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        swipeStartX.current = e.touches[0].clientX;
+        longPressTimer.current = setTimeout(() => {
+            const touch = e.touches[0];
+            setContextMenu({ x: touch.clientX, y: touch.clientY });
+        }, 500);
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        if (longPressTimer.current) {
+            clearTimeout(longPressTimer.current);
+            longPressTimer.current = null;
+        }
+        if (swipeStartX.current !== null && !isMe) {
+            const diff = e.touches[0].clientX - swipeStartX.current;
+            if (diff > 0 && diff < 100) {
+                setSwipeOffset(diff);
+            }
+        }
+    };
+
+    const handleTouchEnd = () => {
+        if (longPressTimer.current) {
+            clearTimeout(longPressTimer.current);
+            longPressTimer.current = null;
+        }
+        if (swipeOffset > 50) {
+            onReply(msg);
+        }
+        setSwipeOffset(0);
+        swipeStartX.current = null;
+    };
+
     return (
-        <div className={`flex flex-col ${isMe ? 'items-end ml-auto' : 'items-start'} ${isLastInGroup ? 'mb-5' : 'mb-1'} group w-full`}>
+        <div
+            className={`flex flex-col ${isMe ? 'items-end ml-auto' : 'items-start'} ${isLastInGroup ? 'mb-5' : 'mb-1'} group w-full`}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            style={{ transform: `translateX(${swipeOffset}px)`, transition: swipeOffset === 0 ? 'transform 0.2s' : 'none' }}
+        >
             {/* Show Date Divider if first in group and from long ago (optional, but good for "chuẩn" UI) */}
 
             <div className={`flex items-end gap-2 max-w-[85%] sm:max-w-[75%] ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
@@ -211,16 +256,33 @@ const MessageBubble = React.memo(({ msg, isMe, isLastInGroup, isFirstInGroup, da
                         </Paper>
                     )}
 
-                    <div className="flex items-center gap-1 group/row">
-                        {isMe && (
-                            <ActionIcon
-                                variant="subtle" color="gray" size="sm" radius="xl"
-                                className="opacity-0 group-hover/row:opacity-100 transition-opacity order-first"
-                                onClick={() => onReply(msg)}
-                            >
-                                <IconArrowLeft size={16} />
-                            </ActionIcon>
+                    <div className="flex items-center gap-1 group/row relative">
+                        {swipeOffset > 0 && !isMe && (
+                            <div className="absolute -left-10 text-blue-500">
+                                <IconCornerDownLeft size={20} />
+                            </div>
                         )}
+
+                        <Menu opened={!!contextMenu} onClose={() => setContextMenu(null)} position="bottom" withArrow>
+                            <Menu.Target>
+                                <div style={{ position: 'absolute', left: contextMenu?.x || 0, top: contextMenu?.y || 0, width: 1, height: 1 }} />
+                            </Menu.Target>
+                            <Menu.Dropdown>
+                                <Menu.Item leftSection={<IconCornerDownLeft size={16} />} onClick={() => { onReply(msg); setContextMenu(null); }}>
+                                    {t('reply') || 'Trả lời'}
+                                </Menu.Item>
+                                {isMe && (
+                                    <>
+                                        <Menu.Item leftSection={<IconEdit size={16} />}>
+                                            {t('edit') || 'Chỉnh sửa'}
+                                        </Menu.Item>
+                                        <Menu.Item leftSection={<IconTrash size={16} />} color="red">
+                                            {t('delete') || 'Xóa'}
+                                        </Menu.Item>
+                                    </>
+                                )}
+                            </Menu.Dropdown>
+                        </Menu>
 
                         <div className={`relative transition-all duration-200 ${isMe ? 'hover:brightness-105' : ''}`}>
                             {msg.loai === 'VAN_BAN' ? (
@@ -272,16 +334,6 @@ const MessageBubble = React.memo(({ msg, isMe, isLastInGroup, isFirstInGroup, da
                                 </Paper>
                             )}
                         </div>
-
-                        {!isMe && (
-                            <ActionIcon
-                                variant="subtle" color="gray" size="sm" radius="xl"
-                                className="opacity-0 group-hover/row:opacity-100 transition-opacity"
-                                onClick={() => onReply(msg)}
-                            >
-                                <IconArrowLeft size={16} />
-                            </ActionIcon>
-                        )}
                     </div>
                 </div>
             </div>
@@ -797,8 +849,8 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                 {(styles) => (
                     <Portal>
                         <div style={{ ...styles, zIndex: 9999 }} className="fixed inset-0 bg-black/95 backdrop-blur-sm flex flex-col">
-                            {/* Toolbar - Fixed at top, outside image area */}
-                            <div className="shrink-0 h-16 flex items-center justify-end px-4 gap-3 z-[10000]">
+                            {/* Toolbar - Absolute positioned at top */}
+                            <div className="absolute top-0 right-0 left-0 h-16 flex items-center justify-end px-4 gap-3 z-[10000]">
                                 <ActionIcon
                                     variant="filled" color="gray" size="xl" radius="xl"
                                     className="bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-md shadow-lg"
@@ -824,47 +876,49 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                                 </ActionIcon>
                             </div>
 
-                            {/* Image Container */}
+                            {/* Image Container - Full height with centered content */}
                             <div
-                                className="flex-1 flex items-center justify-center px-4 overflow-hidden relative group/nav"
+                                className="absolute inset-0 flex items-center justify-center overflow-hidden"
+                                style={{ paddingTop: '64px', paddingBottom: '80px' }}
                                 onClick={() => setPreviewImage(null)}
                                 onTouchStart={onTouchStart}
                                 onTouchMove={onTouchMove}
                                 onTouchEnd={onTouchEnd}
                             >
                                 {/* Nav Buttons */}
-                                {imagesList.length > 1 && (
-                                    <>
-                                        <ActionIcon
-                                            variant="filled" radius="xl" size={48}
-                                            className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-md opacity-0 group-hover/nav:opacity-100 transition-opacity disabled:opacity-0"
-                                            onClick={handlePrevImage}
-                                            disabled={imagesList.findIndex(img => img.url === previewImage) <= 0}
-                                        >
-                                            <IconChevronLeft size={32} />
-                                        </ActionIcon>
-                                        <ActionIcon
-                                            variant="filled" radius="xl" size={48}
-                                            className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-md opacity-0 group-hover/nav:opacity-100 transition-opacity disabled:opacity-0"
-                                            onClick={handleNextImage}
-                                            disabled={imagesList.findIndex(img => img.url === previewImage) >= imagesList.length - 1}
-                                        >
-                                            <IconChevronRight size={32} />
-                                        </ActionIcon>
-                                    </>
-                                )}
+                                <div className="absolute inset-0 flex items-center justify-between px-4 pointer-events-none">
+                                    {imagesList.length > 1 && (
+                                        <>
+                                            <ActionIcon
+                                                variant="filled" radius="xl" size={48}
+                                                className="bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-md opacity-0 group-hover/nav:opacity-100 transition-opacity disabled:opacity-0 pointer-events-auto"
+                                                onClick={handlePrevImage}
+                                                disabled={imagesList.findIndex(img => img.url === previewImage) <= 0}
+                                            >
+                                                <IconChevronLeft size={32} />
+                                            </ActionIcon>
+                                            <ActionIcon
+                                                variant="filled" radius="xl" size={48}
+                                                className="bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-md opacity-0 group-hover/nav:opacity-100 transition-opacity disabled:opacity-0 pointer-events-auto"
+                                                onClick={handleNextImage}
+                                                disabled={imagesList.findIndex(img => img.url === previewImage) >= imagesList.length - 1}
+                                            >
+                                                <IconChevronRight size={32} />
+                                            </ActionIcon>
+                                        </>
+                                    )}
+                                </div>
 
                                 <img
                                     src={previewImage || ''}
                                     alt="Full preview"
                                     className="max-w-full max-h-full object-contain shadow-2xl animate-in zoom-in-95 duration-300 select-none"
-                                    style={{ maxHeight: 'calc(100vh - 180px)' }}
-                                    onClick={(e) => e.stopPropagation()} // Prevent close when clicking image
+                                    onClick={(e) => e.stopPropagation()}
                                 />
                             </div>
 
                             {/* Thumbnail Strip */}
-                            <div className="h-20 shrink-0 bg-black/40 backdrop-blur-md border-t border-white/10 flex items-center justify-center">
+                            <div className="absolute bottom-0 left-0 right-0 h-20 bg-black/40 backdrop-blur-md border-t border-white/10 flex items-center justify-center z-[10000]">
                                 <ScrollArea type="never" viewportProps={{ style: { overflowX: 'auto', whiteSpace: 'nowrap' } }} className="w-full max-w-4xl px-4">
                                     <div className="flex items-center justify-center gap-2 py-2 min-w-full">
                                         {imagesList.map((img) => (

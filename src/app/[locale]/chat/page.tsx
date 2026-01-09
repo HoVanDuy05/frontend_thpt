@@ -5,7 +5,7 @@ import { IconBell, IconSearch, IconUser, IconPalette, IconMoodSmile, IconPhoto, 
 import { AppQuery } from "@/api/AppQuery";
 import { TChannel } from "@/api/types/api.type";
 import { TUser } from "@/shared/types/user.type";
-import { ChatWindow } from "@/feauture/social/components/chat/ChatWindow";
+import { ChatWindow, ChatSkeleton } from "@/feauture/social/components/chat/ChatWindow";
 import { ChatSidebar } from "@/feauture/social/components/chat/ChatSidebar";
 import { UserSearchDrawer } from "@/feauture/social/components/chat/UserSearchDrawer";
 import { ChannelInfoSidebar } from "@/feauture/social/components/chat/ChannelInfoSidebar";
@@ -264,7 +264,7 @@ export default function ChatPage() {
     const handleBack = useCallback(() => {
         const params = new URLSearchParams(searchParams.toString());
         params.delete('id');
-        router.push(`${pathname}?${params.toString()}`);
+        router.replace(`${pathname}?${params.toString()}`);
     }, [pathname, router, searchParams]);
 
     // Helper functions
@@ -331,9 +331,7 @@ export default function ChatPage() {
                                     onToggleInfo={() => setShowInfo(!showInfo)}
                                 />
                             ) : (
-                                <Center className="h-full">
-                                    <Loader size="md" color="blue" />
-                                </Center>
+                                <ChatSkeleton />
                             )}
                         </Box>
 

@@ -191,7 +191,7 @@ export const ChatSidebar = ({
                                     <UnstyledButton
                                         key={channel.id}
                                         w="100%"
-                                        className={`pl-2.5 pr-2 py-3 rounded-xl transition-all duration-200 group relative ${isActive
+                                        className={`pl-2.5 pr-2 py-3 mb-2 rounded-xl transition-all duration-200 group relative ${isActive
                                             ? 'bg-blue-50 dark:bg-[#263951]'
                                             : 'hover:bg-gray-100 dark:hover:bg-[#242526]'
                                             }`}
