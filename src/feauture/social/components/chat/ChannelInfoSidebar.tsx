@@ -2,6 +2,8 @@ import { Box, Stack, Avatar, Text, Group, Divider, Accordion, UnstyledButton, Bu
 import { IconBell, IconSearch, IconUser, IconPalette, IconMoodSmile, IconPhoto, IconFile, IconLink, IconShieldLock, IconInfoCircle, IconArrowLeft, IconBlockquote, IconBan, IconChevronDown } from "@tabler/icons-react";
 import { TChannel } from "@/api/types/api.type";
 import { useTranslations } from "next-intl";
+import { AppQuery } from "@/api/AppQuery";
+import { useMemo, useState } from "react";
 
 interface ChannelInfoSidebarProps {
     channel: TChannel;
@@ -13,9 +15,25 @@ interface ChannelInfoSidebarProps {
 
 export const ChannelInfoSidebar = ({ channel, currentUserId, getChannelName, getChannelAvatar, presenceMap }: ChannelInfoSidebarProps) => {
     const t = useTranslations('chat');
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
 
     const name = getChannelName(channel, currentUserId);
     const avatar = getChannelAvatar(channel, currentUserId);
+
+    // Fetch all messages to extract media (page 1 only for now, can paginate if needed)
+    const { data: allMessages } = AppQuery.chat.useMessages(channel.id, { page: 1 });
+
+    const mediaImages = useMemo(() => {
+        if (!allMessages) return [];
+        return allMessages
+            .filter(m => m.loai === 'HINH_ANH')
+            .map(m => ({
+                id: m.id,
+                url: m.duongDanTep || m.noiDung,
+                date: m.ngayGui
+            }))
+            .reverse(); // Newest first
+    }, [allMessages]);
 
     // Logic for presence
     const otherMember = channel.thanhViens?.find(m => Number(m.nguoiDungId) !== Number(currentUserId));
@@ -86,11 +104,28 @@ export const ChannelInfoSidebar = ({ channel, currentUserId, getChannelName, get
                         <Accordion.Item value="media">
                             <Accordion.Control>{t('sidebar.media_files_links')}</Accordion.Control>
                             <Accordion.Panel>
-                                <Stack gap={12} px={2}>
-                                    <SidebarMenuButton icon={<IconPhoto size={20} className="text-black dark:text-white" />} label="File phương tiện" />
-                                    <SidebarMenuButton icon={<IconFile size={20} className="text-black dark:text-white" />} label="File" />
-                                    <SidebarMenuButton icon={<IconLink size={20} className="text-black dark:text-white" />} label="Liên kết" />
-                                </Stack>
+                                {mediaImages.length > 0 ? (
+                                    <div className="grid grid-cols-3 gap-1 px-2">
+                                        {mediaImages.slice(0, 9).map((img) => (
+                                            <div
+                                                key={img.id}
+                                                className="aspect-square rounded-md overflow-hidden cursor-pointer hover:opacity-80 transition-opacity bg-gray-100 dark:bg-zinc-800"
+                                                onClick={() => img.url && setPreviewImage(img.url)}
+                                            >
+                                                <img src={img.url} className="w-full h-full object-cover" loading="lazy" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <Text size="sm" c="dimmed" className="text-center py-4">
+                                        Chưa có ảnh nào
+                                    </Text>
+                                )}
+                                {mediaImages.length > 9 && (
+                                    <Text size="xs" c="dimmed" className="text-center mt-2">
+                                        +{mediaImages.length - 9} ảnh khác
+                                    </Text>
+                                )}
                             </Accordion.Panel>
                         </Accordion.Item>
 
