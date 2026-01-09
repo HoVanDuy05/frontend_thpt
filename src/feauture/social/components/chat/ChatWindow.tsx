@@ -1,5 +1,5 @@
-import { Paper, Group, ActionIcon, Avatar, Text, Stack, Box, Loader, Center, Image, Drawer, Divider, Badge, Accordion, ThemeIcon, UnstyledButton, Modal, Button, useMantineColorScheme, Skeleton } from "@mantine/core";
-import { IconArrowLeft, IconPhone, IconVideo, IconUser, IconInfoCircle, IconPhoto, IconFile, IconBell, IconSearch, IconMicrophone, IconSend, IconThumbUp, IconUsers } from "@tabler/icons-react";
+import { Paper, Group, ActionIcon, Avatar, Text, Stack, Box, Loader, Center, Image, Drawer, Divider, Badge, Accordion, ThemeIcon, UnstyledButton, Modal, Button, useMantineColorScheme, Skeleton, Portal, Transition } from "@mantine/core";
+import { IconArrowLeft, IconPhone, IconVideo, IconUser, IconInfoCircle, IconPhoto, IconFile, IconBell, IconSearch, IconMicrophone, IconSend, IconThumbUp, IconUsers, IconX, IconDownload } from "@tabler/icons-react";
 import { TChannel } from "@/api/types/api.type";
 import { AppQuery } from "@/api/AppQuery";
 import { useAppStore } from "@/providers/store/useAppStore";
@@ -30,6 +30,34 @@ const ChatSkeleton = () => {
                 </Group>
             ))}
         </Stack>
+    );
+};
+
+// Helper to linkify text
+const Linkify = ({ text }: { text: string }) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    return (
+        <>
+            {parts.map((part, i) => {
+                if (part.match(urlRegex)) {
+                    return (
+                        <a
+                            key={i}
+                            href={part}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline break-all hover:opacity-80"
+                            onClick={(e) => e.stopPropagation()}
+                            style={{ color: 'inherit', textDecorationColor: 'inherit' }}
+                        >
+                            {part}
+                        </a>
+                    );
+                }
+                return part;
+            })}
+        </>
     );
 };
 
@@ -141,7 +169,7 @@ const CustomVoicePlayer = ({ url, isMe, dark, isFirstInGroup, isLastInGroup }: {
 
 const MessageBubble = React.memo(({ msg, isMe, isLastInGroup, isFirstInGroup, dark, setPreviewImage, t, targetUser, lastSeenMessageId, newestOutgoingId, getReceiptLabel, onReply }: any) => {
     return (
-        <div className={`flex flex-col ${isMe ? 'items-end ml-auto' : 'items-start'} ${isLastInGroup ? 'mb-3' : 'mb-[3px]'} group w-full`}>
+        <div className={`flex flex-col ${isMe ? 'items-end ml-auto' : 'items-start'} ${isLastInGroup ? 'mb-5' : 'mb-1'} group w-full`}>
             {/* Show Date Divider if first in group and from long ago (optional, but good for "chuẩn" UI) */}
 
             <div className={`flex items-end gap-2 max-w-[85%] sm:max-w-[75%] ${isMe ? 'flex-row-reverse' : 'flex-row'}`}>
@@ -210,7 +238,9 @@ const MessageBubble = React.memo(({ msg, isMe, isLastInGroup, isFirstInGroup, da
                                     }}
                                     bg={!isMe ? (dark ? '#3e4042' : '#E4E6EB') : undefined}
                                 >
-                                    <Text size="15px" className="leading-[1.4] whitespace-pre-wrap">{msg.noiDung}</Text>
+                                    <Text size="15px" className="leading-[1.4] whitespace-pre-wrap">
+                                        <Linkify text={msg.noiDung} />
+                                    </Text>
                                 </Paper>
                             ) : msg.loai === 'HINH_ANH' ? (
                                 <Box
@@ -330,9 +360,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
             }
 
             setAllMessages(prev => {
-                // Log state before update
                 const exists = prev.some(m => m.id === message.id);
-                console.log('Update State: New Message', { id: message.id, exists, prevLen: prev.length });
                 if (exists) return prev;
 
                 if (isFromMe) {
@@ -345,7 +373,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                 }
                 const updated = [...prev, message];
                 const sorted = updated.sort((a, b) => dayjs(a.ngayGui).valueOf() - dayjs(b.ngayGui).valueOf());
-                console.log('Update State: Result', { newLen: sorted.length });
                 return sorted;
             });
         };
@@ -385,7 +412,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
     }, [channel.id]);
 
     useEffect(() => {
-        console.log('Syncing pageMessages', { len: pageMessages?.length, page });
         if (pageMessages) {
             if (pageMessages.length < 20) hasMoreRef.current = false;
 
@@ -701,12 +727,53 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                 </Stack>
             </div>
 
-            <Modal
-                opened={!!previewImage} onClose={() => setPreviewImage(null)} size="xl" centered withCloseButton={false} padding={0}
-                styles={{ content: { backgroundColor: 'transparent', boxShadow: 'none' }, body: { display: 'flex', justifyContent: 'center' } }}
-            >
-                {previewImage && <Image src={previewImage} alt="Full preview" radius="md" style={{ maxHeight: '90vh', maxWidth: '100vw', objectFit: 'contain' }} />}
-            </Modal>
+            <Transition mounted={!!previewImage} transition="fade" duration={200} timingFunction="ease">
+                {(styles) => (
+                    <Portal>
+                        <div style={{ ...styles, zIndex: 9999 }} className="fixed inset-0 bg-black/95 backdrop-blur-sm flex flex-col pt-safe">
+                            {/* Toolbar */}
+                            <div className="absolute top-4 right-4 z-[10000] flex items-center gap-3">
+                                <ActionIcon
+                                    variant="filled" color="gray" size="xl" radius="xl"
+                                    className="bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-md"
+                                    onClick={() => {
+                                        if (previewImage) {
+                                            const link = document.createElement('a');
+                                            link.href = previewImage;
+                                            link.download = 'image.png';
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            document.body.removeChild(link);
+                                        }
+                                    }}
+                                >
+                                    <IconDownload size={24} />
+                                </ActionIcon>
+                                <ActionIcon
+                                    variant="filled" color="gray" size="xl" radius="xl"
+                                    className="bg-white/10 hover:bg-white/20 text-white border border-white/10 backdrop-blur-md"
+                                    onClick={() => setPreviewImage(null)}
+                                >
+                                    <IconX size={24} />
+                                </ActionIcon>
+                            </div>
+
+                            {/* Image Container */}
+                            <div
+                                className="flex-1 flex items-center justify-center p-4 overflow-hidden"
+                                onClick={() => setPreviewImage(null)}
+                            >
+                                <img
+                                    src={previewImage || ''}
+                                    alt="Full preview"
+                                    className="max-w-full max-h-[90vh] object-contain shadow-2xl animate-in zoom-in-95 duration-300 rounded-md select-none"
+                                    onClick={(e) => e.stopPropagation()} // Prevent close when clicking image
+                                />
+                            </div>
+                        </div>
+                    </Portal>
+                )}
+            </Transition>
 
             <div className="shrink-0 border-t border-gray-200/70 dark:border-zinc-800 bg-white/90 dark:bg-[#1c1e21]/80 backdrop-blur pb-safe">
                 <ChatInput channelId={channel.id} onTyping={handleTyping} replyingTo={replyingTo} onReply={setReplyingTo} />

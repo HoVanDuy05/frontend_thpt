@@ -618,6 +618,7 @@
         "typing": "Đang nhập...",
         "active": "Đang hoạt động",
         "offline": "Ngoại tuyến",
+        "seen": "Đã xem",
         "start_conversation": "Bắt đầu cuộc trò chuyện trên Messenger",
         "micro_error_title": "Lỗi Micro",
         "micro_error_message": "Không thể truy cập microphone. Vui lòng kiểm tra quyền truy cập.",

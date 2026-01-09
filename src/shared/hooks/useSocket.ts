@@ -34,11 +34,11 @@ export function useSocket() {
                 auth: {
                     token: token
                 },
-                transports: ['websocket'], // Force websocket only for better mobile stability
+                transports: ['polling', 'websocket'], // Revert to polling fallback for better compatibility
                 reconnection: true,
-                reconnectionAttempts: 10, // Increase attempts
-                reconnectionDelay: 1000, // Faster retry
-                timeout: 10000,
+                reconnectionAttempts: 20, // Keep increased attempts
+                reconnectionDelay: 2000,
+                timeout: 20000,
                 secure: isSecure
             });
         }

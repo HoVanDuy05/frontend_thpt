@@ -30,6 +30,14 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onSend, onCancel }
 
     const startRecording = async () => {
         try {
+            if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+                throw new Error("INSECURE_CONTEXT");
+            }
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                throw new Error("NOT_SUPPORTED");
+            }
+
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
             let mimeType = 'audio/webm';
@@ -58,11 +66,21 @@ export const VoiceRecorder: React.FC<VoiceRecorderProps> = ({ onSend, onCancel }
                 setDuration(Math.floor((Date.now() - startTimeRef.current) / 1000));
             }, 1000);
 
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error accessing microphone:", error);
+
+            let title = t("micro_error_title");
+            let message = t("micro_error_message");
+
+            if (error.message === "INSECURE_CONTEXT") {
+                message = "Microphone requires HTTPS. Please access via localhost or a secure URL (https).";
+            } else if (error.message === "NOT_SUPPORTED") {
+                message = "Your browser does not support audio recording.";
+            }
+
             notifications.show({
-                title: t("micro_error_title"),
-                message: t("micro_error_message"),
+                title: title,
+                message: message,
                 color: "red"
             });
             onCancel();
