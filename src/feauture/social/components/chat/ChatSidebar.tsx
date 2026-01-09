@@ -5,6 +5,7 @@ import { TUser } from "@/shared/types/user.type";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { ChatListSkeleton } from "./ChatListSkeleton";
 
 interface ChatSidebarProps {
     channels: TChannel[];
@@ -177,71 +178,74 @@ export const ChatSidebar = ({
                 </Group>
             </Box>
 
-            <ScrollArea className="flex-1 px-2">
+            <ScrollArea className="flex-1 px-4">
                 <Stack gap={2} pb="xl">
-                    {isLoading ? (
-                        <Center py="xl"><Loader size="sm" color="blue" /></Center>
-                    ) : filteredChannels && filteredChannels.length > 0 ? (
-                        filteredChannels.map((channel: TChannel) => {
-                            if (!channel || !channel.thanhViens) return null;
-                            const isUnread = unreadChannelIds.has(channel.id) || getIsUnread(channel);
-                            const isActive = selectedChannelId === channel.id;
+                    {channels && channels.length > 0 ? (
+                        <>
+                            {filteredChannels.map((channel: TChannel) => {
+                                if (!channel || !channel.thanhViens) return null;
+                                const isUnread = unreadChannelIds.has(channel.id) || getIsUnread(channel);
+                                const isActive = selectedChannelId === channel.id;
 
-                            return (
-                                <UnstyledButton
-                                    key={channel.id}
-                                    w="100%"
-                                    className={`px-3 py-3 rounded-xl transition-all duration-200 group relative ${isActive
-                                        ? 'bg-blue-50 dark:bg-[#263951]'
-                                        : 'hover:bg-gray-100 dark:hover:bg-[#242526]'
-                                        }`}
-                                    onClick={() => onSelectChannel(channel.id)}
-                                >
-                                    <Group wrap="nowrap" gap="md">
-                                        <Box className="relative shrink-0">
-                                            <Avatar
-                                                src={getChannelAvatar(channel, currentUserId)}
-                                                size={56}
-                                                radius="xl"
-                                                className="shadow-sm"
-                                            />
-                                            {(() => {
-                                                const otherMember = channel.thanhViens.find(m => Number(m.nguoiDungId) !== Number(currentUserId));
-                                                const isOnline = otherMember && presenceMap[otherMember.nguoiDungId];
-                                                if (channel.loaiKenh === 'CA_NHAN' && isOnline) {
-                                                    return <Box className="absolute bottom-0.5 right-0.5 w-4 h-4 bg-[#31A24C] border-[3px] border-white dark:border-[#1c1e21] rounded-full" />;
-                                                }
-                                                return null;
-                                            })()}
-                                        </Box>
-                                        <Stack gap={3} style={{ flex: 1, overflow: 'hidden' }}>
-                                            <Text size="15px" fw={700} truncate className={isUnread ? "text-gray-950 dark:text-white" : "text-gray-900 dark:text-gray-200"}>
-                                                {getChannelName(channel, currentUserId)}
-                                            </Text>
-                                            <Group gap="xs" wrap="nowrap">
-                                                <Text size="13px" c={isUnread ? (dark ? "white" : "black") : "dimmed"} truncate style={{ flex: 1 }} fw={isUnread ? 700 : 400}>
-                                                    {channel.tinNhans?.[0]
-                                                        ? (channel.tinNhans[0].nguoiGuiId === currentUserId ? "Bạn: " : "") +
-                                                        (channel.tinNhans[0].loai === 'HINH_ANH' ? 'Đã gửi một ảnh' :
-                                                            channel.tinNhans[0].loai === 'GHI_AM' ? 'Đã gửi một đoạn ghi âm' :
-                                                                channel.tinNhans[0].loai === 'TEP' ? 'Đã gửi một tệp đính kèm' :
-                                                                    channel.tinNhans[0].noiDung)
-                                                        : "Bắt đầu cuộc trò chuyện"}
-                                                </Text>
-                                                <Text size="12px" c="dimmed" style={{ whiteSpace: 'nowrap' }} fw={isUnread ? 600 : 400} suppressHydrationWarning>
-                                                    · {formatTime(channel.updatedAt)}
-                                                </Text>
-                                            </Group>
-                                        </Stack>
-                                        {isUnread && (
-                                            <Box className="absolute right-4 self-center">
-                                                <Box className="w-3 h-3 bg-blue-500 rounded-full shadow-sm" />
+                                return (
+                                    <UnstyledButton
+                                        key={channel.id}
+                                        w="100%"
+                                        className={`pl-2.5 pr-2 py-3 rounded-xl transition-all duration-200 group relative ${isActive
+                                            ? 'bg-blue-50 dark:bg-[#263951]'
+                                            : 'hover:bg-gray-100 dark:hover:bg-[#242526]'
+                                            }`}
+                                        onClick={() => onSelectChannel(channel.id)}
+                                    >
+                                        <Group wrap="nowrap" gap="md">
+                                            <Box className="relative shrink-0">
+                                                <Avatar
+                                                    src={getChannelAvatar(channel, currentUserId)}
+                                                    size={56}
+                                                    radius="xl"
+                                                    className="shadow-sm"
+                                                />
+                                                {(() => {
+                                                    const otherMember = channel.thanhViens.find(m => Number(m.nguoiDungId) !== Number(currentUserId));
+                                                    const isOnline = otherMember && presenceMap[otherMember.nguoiDungId];
+                                                    if (channel.loaiKenh === 'CA_NHAN' && isOnline) {
+                                                        return <Box className="absolute bottom-0.5 right-0.5 w-4 h-4 bg-[#31A24C] border-[3px] border-white dark:border-[#1c1e21] rounded-full" />;
+                                                    }
+                                                    return null;
+                                                })()}
                                             </Box>
-                                        )}
-                                    </Group>
-                                </UnstyledButton>
-                            );
-                        })
+                                            <Stack gap={3} style={{ flex: 1, overflow: 'hidden' }}>
+                                                <Text size="15px" fw={700} truncate className={isUnread ? "text-gray-950 dark:text-white" : "text-gray-900 dark:text-gray-200"}>
+                                                    {getChannelName(channel, currentUserId)}
+                                                </Text>
+                                                <Group gap="xs" wrap="nowrap">
+                                                    <Text size="13px" c={isUnread ? (dark ? "white" : "black") : "dimmed"} truncate style={{ flex: 1 }} fw={isUnread ? 700 : 400}>
+                                                        {channel.tinNhans?.[0]
+                                                            ? (channel.tinNhans[0].nguoiGuiId === currentUserId ? "Bạn: " : "") +
+                                                            (channel.tinNhans[0].loai === 'HINH_ANH' ? 'Đã gửi một ảnh' :
+                                                                channel.tinNhans[0].loai === 'GHI_AM' ? 'Đã gửi một đoạn ghi âm' :
+                                                                    channel.tinNhans[0].loai === 'TEP' ? 'Đã gửi một tệp đính kèm' :
+                                                                        channel.tinNhans[0].noiDung)
+                                                            : "Bắt đầu cuộc trò chuyện"}
+                                                    </Text>
+                                                    <Text size="12px" c="dimmed" style={{ whiteSpace: 'nowrap' }} fw={isUnread ? 600 : 400} suppressHydrationWarning>
+                                                        · {formatTime(channel.updatedAt)}
+                                                    </Text>
+                                                </Group>
+                                            </Stack>
+                                            {isUnread && (
+                                                <Box className="absolute right-4 self-center">
+                                                    <Box className="w-3 h-3 bg-blue-500 rounded-full shadow-sm" />
+                                                </Box>
+                                            )}
+                                        </Group>
+                                    </UnstyledButton>
+                                );
+                            })}
+                            {isLoading && <Box className="scale-75 origin-top"><Center><Loader size="xs" color="blue" /></Center></Box>}
+                        </>
+                    ) : isLoading ? (
+                        <ChatListSkeleton />
                     ) : (
                         <Center py="xl" className="flex-col gap-2 text-center text-gray-400 opacity-60">
                             <Text size="sm" fw={500}>{t('no_conversations_title')}</Text>

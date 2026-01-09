@@ -85,7 +85,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
         queryClient.setQueriesData({
             predicate: (query) => {
                 const key = query.queryKey;
-                return Array.isArray(key) && key[0] === 'chat' && key[1] === 'messages' && key[2] === channelId;
+                return Array.isArray(key) && key[1] === 'chat' && key[2] === 'messages' && Number(key[3]) === Number(channelId);
             }
         }, (oldData: any) => {
             if (!Array.isArray(oldData)) return [optimisticMessage];
@@ -122,7 +122,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
             queryClient.setQueriesData({
                 predicate: (query) => {
                     const key = query.queryKey;
-                    return Array.isArray(key) && key[0] === 'chat' && key[1] === 'messages' && key[2] === channelId;
+                    return Array.isArray(key) && key[1] === 'chat' && key[2] === 'messages' && Number(key[3]) === Number(channelId);
                 }
             }, (oldData: any) => {
                 if (!Array.isArray(oldData)) return oldData;
@@ -138,7 +138,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
             queryClient.setQueriesData({
                 predicate: (query) => {
                     const key = query.queryKey;
-                    return Array.isArray(key) && key[0] === 'chat' && key[1] === 'messages' && key[2] === channelId;
+                    return Array.isArray(key) && key[1] === 'chat' && key[2] === 'messages' && Number(key[3]) === Number(channelId);
                 }
             }, (oldData: any) => {
                 if (!Array.isArray(oldData)) return oldData;
@@ -177,66 +177,147 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
         const file = e.target.files?.[0];
         if (!file) return;
 
-        const formData = new FormData();
-        formData.append('file', file);
-
-        try {
-            notifications.show({ id: 'uploading', title: t('uploading_image_title'), message: t('uploading_image_message'), loading: true, autoClose: false });
-            const res = await uploadImageMutation.mutateAsync(formData as any);
-            notifications.update({ id: 'uploading', title: t('upload_success_title'), message: t('upload_success_message'), color: 'green', autoClose: 2000, loading: false });
-            await handleSend(res.url, 'HINH_ANH', res.url);
-        } catch (error) {
-            console.error(error);
-            notifications.update({ id: 'uploading', title: t('upload_error_title'), message: t('upload_error_message'), color: 'red', autoClose: 3000, loading: false });
-        } finally {
-            if (e.target) e.target.value = '';
-        }
-    };
-
-    const handleVoiceSend = async (audioBlob: Blob) => {
-        const formData = new FormData();
-        formData.append('file', audioBlob, 'voice.webm');
-
-        // 1. Create optimistic message IMMEDIATELY with placeholder
+        // 1. Immediate UI Feedback
         const tempId = -Date.now();
+        const previewUrl = URL.createObjectURL(file);
+
+        // Optimistic Message
         const optimisticMessage = {
             id: tempId,
             kenhChatId: channelId,
             nguoiGuiId: user?.id,
-            noiDung: 'Đang tải lên...',
-            loai: 'GHI_AM',
-            duongDanTep: URL.createObjectURL(audioBlob), // Temporary local URL
+            noiDung: previewUrl,
+            loai: 'HINH_ANH',
+            duongDanTep: previewUrl,
             ngayGui: new Date().toISOString(),
             nguoiGui: {
                 id: user?.id,
                 taiKhoan: user?.taiKhoan || 'Me',
                 avatar: user?.avatar || null,
                 hoTen: user?.hoTen || user?.taiKhoan || 'User',
-                hoSoHocSinh: user?.hoSoHocSinh || null,
-                hoSoGiaoVien: user?.hoSoGiaoVien || null
             },
             isPending: true
         };
 
-        // 2. Show optimistic message immediately
+        // Add to Cache
         queryClient.setQueriesData({
             predicate: (query) => {
                 const key = query.queryKey;
-                return Array.isArray(key) && key[0] === 'chat' && key[1] === 'messages' && key[2] === channelId;
+                return Array.isArray(key) && key[1] === 'chat' && key[2] === 'messages' && Number(key[3]) === Number(channelId);
             }
         }, (oldData: any) => {
             if (!Array.isArray(oldData)) return [optimisticMessage];
             return [...oldData, optimisticMessage];
         });
 
+        // Clear input immediately
+        if (e.target) e.target.value = '';
+
         try {
-            // 3. Upload in background
+            // 2. Upload in Background
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await uploadImageMutation.mutateAsync(formData as any);
+
+            // 3. Send Real Message
+            // We use handleSend to send the API request for the message itself, 
+            // but we need to intercept the cache update to replace our specific tempId
+
+            const messagePayload = {
+                kenhChatId: channelId,
+                noiDung: res.url,
+                loai: 'HINH_ANH',
+                duongDanTep: res.url,
+                tinNhanGocId: replyingTo?.id || undefined,
+            };
+
+            const newMessage = await sendMessageMutation.mutateAsync(messagePayload as any);
+
+            // 4. Replace Optimistic Message
+            queryClient.setQueriesData({
+                predicate: (query) => {
+                    const key = query.queryKey;
+                    return Array.isArray(key) && key[1] === 'chat' && key[2] === 'messages' && Number(key[3]) === Number(channelId);
+                }
+            }, (oldData: any) => {
+                if (!Array.isArray(oldData)) return oldData;
+                return oldData.map((m: any) => m.id === tempId ? newMessage : m);
+            });
+
+        } catch (error) {
+            console.error(error);
+            notifications.show({ title: t('upload_error_title'), message: t('upload_error_message'), color: 'red' });
+            // Remove optimistic message on failure
+            queryClient.setQueriesData({
+                predicate: (query) => {
+                    const key = query.queryKey;
+                    return Array.isArray(key) && key[1] === 'chat' && key[2] === 'messages' && Number(key[3]) === Number(channelId);
+                }
+            }, (oldData: any) => {
+                if (!Array.isArray(oldData)) return oldData;
+                return oldData.filter((m: any) => m.id !== tempId);
+            });
+        }
+    };
+
+    const handleVoiceSend = async (audioBlob: Blob) => {
+        // 1. Close Recorder IMMEDIATELY
+        setIsRecording(false);
+
+        const tempId = -Date.now();
+        const previewUrl = URL.createObjectURL(audioBlob);
+
+        // 2. Optimistic Message
+        const optimisticMessage = {
+            id: tempId,
+            kenhChatId: channelId,
+            nguoiGuiId: user?.id,
+            noiDung: 'Voice message',
+            loai: 'GHI_AM',
+            duongDanTep: previewUrl,
+            ngayGui: new Date().toISOString(),
+            nguoiGui: {
+                id: user?.id,
+                taiKhoan: user?.taiKhoan || 'Me',
+                avatar: user?.avatar || null,
+                hoTen: user?.hoTen || user?.taiKhoan || 'User',
+            },
+            isPending: true
+        };
+
+        queryClient.setQueriesData({
+            predicate: (query) => {
+                const key = query.queryKey;
+                // Key format: [url, "chat", "messages", channelId, page]
+                return Array.isArray(key) && key[1] === 'chat' && key[2] === 'messages' && Number(key[3]) === Number(channelId);
+            }
+        }, (oldData: any) => {
+            if (!Array.isArray(oldData)) return [optimisticMessage];
+            // API returns chronological (Oldest -> Newest) based on ChatWindow rendering.
+            return [...oldData, optimisticMessage];
+        });
+
+        const formData = new FormData();
+        // Use correct extension based on MIME type detection in VoiceRecorder if possible, but webm is standard for uploads usually.
+        // If backend converts, it's fine. If not, we might need to be careful.
+        // For now, keep sending as 'voice.webm' or detect.
+        formData.append('file', audioBlob, 'voice.webm');
+
+        try {
+            // 3. Upload Background
             const res = await uploadAudioMutation.mutateAsync(formData as any);
 
-            // 4. Send real message
-            await handleSend(res.url, 'GHI_AM', res.url);
+            // 4. Send Real Message
+            const messagePayload = {
+                kenhChatId: channelId,
+                noiDung: res.url,
+                loai: 'GHI_AM',
+                duongDanTep: res.url,
+            };
 
-            // 5. Remove optimistic message (real one will replace it)
+            const newMessage = await sendMessageMutation.mutateAsync(messagePayload as any);
+
+            // 5. Replace Optimistic Message
             queryClient.setQueriesData({
                 predicate: (query) => {
                     const key = query.queryKey;
@@ -244,11 +325,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
                 }
             }, (oldData: any) => {
                 if (!Array.isArray(oldData)) return oldData;
-                return oldData.filter(m => m.id !== tempId);
+                return oldData.map((m: any) => m.id === tempId ? newMessage : m);
             });
+
         } catch (error) {
             console.error('Voice upload error:', error);
-            // Remove failed optimistic message
+            // Remove optimistic message on failure
             queryClient.setQueriesData({
                 predicate: (query) => {
                     const key = query.queryKey;
@@ -256,10 +338,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({ channelId, onTyping, reply
                 }
             }, (oldData: any) => {
                 if (!Array.isArray(oldData)) return oldData;
-                return oldData.filter(m => m.id !== tempId);
+                return oldData.filter((m: any) => m.id !== tempId);
             });
-        } finally {
-            setIsRecording(false);
+            notifications.show({ title: t('send_error_title'), message: t('send_error_message'), color: 'red' });
         }
     };
 

@@ -43,6 +43,7 @@
         "personalInfo": "Personal Information",
         "email": "Email",
         "dateOfBirth": "Date of Birth",
+        "seen": "Seen",
         "gender": "Gender",
         "phone": "Phone",
         "address": "Address",

@@ -619,6 +619,8 @@
         "typing": "is typing...",
         "active": "Active now",
         "offline": "Offline",
+        "online": "Online",
+        "seen": "Seen",
         "start_conversation": "Start a conversation on Messenger",
         "micro_error_title": "Microphone Error",
         "micro_error_message": "Cannot access microphone. Please check permissions.",

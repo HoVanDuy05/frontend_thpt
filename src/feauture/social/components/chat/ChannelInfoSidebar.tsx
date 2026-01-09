@@ -29,54 +29,55 @@ export const ChannelInfoSidebar = ({ channel, currentUserId, getChannelName, get
             <ScrollArea scrollbarSize={4} className="h-full">
                 {/* Header / Avatar Section */}
                 <Stack align="center" gap={4} py={32} px="md">
-                    <Box className="relative mb-2">
+                    <Box className="relative mb-1">
                         <Avatar
                             src={avatar}
-                            size={100}
+                            size={80}
                             radius={999}
-                            className="shadow-sm border-[4px] border-white dark:border-zinc-800"
+                            className="shadow-sm border-[1px] border-gray-100 dark:border-zinc-800"
                         />
                         {isOnline && (
-                            <Box className="absolute bottom-1 right-2 w-5 h-5 bg-green-500 border-[3px] border-white dark:border-[#1c1e21] rounded-full" />
+                            <Box className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 border-[2.5px] border-white dark:border-[#1c1e21] rounded-full" />
                         )}
                     </Box>
 
-                    <Text fw={700} size="20px" className="text-gray-900 dark:text-gray-100 text-center px-4 leading-tight" style={fontStyle}>
+                    <Text fw={700} size="18px" className="text-gray-900 dark:text-white text-center px-4 leading-tight mt-1" style={fontStyle}>
                         {name}
                     </Text>
-                    <Text size="sm" c="dimmed" fw={400} style={fontStyle}>
-                        {isOnline ? t('active_now') : t('offline')}
-                    </Text>
+                    {channel.loaiKenh === 'CA_NHAN' && (
+                        <Text size="13px" c="dimmed" fw={500} style={fontStyle}>
+                            {isOnline ? t('active_now') : t('offline')}
+                        </Text>
+                    )}
 
-                    <Group mt="lg" gap={20} justify="center">
-                        <SidebarActionItem icon={<IconUser size={20} />} label={t('sidebar.profile')} />
-                        <SidebarActionItem icon={<IconBell size={20} />} label={t('sidebar.mute')} />
-                        <SidebarActionItem icon={<IconSearch size={20} />} label={t('sidebar.search')} />
+                    <Group mt="xl" gap={24} justify="center">
+                        <SidebarActionItem icon={<IconUser size={22} />} label={t('sidebar.profile')} />
+                        <SidebarActionItem icon={<IconBell size={22} />} label={t('sidebar.mute')} />
                     </Group>
                 </Stack>
 
                 {/* Sections */}
-                <Stack gap={0}>
+                <Stack gap={0} px="xs">
                     <Accordion
                         variant="default"
                         defaultValue="customize"
                         styles={{
                             item: { borderBottom: 'none' },
-                            control: { padding: '12px 16px', '&:hover': { backgroundColor: 'var(--mantine-color-gray-0)' } },
+                            control: { padding: '12px 8px', '&:hover': { backgroundColor: 'transparent' } },
                             content: { padding: '0 8px 16px 8px' },
-                            label: { fontSize: '13px', fontWeight: 600, color: 'var(--mantine-color-dimmed)' },
-                            chevron: { width: 16, height: 16 }
+                            label: { fontSize: '14px', fontWeight: 600, color: 'var(--mantine-color-text)' },
+                            chevron: { width: 18, height: 18 }
                         }}
-                        chevron={<IconChevronDown size={16} />}
+                        chevron={<IconChevronDown size={18} />}
                     >
                         {/* Customize Chat */}
                         <Accordion.Item value="customize">
                             <Accordion.Control>{t('sidebar.customize_chat')}</Accordion.Control>
                             <Accordion.Panel>
-                                <Stack gap={2}>
+                                <Stack gap={1}>
                                     <SidebarMenuButton icon={<IconPalette size={20} className="text-[#6366f1]" />} label={t('sidebar.theme')} />
                                     <SidebarMenuButton icon={<IconMoodSmile size={20} className="text-[#6366f1]" />} label={t('sidebar.quick_emoji')} />
-                                    <SidebarMenuButton icon={<IconBlockquote size={20} />} label="Biệt danh" />
+                                    <SidebarMenuButton icon={<IconBlockquote size={20} className="text-black dark:text-white" />} label="Biệt danh" />
                                 </Stack>
                             </Accordion.Panel>
                         </Accordion.Item>
@@ -85,17 +86,10 @@ export const ChannelInfoSidebar = ({ channel, currentUserId, getChannelName, get
                         <Accordion.Item value="media">
                             <Accordion.Control>{t('sidebar.media_files_links')}</Accordion.Control>
                             <Accordion.Panel>
-                                <Stack gap={12} px={4}>
-                                    <Box className="grid grid-cols-3 gap-1">
-                                        {[1, 2, 3].map(i => (
-                                            <Box key={i} className="aspect-square bg-gray-100 dark:bg-zinc-800 rounded-lg overflow-hidden cursor-pointer hover:opacity-90">
-                                                <Box className="w-full h-full flex items-center justify-center text-gray-300">
-                                                    <IconPhoto size={24} />
-                                                </Box>
-                                            </Box>
-                                        ))}
-                                    </Box>
-                                    <SidebarMenuButton icon={<IconFile size={20} />} label="File" />
+                                <Stack gap={12} px={2}>
+                                    <SidebarMenuButton icon={<IconPhoto size={20} className="text-black dark:text-white" />} label="File phương tiện" />
+                                    <SidebarMenuButton icon={<IconFile size={20} className="text-black dark:text-white" />} label="File" />
+                                    <SidebarMenuButton icon={<IconLink size={20} className="text-black dark:text-white" />} label="Liên kết" />
                                 </Stack>
                             </Accordion.Panel>
                         </Accordion.Item>
@@ -104,10 +98,10 @@ export const ChannelInfoSidebar = ({ channel, currentUserId, getChannelName, get
                         <Accordion.Item value="privacy">
                             <Accordion.Control>{t('sidebar.privacy_support')}</Accordion.Control>
                             <Accordion.Panel>
-                                <Stack gap={2}>
-                                    <SidebarMenuButton icon={<IconShieldLock size={20} />} label={t('sidebar.encryption_notice')} />
+                                <Stack gap={1}>
+                                    <SidebarMenuButton icon={<IconShieldLock size={20} className="text-gray-600 dark:text-gray-400" />} label={t('sidebar.encryption_notice')} />
                                     <SidebarMenuButton icon={<IconBan size={20} />} label={t('sidebar.block')} danger />
-                                    <SidebarMenuButton icon={<IconInfoCircle size={20} />} label={t('sidebar.report')} />
+                                    <SidebarMenuButton icon={<IconInfoCircle size={20} className="text-gray-600 dark:text-gray-400" />} label={t('sidebar.report')} />
                                     <SidebarMenuButton icon={<IconBan size={20} />} label={t('sidebar.delete_chat')} danger />
                                 </Stack>
                             </Accordion.Panel>
@@ -119,31 +113,31 @@ export const ChannelInfoSidebar = ({ channel, currentUserId, getChannelName, get
     );
 };
 
-const SidebarActionItem = ({ icon, label }: { icon: React.ReactNode, label: string }) => (
+const SidebarActionItem = ({ icon, label, onClick }: { icon: React.ReactNode, label: string, onClick?: () => void }) => (
     <Stack gap={6} align="center" className="cursor-pointer group">
-        <Box className="w-[44px] h-[44px] bg-[#E4E6EB] dark:bg-[#3A3B3C] group-hover:opacity-80 rounded-full flex items-center justify-center transition-all duration-200 text-black dark:text-gray-200">
+        <UnstyledButton
+            onClick={onClick}
+            className="w-[36px] h-[36px] md:w-[44px] md:h-[44px] bg-gray-200 dark:bg-[#3A3B3C] hover:bg-gray-300 dark:hover:brightness-110 rounded-full flex items-center justify-center transition-all duration-200 text-black dark:text-gray-200"
+        >
             {icon}
-        </Box>
-        <Text size="11px" c="dimmed" fw={500} className="group-hover:text-black dark:group-hover:text-white transition-colors" style={{ fontFamily: 'var(--font-be-vietnam), sans-serif' }}>
+        </UnstyledButton>
+        <Text size="12px" c="dimmed" fw={500} className="group-hover:text-black dark:group-hover:text-white transition-colors" style={{ fontFamily: 'var(--font-be-vietnam), sans-serif' }}>
             {label}
         </Text>
     </Stack>
 );
 
-const SidebarMenuButton = ({ icon, label, danger, rightSection }: { icon: React.ReactNode, label: string, danger?: boolean, rightSection?: React.ReactNode }) => (
-    <UnstyledButton className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-colors ${danger ? 'text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10' : 'hover:bg-gray-100 dark:hover:bg-white/5'}`}>
+const SidebarMenuButton = ({ icon, label, danger, rightSection, onClick }: { icon: React.ReactNode, label: string, danger?: boolean, rightSection?: React.ReactNode, onClick?: () => void }) => (
+    <UnstyledButton
+        onClick={onClick}
+        className={`w-full flex items-center justify-between px-2 py-3 rounded-lg transition-colors group ${danger ? 'text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10' : 'hover:bg-gray-100 dark:hover:bg-[#2A2B2C]'}`}
+    >
         <Group gap="md">
-            <Box className={`${danger ? 'text-red-500' : 'text-black dark:text-gray-200'}`}>
+            <Box className={`${danger ? 'text-red-500' : 'text-gray-700 dark:text-gray-300 group-hover:text-black dark:group-hover:text-white'} transition-colors`}>
                 {icon}
             </Box>
-            <Text size="14px" fw={500} className={danger ? 'text-red-500' : 'text-gray-900 dark:text-gray-100'} style={{ fontFamily: 'var(--font-be-vietnam), sans-serif' }}>{label}</Text>
+            <Text size="15px" fw={500} className={danger ? 'text-red-500' : 'text-gray-900 dark:text-gray-200'} style={{ fontFamily: 'var(--font-be-vietnam), sans-serif' }}>{label}</Text>
         </Group>
-        {rightSection || <IconArrowLeft size={16} className={`${danger ? 'text-red-400' : 'text-gray-400 dark:text-zinc-500'} rotate-180`} />}
+        {rightSection || <IconChevronDown size={18} className={`transform -rotate-90 ${danger ? 'text-red-400' : 'text-gray-400 dark:text-zinc-500'}`} />}
     </UnstyledButton>
-);
-
-const SidebarMediaButton = ({ icon, label }: { icon: React.ReactNode, label: string }) => (
-    <Button variant="light" color="gray" size="xs" radius="md" leftSection={icon} styles={{ label: { fontWeight: 700 } }}>
-        {label}
-    </Button>
 );

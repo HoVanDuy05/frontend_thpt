@@ -303,7 +303,11 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
         if (!isConnected) return;
 
         const handleNewMessage = (message: any) => {
-            if (message?.kenhChatId !== channel.id) return;
+            console.log('Socket received message:new', message);
+            if (Number(message?.kenhChatId) !== Number(channel.id)) {
+                console.log('Ignored message for different channel:', message?.kenhChatId, channel.id);
+                return;
+            }
             const isFromMe = Number(message?.nguoiGuiId) === Number(user?.id);
 
             if (message?.nguoiGuiId && !isFromMe && message?.id) {
@@ -375,7 +379,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                 const existingIds = new Set(prev.map(m => m.id));
 
                 pageMessages.forEach((newMsg: any) => {
-                    // 1. If message exists by ID, update it (though usually immutable)
+                    // 1. If message exists by ID, update it
                     if (existingIds.has(newMsg.id)) {
                         const idx = next.findIndex(m => m.id === newMsg.id);
                         if (idx !== -1) next[idx] = newMsg;
@@ -384,29 +388,28 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
 
                     // 2. If it's a new real message (id > 0), check if it replaces an optimistic one
                     if (newMsg.id > 0) {
+                        // Find strictly matching optimistic message
                         const optimisticIdx = next.findIndex(m =>
                             m.id < 0 &&
-                            // Match content and type
-                            m.noiDung === newMsg.noiDung &&
-                            m.loai === newMsg.loai &&
-                            // Only match messages sent by me
-                            Number(m.nguoiGuiId) === Number(newMsg.nguoiGuiId)
+                            Number(m.nguoiGuiId) === Number(newMsg.nguoiGuiId) &&
+                            // Use flexible matching for content as backend might sanitize/trim
+                            (m.noiDung === newMsg.noiDung || m.duongDanTep === newMsg.duongDanTep)
                         );
 
                         if (optimisticIdx !== -1) {
-                            // Replace optimistic with real
                             next[optimisticIdx] = newMsg;
                         } else {
-                            // Genuine new message
                             next.push(newMsg);
                         }
                     } else {
-                        // 3. For new optimistic messages (from cache updates), just add if not exists
-                        next.push(newMsg);
+                        // 3. For new optimistic messages (from cache updates)
+                        // Ensure we don't add duplicates based on tempId
+                        if (!existingIds.has(newMsg.id)) {
+                            next.push(newMsg);
+                        }
                     }
                 });
 
-                // Sort by date
                 return next.sort((a, b) => dayjs(a.ngayGui).valueOf() - dayjs(b.ngayGui).valueOf());
             });
         }
@@ -483,9 +486,9 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
         };
 
         try {
-
             on('presence:update', handlePresenceUpdate);
             on('message:delivered', handleDelivered);
+            // Strict 'seen' handler
             on('message:seen', handleSeen);
         } catch (error) {
             console.warn('Socket event listener setup failed:', error);
@@ -493,7 +496,6 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
 
         return () => {
             try {
-
                 off('presence:update', handlePresenceUpdate);
                 off('message:delivered', handleDelivered);
                 off('message:seen', handleSeen);
@@ -629,9 +631,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ channel, onBack, onToggl
                         <Center py="xs"><Loader size="xs" color="blue" /></Center>
                     )}
 
-                    {allMessages.length === 0 && isLoading ? (
-                        <Center h={100}><Loader size="sm" color="blue" /></Center>
-                    ) : allMessages.length === 0 ? (
+                    {allMessages.length === 0 ? (
                         <Center h={400} className="flex-col animate-in fade-in zoom-in duration-500">
                             <Avatar src={targetUser?.avatar || null} size={100} radius={999} mb="md" />
                             <Text fw={700} size="xl">{channel.loaiKenh === 'NHOM' ? channel.tenKenh : (targetUser?.hoTen || targetUser?.taiKhoan)}</Text>
