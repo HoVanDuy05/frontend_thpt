@@ -7,7 +7,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { formatSocialTime } from "@/shared/utils/social.util";
 import { useTranslations } from "next-intl";
-import { BrandLoader } from "@/shared/components/BrandLoader";
+import { SkeletonLoader } from "@/shared/components/SkeletonLoader";
 
 dayjs.extend(relativeTime);
 
@@ -41,7 +41,7 @@ export default function ActivityPage() {
     };
 
     if (isLoading) {
-        return <BrandLoader fullscreen />
+        return <SkeletonLoader type="threads" count={8} />
     }
 
     return (

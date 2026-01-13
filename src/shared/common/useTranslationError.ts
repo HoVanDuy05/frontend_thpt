@@ -1,24 +1,33 @@
 import { useTranslations } from "next-intl";
 
 export const useTranslationError = () => {
-    const vt = useTranslations("validation");
+    const vt = useTranslations();
+
+    const safeTranslate = (key: string, fallback: string) => {
+        try {
+            // Check if key exists (some versions of next-intl support has())
+            // For now, use try-catch to be safe
+            const translated = vt(key as any);
+            return translated;
+        } catch (e) {
+            return fallback;
+        }
+    };
 
     const translateError = (error: any): string => {
         const data = error?.response?.data;
         const message = data?.message;
 
-        if (!message) return "Đã có lỗi xảy ra. Vui lòng thử lại.";
+        if (!message) return safeTranslate("validation.unknown_error", "Đã có lỗi xảy ra. Vui lòng thử lại.");
 
-        // Special case: "Login failed" is too generic, let's look for specific keys
-        if (message === "Unauthorized") return vt("unauthorized") || "Đăng nhập không thành công";
+        // Special case: "Unauthorized" or specific failure strings
+        if (message === "Unauthorized") return safeTranslate("validation.unauthorized", "Xác thực không thành công");
 
         // Handle array of errors (from NestJS ValidationPipe)
         if (Array.isArray(message)) {
             return message.map(msg => {
-                if (typeof msg === 'string' && msg.includes('validation.')) {
-                    // Extract key even if it's buried in a string or is the whole string
-                    const key = msg.split('.').pop(); // Simple extraction logic if it follows validation.xxx
-                    return vt(key as any) || msg;
+                if (typeof msg === 'string' && msg.startsWith('validation.')) {
+                    return safeTranslate(msg, msg);
                 }
                 return msg;
             }).join(', ');
@@ -26,17 +35,14 @@ export const useTranslationError = () => {
 
         // Handle single error string
         if (typeof message === 'string') {
-            if (message.includes('validation.')) {
-                const key = message.split('.').pop();
-                return vt(key as any) || message;
+            if (message.startsWith('validation.')) {
+                return safeTranslate(message, message);
             }
 
-            // Try translating the message itself as a fallback key
-            const directKey = message.toLowerCase().replace(/\s+/g, '_');
-            try {
-                const translated = vt(directKey as any);
-                if (translated !== directKey) return translated;
-            } catch (e) { }
+            // Legacy support for plain strings that match keys
+            const directKey = `validation.${message.toLowerCase().replace(/\s+/g, '_')}`;
+            const translated = safeTranslate(directKey, "");
+            if (translated && translated !== directKey) return translated;
         }
 
         return message;

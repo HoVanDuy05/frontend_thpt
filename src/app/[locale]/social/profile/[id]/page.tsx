@@ -17,7 +17,8 @@ import { useTranslations, useLocale } from "next-intl";
 import { UserAvatar } from "@/feauture/social/components/UserAvatar";
 import { UnstyledButton } from "@mantine/core";
 import { SettingsDrawer } from "@/feauture/social/components/chat/SettingsDrawer";
-import { BrandLoader } from "@/shared/components/BrandLoader";
+import { SkeletonLoader } from "@/shared/components/SkeletonLoader";
+import { useSocialActions } from "@/shared/hooks/useSocialActions";
 
 export default function UserProfilePage() {
     const params = useParams();
@@ -31,15 +32,34 @@ export default function UserProfilePage() {
     const [editModalOpened, setEditModalOpened] = useState(false);
     const [settingsOpened, setSettingsOpened] = useState(false);
 
-    const { data: profile, isLoading: isLoadingProfile } = AppQuery.social.useSocialProfile(id);
+    const { data: profile, isLoading: isLoadingProfile, refetch: refetchProfile } = AppQuery.social.useSocialProfile(id);
     const { data: userThreads, isLoading: isLoadingThreads } = AppQuery.social.useUserThreads(id);
-    const { data: statusData, refetch: refetchStatus } = AppQuery.friends.useStatus(id);
 
-    const sendRequestMutation = AppMutation().friends.useSendRequest(id);
-    const handleRequestMutation = AppMutation().friends.useHandleRequest(id);
-    const unfriendMutation = AppMutation().friends.useUnfriend(id);
+    const {
+        handleAction,
+        isLoading: isSocialLoading,
+        followMutation
+    } = useSocialActions({
+        userId: id,
+        profile,
+        refetchProfile
+    });
+
     const router = useRouter();
     const createChannelMutation = AppMutation().chat.useCreateChannel();
+
+    const handleToggleFollow = async () => {
+        try {
+            await followMutation.mutateAsync({ urlParams: { id } });
+            refetchProfile();
+        } catch (error) {
+            notifications.show({
+                title: 'Lỗi',
+                message: t('error.actionError') || 'Có lỗi xảy ra',
+                color: 'red'
+            });
+        }
+    };
 
     const handleMessage = async () => {
         try {
@@ -75,35 +95,10 @@ export default function UserProfilePage() {
         }
     };
 
-    const handleAction = async () => {
-        try {
-            if (!statusData) return;
 
-            if (statusData.status === 'NONE') {
-                await sendRequestMutation.mutateAsync(undefined);
-            } else if (statusData.status === 'RECEIVED') {
-                await handleRequestMutation.mutateAsync({ action: 'ACCEPT' });
-            } else if (statusData.status === 'SENT') {
-                await handleRequestMutation.mutateAsync({ action: 'CANCEL' });
-            } else if (statusData.status === 'FRIEND') {
-                await unfriendMutation.mutateAsync(undefined);
-            }
-            refetchStatus();
-        } catch (error) {
-            notifications.show({
-                title: 'Lỗi',
-                message: t('error.actionError'),
-                color: 'red'
-            });
-        }
-    };
-
-    const statusMutation = {
-        isPending: sendRequestMutation.isPending || handleRequestMutation.isPending || unfriendMutation.isPending
-    };
 
     if (isLoadingProfile) {
-        return <BrandLoader fullscreen />
+        return <SkeletonLoader type="threads" count={6} />
     }
 
     if (!profile) {
@@ -111,19 +106,19 @@ export default function UserProfilePage() {
     }
 
     const getButtonProps = () => {
-        if (!statusData) return { label: '...', disabled: true, variant: 'default' };
+        if (!profile) return { label: '...', disabled: true, variant: 'default' };
 
-        switch (statusData.status) {
+        switch (profile.friendshipStatus) {
             case 'NONE':
-                return { label: t('follow'), variant: 'filled', bg: 'black', c: 'white' }; // Threads black button
+                return { label: t('add_friend'), variant: 'outline', color: 'gray' };
             case 'FRIEND':
-                return { label: t('following'), variant: 'outline', color: 'gray' };
+                return { label: t('is_friend'), variant: 'outline', color: 'gray' };
             case 'SENT':
-                return { label: t('sentRequest'), variant: 'outline', color: 'gray' };
+                return { label: t('cancel_request'), variant: 'outline', color: 'gray' };
             case 'RECEIVED':
                 return { label: t('accept'), variant: 'filled', color: 'black' };
             default:
-                return { label: t('follow'), variant: 'filled', bg: 'black', c: 'white' };
+                return { label: t('add_friend'), variant: 'outline', color: 'gray' };
         }
     };
 
@@ -223,26 +218,61 @@ export default function UserProfilePage() {
                             </Button>
                         </>
                     ) : (
-                        <>
+                        <Stack gap="sm" className="w-full">
+                            <Group grow gap="sm">
+
+                                {['FRIEND', 'SENT'].includes(profile.friendshipStatus) ? (
+                                    <Menu shadow="md" width={200} position="bottom-end">
+                                        <Menu.Target>
+                                            <Button
+                                                radius="md"
+                                                loading={isSocialLoading}
+                                                variant="default"
+                                                className="border-gray-300 dark:border-zinc-700 font-semibold"
+                                            >
+                                                {buttonProps.label}
+                                            </Button>
+                                        </Menu.Target>
+
+                                        <Menu.Dropdown>
+                                            {profile.isFollowing && (
+                                                <Menu.Item
+                                                    color="red"
+                                                    onClick={() => handleAction('UNFOLLOW')}
+                                                >
+                                                    {t('unfollow')}
+                                                </Menu.Item>
+                                            )}
+                                            <Menu.Item
+                                                color="red"
+                                                onClick={() => handleAction(profile.friendshipStatus === 'SENT' ? 'CANCEL' : 'UNFRIEND')}
+                                            >
+                                                {profile.friendshipStatus === 'SENT' ? t('cancel_request') : t('unfriend')}
+                                            </Menu.Item>
+                                        </Menu.Dropdown>
+                                    </Menu>
+                                ) : (
+                                    <Button
+                                        radius="md"
+                                        onClick={handleAction}
+                                        loading={isSocialLoading}
+                                        variant={profile.friendshipStatus === 'RECEIVED' ? 'filled' : 'default'}
+                                        color={profile.friendshipStatus === 'RECEIVED' ? 'black' : undefined}
+                                        className={profile.friendshipStatus === 'RECEIVED' ? "bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 border-transparent font-bold" : "border-gray-300 dark:border-zinc-700 font-semibold"}
+                                    >
+                                        {buttonProps.label}
+                                    </Button>
+                                )}
+                            </Group>
                             <Button
+                                variant="default"
                                 radius="md"
-                                onClick={handleAction}
-                                loading={statusMutation.isPending}
-                                {...(buttonProps.variant === 'filled' ? { bg: 'black', c: 'white', className: "hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200 border-transparent" } : { variant: 'default', className: "border-gray-300 dark:border-zinc-700 font-semibold" })}
+                                className="border-gray-300 dark:border-zinc-700 font-semibold w-full"
+                                onClick={handleMessage}
                             >
-                                {buttonProps.label}
+                                {t('message')}
                             </Button>
-                            {statusData?.status === 'FRIEND' && (
-                                <Button
-                                    variant="default"
-                                    radius="md"
-                                    className="border-gray-300 dark:border-zinc-700 font-semibold"
-                                    onClick={handleMessage}
-                                >
-                                    {t('message')}
-                                </Button>
-                            )}
-                        </>
+                        </Stack>
                     )}
                 </Group>
             </Box>
@@ -285,7 +315,7 @@ export default function UserProfilePage() {
                         )}
 
                         {isLoadingThreads ? (
-                            <BrandLoader size="sm" minHeight={200} />
+                            <SkeletonLoader type="threads" count={3} />
                         ) : userThreads && userThreads.length > 0 ? (
                             <ThreadFeed threads={userThreads} />
                         ) : (

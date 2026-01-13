@@ -192,8 +192,12 @@ export type ApiQueryType = {
         response: Thread[];
     };
     getSocialProfile: {
-        url: { baseUrl: "/social/users/profile/:id"; urlParams: { id: number } };
-        response: TUser & { _count: { threads: number; followers: number; following: number } };
+        url: { baseUrl: "/social/profile/:id"; urlParams: { id: number } };
+        response: TUser & {
+            isFollowing: boolean;
+            friendshipStatus: 'NONE' | 'FRIEND' | 'SENT' | 'RECEIVED' | 'BLOCKED';
+            _count: { threads: number; followers: number; following: number };
+        };
     };
     getSocialActivity: {
         url: { baseUrl: "/social/activity"; queryParams?: { limit?: number } };
@@ -202,6 +206,14 @@ export type ApiQueryType = {
     getThreadDetail: {
         url: { baseUrl: "/social/threads/:id"; urlParams: { id: number } };
         response: Thread & { replies: Thread[] };
+    };
+    getTrending: {
+        url: { baseUrl: "/social/trending" };
+        response: { id: number; name: string; category: string; count: string }[];
+    };
+    getSuggestedUsers: {
+        url: { baseUrl: "/social/suggested-users"; queryParams?: { limit?: number } };
+        response: UserBasic[];
     };
 
     // Friends
@@ -546,13 +558,13 @@ export type ApiMutationType = {
         response: Thread;
     };
     likeThread: {
-        url: { baseUrl: "/social/threads/:id/like"; urlParams: { id: number } };
-        payload: undefined;
+        url: { baseUrl: "/social/threads/:id/like"; urlParams?: { id: number } };
+        payload: { urlParams?: { id: number } };
         response: { liked: boolean };
     };
     followUser: {
-        url: { baseUrl: "/social/users/:id/follow"; urlParams: { id: number } };
-        payload: undefined;
+        url: { baseUrl: "/social/users/:id/follow"; urlParams?: { id: number } };
+        payload: { urlParams?: { id: number } };
         response: { following: boolean };
     };
 

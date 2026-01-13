@@ -55,7 +55,7 @@ export function useSocket() {
                 auth: {
                     token: token
                 },
-                transports: ['polling', 'websocket'], // Revert to polling fallback for better compatibility
+                transports: ['websocket', 'polling'], // Prioritize websocket for stability and speed
                 reconnection: true,
                 reconnectionAttempts: 20, // Keep increased attempts
                 reconnectionDelay: 2000,

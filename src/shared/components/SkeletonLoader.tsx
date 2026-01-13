@@ -1,13 +1,61 @@
 "use client";
 
-import { Skeleton, Stack, Table, Grid, Card, SimpleGrid, Group, Box } from "@mantine/core";
+import { Skeleton, Stack, Table, Grid, Card, SimpleGrid, Group, Box, Paper } from "@mantine/core";
 
 interface SkeletonLoaderProps {
-    type: "table" | "cards" | "dashboard" | "form" | "stats";
+    type: "table" | "cards" | "dashboard" | "form" | "stats" | "threads" | "users";
     count?: number;
 }
 
 export function SkeletonLoader({ type, count = 5 }: SkeletonLoaderProps) {
+    if (type === "threads") {
+        return (
+            <Stack gap="md">
+                {Array(count).fill(0).map((_, i) => (
+                    <Paper key={i} p="md" withBorder={false} style={{ borderBottom: '1px solid var(--mantine-color-default-border)' }}>
+                        <Group gap="sm" mb="sm">
+                            <Skeleton height={40} circle />
+                            <Box style={{ flex: 1 }}>
+                                <Skeleton height={14} width="30%" mb={6} />
+                                <Skeleton height={10} width="20%" />
+                            </Box>
+                        </Group>
+                        <Skeleton height={60} mb="sm" radius="md" />
+                        <Group gap="xl">
+                            <Skeleton height={20} width={40} radius="xl" />
+                            <Skeleton height={20} width={40} radius="xl" />
+                            <Skeleton height={20} width={40} radius="xl" />
+                        </Group>
+                    </Paper>
+                ))}
+            </Stack>
+        );
+    }
+
+    if (type === "users") {
+        return (
+            <Stack gap="xs">
+                {Array(count).fill(0).map((_, i) => (
+                    <Paper key={i} p="md" radius="xl" bg="transparent" className="border border-zinc-100 dark:border-zinc-800">
+                        <Group justify="space-between" wrap="nowrap">
+                            <Group gap="md" wrap="nowrap" style={{ flex: 1 }}>
+                                <Skeleton height={54} circle />
+                                <Stack gap={4} style={{ flex: 1 }}>
+                                    <Group gap="xs">
+                                        <Skeleton height={16} width="40%" />
+                                        <Skeleton height={14} width={50} radius="xs" />
+                                    </Group>
+                                    <Skeleton height={12} width="30%" />
+                                </Stack>
+                            </Group>
+                            <Skeleton height={34} width={100} radius="md" />
+                        </Group>
+                    </Paper>
+                ))}
+            </Stack>
+        );
+    }
+
     if (type === "table") {
         return (
             <Box className="w-full">

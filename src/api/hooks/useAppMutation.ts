@@ -20,8 +20,8 @@ export const useAppMutation = <T extends keyof ApiMutationType>({
     url: ApiMutationType[T]["url"];
     method?: "POST" | "PUT" | "PATCH" | "DELETE";
     options?: AppMutationOptions<T>;
-    onSuccess?: (data: ApiMutationType[T]["response"]) => void;
-    onError?: (error: any) => void;
+    onSuccess?: (data: ApiMutationType[T]["response"], payload: ApiMutationType[T]["payload"]) => void;
+    onError?: (error: any, payload: ApiMutationType[T]["payload"]) => void;
 }) => {
     return useMutation<ApiMutationType[T]["response"], Error, ApiMutationType[T]["payload"]>({
         ...options,
@@ -54,10 +54,10 @@ export const useAppMutation = <T extends keyof ApiMutationType>({
                         response = await axiosClient.post(urlApi, payload);
                 }
                 const data = response as ApiMutationType[T]["response"];
-                onSuccess?.(data);
+                onSuccess?.(data, payload);
                 return data;
             } catch (error) {
-                onError?.(error);
+                onError?.(error, payload);
                 return Promise.reject(error);
             } finally {
             }

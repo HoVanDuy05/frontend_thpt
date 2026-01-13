@@ -1,15 +1,17 @@
-import { ActionIcon, Avatar, Box, Button, Group, Stack, Text, TextInput, Tooltip, UnstyledButton, ScrollArea, Indicator, Image as MantineImage, Drawer } from '@mantine/core';
+import { ActionIcon, Avatar, Box, Button, Group, Stack, Text, TextInput, Tooltip, UnstyledButton, ScrollArea, Indicator, Image as MantineImage, Drawer, Badge } from '@mantine/core';
 import { useDisclosure, useMediaQuery } from '@mantine/hooks';
 import { IconHome, IconSearch, IconBell, IconUser, IconMessageCircle, IconHeart, IconTrendingUp, IconUsers, IconPlus, IconCompass, IconSettings, IconArrowLeft } from '@tabler/icons-react';
 import { Link, usePathname, useRouter } from '@/i18n/routing';
-import { ReactNode } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
 import { useAppStore } from '@/providers/store/useAppStore';
 import { useTranslations } from 'next-intl';
+import { useSocket } from '@/shared/hooks/useSocket';
 import { CreateThread } from '../components/CreateThread';
 import { UserAvatar } from '../components/UserAvatar';
 import { AppMutation } from '@/api/AppMutation';
 import { notifications } from '@mantine/notifications';
 import { useSearchParams } from 'next/navigation';
+import { AppQuery } from '@/api/AppQuery';
 
 interface SocialLayoutProps {
     children: ReactNode;
@@ -23,9 +25,107 @@ export const SocialLayout = ({ children }: SocialLayoutProps) => {
     const t = useTranslations('social');
     const searchParams = useSearchParams();
     const createThreadMutation = AppMutation().social.useCreateThread();
+    const followMutation = AppMutation().social.useFollowUser();
+    const { on, off, isConnected } = useSocket();
+
+    // Unified Notification Counts from API
+    const { data: receivedRequests, refetch: refetchRequests } = AppQuery.friends.useReceivedRequests();
+    const { data: serverNotifications, refetch: refetchActivities } = AppQuery.auth.useNotifications();
+    const { data: channels } = AppQuery.chat.useChannels();
+
+    const [friendRequestCount, setFriendRequestCount] = useState(0);
+    const [activityCount, setActivityCount] = useState(0);
+    const [messageCount, setMessageCount] = useState(0);
+
+    // Right Sidebar Data
+    const { data: trendingData } = AppQuery.social.useTrending();
+    const { data: suggestedUsers, refetch: refetchSuggested } = AppQuery.social.useSuggestedUsers({ limit: 5 });
+
+    const [hasNewFriendRequest, setHasNewFriendRequest] = useState(false);
+    const [hasNewActivity, setHasNewActivity] = useState(false);
+
+    // Synchronize unseen activities from server on initial load
+    useEffect(() => {
+        if (serverNotifications) {
+            const unread = serverNotifications.filter((n: any) => !n.daXem);
+            if (unread.length > 0) setHasNewActivity(true);
+        }
+    }, [serverNotifications]);
+
+    // Reset flags when navigating
+    useEffect(() => {
+        if (pathname === '/social/friends') setHasNewFriendRequest(false);
+        if (pathname === '/social/activity') setHasNewActivity(false);
+    }, [pathname]);
 
     // Check if drawer should be open based on URL
     const isCreateDrawerOpen = searchParams.get('create') === 'true';
+
+    // Persistent seen status
+    useEffect(() => {
+        if (receivedRequests) {
+            setFriendRequestCount(receivedRequests.length);
+            const lastSeen = Number(localStorage.getItem('lastSeenFriends') || 0);
+            if (receivedRequests.length > lastSeen) {
+                setHasNewFriendRequest(true);
+            } else if (receivedRequests.length === 0) {
+                setHasNewFriendRequest(false);
+            }
+        }
+    }, [receivedRequests]);
+
+    useEffect(() => {
+        if (serverNotifications) {
+            const unread = serverNotifications.filter((n: any) => !n.daXem).length;
+            setActivityCount(unread);
+            const lastSeen = Number(localStorage.getItem('lastSeenActivities') || 0);
+            if (unread > lastSeen) {
+                setHasNewActivity(true);
+            } else if (unread === 0) {
+                setHasNewActivity(false);
+            }
+        }
+    }, [serverNotifications]);
+
+    useEffect(() => {
+        if (pathname === '/social/friends' && receivedRequests) {
+            setHasNewFriendRequest(false);
+            localStorage.setItem('lastSeenFriends', receivedRequests.length.toString());
+        }
+        if (pathname === '/social/activity' && serverNotifications) {
+            setHasNewActivity(false);
+            const unread = serverNotifications.filter((n: any) => !n.daXem).length;
+            localStorage.setItem('lastSeenActivities', unread.toString());
+        }
+    }, [pathname, receivedRequests, serverNotifications]);
+
+    // Real-time notifications
+    useEffect(() => {
+        if (!isConnected) return;
+
+        const handleFriendRequest = () => {
+            refetchRequests();
+            setHasNewFriendRequest(true);
+            notifications.show({
+                title: t('nav.friends'),
+                message: 'Bạn có lời mời kết bạn mới',
+                color: 'indigo'
+            });
+        };
+
+        const handleActivity = () => {
+            refetchActivities();
+            setHasNewActivity(true);
+        };
+
+        on('friend:request', handleFriendRequest);
+        on('activity:new', handleActivity);
+
+        return () => {
+            off('friend:request', handleFriendRequest);
+            off('activity:new', handleActivity);
+        };
+    }, [isConnected, on, off, refetchRequests, refetchActivities, t]);
 
     // Explicitly enforce 'Be Vietnam Pro' for premium feel
     const fontStyle = { fontFamily: 'var(--font-be-vietnam), sans-serif' };
@@ -71,6 +171,24 @@ export const SocialLayout = ({ children }: SocialLayoutProps) => {
         }
     };
 
+    const handleFollow = async (id: number) => {
+        try {
+            await followMutation.mutateAsync({ urlParams: { id } });
+            notifications.show({
+                title: 'Thành công',
+                message: 'Đã theo dõi người dùng',
+                color: 'green'
+            });
+            refetchSuggested();
+        } catch (error) {
+            notifications.show({
+                title: 'Lỗi',
+                message: 'Không thể thực hiện yêu cầu',
+                color: 'red'
+            });
+        }
+    };
+
     return (
         <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white selection:bg-indigo-100 selection:text-indigo-900" style={fontStyle}>
             {/* Create Post Drawer Global */}
@@ -101,45 +219,63 @@ export const SocialLayout = ({ children }: SocialLayoutProps) => {
             <div className="max-w-[1350px] mx-auto h-screen flex">
 
                 {/* Left Sidebar - Navigation (Desktop only) */}
-                <div className="hidden md:flex w-[280px] flex-col h-full border-r border-gray-100 dark:border-zinc-800 pt-6 pb-6 px-4 sticky top-0 bg-white dark:bg-black z-20">
-                    <div className="px-4 mb-4 flex items-center gap-3">
+                <div className="hidden md:flex w-[300px] shrink-0 flex-col h-full border-r border-gray-100 dark:border-zinc-800 pt-6 pb-6 px-4 sticky top-0 bg-white dark:bg-black z-20">
+                    <div className="px-4 mb-8 flex items-center gap-3">
                         <MantineImage src="/favicon.png" w={38} h={38} />
                         <Text size="xl" fw={800} className="tracking-tight text-black dark:text-white" style={fontStyle}>
                             Social
                         </Text>
                     </div>
 
-                    <Stack gap={2} className="flex-1 px-2">
+                    <Stack gap={8} className="flex-1 px-2">
                         {desktopNavItems.map((item) => {
                             const isActive = item.exact ? pathname === item.link : pathname.startsWith(item.link);
                             return (
                                 <Link href={item.link} key={item.link} className="no-underline">
                                     <UnstyledButton
-                                        className={`w-full p-3.5 rounded-2xl flex items-center gap-4 transition-all duration-300 group relative overflow-hidden
+                                        className={`w-full py-4 px-5 rounded-2xl flex items-center gap-5 transition-all duration-300 group relative overflow-hidden
                                             ${isActive
-                                                ? 'bg-black/5 dark:bg-white/10 font-bold'
+                                                ? 'bg-indigo-50 dark:bg-indigo-950/30 font-bold'
                                                 : 'hover:bg-black/5 dark:hover:bg-white/5'
                                             }`}
                                     >
-                                        {item.label === t('nav.profile') ? (
-                                            <UserAvatar
-                                                src={user?.avatar}
-                                                size={26}
-                                                className={`${isActive ? 'ring-2 ring-black dark:ring-white scale-110' : 'group-hover:scale-110'} transition-all duration-300`}
-                                            />
-                                        ) : (
-                                            <item.icon
-                                                size={26}
-                                                stroke={isActive ? 2.5 : 1.8}
-                                                className={isActive
-                                                    ? 'text-black dark:text-white scale-110 transition-transform duration-300'
-                                                    : 'text-gray-500 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white group-hover:scale-110 transition-all duration-300'}
-                                            />
-                                        )}
+                                        <Indicator
+                                            color="red"
+                                            disabled={
+                                                !(
+                                                    (item.label === t('nav.friends') && hasNewFriendRequest) ||
+                                                    (item.label === t('nav.activities') && hasNewActivity)
+                                                )
+                                            }
+                                            label={
+                                                item.label === t('nav.friends') ? (friendRequestCount > 9 ? '9+' : friendRequestCount) :
+                                                    item.label === t('nav.activities') ? (activityCount > 9 ? '9+' : activityCount) : null
+                                            }
+                                            size={18}
+                                            offset={2}
+                                            withBorder
+                                            styles={{ indicator: { fontSize: '10px', fontWeight: 700 } }}
+                                        >
+                                            {item.label === t('nav.profile') ? (
+                                                <UserAvatar
+                                                    src={user?.avatar}
+                                                    size={26}
+                                                    className={`${isActive ? 'ring-2 ring-black dark:ring-white scale-110' : 'group-hover:scale-110'} transition-all duration-300`}
+                                                />
+                                            ) : (
+                                                <item.icon
+                                                    size={26}
+                                                    stroke={isActive ? 2.5 : 1.8}
+                                                    className={isActive
+                                                        ? 'text-indigo-600 dark:text-indigo-400 scale-110 transition-transform duration-300'
+                                                        : 'text-gray-500 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white group-hover:scale-110 transition-all duration-300'}
+                                                />
+                                            )}
+                                        </Indicator>
                                         <Text
                                             size="lg"
                                             style={fontStyle}
-                                            className={isActive ? 'text-black dark:text-white font-bold' : 'text-gray-600 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white font-medium transition-colors'}
+                                            className={isActive ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-gray-600 dark:text-gray-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 font-medium transition-colors'}
                                         >
                                             {item.label}
                                         </Text>
@@ -152,7 +288,7 @@ export const SocialLayout = ({ children }: SocialLayoutProps) => {
                         <Tooltip label={t('nav.create')} position="right" withArrow>
                             <UnstyledButton
                                 onClick={handleCreateClick}
-                                className="mt-4 mx-2 p-3.5 rounded-2xl flex items-center gap-4 hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 group"
+                                className="mt-8 mx-2 py-4 px-5 rounded-2xl flex items-center gap-5 hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 group"
                             >
                                 <div className="w-[26px] h-[26px] flex items-center justify-center border-2 border-black dark:border-white rounded-md group-hover:bg-black dark:group-hover:bg-white transition-colors duration-300">
                                     <IconPlus size={18} className="text-black dark:text-white group-hover:text-white dark:group-hover:text-black transition-colors duration-300" stroke={3} />
@@ -164,7 +300,7 @@ export const SocialLayout = ({ children }: SocialLayoutProps) => {
                     </Stack>
 
                     <div className="mt-auto px-2">
-                        <UnstyledButton component={Link} href="/settings" className="w-full p-3.5 rounded-2xl flex items-center gap-4 hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 group">
+                        <UnstyledButton component={Link} href="/settings" className="w-full py-4 px-5 rounded-2xl flex items-center gap-5 hover:bg-black/5 dark:hover:bg-white/5 transition-all duration-300 group">
                             <IconSettings size={26} stroke={1.8} className="text-gray-500 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white transition-colors" />
                             <Text size="lg" fw={500} className="text-gray-600 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white" style={fontStyle}>
                                 {t('nav.settings')}
@@ -181,12 +317,32 @@ export const SocialLayout = ({ children }: SocialLayoutProps) => {
                             <MantineImage src="/favicon.png" w={32} h={32} />
                             <Text size="xl" fw={900} className="tracking-tight" style={fontStyle}>Social</Text>
                         </div>
-                        <Group gap="xs">
+                        <Group gap="sm">
                             <ActionIcon variant="transparent" color="gray" component={Link} href="/social/activity">
-                                <IconHeart size={26} stroke={1.5} className="text-black dark:text-white" />
+                                <Indicator
+                                    color="red"
+                                    offset={2}
+                                    label={activityCount > 0 ? (activityCount > 9 ? '9+' : activityCount) : null}
+                                    disabled={!hasNewActivity}
+                                    size={16}
+                                    withBorder
+                                    styles={{ indicator: { fontSize: '8px', fontWeight: 800, padding: 0 } }}
+                                >
+                                    <IconHeart size={26} stroke={1.5} className="text-black dark:text-white" />
+                                </Indicator>
                             </ActionIcon>
                             <ActionIcon variant="transparent" color="gray" component={Link} href="/chat">
-                                <IconMessageCircle size={26} stroke={1.5} className="text-black dark:text-white" />
+                                <Indicator
+                                    color="red"
+                                    offset={2}
+                                    label={messageCount > 0 ? (messageCount > 9 ? '9+' : messageCount) : null}
+                                    disabled={messageCount === 0}
+                                    size={16}
+                                    withBorder
+                                    styles={{ indicator: { fontSize: '8px', fontWeight: 800, padding: 0 } }}
+                                >
+                                    <IconMessageCircle size={26} stroke={1.5} className="text-black dark:text-white" />
+                                </Indicator>
                             </ActionIcon>
                         </Group>
                     </div>
@@ -208,47 +364,36 @@ export const SocialLayout = ({ children }: SocialLayoutProps) => {
                         }}
                     />
 
-                    <Box className="bg-gray-50/50 dark:bg-zinc-900/50 rounded-3xl p-5 border border-gray-100 dark:border-zinc-800">
-                        <Text fw={800} size="xl" mb="lg" style={fontStyle}>{t('widgets.trending')}</Text>
-                        <Stack gap="lg">
-                            {[1, 2, 3, 4].map((i) => (
-                                <Group key={i} justify="space-between" className="cursor-pointer group">
-                                    <div className="flex-1">
-                                        <Text size="xs" c="dimmed" fw={600} className="mb-0.5">Trending in Vietnam</Text>
-                                        <Text size="md" fw={700} className="group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">#SchoolLife</Text>
-                                        <Text size="xs" c="dimmed" mt={2}>{t('widgets.trending_subtitle', { count: '12.5K' })}</Text>
-                                    </div>
-                                    <div className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors">
-                                        <IconTrendingUp size={16} className="text-gray-400" />
-                                    </div>
-                                </Group>
-                            ))}
-                        </Stack>
-                    </Box>
-
                     <Box>
                         <Text fw={800} size="xl" mb="lg" style={fontStyle}>{t('widgets.suggested')}</Text>
                         <Stack gap="md">
-                            {[1, 2, 3].map((i) => (
-                                <Group key={i} justify="space-between" className="hover:bg-black/5 dark:hover:bg-white/5 p-2 -mx-2 rounded-xl transition-colors cursor-pointer">
-                                    <Group gap="sm">
-                                        <Indicator inline size={10} offset={4} position="bottom-end" color="green" withBorder>
-                                            <Avatar radius="full" size="md" />
-                                        </Indicator>
-                                        <div>
-                                            <Text size="sm" fw={700} style={fontStyle}>User Name</Text>
-                                            <Text size="xs" c="dimmed">@username</Text>
-                                        </div>
-                                    </Group>
-                                    <Button variant="light" radius="xl" size="xs" color="black" className="dark:bg-white dark:text-black hover:opacity-80 font-bold px-4 h-8">{t('widgets.follow')}</Button>
+                            {suggestedUsers?.map((suggested: any) => (
+                                <Group key={suggested.id} justify="space-between" className="hover:bg-black/5 dark:hover:bg-white/5 p-2 -mx-2 rounded-xl transition-colors cursor-pointer">
+                                    <Link href={`/social/profile/${suggested.id}`} className="no-underline text-inherit flex-1">
+                                        <Group gap="sm">
+                                            <Indicator inline size={10} offset={4} position="bottom-end" color="green" withBorder>
+                                                <UserAvatar src={suggested.avatar} size="md" />
+                                            </Indicator>
+                                            <div>
+                                                <Text size="sm" fw={700} style={fontStyle}>{suggested.hoTen}</Text>
+                                                <Text size="xs" c="dimmed">@{suggested.taiKhoan}</Text>
+                                            </div>
+                                        </Group>
+                                    </Link>
+                                    <Button
+                                        variant="light"
+                                        radius="xl"
+                                        size="xs"
+                                        color="black"
+                                        className="dark:bg-white dark:text-black hover:opacity-80 font-bold px-4 h-8"
+                                        onClick={() => handleFollow(suggested.id)}
+                                    >
+                                        {t('widgets.follow')}
+                                    </Button>
                                 </Group>
                             ))}
                         </Stack>
                     </Box>
-
-                    <Text size="xs" c="dimmed" className="px-2">
-                        © 2024 Nguyen Hue Social Network. All rights reserved.
-                    </Text>
                 </div>
 
             </div>
@@ -280,28 +425,50 @@ export const SocialLayout = ({ children }: SocialLayoutProps) => {
                         }
 
                         const isActive = item.exact ? pathname === item.link : pathname.startsWith(item.link);
+                        const isNewItem = (item.label === t('nav.friends') && hasNewFriendRequest) ||
+                            (item.label === t('nav.activities') && hasNewActivity);
+                        const badgeCount = item.label === t('nav.friends') ? friendRequestCount : activityCount;
+
                         return (
                             <Link href={item.link} key={index} className="w-full">
-                                <div className="flex flex-col items-center justify-center gap-1 py-1">
-                                    {item.label === t('nav.profile') ? (
-                                        <UserAvatar
-                                            src={user?.avatar}
-                                            size={26}
-                                            className={`${isActive ? 'ring-2 ring-black dark:ring-white scale-110' : ''} transition-all duration-300`}
-                                        />
-                                    ) : (
-                                        <item.icon
-                                            size={26}
-                                            stroke={isActive ? 2.5 : 2}
-                                            className={isActive ? 'text-black dark:text-white scale-110 transition-transform' : 'text-gray-400 dark:text-gray-500'}
-                                        />
-                                    )}
+                                <div className="flex flex-col items-center justify-center gap-1 py-1 relative">
+                                    <Indicator
+                                        color="red"
+                                        disabled={!isNewItem}
+                                        label={badgeCount > 9 ? '9+' : badgeCount}
+                                        size={16}
+                                        offset={2}
+                                        withBorder
+                                        styles={{ indicator: { fontSize: '9px', fontWeight: 700 } }}
+                                    >
+                                        {item.label === t('nav.profile') ? (
+                                            <UserAvatar
+                                                src={user?.avatar}
+                                                size={24}
+                                                className={`${isActive ? 'ring-2 ring-black dark:ring-white scale-110' : ''} transition-all duration-300`}
+                                            />
+                                        ) : (
+                                            <item.icon
+                                                size={24}
+                                                stroke={isActive ? 2.5 : 2}
+                                                className={isActive ? 'text-indigo-600 dark:text-indigo-400 scale-110 transition-transform' : 'text-gray-400 dark:text-gray-500'}
+                                            />
+                                        )}
+                                    </Indicator>
+                                    <Text
+                                        size="10px"
+                                        fw={isActive ? 700 : 500}
+                                        className={`${isActive ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-500 dark:text-gray-600'} transition-colors leading-none mt-0.5`}
+                                        style={fontStyle}
+                                    >
+                                        {item.label}
+                                    </Text>
                                 </div>
                             </Link>
                         );
                     })}
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };

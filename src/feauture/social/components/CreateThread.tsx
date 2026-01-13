@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from 'react';
-import { Paper, Group, Textarea, Button, Stack, ActionIcon, FileButton, Image, Box, Text, Divider } from '@mantine/core';
+import { Paper, Group, Textarea, Button, Stack, ActionIcon, FileButton, Image, Box, Text, Divider, UnstyledButton } from '@mantine/core';
 import { UserAvatar } from './UserAvatar';
 import { SocialButton } from './SocialButton';
 import { IconPhoto, IconGif, IconList, IconAt, IconX, IconFileSmile, IconChevronLeft } from '@tabler/icons-react';

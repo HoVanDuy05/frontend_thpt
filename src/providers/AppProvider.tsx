@@ -8,6 +8,7 @@ import { NextIntlClientProvider, AbstractIntlMessages } from "next-intl";
 import { SplashScreen } from "@/shared/components/SplashScreen";
 import { PWAProvider } from "@/providers/PWAProvider";
 import { GlobalSocketHandler } from "@/shared/components/GlobalSocketHandler";
+import { ThemeSync } from "@/shared/components/ThemeSync";
 
 interface AppProviderProps {
     children: React.ReactNode;
@@ -144,6 +145,9 @@ export function AppProvider({ children, messages, locale }: AppProviderProps) {
                 <MantineProvider defaultColorScheme="auto" theme={theme}>
                     <Notifications position="top-right" zIndex={1000} />
                     <SplashScreen />
+                    <Suspense fallback={null}>
+                        <ThemeSync />
+                    </Suspense>
                     <PWAProvider>
                         <Suspense fallback={null}>
                             <GlobalSocketHandler />

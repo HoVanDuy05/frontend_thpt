@@ -9,13 +9,15 @@ import { UserCard } from "@/feauture/social/components/UserCard";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { BrandLoader } from "@/shared/components/BrandLoader";
+import { SkeletonLoader } from "@/shared/components/SkeletonLoader";
+import { useAppStore } from "@/providers/store/useAppStore";
 
 export default function ExplorePage() {
     const t = useTranslations('social.search');
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
+    const { user: currentUser } = useAppStore();
 
     const urlQuery = searchParams.get("q") || "";
     const urlTab = searchParams.get("tab") || "all";
@@ -101,7 +103,7 @@ export default function ExplorePage() {
                 <Tabs.Panel value="all" pt="md">
                     {debounced.length > 0 ? (
                         isLoading ? (
-                            <BrandLoader size="sm" minHeight={150} />
+                            urlTab === "users" ? <SkeletonLoader type="users" count={5} /> : <SkeletonLoader type="threads" count={5} />
                         ) : hasResults ? (
                             <Stack gap="lg">
                                 {/* Users Section */}
@@ -113,9 +115,18 @@ export default function ExplorePage() {
                                             </Text>
                                         </Group>
                                         <Stack gap={0}>
-                                            {userResults.map(user => (
-                                                <UserCard key={user.id} user={user} />
-                                            ))}
+                                            {userResults
+                                                .filter(u => u.id === currentUser?.id)
+                                                .map(user => (
+                                                    <UserCard key={user.id} user={user} isMe={true} />
+                                                ))
+                                            }
+                                            {userResults
+                                                .filter(u => u.id !== currentUser?.id)
+                                                .map(user => (
+                                                    <UserCard key={user.id} user={user} />
+                                                ))
+                                            }
                                         </Stack>
                                     </Stack>
                                 )}
@@ -156,7 +167,7 @@ export default function ExplorePage() {
                                 </Text>
                             </Group>
                             {isLoadingTrending ? (
-                                <BrandLoader size="sm" minHeight={150} />
+                                <SkeletonLoader type="threads" count={5} />
                             ) : (
                                 <ThreadFeed threads={trendingThreads} />
                             )}
@@ -168,12 +179,21 @@ export default function ExplorePage() {
                 <Tabs.Panel value="users" pt="md">
                     {debounced.length > 0 ? (
                         isSearchingUsers ? (
-                            <BrandLoader size="sm" minHeight={150} />
+                            <SkeletonLoader type="users" count={5} />
                         ) : userResults && userResults.length > 0 ? (
                             <Stack gap={0}>
-                                {userResults.map(user => (
-                                    <UserCard key={user.id} user={user} />
-                                ))}
+                                {userResults
+                                    .filter(u => u.id === currentUser?.id)
+                                    .map(user => (
+                                        <UserCard key={user.id} user={user} isMe={true} />
+                                    ))
+                                }
+                                {userResults
+                                    .filter(u => u.id !== currentUser?.id)
+                                    .map(user => (
+                                        <UserCard key={user.id} user={user} />
+                                    ))
+                                }
                             </Stack>
                         ) : (
                             <Center py={80}>
@@ -206,7 +226,7 @@ export default function ExplorePage() {
                 <Tabs.Panel value="posts" pt="md">
                     {debounced.length > 0 ? (
                         isSearchingThreads ? (
-                            <BrandLoader size="sm" minHeight={150} />
+                            <SkeletonLoader type="threads" count={5} />
                         ) : threadResults && threadResults.length > 0 ? (
                             <ThreadFeed threads={threadResults} />
                         ) : (

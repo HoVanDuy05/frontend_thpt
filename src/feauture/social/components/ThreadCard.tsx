@@ -1,13 +1,10 @@
 import React from 'react';
-import { Card, Text, Group, ActionIcon, Stack, Image, Box, Divider } from '@mantine/core';
+import { Card, Text, Group, ActionIcon, Stack, Image, Box, Divider, UnstyledButton } from '@mantine/core';
 import { UserAvatar } from './UserAvatar';
-import { IconHeart, IconMessageCircle, IconRepeat, IconShare, IconHeartFilled } from '@tabler/icons-react';
+import { IconHeart, IconMessageCircle, IconRepeat, IconShare, IconHeartFilled, IconUsers } from '@tabler/icons-react';
 import { Thread } from '../types';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import { useRouter, usePathname } from '@/i18n/routing';
-
-dayjs.extend(relativeTime);
+import { formatSocialTime } from '@/shared/utils/social.util';
 
 import { AppMutation } from '@/api/AppMutation';
 import { notifications } from '@mantine/notifications';
@@ -19,7 +16,7 @@ interface ThreadCardProps {
 
 export const ThreadCard: React.FC<ThreadCardProps> = ({ thread: initialThread }) => {
     const t = useTranslations('social');
-    const likeMutation = AppMutation().social.useLikeThread(initialThread.id);
+    const likeMutation = AppMutation().social.useLikeThread();
     const [thread, setThread] = React.useState(initialThread);
     const router = useRouter();
     const pathname = usePathname();
@@ -29,43 +26,7 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({ thread: initialThread })
         setThread(initialThread);
     }, [initialThread]);
 
-    const formatTimeAgo = (date: string) => {
-        const now = dayjs();
-        const then = dayjs(date);
-        const diffInSeconds = now.diff(then, 'second');
 
-        if (diffInSeconds < 60) {
-            return t('time.just_now');
-        }
-
-        const diffInMinutes = now.diff(then, 'minute');
-        if (diffInMinutes < 60) {
-            return t('time.minutes', { count: diffInMinutes }) + (t('time.suffix') ? ` ${t('time.suffix')}` : '');
-        }
-
-        const diffInHours = now.diff(then, 'hour');
-        if (diffInHours < 24) {
-            return t('time.hours', { count: diffInHours }) + (t('time.suffix') ? ` ${t('time.suffix')}` : '');
-        }
-
-        const diffInDays = now.diff(then, 'day');
-        if (diffInDays < 7) {
-            return t('time.days', { count: diffInDays }) + (t('time.suffix') ? ` ${t('time.suffix')}` : '');
-        }
-
-        const diffInWeeks = now.diff(then, 'week');
-        if (diffInWeeks < 4) {
-            return t('time.weeks', { count: diffInWeeks }) + (t('time.suffix') ? ` ${t('time.suffix')}` : '');
-        }
-
-        const diffInMonths = now.diff(then, 'month');
-        if (diffInMonths < 12) {
-            return t('time.months', { count: diffInMonths }) + (t('time.suffix') ? ` ${t('time.suffix')}` : '');
-        }
-
-        const diffInYears = now.diff(then, 'year');
-        return t('time.years', { count: diffInYears }) + (t('time.suffix') ? ` ${t('time.suffix')}` : '');
-    };
 
     const handleLike = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -82,7 +43,7 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({ thread: initialThread })
             }
         }));
 
-        likeMutation.mutate(undefined, {
+        likeMutation.mutate({ urlParams: { id: thread.id } }, {
             onError: () => {
                 // Revert on error
                 setThread(prev => ({
@@ -128,7 +89,7 @@ export const ThreadCard: React.FC<ThreadCardProps> = ({ thread: initialThread })
                             </Text>
                             <Text size="xs" c="dimmed">•</Text>
                             <Text size="xs" c="dimmed" fw={500} className="tracking-tight">
-                                {formatTimeAgo(thread.ngayTao)}
+                                {formatSocialTime(thread.ngayTao, t)}
                             </Text>
                         </Group>
                     </Group>

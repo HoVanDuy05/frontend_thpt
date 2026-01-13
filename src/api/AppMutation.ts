@@ -290,15 +290,18 @@ export const AppMutation = () => {
                     queryClient.invalidateQueries({ queryKey: ["/social/feed"] as any });
                 }
             }),
-            useLikeThread: (id: number) => useAppMutation<"likeThread">({
-                url: { baseUrl: "/social/threads/:id/like", urlParams: { id } },
-                onSuccess: () => {
+            useLikeThread: () => useAppMutation<"likeThread">({
+                url: { baseUrl: "/social/threads/:id/like" },
+                onSuccess: (_data, payload) => {
+                    const id = payload?.urlParams?.id;
                     queryClient.invalidateQueries({ queryKey: ["/social/feed"] as any });
-                    queryClient.invalidateQueries({ queryKey: ["/social/threads", id] as any });
+                    if (id) {
+                        queryClient.invalidateQueries({ queryKey: ["/social/threads", id] as any });
+                    }
                 }
             }),
-            useFollowUser: (id: number) => useAppMutation<"followUser">({
-                url: { baseUrl: "/social/users/:id/follow", urlParams: { id } },
+            useFollowUser: () => useAppMutation<"followUser">({
+                url: { baseUrl: "/social/users/:id/follow" },
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["/social/feed"] as any });
                 }

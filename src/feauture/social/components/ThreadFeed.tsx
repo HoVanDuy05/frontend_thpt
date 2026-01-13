@@ -8,6 +8,7 @@ import { Link, useRouter, usePathname } from '@/i18n/routing';
 import { useAppStore } from '@/providers/store/useAppStore';
 import { useSearchParams } from 'next/navigation';
 import { UserAvatar } from './UserAvatar';
+import { SkeletonLoader } from '@/shared/components/SkeletonLoader';
 
 interface ThreadFeedProps {
     threads?: Thread[];
@@ -32,20 +33,7 @@ export const ThreadFeed: React.FC<ThreadFeedProps> = ({
     };
 
     if (isLoading && !initialThreads) {
-        return (
-            <Stack gap="md">
-                {[1, 2, 3, 4, 5].map((i) => (
-                    <Paper key={i} p="md" withBorder={false} style={{ borderBottom: '1px solid var(--mantine-color-default-border)' }}>
-                        <Group gap="sm" mb="sm">
-                            <Skeleton height={40} circle />
-                            <Skeleton height={20} width="30%" />
-                        </Group>
-                        <Skeleton height={80} mb="sm" radius="md" />
-                        <Skeleton height={20} width="50%" />
-                    </Paper>
-                ))}
-            </Stack>
-        );
+        return <SkeletonLoader type="threads" count={5} />;
     }
 
     const EmptyFeed = () => (

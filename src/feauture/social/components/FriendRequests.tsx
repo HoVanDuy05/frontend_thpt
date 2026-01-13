@@ -18,8 +18,10 @@ import { IconUserPlus, IconUserCheck, IconUserX, IconCheck, IconX, IconSend } fr
 import { FriendRequest } from "../types";
 import { AppQuery } from "@/api/AppQuery";
 import { AppMutation } from "@/api/AppMutation";
-import { BrandLoader } from "@/shared/components/BrandLoader";
+import { SkeletonLoader } from "@/shared/components/SkeletonLoader";
 import { useTranslations } from "next-intl";
+import { formatRelativeTime } from "@/shared/utils/date.util";
+import dayjs from "dayjs";
 
 // Separate component to handle hooks properly
 function RequestCard({ request, type }: { request: FriendRequest; type: 'received' | 'sent' }) {
@@ -55,81 +57,72 @@ function RequestCard({ request, type }: { request: FriendRequest; type: 'receive
     };
 
     return (
-        <Card radius="xl" shadow="sm" p="md" className="bg-white dark:bg-zinc-900 border-zinc-100 dark:border-zinc-800 hover:shadow-md transition-all duration-300">
-            <Group justify="space-between" wrap="nowrap" gap="md">
-                <Group gap="sm" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
-                    <Box className="relative flex-shrink-0">
-                        <Avatar
-                            src={user.avatar}
-                            size={52}
-                            radius="xl"
-                            className="border-2 border-white dark:border-zinc-800 shadow-sm"
-                        >
-                            {user.hoTen?.charAt(0) || user.taiKhoan.charAt(0)}
-                        </Avatar>
-                        <Box
-                            className="absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-zinc-900 bg-green-500"
-                        />
-                    </Box>
-                    <Box style={{ flex: 1, minWidth: 0 }}>
-                        <Text fw={700} size="sm" className="text-zinc-900 dark:text-zinc-100 truncate">
-                            {user.hoTen || user.taiKhoan}
-                        </Text>
-                        <Group gap={6} align="center" wrap="nowrap">
-                            <Text size="xs" fw={500} className="text-zinc-500 dark:text-zinc-400 truncate">
-                                @{user.taiKhoan}
-                            </Text>
-                            {type === 'received' && (
-                                <Badge size="xs" variant="gradient" gradient={{ from: 'indigo', to: 'cyan' }} className="rounded-sm px-1 h-3.5 scale-90 border-0">
-                                    {t('new')}
-                                </Badge>
-                            )}
-                        </Group>
-                    </Box>
+        <Group align="flex-start" gap="md" py="sm" wrap="nowrap" className="hover:bg-zinc-50 dark:hover:bg-zinc-900/40 rounded-xl px-2 transition-colors duration-200">
+            <Avatar
+                src={user.avatar}
+                size={86}
+                radius="xl"
+                className="flex-shrink-0"
+            >
+                {user.hoTen?.charAt(0) || user.taiKhoan.charAt(0)}
+            </Avatar>
+
+            <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
+                <Group justify="space-between" wrap="nowrap" align="flex-start">
+                    <Text fw={700} size="md" className="text-zinc-900 dark:text-zinc-100 truncate pb-1">
+                        {user.hoTen || user.taiKhoan}
+                    </Text>
+                    <Text size="xs" c="dimmed" className="flex-shrink-0 pt-0.5">
+                        {formatRelativeTime(request.ngayTao)}
+                    </Text>
                 </Group>
 
-                <Group gap={6} wrap="nowrap" className="flex-shrink-0">
+                <Text size="xs" c="dimmed" mb={4}>
+                    @{user.taiKhoan}
+                </Text>
+
+                <Group gap="xs" mt={2} grow wrap="nowrap">
                     {type === 'received' ? (
                         <>
                             <Button
-                                size="compact-xs"
+                                fullWidth
+                                size="sm"
                                 variant="filled"
-                                color="indigo"
-                                radius="xl"
                                 onClick={handleAcceptRequest}
                                 loading={mutation.isPending}
-                                className="h-8 px-4 text-xs font-bold shadow-sm shadow-indigo-500/20"
+                                radius="md"
+                                className="h-9 font-bold bg-[#1877F2] hover:bg-[#166fe5]"
                             >
                                 {t('accept')}
                             </Button>
-                            <ActionIcon
-                                size="md"
-                                variant="subtle"
-                                color="gray"
-                                radius="xl"
+                            <Button
+                                fullWidth
+                                size="sm"
+                                variant="filled"
                                 onClick={handleDeclineRequest}
                                 loading={mutation.isPending}
-                                className="h-8 w-8 bg-zinc-50 dark:bg-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+                                radius="md"
+                                className="h-9 font-bold bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-300 dark:hover:bg-zinc-700 active:scale-95 transition-transform"
                             >
-                                <IconX size={16} />
-                            </ActionIcon>
+                                {t('decline')}
+                            </Button>
                         </>
                     ) : (
                         <Button
-                            size="compact-xs"
-                            variant="light"
-                            color="gray"
-                            radius="xl"
+                            fullWidth
+                            size="sm"
+                            variant="filled"
                             onClick={handleCancelRequest}
                             loading={mutation.isPending}
-                            className="h-8 px-4 text-xs font-bold hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                            radius="md"
+                            className="h-9 font-bold bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-300 dark:hover:bg-zinc-700 active:scale-95 transition-transform"
                         >
                             {t('cancel')}
                         </Button>
                     )}
                 </Group>
-            </Group>
-        </Card>
+            </Stack>
+        </Group>
     );
 }
 
@@ -141,12 +134,11 @@ export function FriendRequests() {
     const receivedRequestsQuery = AppQuery.friends.useReceivedRequests();
     const sentRequestsQuery = AppQuery.friends.useSentRequests();
 
-    const isLoading = receivedRequestsQuery.isLoading || sentRequestsQuery.isLoading;
-    const error = receivedRequestsQuery.error || sentRequestsQuery.error;
+    // Move loading state inside return to keep header visible
+    const isLoading = (activeTab === 'received' && receivedRequestsQuery.isLoading) ||
+        (activeTab === 'sent' && sentRequestsQuery.isLoading);
 
-    if (isLoading) {
-        return <BrandLoader minHeight={300} />;
-    }
+    const error = receivedRequestsQuery.error || sentRequestsQuery.error;
 
     if (error) {
         return (
@@ -157,16 +149,16 @@ export function FriendRequests() {
     }
 
     return (
-        <Stack gap="xl" className="pb-20 mt-4">
-            {/* Header section */}
-            <Box>
-                <Title order={2} className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-3">
-                    <Box className="p-2.5 bg-indigo-50 dark:bg-indigo-950/30 rounded-2xl text-indigo-600 dark:text-indigo-400 shadow-sm shadow-indigo-500/10">
-                        <IconUserPlus size={24} stroke={2.5} />
-                    </Box>
-                    {t('title')}
-                </Title>
-            </Box>
+        <Stack gap="md" className="pb-20 mt-4 px-1">
+            {/* Simple Header */}
+            <Group justify="space-between" align="center" px="xs" mb={4}>
+                <Text fw={800} size="xl" className="text-zinc-900 dark:text-white">
+                    {t('title')} ({receivedRequestsQuery.data?.length || 0})
+                </Text>
+                <Text fw={600} size="sm" component="a" className="text-indigo-600 dark:text-indigo-400 cursor-pointer hover:underline">
+                    {t('sort')}
+                </Text>
+            </Group>
 
             {/* Tabs section */}
             <Tabs
@@ -176,8 +168,9 @@ export function FriendRequests() {
                 radius="xl"
                 classNames={{
                     root: 'w-full',
-                    list: 'bg-zinc-50 dark:bg-zinc-900/50 p-1.5 mb-8 border border-zinc-100 dark:border-zinc-800',
-                    tab: 'flex-1 py-2 font-bold transition-all duration-300 text-zinc-500 dark:text-zinc-400 data-[active]:bg-indigo-600 dark:data-[active]:bg-indigo-500 data-[active]:text-white data-[active]:shadow-md data-[active]:shadow-indigo-500/20'
+                    list: 'bg-transparent p-0 gap-2 overflow-x-auto no-scrollbar mb-6 border-0',
+                    tab: 'px-4 py-2 font-bold transition-all duration-300 text-zinc-500 dark:text-zinc-400 border-0 bg-zinc-100 dark:bg-zinc-900/50 data-[active]:bg-indigo-600 dark:data-[active]:bg-indigo-500 data-[active]:text-white data-[active]:shadow-md data-[active]:shadow-indigo-500/20 rounded-full',
+                    tabLabel: 'flex items-center gap-2'
                 }}
             >
                 <Tabs.List>
@@ -185,34 +178,44 @@ export function FriendRequests() {
                         value="received"
                         leftSection={<IconUserCheck size={18} />}
                     >
-                        {t('tabs.received')}
-                        {receivedRequestsQuery.data && receivedRequestsQuery.data.length > 0 && (
-                            <Badge
-                                size="xs"
-                                circle
-                                ml="xs"
-                                color="indigo"
-                                className="shadow-sm shadow-indigo-500/20"
-                            >
-                                {receivedRequestsQuery.data.length}
-                            </Badge>
-                        )}
+                        <Group gap={6} wrap="nowrap">
+                            {t('tabs.received')}
+                            {receivedRequestsQuery.data && receivedRequestsQuery.data.length > 0 && (
+                                <Badge
+                                    size="xs"
+                                    variant={activeTab === 'received' ? 'white' : 'filled'}
+                                    color={activeTab === 'received' ? 'indigo' : 'red'}
+                                    className={`h-4 min-w-[16px] p-0 px-1 text-[10px] font-bold rounded-full ${activeTab === 'received' ? 'text-indigo-600' : 'text-white'}`}
+                                >
+                                    {receivedRequestsQuery.data.length}
+                                </Badge>
+                            )}
+                        </Group>
                     </Tabs.Tab>
                     <Tabs.Tab
                         value="sent"
                         leftSection={<IconSend size={18} />}
                     >
-                        {t('tabs.sent')}
-                        {sentRequestsQuery.data && sentRequestsQuery.data.length > 0 && (
-                            <Badge size="xs" circle ml="xs" color="gray">
-                                {sentRequestsQuery.data.length}
-                            </Badge>
-                        )}
+                        <Group gap={6} wrap="nowrap">
+                            {t('tabs.sent')}
+                            {sentRequestsQuery.data && sentRequestsQuery.data.length > 0 && (
+                                <Badge
+                                    size="xs"
+                                    variant={activeTab === 'sent' ? 'white' : 'filled'}
+                                    color={activeTab === 'sent' ? 'indigo' : 'zinc'}
+                                    className={`h-4 min-w-[16px] p-0 px-1 text-[10px] font-bold rounded-full ${activeTab === 'sent' ? 'text-indigo-600' : 'text-white bg-zinc-400'}`}
+                                >
+                                    {sentRequestsQuery.data.length}
+                                </Badge>
+                            )}
+                        </Group>
                     </Tabs.Tab>
                 </Tabs.List>
 
                 <Tabs.Panel value="received">
-                    {receivedRequestsQuery.data && receivedRequestsQuery.data.length > 0 ? (
+                    {receivedRequestsQuery.isLoading ? (
+                        <SkeletonLoader type="users" count={5} />
+                    ) : receivedRequestsQuery.data && receivedRequestsQuery.data.length > 0 ? (
                         <Stack gap="xs">
                             {receivedRequestsQuery.data.map(request => (
                                 <RequestCard key={request.id} request={request} type="received" />
@@ -234,7 +237,9 @@ export function FriendRequests() {
                 </Tabs.Panel>
 
                 <Tabs.Panel value="sent">
-                    {sentRequestsQuery.data && sentRequestsQuery.data.length > 0 ? (
+                    {sentRequestsQuery.isLoading ? (
+                        <SkeletonLoader type="users" count={5} />
+                    ) : sentRequestsQuery.data && sentRequestsQuery.data.length > 0 ? (
                         <Stack gap="xs">
                             {sentRequestsQuery.data.map(request => (
                                 <RequestCard key={request.id} request={request} type="sent" />

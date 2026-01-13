@@ -1,9 +1,10 @@
 "use client";
 
-import { Center, Loader } from "@mantine/core";
+import { SkeletonLoader } from "@/shared/components/SkeletonLoader";
 import { useAppStore } from "@/providers/store/useAppStore";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { Box, Container } from "@mantine/core";
 
 export default function ProfilePage() {
     const { user } = useAppStore();
@@ -16,8 +17,8 @@ export default function ProfilePage() {
     }, [router, user?.id]);
 
     return (
-        <Center h="50vh">
-            <Loader color="indigo" />
-        </Center>
+        <Container size="sm" py="xl">
+            <SkeletonLoader type="threads" count={3} />
+        </Container>
     );
 }

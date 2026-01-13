@@ -147,6 +147,11 @@
                 "received_at": "Received on {date}",
                 "sent_at": "Sent on {date}"
             },
+            "sort": "Sort",
+            "sort_by": {
+                "newest": "Newest",
+                "oldest": "Oldest"
+            },
             "empty": {
                 "received_title": "No requests yet",
                 "received_subtitle": "You don't have any pending friend requests to see",
@@ -371,8 +376,15 @@
         }
     },
     "validation": {
-        "email_đã_được_sử_dụng": "This email is already in use",
+        "unauthorized": "Authentication failed",
+        "unknown_error": "An error occurred. Please try again.",
+        "email_in_use": "This email is already in use",
         "invalid_credentials": "Invalid login credentials",
+        "invalid_token": "Invalid token",
+        "user_not_found": "User not found",
+        "token_expired": "Token expired or invalid",
+        "invalid_avatar": "Invalid avatar",
+        "invalid_user_id": "Invalid user ID",
         "required": "This field is required",
         "minLength": "Minimum {{min}} characters",
         "maxLength": "Maximum {{max}} characters",
@@ -487,9 +499,14 @@
     "profile": {
         "edit": "Edit",
         "share": "Share",
+        "add_friend": "Add friend",
+        "is_friend": "Friends",
         "follow": "Follow",
         "following": "Following",
         "sentRequest": "Request sent",
+        "cancel_request": "Cancel request",
+        "unfriend": "Unfriend",
+        "unfollow": "Unfollow",
         "accept": "Accept",
         "blocked": "Blocked",
         "message": "Message",

@@ -81,11 +81,15 @@ export const AppQuery = {
         useSearch: (q: string, params?: { limit?: number }, options?: AppQueryOptions<"getSocialSearch">) =>
             useAppQuery({ url: { baseUrl: "/social/search", queryParams: { q, ...params } }, options }),
         useSocialProfile: (id: number, options?: AppQueryOptions<"getSocialProfile">) =>
-            useAppQuery({ url: { baseUrl: "/social/users/profile/:id", urlParams: { id } }, options }),
+            useAppQuery({ url: { baseUrl: "/social/profile/:id", urlParams: { id } }, options }),
         useActivity: (params?: { limit?: number }, options?: AppQueryOptions<"getSocialActivity">) =>
             useAppQuery({ url: { baseUrl: "/social/activity", queryParams: params }, options }),
         useThreadDetail: (id: number, options?: AppQueryOptions<"getThreadDetail">) =>
             useAppQuery({ url: { baseUrl: "/social/threads/:id", urlParams: { id } }, options }),
+        useTrending: (options?: AppQueryOptions<"getTrending">) =>
+            useAppQuery({ url: { baseUrl: "/social/trending" }, options }),
+        useSuggestedUsers: (params?: { limit?: number }, options?: AppQueryOptions<"getSuggestedUsers">) =>
+            useAppQuery({ url: { baseUrl: "/social/suggested-users", queryParams: params }, options }),
     },
     friends: {
         useSearch: (q: string, options?: AppQueryOptions<"searchFriends">) =>
