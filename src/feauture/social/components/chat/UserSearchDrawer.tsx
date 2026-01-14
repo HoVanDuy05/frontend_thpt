@@ -17,22 +17,27 @@ interface UserSearchDrawerProps {
 }
 
 const UserItem = ({ user, onClick, fontStyle }: { user: TUser, onClick: () => void, fontStyle: any }) => (
-    <Group
-        wrap="nowrap"
-        p="sm"
-        className="cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-900 rounded-xl group"
-        onClick={onClick}
+    <button
+        type="button"
+        className="w-full p-3 cursor-pointer transition-all duration-200 hover:bg-gray-50 dark:hover:bg-zinc-900 rounded-xl group text-left"
+        onClick={(e: React.MouseEvent) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onClick();
+        }}
     >
-        <Avatar src={user.avatar} size={48} radius="xl" className="group-hover:scale-105 transition-transform" />
-        <Stack gap={2} style={{ flex: 1, overflow: 'hidden' }}>
-            <Text size="sm" fw={600} className="text-gray-900 dark:text-gray-200" style={fontStyle}>
-                {user.hoTen || user.taiKhoan}
-            </Text>
-            <Text size="xs" c="dimmed" truncate style={fontStyle}>
-                {user.email || (user.vaiTro === 'HOC_SINH' ? 'Học sinh' : user.vaiTro)}
-            </Text>
-        </Stack>
-    </Group>
+        <Group wrap="nowrap" gap="sm">
+            <Avatar src={user.avatar} size={48} radius="xl" className="group-hover:scale-105 transition-transform" />
+            <Stack gap={2} style={{ flex: 1, overflow: 'hidden' }}>
+                <Text size="sm" fw={600} className="text-gray-900 dark:text-gray-200" style={fontStyle}>
+                    {user.hoTen || user.taiKhoan}
+                </Text>
+                <Text size="xs" c="dimmed" truncate style={fontStyle}>
+                    {user.email || (user.vaiTro === 'HOC_SINH' ? 'Học sinh' : user.vaiTro)}
+                </Text>
+            </Stack>
+        </Group>
+    </button>
 );
 
 export const UserSearchDrawer = ({

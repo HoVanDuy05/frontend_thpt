@@ -166,21 +166,28 @@ export default function UserProfilePage() {
                     />
                 </Group>
 
-                {/* Bio (Currently using default text if no bio field, assuming 'description' or using a placeholder) */}
+                {/* Bio Section */}
                 <Box mt="md">
-                    {profile.hoSoGiaoVien?.chuyenMon ? (
-                        <Text className="text-gray-900 dark:text-gray-100">
-                            Giáo viên - {profile.hoSoGiaoVien.chuyenMon}
-                        </Text>
-                    ) : profile.vaiTro === 'HOC_SINH' && profile.hoSoHocSinh?.lopHoc ? (
-                        <Text className="text-gray-900 dark:text-gray-100">
-                            Học sinh lớp {profile.hoSoHocSinh.lopHoc.tenLop}
+                    {profile.hoSoXaHoi?.tieuSu ? (
+                        <Text className="text-gray-900 dark:text-gray-100 whitespace-pre-line">
+                            {profile.hoSoXaHoi.tieuSu}
                         </Text>
                     ) : (
-                        <Text className="text-gray-900 dark:text-gray-100">
-                            {/* Placeholder for bio if not available */}
-                            {t('no_info')}
-                        </Text>
+                        // Fallback to Academic Info if no Social Bio
+                        profile.hoSoGiaoVien?.chuyenMon ? (
+                            <Text className="text-gray-900 dark:text-gray-100">
+                                Giáo viên - {profile.hoSoGiaoVien.chuyenMon}
+                            </Text>
+                        ) : profile.vaiTro === 'HOC_SINH' && profile.hoSoHocSinh?.lopHoc ? (
+                            <Text className="text-gray-900 dark:text-gray-100">
+                                Học sinh lớp {profile.hoSoHocSinh.lopHoc.tenLop}
+                            </Text>
+                        ) : (
+                            <Text c="dimmed" fs="italic">
+                                {/* Placeholder for bio if not available */}
+                                {t('no_info')}
+                            </Text>
+                        )
                     )}
                 </Box>
 

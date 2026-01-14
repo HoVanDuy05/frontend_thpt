@@ -328,6 +328,7 @@
             "no_account": "No account?",
             "register_link": "Register now",
             "download_app": "Download NHers App",
+            "account_not_activated": "Your account is not activated. Please verify your email.",
             "success": "Login successful",
             "error": "Login failed",
             "welcome_back": "Welcome back, {name}!",
@@ -348,8 +349,20 @@
             "have_account": "Already have an account?",
             "login_link": "Sign In",
             "or": "or",
-            "success_message": "Your account has been created successfully! Please sign in.",
+            "fullname": "Full Name",
+            "phone": "Phone Number",
+            "success_message": "Registration successful! Please check your email for the activation code.",
             "error_message": "Unable to create account. Please try again."
+        },
+        "verify": {
+            "title": "Account Verification",
+            "subtitle": "We've sent a 6-digit verification code to {email}",
+            "code_label": "Verification Code",
+            "submit": "Verify Account",
+            "resend_text": "Didn't receive the code?",
+            "resend_link": "Resend code",
+            "success": "Activation successful!",
+            "error": "Incorrect verification code"
         },
         "forgot": {
             "title": "Forgot Password",
@@ -380,6 +393,10 @@
         "unknown_error": "An error occurred. Please try again.",
         "email_in_use": "This email is already in use",
         "invalid_credentials": "Invalid login credentials",
+        "account_not_activated": "Account is not activated",
+        "invalid_verification_code": "Incorrect verification code",
+        "activation_success": "Account activation successful",
+        "code_resent": "Verification code has been resent",
         "invalid_token": "Invalid token",
         "user_not_found": "User not found",
         "token_expired": "Token expired or invalid",
@@ -720,6 +737,101 @@
             "update_body": "Update now to experience the latest features.",
             "update_btn": "Update",
             "update_native_body": "Tap to update now."
+        }
+    },
+    "student_flow": {
+        "title": "Approval Request List",
+        "subtitle": "Manage and track the status of submitted records",
+        "sections": {
+            "my_flows": "MY REQUESTS",
+            "categories": "Digital Service Categories",
+            "explore_categories": "Explore Service Categories",
+            "flows_in_category": "Procedures in {name}"
+        },
+        "common": {
+            "status": {
+                "pending": "Pending"
+            },
+            "actions": {
+                "create": "Create Request",
+                "search": "Search..."
+            }
+        },
+        "tabs": {
+            "all": "All",
+            "pending": "Pending",
+            "completed": "Completed",
+            "rejected": "Rejected"
+        },
+        "empty": {
+            "title": "YOU HAVE NO REQUESTS",
+            "subtitle": "Start by creating a new approval process to track your work progress.",
+            "action": "Initialize Now"
+        },
+        "drawer": {
+            "header": {
+                "categories": "Digital Service Categories",
+                "flows": "Select Processing Procedure",
+                "register": "Service Registration"
+            },
+            "placeholders": {
+                "search_categories": "Search categories...",
+                "search_flows": "Search procedures..."
+            },
+            "category_card": {
+                "available_count": "{count} Available Procedures"
+            }
+        },
+        "stats": {
+            "total_flows": "Total Records",
+            "today_trend": "+2 today",
+            "priority": "Priority",
+            "completed": "Completed",
+            "note": "Note"
+        },
+        "table": {
+            "header_flow": "Timeline",
+            "header_submitter": "Submitter",
+            "header_date": "Submission Date",
+            "header_status": "Status",
+            "header_objective": "Objective"
+        },
+        "form": {
+            "stepper": {
+                "flow": "Flow",
+                "data": "Data"
+            },
+            "info": {
+                "title": "Record Information",
+                "preparation": "Preparation",
+                "ready_msg": "Your record is ready to be initialized. Please carefully check the processing flow below before continuing.",
+                "default_desc": "Administrative procedures supported by automation."
+            },
+            "steps": {
+                "title": "Processing Flow",
+                "approver_role": "APPROVER ROLE",
+                "rule_all": "■ Collective Approval",
+                "rule_any": "■ Unilateral Approval",
+                "empty": "NO FLOW DATA"
+            },
+            "input": {
+                "title": "Input Information",
+                "subtitle": "Accuracy directly affects approval results.",
+                "placeholder": "Enter {name}...",
+                "empty_fields": "NO ADDITIONAL DATA REQUIRED"
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "back": "Back",
+                "continue": "Continue",
+                "submit": "Submit Record"
+            }
+        },
+        "notifications": {
+            "success_title": "Request Submitted Successfully",
+            "success_msg": "Your request has been submitted and is pending approval.",
+            "error_title": "Request Submission Failed",
+            "error_msg": "An error occurred. Please try again later."
         }
     }
 }

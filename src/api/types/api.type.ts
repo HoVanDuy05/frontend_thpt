@@ -262,7 +262,17 @@ export type ApiMutationType = {
     };
     register: {
         url: { baseUrl: "/auth/register" };
-        payload: { email: string; matKhau: string };
+        payload: { email: string; matKhau: string; hoTen: string; soDienThoai: string };
+        response: { message: string };
+    };
+    verifyCode: {
+        url: { baseUrl: "/auth/verify" };
+        payload: { email: string; code: string };
+        response: { message: string };
+    };
+    resendCode: {
+        url: { baseUrl: "/auth/resend-code" };
+        payload: { email: string };
         response: { message: string };
     };
     forgotPassword: {
@@ -283,7 +293,7 @@ export type ApiMutationType = {
     uploadAvatar: {
         url: { baseUrl: "/auth/avatar" };
         payload: FormData;
-        response: { avatar: string };
+        response: TUser;
     };
     markNotificationAsRead: {
         url: { baseUrl: "/communication/notifications/:id/read"; urlParams: { id: number } };

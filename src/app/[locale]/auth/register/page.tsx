@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { useRouter, Link } from "@/i18n/routing";
 import { AppMutation } from "@/api/AppMutation";
 import { notifications } from "@mantine/notifications";
-import { IconCheck, IconX, IconLock, IconUser, IconSchool, IconChevronRight, IconMail } from "@tabler/icons-react";
+import { IconCheck, IconX, IconLock, IconUser, IconSchool, IconChevronRight, IconMail, IconDeviceMobile } from "@tabler/icons-react";
 import { useValidation } from "@/shared/common/useValidation";
 import { useTranslationError } from "@/shared/common/useTranslationError";
 
@@ -19,20 +19,25 @@ export default function RegisterPage() {
 
     const form = useForm({
         initialValues: {
+            hoTen: "",
             email: "",
+            soDienThoai: "",
             matKhau: "",
             confirmPassword: "",
         },
         validate: {
+            hoTen: (value) => (value.length < 2 ? t("validation.fullname_too_short") : null),
             email: validate.email,
+            soDienThoai: (value) => (/^[0-9+]{10,15}$/.test(value) ? null : t("validation.phone_invalid")),
             matKhau: validate.password,
             confirmPassword: (value, values) => validate.confirmPassword(values.matKhau)(value),
         },
     });
 
     const handleSubmit = (values: typeof form.values) => {
+        const { confirmPassword, ...payload } = values;
         registerMutation.mutate(
-            { email: values.email, matKhau: values.matKhau },
+            payload,
             {
                 onSuccess: () => {
                     notifications.show({
@@ -41,7 +46,7 @@ export default function RegisterPage() {
                         color: "teal",
                         icon: <IconCheck size={16} />,
                     });
-                    router.push("/auth/login");
+                    router.push(`/auth/verify?email=${encodeURIComponent(values.email)}`);
                 },
                 onError: (error: any) => {
                     notifications.show({
@@ -92,6 +97,24 @@ export default function RegisterPage() {
                         <TextInput
                             label={
                                 <Text component="span" size="xs" fw={900} className="uppercase tracking-[0.15em] text-zinc-700 dark:text-zinc-300 whitespace-nowrap">
+                                    {t("fullname")} <Text component="span" c="red.6" ml={2}>*</Text>
+                                </Text>
+                            }
+                            placeholder="John Doe"
+                            withAsterisk={false}
+                            required
+                            size="md"
+                            {...form.getInputProps("hoTen")}
+                            leftSection={<IconUser size={18} stroke={2} className="text-zinc-400" />}
+                            classNames={{
+                                label: "mb-2.5",
+                                input: "h-[54px] rounded-[18px] border-zinc-200 dark:border-zinc-800 focus:border-indigo-500 bg-white dark:bg-zinc-900/50 shadow-sm text-[15px] font-bold transition-all placeholder:text-zinc-300 dark:placeholder:text-zinc-700 pl-12"
+                            }}
+                        />
+
+                        <TextInput
+                            label={
+                                <Text component="span" size="xs" fw={900} className="uppercase tracking-[0.15em] text-zinc-700 dark:text-zinc-300 whitespace-nowrap">
                                     {t("email")} <Text component="span" c="red.6" ml={2}>*</Text>
                                 </Text>
                             }
@@ -101,6 +124,24 @@ export default function RegisterPage() {
                             size="md"
                             {...form.getInputProps("email")}
                             leftSection={<IconMail size={18} stroke={2} className="text-zinc-400" />}
+                            classNames={{
+                                label: "mb-2.5",
+                                input: "h-[54px] rounded-[18px] border-zinc-200 dark:border-zinc-800 focus:border-indigo-500 bg-white dark:bg-zinc-900/50 shadow-sm text-[15px] font-bold transition-all placeholder:text-zinc-300 dark:placeholder:text-zinc-700 pl-12"
+                            }}
+                        />
+
+                        <TextInput
+                            label={
+                                <Text component="span" size="xs" fw={900} className="uppercase tracking-[0.15em] text-zinc-700 dark:text-zinc-300 whitespace-nowrap">
+                                    {t("phone")} <Text component="span" c="red.6" ml={2}>*</Text>
+                                </Text>
+                            }
+                            placeholder="0123456789"
+                            withAsterisk={false}
+                            required
+                            size="md"
+                            {...form.getInputProps("soDienThoai")}
+                            leftSection={<IconDeviceMobile size={18} stroke={2} className="text-zinc-400" />}
                             classNames={{
                                 label: "mb-2.5",
                                 input: "h-[54px] rounded-[18px] border-zinc-200 dark:border-zinc-800 focus:border-indigo-500 bg-white dark:bg-zinc-900/50 shadow-sm text-[15px] font-bold transition-all placeholder:text-zinc-300 dark:placeholder:text-zinc-700 pl-12"

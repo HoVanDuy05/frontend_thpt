@@ -23,18 +23,32 @@ export const AppMutation = () => {
             useResetPassword: () => useAppMutation<"resetPassword">({
                 url: { baseUrl: "/auth/reset-password" }
             }),
+            useVerifyCode: () => useAppMutation<"verifyCode">({
+                url: { baseUrl: "/auth/verify" },
+                method: "POST"
+            }),
+            useResendCode: () => useAppMutation<"resendCode">({
+                url: { baseUrl: "/auth/resend-code" },
+                method: "POST"
+            }),
             useUpdateProfile: () => useAppMutation<"updateProfile">({
                 url: { baseUrl: "/auth/profile" },
                 method: "PATCH",
-                onSuccess: () => {
+                onSuccess: (data) => {
                     queryClient.invalidateQueries({ queryKey: ["/auth/profile"] as any });
+                    if (data?.id) {
+                        queryClient.invalidateQueries({ queryKey: [`/social/profile/${data.id}`] as any });
+                    }
                 }
             }),
             useUploadAvatar: () => useAppMutation<"uploadAvatar">({
                 url: { baseUrl: "/auth/avatar" },
                 method: "POST",
-                onSuccess: () => {
+                onSuccess: (data) => {
                     queryClient.invalidateQueries({ queryKey: ["/auth/profile"] as any });
+                    if (data?.id) {
+                        queryClient.invalidateQueries({ queryKey: [`/social/profile/${data.id}`] as any });
+                    }
                 }
             }),
         },

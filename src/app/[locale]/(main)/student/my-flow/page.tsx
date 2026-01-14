@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
     Stack, Title, Text, Button, Tabs, Group,
     Badge, ThemeIcon, ActionIcon, Drawer, Box, Paper, LoadingOverlay,
@@ -8,24 +8,73 @@ import {
     SimpleGrid, Table, UnstyledButton
 } from "@mantine/core";
 import {
+    useMediaQuery,
+    useDebouncedValue
+} from "@mantine/hooks";
+import {
     IconPlus, IconFileDescription, IconClock, IconCheck, IconX,
     IconChevronRight, IconCalendar, IconChevronLeft, IconFiles,
     IconActivity, IconExternalLink, IconSearch, IconArrowRight,
-    IconTrendingUp, IconBriefcase, IconHistory
+    IconTrendingUp, IconBriefcase, IconHistory, IconAlertCircle
 } from "@tabler/icons-react";
 import { AppQuery } from "@/api/AppQuery";
 import { AppMutation } from "@/api/AppMutation";
 import { notifications } from "@mantine/notifications";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { TPhienQuyTrinh, TQuyTrinh, TTruongFormQuyTrinh, LoaiTruongForm } from "@/shared/types/approval.type";
-import { useMediaQuery } from "@mantine/hooks";
 import { dayjs } from "@/shared/utils/date.util";
+import { useTranslations } from "next-intl";
 
 export default function MyFlowPage() {
+    const t = useTranslations('student_flow');
     const router = useRouter();
-    const [activeTab, setActiveTab] = useState<string | null>("all");
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const [searchQuery, setSearchQuery] = useState("");
+    const pathname = usePathname();
+
+    const searchParams = useSearchParams();
+
+    // URL State management
+    const activeTab = searchParams.get("status") || "all";
+    const searchQuery = searchParams.get("q") || "";
+    const [inputValue, setInputValue] = useState(searchQuery);
+    const [debouncedSearch] = useDebouncedValue(inputValue, 300);
+
+    const updateParams = (updates: Record<string, string | null>) => {
+        const params = new URLSearchParams(searchParams.toString());
+        Object.entries(updates).forEach(([key, value]) => {
+            if (value === null) {
+                params.delete(key);
+            } else {
+                params.set(key, value);
+            }
+        });
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    };
+
+    const setActiveTab = (status: string) => updateParams({ status });
+
+    useEffect(() => {
+        updateParams({ q: debouncedSearch || null });
+    }, [debouncedSearch]);
+
+    // Update local input if URL changes externally
+    useEffect(() => {
+        setInputValue(searchQuery);
+    }, [searchQuery]);
+
+    const isDrawerOpen = searchParams.get("create") === "true";
+
+    const setIsDrawerOpen = (open: boolean) => {
+        if (open) {
+            updateParams({ create: 'true' });
+        } else {
+            updateParams({
+                create: null,
+                flowId: null,
+                categoryId: null,
+                step: null
+            });
+        }
+    };
 
     // Queries
     const { data: myFlows, isLoading: isLoadingFlows } = AppQuery.approvals.useMyFlows();
@@ -33,10 +82,10 @@ export default function MyFlowPage() {
 
     const getStatusConfig = (status: string) => {
         switch (status) {
-            case 'DA_DUYET': return { color: 'teal', label: 'Đã hoàn tất', icon: IconCheck };
-            case 'TU_CHOI': return { color: 'red', label: 'Từ chối', icon: IconX };
-            case 'DANG_XU_LY': return { color: 'blue', label: 'Đang xử lý', icon: IconActivity };
-            case 'CHO_DUYET': return { color: 'orange', label: 'Chờ duyệt', icon: IconClock };
+            case 'DA_DUYET': return { color: 'teal', label: t('tabs.completed'), icon: IconCheck };
+            case 'TU_CHOI': return { color: 'red', label: t('tabs.rejected'), icon: IconX };
+            case 'DANG_XU_LY': return { color: 'blue', label: t('common.status.pending'), icon: IconActivity };
+            case 'CHO_DUYET': return { color: 'orange', label: t('tabs.pending'), icon: IconClock };
             default: return { color: 'gray', label: status, icon: IconFileDescription };
         }
     };
@@ -53,204 +102,201 @@ export default function MyFlowPage() {
         return matchesTab && matchesSearch;
     });
 
-    const rows = filteredFlows?.map((flow: TPhienQuyTrinh, index: number) => {
-        const config = getStatusConfig(flow.trangThai);
-        return (
-            <Table.Tr
-                key={flow.id}
-                className="hover:bg-indigo-50/10 dark:hover:bg-indigo-500/5 cursor-pointer transition-all duration-300 group border-b border-gray-50 dark:border-zinc-800/50"
-                onClick={() => router.push(`./my-flow/${flow.id}`)}
-            >
-                <Table.Td>
-                    <Box className="flex items-center gap-4">
-                        <Box className="w-8 h-8 rounded-lg bg-gray-50 dark:bg-zinc-800 flex items-center justify-center text-[10px] fw-900 text-gray-400 font-mono group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                            {index + 1}
-                        </Box>
-                        <Text fw={850} size="xs" className="text-gray-400 font-mono tracking-tighter">CF-{flow.id.toString().padStart(6, '0')}</Text>
-                    </Box>
-                </Table.Td>
-                <Table.Td>
-                    <Stack gap={2}>
-                        <Text fw={900} size="sm" className="text-gray-900 dark:text-gray-100 group-hover:text-indigo-600 transition-colors uppercase tracking-tight leading-none">
-                            {flow.quyTrinh?.ten || "Yêu cầu hành chính"}
-                        </Text>
-                        <Group gap={6} mt={4}>
-                            <Badge variant="dot" color="gray" size="xs" radius="sm" fw={800} className="border-none bg-transparent px-0">{flow.quyTrinh?.danhMuc?.ten || "Hành chính"}</Badge>
-                            <Text size="10px" c="dimmed" fw={700}>•</Text>
-                            <Text size="10px" c="dimmed" fw={750} tt="uppercase" lts={0.5}>Mã: HS-{flow.id}</Text>
-                        </Group>
-                    </Stack>
-                </Table.Td>
-                <Table.Td>
-                    <Badge variant="light" color={config.color} size="md" radius="sm" fw={900} tt="uppercase" lts={1} className="h-8 px-4 border border-current/10">
-                        {config.label}
-                    </Badge>
-                </Table.Td>
-                <Table.Td>
-                    <Stack gap={2}>
-                        <Text size="sm" fw={850} className="text-gray-800 dark:text-gray-200 tabular-nums">
-                            {dayjs(flow.ngayTao).format("HH:mm")}
-                        </Text>
-                        <Text size="11px" fw={700} c="dimmed">
-                            {dayjs(flow.ngayTao).format("DD MMM, YYYY")}
-                        </Text>
-                    </Stack>
-                </Table.Td>
-                <Table.Td>
-                    <Text size="xs" fw={850} className="text-indigo-600 uppercase tracking-widest text-right">
-                        {dayjs(flow.ngayTao).fromNow()}
-                    </Text>
-                </Table.Td>
-                <Table.Td>
-                    <Group justify="flex-end">
-                        <Box className="w-10 h-10 rounded-xl bg-gray-50 dark:bg-zinc-800 flex items-center justify-center text-gray-400 group-hover:bg-indigo-600 group-hover:text-white group-hover:rotate-45 transition-all">
-                            <IconArrowRight size={18} stroke={3} />
-                        </Box>
-                    </Group>
-                </Table.Td>
-            </Table.Tr>
-        );
-    });
 
     return (
         <Box h="calc(100vh - 60px)" className="flex flex-col bg-[#fcfcfd] dark:bg-[#09090b] translate-z-0">
-            {/* Ultra-Premium Navigation Bar */}
-            <Box h={100} className="bg-white/90 dark:bg-zinc-950/90 backdrop-blur-2xl border-b border-gray-100 dark:border-zinc-800 px-6 md:px-12 flex items-center shrink-0 z-40 relative">
+            {/* Optimized Navigation Bar */}
+            <Box className="h-[70px] sm:h-[90px] bg-white/90 dark:bg-zinc-950/90 backdrop-blur-2xl border-b border-gray-100 dark:border-zinc-800 px-4 md:px-8 flex items-center shrink-0 z-40 relative">
                 <Box className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent" />
                 <Group justify="space-between" className="w-full max-w-7xl mx-auto">
-                    <Group gap="xl">
+                    <Group className="gap-2 sm:gap-4">
                         <Box className="relative group">
-                            <Box className="absolute -inset-2 bg-indigo-500/20 rounded-2xl blur-xl group-hover:bg-indigo-500/30 transition-all opacity-0 group-hover:opacity-100" />
-                            <Group gap="md" className="relative">
-                                <Box className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-xl shadow-indigo-200">
-                                    <IconFiles size={24} stroke={2.5} />
+                            <Group className="gap-2 sm:gap-4 relative">
+                                <Box className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg">
+                                    <IconFiles size={20} stroke={2.5} />
                                 </Box>
                                 <div>
-                                    <Title order={3} fw={900} className="tracking-tighter text-gray-900 dark:text-gray-50 leading-none">Smart Portal</Title>
-                                    <Text size="xs" fw={800} tt="uppercase" lts={1.5} className="text-indigo-600 mt-1">Dịch vụ một cửa số</Text>
+                                    <Title order={4} fw={900} className="tracking-tight text-gray-900 dark:text-gray-50 leading-none text-sm sm:text-base">Smart Portal</Title>
+                                    <Text size="10px" fw={700} tt="uppercase" lts={1} className="text-indigo-600 mt-0.5 hidden sm:block">{t('drawer.header.categories')}</Text>
                                 </div>
                             </Group>
                         </Box>
                     </Group>
 
-                    <Group gap="md">
+                    <Group gap="xs">
                         <Button
-                            leftSection={<IconPlus size={20} stroke={3} />}
+                            leftSection={<IconPlus size={18} stroke={3} />}
                             variant="filled"
                             color="indigo"
-                            radius="100px"
-                            h={52}
-                            px={32}
+                            radius="xl"
+                            h={40}
                             onClick={() => setIsDrawerOpen(true)}
-                            className="shadow-2xl shadow-indigo-200 hover:shadow-indigo-300 transition-all active:scale-95 fw-900 text-sm uppercase tracking-wider"
+                            className="shadow-lg hover:shadow-xl transition-all active:scale-95 fw-800 text-xs sm:text-sm sm:h-12 px-4 sm:px-6"
                         >
-                            Tạo đề xuất mới
+                            <span className="hidden sm:inline">{t('empty.action')}</span>
+                            <span className="sm:hidden">{t('common.actions.create')}</span>
                         </Button>
                     </Group>
                 </Group>
             </Box>
 
             <ScrollArea className="flex-1" type="scroll">
-                <Box className="max-w-7xl mx-auto p-6 md:p-12 pb-32">
-                    <Stack gap={56}>
-                        {/* Summary Section - Masterpiece Edition */}
+                <Box className="max-w-7xl mx-auto p-4 md:p-8 pb-20">
+                    <Stack className="gap-8 sm:gap-12">
+                        {/* Summary Section - Mobile Optimized */}
                         {!isLoadingFlows && myFlows && (
-                            <SimpleGrid cols={{ base: 1, sm: 2, lg: 4 }} spacing="xl">
+                            <SimpleGrid cols={{ base: 2, sm: 2, lg: 4 }} className="gap-2 sm:gap-4">
                                 {[
-                                    { label: 'Tổng số hồ sơ', value: myFlows.length, color: 'indigo', icon: IconBriefcase, trend: '+2 hôm nay' },
-                                    { label: 'Đang chờ xử lý', value: myFlows.filter((f: TPhienQuyTrinh) => f.trangThai === 'CHO_DUYET').length, color: 'blue', icon: IconClock, trend: 'Ưu tiên' },
-                                    { label: 'Đã được duyệt', value: myFlows.filter((f: TPhienQuyTrinh) => f.trangThai === 'DA_DUYET').length, color: 'teal', icon: IconCheck, trend: 'Hoàn tất' },
-                                    { label: 'Cần xem lại', value: myFlows.filter((f: TPhienQuyTrinh) => f.trangThai === 'TU_CHOI').length, color: 'red', icon: IconHistory, trend: 'Lưu ý' },
-                                ].map((s, i) => (
-                                    <Paper key={i} withBorder radius="32px" p={32} className="border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 group hover:border-indigo-200 transition-all duration-500 shadow-sm hover:shadow-xl">
-                                        <Group justify="space-between" mb={24}>
-                                            <ThemeIcon variant="light" color={s.color} size={48} radius="xl" className="group-hover:scale-110 transition-transform">
-                                                <s.icon size={24} stroke={2} />
-                                            </ThemeIcon>
-                                            <Badge variant="light" color={s.color} size="xs" radius="sm" fw={900}>{s.trend}</Badge>
-                                        </Group>
-                                        <Text size="xs" fw={850} c="dimmed" tt="uppercase" lts={1.5} mb={4}>{s.label}</Text>
-                                        <Text size="36px" fw={950} className="text-gray-900 dark:text-white leading-none tracking-tight">{s.value}</Text>
-                                    </Paper>
-                                ))}
+                                    { key: 'all', label: t('stats.total_flows'), value: myFlows.length, color: 'indigo', icon: IconBriefcase, trend: t('stats.today_trend') },
+                                    { key: 'pending', label: t('tabs.pending'), value: myFlows.filter((f: TPhienQuyTrinh) => f.trangThai === 'CHO_DUYET').length, color: 'blue', icon: IconClock, trend: t('stats.priority') },
+                                    { key: 'approved', label: t('tabs.completed'), value: myFlows.filter((f: TPhienQuyTrinh) => f.trangThai === 'DA_DUYET').length, color: 'teal', icon: IconCheck, trend: t('stats.completed') },
+                                    { key: 'rejected', label: t('tabs.rejected'), value: myFlows.filter((f: TPhienQuyTrinh) => f.trangThai === 'TU_CHOI').length, color: 'red', icon: IconHistory, trend: t('stats.note') },
+                                ].map((s, i) => {
+                                    const isActive = activeTab === s.key;
+                                    return (
+                                        <Paper
+                                            key={i}
+                                            withBorder
+                                            radius="xl"
+                                            onClick={() => setActiveTab(s.key)}
+                                            className={`
+                                                cursor-pointer transition-all duration-300 min-h-[140px]
+                                                ${isActive
+                                                    ? 'border-indigo-500 bg-indigo-50/10 dark:bg-indigo-500/10 shadow-md ring-2 ring-indigo-500/20'
+                                                    : 'border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 group hover:border-indigo-200 shadow-sm hover:shadow-lg'
+                                                }
+                                                p-4 sm:p-6
+                                            `}
+                                        >
+                                            <Group justify="space-between" mb={{ base: 12, sm: 16 }}>
+                                                <ThemeIcon variant={isActive ? 'filled' : 'light'} color={s.color} size={40} radius="lg" className="group-hover:scale-110 transition-transform">
+                                                    <s.icon size={20} stroke={2} />
+                                                </ThemeIcon>
+                                                <Badge variant="light" color={s.color} size="xs" radius="sm" fw={800} className="hidden sm:block">{s.trend}</Badge>
+                                            </Group>
+                                            <Text size="10px" fw={800} c={isActive ? 'indigo' : 'dimmed'} tt="uppercase" lts={1} mb={4} className="line-clamp-1">{s.label}</Text>
+                                            <Text fw={900} className="text-[24px] sm:text-[32px] text-gray-900 dark:text-white leading-none tracking-tight">{s.value}</Text>
+                                        </Paper>
+                                    );
+                                })}
                             </SimpleGrid>
                         )}
 
                         <Box>
-                            <Stack gap="xl">
-                                <Group justify="space-between" align="center">
-                                    <Tabs value={activeTab} onChange={setActiveTab} variant="unstyled">
-                                        <Tabs.List className="bg-gray-100/40 dark:bg-zinc-800/40 p-1.5 rounded-20px flex gap-1.5 backdrop-blur-sm">
-                                            {[
-                                                { value: 'all', label: 'Tất cả hồ sơ' },
-                                                { value: 'pending', label: 'Đang chờ xử lý' },
-                                                { value: 'approved', label: 'Đã phê duyệt' },
-                                                { value: 'rejected', label: 'Bị từ chối' },
-                                            ].map((t) => (
-                                                <Tabs.Tab
-                                                    key={t.value}
-                                                    value={t.value}
-                                                    className={`px-8 py-2.5 rounded-16px text-xs fw-900 transition-all uppercase tracking-widest ${activeTab === t.value ? 'bg-white dark:bg-zinc-700 shadow-xl shadow-gray-200/50 text-indigo-600' : 'text-gray-400 hover:text-gray-600'}`}
-                                                >
-                                                    {t.label}
-                                                </Tabs.Tab>
-                                            ))}
-                                        </Tabs.List>
-                                    </Tabs>
-
-                                    <Box w={{ base: '100%', sm: 360 }}>
+                            <Stack gap="md">
+                                <Group justify="space-between" align="center" className="flex-col sm:flex-row gap-4">
+                                    <Box className="w-full sm:flex-1">
                                         <TextInput
-                                            placeholder="Tìm kiếm thông tin hồ sơ..."
-                                            leftSection={<IconSearch size={22} stroke={2.5} className="text-gray-400" />}
-                                            radius="100px"
-                                            size="md"
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.currentTarget.value)}
-                                            styles={{ input: { background: 'white', border: '1px solid var(--mantine-color-gray-100)', height: '52px', fontWeight: 700 } }}
+                                            placeholder={t('common.actions.search')}
+                                            leftSection={<IconSearch size={18} stroke={2.5} className="text-gray-400" />}
+                                            radius="xl"
+                                            size="sm"
+                                            value={inputValue}
+                                            onChange={(e) => setInputValue(e.currentTarget.value)}
+                                            styles={{ input: { background: 'white', border: '1px solid var(--mantine-color-gray-100)', height: '44px', fontWeight: 600 } }}
                                         />
                                     </Box>
                                 </Group>
 
-                                <Paper withBorder radius="32px" className="border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden shadow-2xl shadow-gray-200/20 mb-20">
-                                    <div className="overflow-x-auto">
-                                        <Table verticalSpacing={24} horizontalSpacing={40} highlightOnHover={false}>
-                                            <Table.Thead className="bg-gray-50/30 dark:bg-zinc-800/30 border-b border-gray-100 dark:border-zinc-800">
-                                                <Table.Tr>
-                                                    <Table.Th className="text-[10px] fw-900 uppercase lts={2} text-gray-400 py-6">Định danh hồ sơ</Table.Th>
-                                                    <Table.Th className="text-[10px] fw-900 uppercase lts={2} text-gray-400 py-6">Thông tin dịch vụ</Table.Th>
-                                                    <Table.Th className="text-[10px] fw-900 uppercase lts={2} text-gray-400 py-6">Tiến độ</Table.Th>
-                                                    <Table.Th className="text-[10px] fw-900 uppercase lts={2} text-gray-400 py-6">Ngày khởi tạo</Table.Th>
-                                                    <Table.Th className="text-[10px] fw-900 uppercase lts={2} text-gray-400 py-6 text-right">Hoạt động</Table.Th>
-                                                    <Table.Th />
-                                                </Table.Tr>
-                                            </Table.Thead>
-                                            <Table.Tbody>
-                                                {isLoadingFlows ? (
-                                                    <Table.Tr>
-                                                        <Table.Td colSpan={6} p={0}>
-                                                            <Box h={300} className="relative">
-                                                                <LoadingOverlay visible={true} overlayProps={{ blur: 0 }} loaderProps={{ color: 'indigo', type: 'bars' }} />
+                                <Box pb={120}>
+                                    {isLoadingFlows ? (
+                                        <Box h={400} className="relative">
+                                            <LoadingOverlay visible={true} overlayProps={{ blur: 0 }} loaderProps={{ color: 'indigo', type: 'bars' }} />
+                                        </Box>
+                                    ) : filteredFlows && filteredFlows.length > 0 ? (
+                                        <Stack gap="md">
+                                            {filteredFlows.map((flow: TPhienQuyTrinh, index: number) => {
+                                                const status = getStatusConfig(flow.trangThai);
+                                                return (
+                                                    <Paper
+                                                        key={flow.id}
+                                                        radius="24px"
+                                                        className="group hover:shadow-xl hover:scale-[1.01] transition-all duration-300 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-indigo-100 dark:hover:border-indigo-900 cursor-pointer overflow-hidden p-0"
+                                                        onClick={() => {/* detail view handling */ }}
+                                                    >
+                                                        <Group gap={0} wrap="nowrap" align="stretch">
+                                                            {/* Left indicator bar */}
+                                                            <Box style={{ width: 6 }} className={`bg-${status.color}-500 group-hover:w-3 transition-all duration-300`} />
+
+                                                            <Box p={{ base: 16, sm: 20 }} className="flex-1">
+                                                                <Stack gap="md">
+                                                                    <Group justify="space-between" align="flex-start" wrap="nowrap">
+                                                                        <Stack gap={2}>
+                                                                            <Text fw={900} size="sm" tt="uppercase" className="tracking-tighter text-gray-900 dark:text-white leading-tight">
+                                                                                {flow.quyTrinh?.ten}
+                                                                            </Text>
+                                                                            <Group gap={6}>
+                                                                                <Badge size="xs" variant="outline" color="gray" radius="sm" fw={800} className="opacity-60 text-[9px]">
+                                                                                    • {flow.quyTrinh?.danhMuc?.ten || 'GENERAL'}
+                                                                                </Badge>
+                                                                                <Text size="10px" fw={700} c="dimmed" className="hidden sm:block">ID: #{flow.id}</Text>
+                                                                            </Group>
+                                                                        </Stack>
+                                                                        <Badge
+                                                                            color={status.color}
+                                                                            variant="light"
+                                                                            size="sm"
+                                                                            radius="md"
+                                                                            h={28}
+                                                                            px={12}
+                                                                            fw={900}
+                                                                            className="shadow-sm text-[10px] uppercase lts={1}"
+                                                                        >
+                                                                            {status.label}
+                                                                        </Badge>
+                                                                    </Group>
+
+                                                                    <Group justify="space-between" align="center">
+                                                                        <Group gap={20}>
+                                                                            <Group gap={6}>
+                                                                                <ThemeIcon size={20} radius="sm" variant="light" color="gray">
+                                                                                    <IconCalendar size={12} stroke={2.5} />
+                                                                                </ThemeIcon>
+                                                                                <Text size="10px" fw={700} c="dimmed">
+                                                                                    {dayjs(flow.ngayTao).format('DD MMM, YYYY')}
+                                                                                </Text>
+                                                                            </Group>
+
+                                                                            <Group gap={6}>
+                                                                                <ThemeIcon size={20} radius="sm" variant="light" color="indigo">
+                                                                                    <IconHistory size={12} stroke={2.5} />
+                                                                                </ThemeIcon>
+                                                                                <Text size="10px" fw={800} c="indigo">
+                                                                                    {flow.quyTrinh?._count?.cacBuoc || 0} {t('form.info.preparation')}
+                                                                                </Text>
+                                                                            </Group>
+                                                                        </Group>
+
+                                                                        <ActionIcon
+                                                                            variant="light"
+                                                                            color="gray"
+                                                                            radius="xl"
+                                                                            size="md"
+                                                                            className="group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-all sm:opacity-0 group-hover:opacity-100"
+                                                                        >
+                                                                            <IconChevronRight size={16} stroke={3} />
+                                                                        </ActionIcon>
+                                                                    </Group>
+                                                                </Stack>
                                                             </Box>
-                                                        </Table.Td>
-                                                    </Table.Tr>
-                                                ) : rows && rows.length > 0 ? rows : (
-                                                    <Table.Tr>
-                                                        <Table.Td colSpan={6}>
-                                                            <Stack align="center" justify="center" py={120} className="opacity-60">
-                                                                <Box className="w-24 h-24 rounded-3xl bg-gray-50 flex items-center justify-center text-gray-300">
-                                                                    <IconFiles size={48} stroke={1} />
-                                                                </Box>
-                                                                <Text fw={900} size="xl" className="text-gray-400 tracking-tight mt-6">Hộp thư hồ sơ trống</Text>
-                                                                <Text size="sm" c="dimmed" maw={300} ta="center">Bạn chưa có bất kỳ yêu cầu phê duyệt nào được khởi tạo trong hệ thống.</Text>
-                                                                <Button variant="light" color="indigo" radius="xl" size="md" mt={24} onClick={() => setIsDrawerOpen(true)}>Khởi tạo ngay</Button>
-                                                            </Stack>
-                                                        </Table.Td>
-                                                    </Table.Tr>
-                                                )}
-                                            </Table.Tbody>
-                                        </Table>
-                                    </div>
-                                </Paper>
+                                                        </Group>
+                                                    </Paper>
+                                                );
+                                            })}
+                                        </Stack>
+                                    ) : (
+                                        <Paper withBorder radius="24px" p={80} className="border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-sm">
+                                            <Stack align="center" justify="center" className="opacity-60">
+                                                <Box className="w-20 h-20 rounded-2xl bg-gray-50 flex items-center justify-center text-gray-300">
+                                                    <IconFiles size={36} stroke={1} />
+                                                </Box>
+                                                <Title order={4} fw={800} className="text-lg text-gray-400 tracking-tight mt-4 uppercase">{t('empty.title')}</Title>
+                                                <Text size="xs" c="dimmed" maw={280} ta="center">{t('empty.subtitle')}</Text>
+                                                <Button variant="light" color="indigo" radius="xl" size="sm" mt={16} onClick={() => setIsDrawerOpen(true)}>{t('empty.action')}</Button>
+                                            </Stack>
+                                        </Paper>
+                                    )}
+                                </Box>
                             </Stack>
                         </Box>
                     </Stack>
@@ -271,17 +317,59 @@ export default function MyFlowPage() {
 // --------------------------------------------------------------------------------------
 
 function CreateRequestDrawer({ opened, onClose, templates }: { opened: boolean, onClose: () => void, templates: TQuyTrinh[] }) {
-    const [selectedTemplate, setSelectedTemplate] = useState<TQuyTrinh | null>(null);
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const t = useTranslations('student_flow');
+
+    const categoryId = searchParams.get("categoryId");
+    const flowId = searchParams.get("flowId");
+
+    const selectedTemplate = templates.find(temp => temp.id.toString() === flowId) || null;
+
+    // Derived Categories
+    const categories = templates.reduce((acc: any[], template) => {
+        const cat = template.danhMuc;
+        if (!cat) return acc;
+        const existing = acc.find(c => c.id === cat.id);
+        if (existing) {
+            existing.count++;
+        } else {
+            acc.push({ ...cat, count: 1 });
+        }
+        return acc;
+    }, []);
+
+    const selectedCategory = categories.find(c => c.id.toString() === categoryId) || null;
+
+    const navigate = (paramsToUpdate: Record<string, string | null>) => {
+        const params = new URLSearchParams(searchParams.toString());
+        Object.entries(paramsToUpdate).forEach(([key, value]) => {
+            if (value === null) params.delete(key);
+            else params.set(key, value);
+        });
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    };
+
+    const handleBack = () => {
+        if (flowId) {
+            navigate({ flowId: null, step: null });
+        } else if (categoryId) {
+            navigate({ categoryId: null });
+        } else {
+            onClose();
+        }
+    };
+
     const [searchTerm, setSearchTerm] = useState("");
     const isMobile = useMediaQuery('(max-width: 48em)');
 
-    const filteredTemplates = templates.filter(t =>
-        t.ten.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        t.moTa?.toLowerCase().includes(searchTerm.toLowerCase())
-    ).filter(t => t.trangThai === "HOAT_DONG");
+    const filteredTemplates = templates.filter(temp =>
+        temp.ten.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        temp.moTa?.toLowerCase().includes(searchTerm.toLowerCase())
+    ).filter(temp => temp.trangThai === "HOAT_DONG");
 
     const handleClose = () => {
-        setSelectedTemplate(null);
         setSearchTerm("");
         onClose();
     };
@@ -302,31 +390,28 @@ function CreateRequestDrawer({ opened, onClose, templates }: { opened: boolean, 
                 <Box className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none" />
 
                 {/* Custom Drawer Header - Masterpiece Edition */}
-                <Box px={40} py={32} className="border-b border-gray-100 dark:border-zinc-800 shrink-0 relative">
+                <Box className="px-5 py-6 sm:px-10 sm:py-8 border-b border-gray-100 dark:border-zinc-800 shrink-0 relative">
                     <Group justify="space-between">
-                        <Group gap="xl">
+                        <Group className="gap-3 sm:gap-6">
                             <ActionIcon
                                 variant="light"
                                 color="indigo"
-                                radius="16px"
-                                size={48}
-                                onClick={selectedTemplate ? () => setSelectedTemplate(null) : handleClose}
-                                className="shadow-sm hover:scale-110 active:scale-95 transition-all"
+                                radius="12px"
+                                size={40}
+                                onClick={handleBack}
+                                className="shadow-sm hover:scale-110 active:scale-95 transition-all sm:size-12 sm:rounded-2xl"
                             >
-                                <IconChevronLeft size={24} stroke={3} />
+                                <IconChevronLeft size={20} className="sm:size-6" stroke={3} />
                             </ActionIcon>
                             <div>
-                                <Title order={3} fw={950} className="tracking-tighter text-gray-900 dark:text-gray-50 leading-none mb-1">
-                                    {selectedTemplate ? selectedTemplate.ten : "Dịch vụ Smart Portal"}
+                                <Title order={3} fw={950} className="text-lg sm:text-xl tracking-tighter text-gray-900 dark:text-gray-50 leading-none mb-1">
+                                    {selectedTemplate ? selectedTemplate.ten : selectedCategory ? selectedCategory.ten : "Smart Portal"}
                                 </Title>
-                                <Text size="10px" fw={900} c="indigo" tt="uppercase" lts={2}>Trung tâm hành chính công số</Text>
+                                <Text size="9px" className="sm:text-[10px]" fw={900} c="indigo" tt="uppercase" lts={1.5}>
+                                    {selectedTemplate ? t('drawer.header.register') : selectedCategory ? t('drawer.header.flows') : t('drawer.header.categories')}
+                                </Text>
                             </div>
                         </Group>
-                        {!selectedTemplate && (
-                            <ActionIcon variant="subtle" color="gray" radius="xl" size="lg" onClick={handleClose}>
-                                <IconX size={24} stroke={2.5} />
-                            </ActionIcon>
-                        )}
                     </Group>
                 </Box>
 
@@ -334,59 +419,84 @@ function CreateRequestDrawer({ opened, onClose, templates }: { opened: boolean, 
                     {selectedTemplate ? (
                         <DynamicRequestForm
                             template={selectedTemplate}
-                            onBack={() => setSelectedTemplate(null)}
+                            onBack={handleBack}
                             onSuccess={handleClose}
                         />
                     ) : (
                         <Stack gap={0} h="100%">
-                            <Box p={32} pb={16}>
+                            <Box className="p-5 sm:p-8 pb-2 sm:pb-4">
                                 <TextInput
-                                    placeholder="Tìm kiếm thủ tục (ví dụ: cấp lại thẻ, xin nghỉ...)"
-                                    leftSection={<IconSearch size={20} className="text-gray-400" />}
+                                    placeholder={categoryId ? t('drawer.placeholders.search_flows') : t('drawer.placeholders.search_categories')}
+                                    leftSection={<IconSearch size={18} className="text-gray-400" />}
                                     radius="12px"
-                                    size="lg"
+                                    size="md"
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.currentTarget.value)}
-                                    styles={{ input: { background: '#f8fafc', border: 'none', height: '56px' } }}
+                                    styles={{ input: { background: '#f8fafc', border: 'none', height: '48px' } }}
+                                    className="sm:h-14 sm:text-lg"
                                 />
                             </Box>
 
                             <ScrollArea className="flex-1" type="scroll">
-                                <Box px={32} pb={32}>
-                                    <Text size="xs" fw={800} c="dimmed" tt="uppercase" lts={1.5} mb={20} mt={10}>Danh mục dịch vụ ({filteredTemplates.length})</Text>
+                                <Box className="px-5 sm:px-8 pb-8">
+                                    <Text size="xs" fw={800} c="dimmed" tt="uppercase" lts={1.2} mb={16} mt={10}>
+                                        {categoryId ? t('sections.flows_in_category', { name: selectedCategory?.ten }) : t('sections.explore_categories')}
+                                    </Text>
+
                                     <SimpleGrid cols={isMobile ? 1 : 2} spacing="xl">
-                                        {filteredTemplates.map((template: TQuyTrinh) => (
-                                            <UnstyledButton
-                                                key={template.id}
-                                                className="group p-6 rounded-20px bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-indigo-200 hover:bg-indigo-50/10 transition-all"
-                                                onClick={() => setSelectedTemplate(template)}
-                                            >
-                                                <Group justify="space-between" wrap="nowrap">
-                                                    <Group gap="xl" wrap="nowrap">
-                                                        <ThemeIcon
-                                                            variant="light"
-                                                            size={52}
-                                                            radius="16px"
-                                                            color="indigo"
-                                                            className="group-hover:scale-110 transition-transform"
-                                                        >
-                                                            <IconFileDescription size={26} stroke={1.5} />
-                                                        </ThemeIcon>
-                                                        <div className="min-w-0">
-                                                            <Text fw={850} size="md" className="text-gray-900 dark:text-gray-50 tracking-tight uppercase leading-snug">{template.ten}</Text>
-                                                            <Text size="xs" c="dimmed" fw={600} className="line-clamp-1 mt-1 opacity-80">
-                                                                {template.moTa || "Khởi tạo yêu cầu phê duyệt kỹ thuật số."}
-                                                            </Text>
-                                                            <Group gap={8} mt={12}>
-                                                                <Badge size="xs" variant="outline" color="indigo" radius="sm" fw={850} h={22}>{template.cacBuoc?.length || 0} CHIỀU DUYỆT</Badge>
-                                                                <Badge size="xs" variant="dot" color="gray" radius="sm" fw={850} h={22}>{template.danhMuc?.ten || "CHUNG"}</Badge>
-                                                            </Group>
-                                                        </div>
+                                        {!categoryId ? (
+                                            // Level 1: Categories
+                                            categories.filter(c => c.ten.toLowerCase().includes(searchTerm.toLowerCase())).map((cat: any) => (
+                                                <UnstyledButton
+                                                    key={cat.id}
+                                                    className="group p-4 sm:p-6 rounded-20px bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-indigo-200 hover:bg-indigo-50/10 transition-all"
+                                                    onClick={() => navigate({ categoryId: cat.id.toString() })}
+                                                >
+                                                    <Group justify="space-between" wrap="nowrap">
+                                                        <Group className="gap-4 sm:gap-6" wrap="nowrap">
+                                                            <ThemeIcon variant="light" size={44} radius="12px" color="indigo" className="group-hover:rotate-12 transition-transform">
+                                                                <IconBriefcase size={22} stroke={1.5} />
+                                                            </ThemeIcon>
+                                                            <div className="min-w-0">
+                                                                <Text fw={850} className="text-sm sm:text-md text-gray-900 dark:text-gray-50 tracking-tight uppercase leading-snug">{cat.ten}</Text>
+                                                                <Text className="text-[10px] sm:text-xs" fw={700} c="indigo" mt={2}>{t('drawer.category_card.available_count', { count: cat.count })}</Text>
+                                                            </div>
+                                                        </Group>
+                                                        <IconChevronRight size={20} stroke={3} className="text-gray-200 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
                                                     </Group>
-                                                    <IconChevronRight size={24} stroke={3} className="text-gray-200 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
-                                                </Group>
-                                            </UnstyledButton>
-                                        ))}
+                                                </UnstyledButton>
+                                            ))
+                                        ) : (
+                                            // Level 2: Flows in Category
+                                            filteredTemplates.filter(temp => temp.danhMuc?.id.toString() === categoryId).map((template: TQuyTrinh) => (
+                                                <UnstyledButton
+                                                    key={template.id}
+                                                    className="group p-4 sm:p-6 rounded-20px bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-indigo-200 hover:bg-indigo-50/10 transition-all"
+                                                    onClick={() => navigate({ flowId: template.id.toString(), step: "flow" })}
+                                                >
+                                                    <Group justify="space-between" wrap="nowrap">
+                                                        <Group className="gap-4 sm:gap-6" wrap="nowrap">
+                                                            <ThemeIcon
+                                                                variant="light"
+                                                                size={44}
+                                                                radius="12px"
+                                                                color="indigo"
+                                                                className="group-hover:scale-110 transition-transform"
+                                                            >
+                                                                <IconFileDescription size={22} stroke={1.5} className="sm:size-[26px]" />
+                                                            </ThemeIcon>
+                                                            <div className="min-w-0">
+                                                                <Text fw={850} className="text-sm sm:text-md text-gray-900 dark:text-gray-50 tracking-tight uppercase leading-snug">{template.ten}</Text>
+                                                                <Text size="xs" c="dimmed" fw={600} className="line-clamp-1 mt-1 opacity-80">
+                                                                    {template.moTa || t('form.info.default_desc')}
+                                                                </Text>
+                                                            </div>
+                                                        </Group>
+                                                        <IconChevronRight size={20} stroke={3} className="text-gray-200 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
+                                                    </Group>
+                                                </UnstyledButton>
+                                            ))
+                                        )}
                                     </SimpleGrid>
                                 </Box>
                             </ScrollArea>
@@ -399,28 +509,41 @@ function CreateRequestDrawer({ opened, onClose, templates }: { opened: boolean, 
 }
 
 function DynamicRequestForm({ template, onBack, onSuccess }: { template: TQuyTrinh, onBack: () => void, onSuccess: () => void }) {
+    const t = useTranslations('student_flow');
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
     const flowId = template.id;
+    const stepParam = searchParams.get("step") || "flow";
+    const activeStep = stepParam === "data" ? 1 : 0;
+
     const { data: fields, isLoading } = AppQuery.approvals.useFormFields(flowId);
     const submitMutation = AppMutation().approvals.useSubmit();
 
     const [formData, setFormData] = useState<Record<string, string | number | boolean | null>>({});
-    const [activeStep, setActiveStep] = useState(0);
 
     const hasSteps = Array.isArray(template.cacBuoc) && template.cacBuoc.length > 0;
+
+    const navigateToStep = (step: "flow" | "data") => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("step", step);
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    };
 
     const handleSubmit = async () => {
         try {
             if (fields) {
                 for (const field of fields) {
                     if (field.batBuoc && !formData[field.id]) {
-                        notifications.show({ title: "Dữ liệu không hợp lệ", message: `Vui lòng hoàn thành: ${field.nhan}`, color: "red" });
+                        notifications.show({ title: t('notifications.error_title'), message: `${t('form.input.placeholder', { name: field.nhan })}`, color: "red" });
                         return;
                     }
                 }
             }
 
             if (!hasSteps) {
-                notifications.show({ title: "Cảnh báo hệ thống", message: "Quy trình này chưa được thiết lập luồng phê duyệt.", color: "orange" });
+                notifications.show({ title: t('common.status.pending'), message: t('form.steps.empty'), color: "orange" });
                 return;
             }
 
@@ -430,11 +553,11 @@ function DynamicRequestForm({ template, onBack, onSuccess }: { template: TQuyTri
                 target_id: null
             });
 
-            notifications.show({ title: "Gửi yêu cầu thành công 🛰️", message: "Hồ sơ của bạn đang được truyền tải.", color: "indigo" });
+            notifications.show({ title: t('notifications.success_title'), message: t('notifications.success_msg'), color: "indigo" });
             onSuccess();
         } catch (error: unknown) {
-            const errorMsg = (error as any)?.response?.data?.message || "Không thể khởi tạo hồ sơ.";
-            notifications.show({ title: "Lỗi kết nối", message: errorMsg, color: "red" });
+            const errorMsg = (error as any)?.response?.data?.message || t('notifications.error_msg');
+            notifications.show({ title: t('notifications.error_title'), message: errorMsg, color: "red" });
         }
     };
 
@@ -447,130 +570,225 @@ function DynamicRequestForm({ template, onBack, onSuccess }: { template: TQuyTri
     return (
         <Stack gap={0} h="100%" className="bg-white dark:bg-zinc-950">
             {/* Minimal Form Stepper */}
-            <Box px={40} py={24} className="bg-gray-50/50 dark:bg-zinc-900/30 border-b border-gray-100 dark:border-zinc-800">
-                <Stepper active={activeStep} onStepClick={setActiveStep} size="sm" color="indigo" radius="xl" allowNextStepsSelect={false}>
-                    <Stepper.Step label={<Text fw={900} size="11px" tt="uppercase" lts={1.5}>Luồng truyền tải</Text>} />
-                    <Stepper.Step label={<Text fw={900} size="11px" tt="uppercase" lts={1.5}>Khai báo dữ liệu</Text>} />
+            <Box className="px-5 py-4 sm:px-10 sm:py-6 bg-gray-50/50 dark:bg-zinc-900/30 border-b border-gray-100 dark:border-zinc-800">
+                <Stepper active={activeStep} onStepClick={(s) => navigateToStep(s === 0 ? "flow" : "data")} size="xs" color="indigo" radius="xl" allowNextStepsSelect={false}>
+                    <Stepper.Step label={<Text fw={900} className="text-[9px] sm:text-[11px]" tt="uppercase" lts={1.2}>{t('form.stepper.flow')}</Text>} />
+                    <Stepper.Step label={<Text fw={900} className="text-[9px] sm:text-[11px]" tt="uppercase" lts={1.2}>{t('form.stepper.data')}</Text>} />
                 </Stepper>
             </Box>
 
-            <ScrollArea className="flex-1" p={40}>
-                <div className="max-w-xl mx-auto">
-                    {activeStep === 0 ? (
-                        <Stack gap={32}>
-                            <Box className="p-8 rounded-24px bg-gray-900 text-white shadow-xl">
-                                <Title order={4} fw={850} className="tracking-tight uppercase mb-2">{template.ten}</Title>
-                                <Text size="xs" fw={500} className="leading-relaxed opacity-70">
-                                    {template.moTa || "Thủ tục hành chính được hỗ trợ tự động hóa."}
-                                </Text>
-                            </Box>
-
-                            <Stack gap="xl">
-                                <Group gap="xs">
-                                    <Box className="w-1.5 h-6 bg-indigo-600 rounded-full" />
-                                    <Text fw={900} size="xs" tt="uppercase" lts={1.5} className="text-gray-900 dark:text-gray-100">Luồng xử lý hồ sơ</Text>
-                                </Group>
-
-                                <Box className="relative">
-                                    <Stack gap={0}>
-                                        {hasSteps ? template.cacBuoc?.map((b, index) => {
-                                            const approver = b.nguoiDuyets?.[0];
-                                            let approverName = "N/A";
-                                            if (approver) {
-                                                if (approver.loaiNguoiPheDuyet === 'VAI_TRO') {
-                                                    approverName = approver.approverRole === 'GVCN' ? 'Giảng viên Chủ nhiệm' :
-                                                        approver.approverRole === 'TRUONG_KHOA' ? 'Lãnh đạo Khoa' :
-                                                            approver.approverRole === 'ADMIN' ? 'Ban Giám Hiệu' : (approver.approverRole || "N/A");
-                                                } else if (approver.user) {
-                                                    approverName = approver.user.hoTen || approver.user.email || "N/A";
-                                                }
-                                            }
-
-                                            return (
-                                                <Group key={b.id} wrap="nowrap" gap="xl" className="relative pb-10 last:pb-0">
-                                                    {(template.cacBuoc && index < template.cacBuoc.length - 1) && (
-                                                        <Box className="absolute left-[19px] top-10 bottom-0 w-[2px] bg-indigo-100 dark:bg-zinc-800" />
-                                                    )}
-                                                    <Box className="w-10 h-10 rounded-14px bg-white dark:bg-zinc-900 border-2 border-indigo-600 flex items-center justify-center text-indigo-600 font-black text-xs shrink-0 z-10 shadow-sm">
-                                                        {index + 1}
-                                                    </Box>
-                                                    <Box className="flex-1">
-                                                        <Group justify="space-between" mb={4}>
-                                                            <Text fw={850} size="sm" className="text-gray-900 dark:text-gray-100 uppercase tracking-tight leading-none">{b.ten}</Text>
-                                                            <Badge size="xs" variant="light" color="indigo" radius="sm" fw={850}>P{index + 1}</Badge>
-                                                        </Group>
-                                                        <Text size="xs" fw={750} c="indigo" tt="uppercase" lts={0.5}>{approverName}</Text>
-                                                        <Text size="11px" c="dimmed" fw={600} mt={6} className="opacity-80 italic">
-                                                            {b.loaiQuyTac === 'TAT_CA' ? "■ Phê duyệt tập thể" : "■ Phê duyệt đơn phương"}
-                                                        </Text>
-                                                    </Box>
-                                                </Group>
-                                            );
-                                        }) : (
-                                            <Paper p="xl" radius="16px" className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 text-center">
-                                                <Text size="xs" fw={850} c="red">KHÔNG CÓ DỮ LIỆU LUỒNG</Text>
-                                            </Paper>
-                                        )}
-                                    </Stack>
-                                </Box>
-                            </Stack>
-                        </Stack>
-                    ) : (
-                        <Stack gap={32}>
-                            <Box>
-                                <Title order={2} fw={850} className="tracking-tight mb-2">Thông tin đầu vào</Title>
-                                <Text size="xs" fw={600} c="dimmed">Tính chính xác của thông tin ảnh hưởng trực tiếp đến kết quả phê duyệt.</Text>
-                            </Box>
-
-                            <Stack gap="xl">
-                                {fields && fields.length > 0 ? fields.map((field: TTruongFormQuyTrinh) => {
-                                    const commonProps = {
-                                        label: <Text fw={850} size="xs" mb={8} className="uppercase tracking-widest text-gray-500">{field.nhan} {field.batBuoc && <span className="text-red-500">*</span>}</Text>,
-                                        required: field.batBuoc,
-                                        placeholder: `Nhập ${field.nhan.toLowerCase()}...`,
-                                        size: "md",
-                                        radius: "8px",
-                                        styles: {
-                                            input: {
-                                                border: '1px solid var(--mantine-color-gray-200)',
-                                                height: '48px',
-                                                '&:focus': { border: '1px solid var(--mantine-color-indigo-600)' }
-                                            }
-                                        }
-                                    };
-
-                                    const handleChange = (val: string | number | boolean | null) => setFormData(prev => ({ ...prev, [field.id]: val }));
-
-                                    switch (field.loai) {
-                                        case LoaiTruongForm.TEXTAREA:
-                                        case LoaiTruongForm.LONG_TEXT:
-                                            return <Textarea key={field.id} {...commonProps} minRows={4} onChange={(e) => handleChange(e.currentTarget.value)} radius="12px" />;
-                                        case LoaiTruongForm.NUMBER: return <NumberInput key={field.id} {...commonProps} onChange={handleChange} />;
-                                        case LoaiTruongForm.DATE: return <TextInput key={field.id} type="date" {...commonProps} onChange={(e) => handleChange(e.currentTarget.value)} />;
-                                        case LoaiTruongForm.SELECT: return <Select key={field.id} {...commonProps} data={field.tuyChon ? (typeof field.tuyChon === 'string' ? JSON.parse(field.tuyChon) : field.tuyChon) : []} onChange={handleChange} searchable clearable />;
-                                        default: return <TextInput key={field.id} {...commonProps} onChange={(e) => handleChange(e.currentTarget.value)} />;
-                                    }
-                                }) : (
-                                    <Box py={60} className="text-center bg-gray-50/50 rounded-24px border border-dashed border-gray-200">
-                                        <Text fw={850} size="sm" c="gray">KHÔNG YÊU CẦU DỮ LIỆU BỔ SUNG</Text>
+            <ScrollArea className="flex-1" type="scroll">
+                <Box className="p-5 sm:p-10">
+                    <div className="max-w-xl mx-auto">
+                        {activeStep === 0 ? (
+                            <Stack className="gap-8 sm:gap-10">
+                                {/* Enhanced Procedure Card */}
+                                <Paper p={0} radius="24px" className="overflow-hidden border-none shadow-2xl">
+                                    <Box className="bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 p-6 sm:p-10 text-white relative">
+                                        <Box className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16" />
+                                        <Group wrap="nowrap" align="flex-start" className="gap-4 sm:gap-6 relative">
+                                            <ThemeIcon size={54} radius="16px" className="bg-white/20 backdrop-blur-md text-white border border-white/30 shrink-0">
+                                                <IconFileDescription size={28} stroke={2} />
+                                            </ThemeIcon>
+                                            <Stack gap={4}>
+                                                <Title order={3} fw={900} className="text-lg sm:text-2xl tracking-tight leading-tight uppercase">
+                                                    {template.ten}
+                                                </Title>
+                                                <Text fw={500} className="text-[11px] sm:text-sm leading-relaxed opacity-80 max-w-lg">
+                                                    {template.moTa || t('form.info.default_desc')}
+                                                </Text>
+                                            </Stack>
+                                        </Group>
                                     </Box>
-                                )}
+                                </Paper>
+
+                                {/* Preparation & Context Info */}
+                                <Stack gap="md">
+                                    <Group gap="xs">
+                                        <Box className="w-1 h-5 bg-indigo-600 rounded-full" />
+                                        <Text fw={900} tt="uppercase" lts={1.5} className="text-xs text-gray-900 dark:text-gray-100">{t('form.info.preparation')}</Text>
+                                    </Group>
+                                    <Paper withBorder radius="20px" p="xl" className="border-gray-100 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/40">
+                                        <Stack gap="lg">
+                                            <Text size="sm" fw={600} c="dimmed" lh={1.6}>
+                                                {t('form.info.ready_msg')}
+                                            </Text>
+
+                                            <SimpleGrid cols={2} spacing="md">
+                                                <Group gap="sm">
+                                                    <ThemeIcon variant="light" color="indigo" size="lg" radius="md">
+                                                        <IconActivity size={18} stroke={2} />
+                                                    </ThemeIcon>
+                                                    <div>
+                                                        <Text size="xs" fw={800} c="indigo" tt="uppercase" lts={0.5}>{template.cacBuoc?.length || 0} {t('form.stepper.flow')}</Text>
+                                                        <Text size="10px" fw={600} c="dimmed">{t('form.steps.title')}</Text>
+                                                    </div>
+                                                </Group>
+                                                <Group gap="sm">
+                                                    <ThemeIcon variant="light" color="teal" size="lg" radius="md">
+                                                        <IconFiles size={18} stroke={2} />
+                                                    </ThemeIcon>
+                                                    <div>
+                                                        <Text size="xs" fw={800} c="teal" tt="uppercase" lts={0.5}>{fields?.length || 0} {t('form.stepper.data')}</Text>
+                                                        <Text size="10px" fw={600} c="dimmed">{t('form.input.title')}</Text>
+                                                    </div>
+                                                </Group>
+                                            </SimpleGrid>
+                                        </Stack>
+                                    </Paper>
+                                </Stack>
+
+                                {/* Flow Timeline Visualization */}
+                                <Stack className="gap-8">
+                                    <Group gap="xs">
+                                        <Box className="w-1 h-5 bg-indigo-600 rounded-full" />
+                                        <Text fw={900} tt="uppercase" lts={1.5} className="text-xs text-gray-900 dark:text-gray-100">{t('form.steps.title')}</Text>
+                                    </Group>
+
+                                    <Box className="px-2 sm:px-4">
+                                        <Stack gap={0}>
+                                            {hasSteps ? template.cacBuoc?.map((b, index) => {
+                                                const approver = b.nguoiDuyets?.[0];
+                                                let approverName = "N/A";
+                                                if (approver) {
+                                                    if (approver.loaiNguoiPheDuyet === 'VAI_TRO') {
+                                                        approverName = approver.approverRole === 'GVCN' ? 'Giảng viên Chủ nhiệm' :
+                                                            approver.approverRole === 'TRUONG_KHOA' ? 'Lãnh đạo Khoa' :
+                                                                approver.approverRole === 'ADMIN' ? 'Ban Giám Hiệu' : (approver.approverRole || "N/A");
+                                                    } else if (approver.user) {
+                                                        approverName = approver.user.hoTen || approver.user.email || "N/A";
+                                                    }
+                                                }
+
+                                                return (
+                                                    <Group key={b.id} wrap="nowrap" className="gap-6 sm:gap-10 relative pb-8 last:pb-0">
+                                                        {(template.cacBuoc && index < template.cacBuoc.length - 1) && (
+                                                            <Box className="absolute left-[17px] sm:left-[21px] top-10 bottom-0 w-[2px] bg-gradient-to-b from-indigo-500/30 to-transparent" />
+                                                        )}
+                                                        <Box className="relative shrink-0">
+                                                            <Box className="size-9 sm:size-11 rounded-2xl bg-white dark:bg-zinc-900 border-[2.5px] border-indigo-600 flex items-center justify-center text-indigo-600 font-black text-xs sm:text-sm shrink-0 z-10 shadow-lg shadow-indigo-500/10">
+                                                                {index + 1}
+                                                            </Box>
+                                                            {index === 0 && (
+                                                                <Box className="absolute -inset-1 bg-indigo-500/20 blur-md rounded-2xl -z-10 animate-pulse" />
+                                                            )}
+                                                        </Box>
+                                                        <Box className="flex-1">
+                                                            <Paper withBorder p="md" radius="16px" className="border-gray-100 dark:border-zinc-800 hover:border-indigo-200 transition-colors shadow-sm">
+                                                                <Group justify="space-between" mb={4}>
+                                                                    <Text fw={850} className="text-xs sm:text-sm text-gray-900 dark:text-gray-100 uppercase tracking-tight leading-none">{b.ten}</Text>
+                                                                    <Badge size="xs" variant="light" color="indigo" radius="md" fw={900} className="h-5 px-1.5 opacity-80">P{index + 1}</Badge>
+                                                                </Group>
+                                                                <Text className="text-[11px] sm:text-xs" fw={750} c="indigo" tt="uppercase" lts={0.5}>{approverName}</Text>
+                                                                <Text c="dimmed" fw={600} mt={8} className="text-[10px] sm:text-[11px] opacity-70 flex items-center gap-1.5">
+                                                                    <IconClock size={12} />
+                                                                    {b.loaiQuyTac === 'TAT_CA' ? t('form.steps.rule_all') : t('form.steps.rule_any')}
+                                                                </Text>
+                                                            </Paper>
+                                                        </Box>
+                                                    </Group>
+                                                );
+                                            }) : (
+                                                <Paper p="xl" radius="16px" className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 text-center">
+                                                    <Text size="xs" fw={850} c="red">{t('form.steps.empty')}</Text>
+                                                </Paper>
+                                            )}
+                                        </Stack>
+                                    </Box>
+                                </Stack>
                             </Stack>
-                        </Stack>
-                    )}
-                </div>
+                        ) : (
+                            <Stack className="gap-10 sm:gap-12">
+                                <Box>
+                                    <Title order={3} fw={900} className="text-xl sm:text-3xl tracking-tight mb-2 text-gray-900 dark:text-white">
+                                        {t('form.input.title')}
+                                    </Title>
+                                    <Text className="text-xs sm:text-sm" fw={500} c="dimmed" lh={1.6}>
+                                        {t('form.input.subtitle')}
+                                    </Text>
+                                </Box>
+
+                                <Stack gap={24}>
+                                    {fields && fields.length > 0 ? fields.map((field: TTruongFormQuyTrinh) => {
+                                        const commonProps = {
+                                            label: field.nhan,
+                                            withAsterisk: field.batBuoc,
+                                            placeholder: t('form.input.placeholder', { name: field.nhan.toLowerCase() }),
+                                            size: "md",
+                                            radius: "12px",
+                                            className: "transition-all duration-200",
+                                            styles: (theme: any) => ({
+                                                label: {
+                                                    marginBottom: '8px',
+                                                    fontWeight: 700,
+                                                    fontSize: '14px',
+                                                    color: theme.colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.gray[8],
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '4px',
+                                                    letterSpacing: '-0.01em'
+                                                },
+                                                required: {
+                                                    color: theme.colors.red[5],
+                                                    fontSize: '14px'
+                                                },
+                                                input: {
+                                                    backgroundColor: theme.colorScheme === 'dark' ? 'var(--mantine-color-zinc-900)' : '#f8fafc',
+                                                    border: '1px solid',
+                                                    borderColor: theme.colorScheme === 'dark' ? 'var(--mantine-color-zinc-800)' : '#e2e8f0',
+                                                    height: '50px',
+                                                    fontSize: '14px',
+                                                    fontWeight: 500,
+                                                    paddingLeft: '16px',
+                                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                                                    borderRadius: '12px',
+                                                    '&:focus': {
+                                                        borderColor: '#6366f1',
+                                                        boxShadow: '0 0 0 4px rgba(99, 102, 241, 0.08)',
+                                                        backgroundColor: '#fff'
+                                                    },
+                                                    '&::placeholder': {
+                                                        color: '#94a3b8',
+                                                        fontSize: '13px'
+                                                    }
+                                                }
+                                            })
+                                        };
+
+                                        const handleChange = (val: string | number | boolean | null) => setFormData(prev => ({ ...prev, [field.id]: val }));
+
+                                        switch (field.loai) {
+                                            case LoaiTruongForm.TEXTAREA:
+                                            case LoaiTruongForm.LONG_TEXT:
+                                                return <Textarea key={field.id} {...commonProps} minRows={4} onChange={(e) => handleChange(e.currentTarget.value)} styles={{ ...commonProps.styles, input: { ...commonProps.styles({}).input, height: 'auto', minHeight: '120px' } }} />;
+                                            case LoaiTruongForm.NUMBER: return <NumberInput key={field.id} {...commonProps} onChange={handleChange} />;
+                                            case LoaiTruongForm.DATE: return <TextInput key={field.id} type="date" {...commonProps} onChange={(e) => handleChange(e.currentTarget.value)} />;
+                                            case LoaiTruongForm.SELECT: return <Select key={field.id} {...commonProps} data={field.tuyChon ? (typeof field.tuyChon === 'string' ? JSON.parse(field.tuyChon) : field.tuyChon) : []} onChange={handleChange} searchable clearable />;
+                                            default: return <TextInput key={field.id} {...commonProps} onChange={(e) => handleChange(e.currentTarget.value)} />;
+                                        }
+                                    }) : (
+                                        <Box py={60} className="text-center bg-gray-50/50 rounded-24px border border-dashed border-gray-200">
+                                            <Text fw={850} size="sm" c="gray">{t('form.input.empty_fields')}</Text>
+                                        </Box>
+                                    )}
+                                </Stack>
+                            </Stack>
+                        )}
+                    </div>
+                </Box>
             </ScrollArea>
 
-            <Box px={32} py={24} className="border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 shrink-0">
+            <Box className="px-5 py-4 sm:px-8 sm:py-6 border-t border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 shrink-0">
                 <Group justify="space-between">
                     <Button
                         variant="subtle"
                         color="gray"
                         radius="100px"
                         fw={800}
-                        onClick={activeStep === 0 ? onBack : () => setActiveStep(0)}
+                        size="sm"
+                        onClick={activeStep === 0 ? onBack : () => navigateToStep("flow")}
                     >
-                        {activeStep === 0 ? "Huỷ bỏ" : "Quay lại"}
+                        {activeStep === 0 ? t('form.actions.cancel') : t('form.actions.back')}
                     </Button>
 
                     <Button
@@ -578,16 +796,16 @@ function DynamicRequestForm({ template, onBack, onSuccess }: { template: TQuyTri
                         color="indigo"
                         radius="100px"
                         size="md"
-                        h={48}
-                        px={40}
+                        h={44}
+                        px={32}
                         fw={850}
                         disabled={!hasSteps}
-                        onClick={activeStep === 0 ? () => setActiveStep(1) : handleSubmit}
+                        onClick={activeStep === 0 ? () => navigateToStep("data") : handleSubmit}
                         loading={submitMutation.isPending}
                         rightSection={activeStep === 0 ? <IconChevronRight size={18} stroke={3} /> : <IconCheck size={18} stroke={3} />}
-                        className="shadow-lg shadow-indigo-500/10"
+                        className="shadow-lg shadow-indigo-500/10 sm:h-12 sm:px-10"
                     >
-                        {activeStep === 0 ? "Tiếp tục" : "Nộp hồ sơ"}
+                        {activeStep === 0 ? t('form.actions.continue') : t('form.actions.submit')}
                     </Button>
                 </Group>
             </Box>

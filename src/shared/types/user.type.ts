@@ -22,6 +22,7 @@ export interface TUser {
 
     hoSoGiaoVien?: THoSoGiaoVien;
     hoSoHocSinh?: THoSoHocSinh;
+    hoSoXaHoi?: THoSoXaHoi;
 }
 
 export interface TNotification {
@@ -63,4 +64,14 @@ export interface THoSoHocSinh {
     gioiTinh?: string;
     soDienThoai?: string;
     diaChi?: string;
+}
+
+export interface THoSoXaHoi {
+    id: number;
+    userId: number;
+    tieuSu?: string;
+    ngaySinhHienThi?: string;
+    diaChiHienThi?: string;
+    lienKetMangXaHoi?: string;
+    soThich?: string;
 }

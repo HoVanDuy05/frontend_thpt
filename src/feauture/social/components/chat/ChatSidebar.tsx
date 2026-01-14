@@ -4,7 +4,7 @@ import { TChannel } from "@/api/types/api.type";
 import { TUser } from "@/shared/types/user.type";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { ChatListSkeleton } from "./ChatListSkeleton";
 
 interface ChatSidebarProps {
@@ -47,6 +47,7 @@ export const ChatSidebar = ({
     friends
 }: ChatSidebarProps) => {
     const router = useRouter();
+    const locale = useLocale();
     const t = useTranslations('chat');
     const { colorScheme } = useMantineColorScheme();
     const dark = colorScheme === 'dark';
@@ -91,9 +92,9 @@ export const ChatSidebar = ({
                         className="bg-gray-100 dark:bg-zinc-800 text-black dark:text-white hover:bg-gray-200 dark:hover:bg-zinc-700"
                         onClick={() => {
                             if (currentUser?.vaiTro === 'HOC_SINH') {
-                                router.push('/student');
+                                router.push(`/${locale}/student`);
                             } else if (currentUser?.vaiTro === 'ADMIN' || currentUser?.vaiTro === 'GIAO_VIEN') {
-                                router.push('/admin/dashboard');
+                                router.push(`/${locale}/admin/dashboard`);
                             }
                         }}
                     >
@@ -116,7 +117,7 @@ export const ChatSidebar = ({
                         radius="xl"
                         size="lg"
                         className="bg-gray-100 dark:bg-zinc-800 text-black dark:text-white hover:bg-gray-200 dark:hover:bg-zinc-700"
-                        onClick={() => router.push('/social')}
+                        onClick={() => router.push(`/${locale}/social`)}
                     >
                         <IconWorld size={20} />
                     </ActionIcon>

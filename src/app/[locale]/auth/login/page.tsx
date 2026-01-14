@@ -9,7 +9,7 @@ import { AppMutation } from "@/api/AppMutation";
 import { useAppStore } from "@/providers/store/useAppStore";
 import { notifications } from "@mantine/notifications";
 import { useEffect, useState } from "react";
-import { IconCheck, IconX, IconLock, IconBrandGoogle, IconSchool, IconChevronRight, IconUser, IconMail, IconDeviceMobile } from "@tabler/icons-react";
+import { IconCheck, IconX, IconLock, IconUser, IconSchool, IconChevronRight, IconMail, IconAlertCircle, IconBrandGoogle, IconDeviceMobile } from "@tabler/icons-react";
 import { useValidation } from "@/shared/common/useValidation";
 import { useTranslationError } from "@/shared/common/useTranslationError";
 import { usePWA } from "@/providers/PWAProvider";
@@ -96,13 +96,26 @@ export default function LoginPage() {
                 }
             },
             onError: (error: any) => {
+                const message = error?.response?.data?.message;
+
+                if (message === "validation.account_not_activated") {
+                    notifications.show({
+                        title: t("auth_failed"),
+                        message: t("account_not_activated"),
+                        color: "orange",
+                        icon: <IconAlertCircle size={16} />,
+                    });
+                    router.push(`/auth/verify?email=${encodeURIComponent(form.values.email)}`);
+                    return;
+                }
+
                 notifications.show({
                     title: t("error"),
                     message: translateError(error),
                     color: "red",
                     icon: <IconX size={16} />,
                 });
-            }
+            },
         });
     };
 

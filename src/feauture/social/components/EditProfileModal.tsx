@@ -46,7 +46,7 @@ import { SocialButton } from "./SocialButton";
 interface ProfileFormData {
     hoTen?: string;
     email?: string;
-    // Date parts
+    // Date parts (Social Display DOB)
     dobDay: string;
     dobMonth: string;
     dobYear: string;
@@ -54,12 +54,14 @@ interface ProfileFormData {
     gioiTinh?: 'NAM' | 'NU';
     soDienThoai?: string;
 
-    // Address parts
+    // Address parts (Social Display Address)
     addrCity: string;
     addrDetail: string;
 
-    lopHocId?: number;
-    chuyenMon?: string;
+    // REMOVED: lopHocId
+    // CHANGED: tieuSu (Bio) - standardized
+    tieuSu?: string;
+    soThich?: string;
 }
 
 interface EditProfileModalProps {
@@ -126,8 +128,11 @@ export function EditProfileModal({ opened, onClose, profile }: EditProfileModalP
     const { user } = useAppStore();
 
     const initializeForm = () => {
-        const addr = splitAddress(profile?.diaChi);
-        const date = splitDate(profile?.ngaySinh);
+        const social = profile?.hoSoXaHoi || {};
+
+        // Priority: Social Display -> User Profile
+        const addr = splitAddress(social.diaChiHienThi || profile?.diaChi);
+        const date = splitDate(social.ngaySinhHienThi || profile?.ngaySinh);
 
         return {
             hoTen: profile?.hoTen || '',
@@ -143,8 +148,9 @@ export function EditProfileModal({ opened, onClose, profile }: EditProfileModalP
             addrCity: addr.city,
             addrDetail: addr.detail,
 
-            lopHocId: profile?.hoSoHocSinh?.lopHocId || undefined,
-            chuyenMon: profile?.hoSoGiaoVien?.chuyenMon || ''
+            // Map Bio to 'tieuSu' field
+            tieuSu: social.tieuSu || '',
+            soThich: social.soThich || ''
         };
     };
 
@@ -388,8 +394,8 @@ export function EditProfileModal({ opened, onClose, profile }: EditProfileModalP
                                     </Grid.Col>
                                     <Grid.Col span={9}>
                                         <Textarea
-                                            value={formData.chuyenMon}
-                                            onChange={(e) => handleInputChange('chuyenMon', e.target.value)}
+                                            value={formData.tieuSu}
+                                            onChange={(e) => handleInputChange('tieuSu', e.target.value)}
                                             variant="unstyled"
                                             autosize
                                             minRows={1}
