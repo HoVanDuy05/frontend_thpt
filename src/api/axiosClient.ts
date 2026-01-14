@@ -35,6 +35,14 @@ axiosClient.interceptors.request.use(
             config.headers.Authorization = `Bearer ${token}`;
         }
 
+        // Detect locale from URL in browser, default to 'vi'
+        if (typeof window !== 'undefined') {
+            const path = window.location.pathname;
+            const localeMatch = path.match(/^\/(vi|en)/);
+            const locale = localeMatch ? localeMatch[1] : 'vi';
+            config.headers['x-custom-lang'] = locale;
+        }
+
         return config;
     },
     (error) => {
