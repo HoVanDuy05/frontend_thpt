@@ -59,7 +59,7 @@ export function FlowCategorySidebar({ activeCategory, onCategoryChange, categori
     return (
         <Box
             component="aside"
-            className="w-full sm:w-[280px] shrink-0 border-r border-gray-200 dark:border-zinc-800 h-full bg-white dark:bg-zinc-900 flex flex-col"
+            className="w-full h-full bg-white dark:bg-zinc-900 flex flex-col"
         >
             <Stack gap={0} className="flex-1">
                 <Box p="md" className="border-b border-gray-100 dark:border-zinc-800/50">
@@ -130,29 +130,34 @@ export function FlowCategorySidebar({ activeCategory, onCategoryChange, categori
                                     key={cat.id}
                                     onClick={() => onCategoryChange(cat.id)}
                                     className={`
-                                        w-full px-3 py-2.5 rounded-lg transition-all flex items-center justify-between group
+                                        w-full px-4 py-3 rounded-xl transition-all flex items-center justify-between group
                                         ${isActive
-                                            ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300'
-                                            : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                                            ? 'bg-indigo-600 shadow-md shadow-indigo-200 dark:shadow-none text-white'
+                                            : 'hover:bg-gray-50 dark:hover:bg-zinc-800/50 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400'
                                         }
                                     `}
                                 >
-                                    <Group gap="sm">
-                                        <Icon
-                                            size={18}
-                                            stroke={isActive ? 2 : 1.5}
-                                            className="shrink-0"
-                                        />
-                                        <Text size="sm" fw={isActive ? 600 : 500} className="truncate">
+                                    <Group gap="md">
+                                        <Box className={`
+                                            w-8 h-8 rounded-lg flex items-center justify-center transition-colors
+                                            ${isActive ? 'bg-white/20' : 'bg-gray-50 dark:bg-zinc-800 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/40'}
+                                        `}>
+                                            <Icon
+                                                size={18}
+                                                stroke={isActive ? 2.5 : 1.5}
+                                                className={isActive ? 'text-white' : 'text-gray-500 group-hover:text-indigo-600'}
+                                            />
+                                        </Box>
+                                        <Text size="sm" fw={isActive ? 700 : 500}>
                                             {cat.label}
                                         </Text>
                                     </Group>
                                     {cat.count > 0 && (
                                         <Badge
-                                            variant={isActive ? "filled" : "light"}
+                                            variant={isActive ? "white" : "light"}
                                             color={isActive ? "indigo" : "gray"}
-                                            size="xs"
-                                            radius="sm"
+                                            size="sm"
+                                            radius="md"
                                         >
                                             {cat.count}
                                         </Badge>

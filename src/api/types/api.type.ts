@@ -165,6 +165,10 @@ export type ApiQueryType = {
         url: { baseUrl: "/my-flow", queryParams?: { status?: string } };
         response: TPhienQuyTrinh[];
     };
+    getPendingApprovals: {
+        url: { baseUrl: "/pending" };
+        response: TPhienQuyTrinh[];
+    };
     getFlowInstance: {
         url: { baseUrl: "/flow-instance/:id", urlParams: { id: number } };
         response: TPhienQuyTrinh;

@@ -8,6 +8,8 @@ import { AppQuery } from '@/api/AppQuery';
 import { AppMutation } from '@/api/AppMutation';
 import { notifications } from '@mantine/notifications';
 import { useMediaQuery } from '@mantine/hooks';
+import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { IconZoomIn, IconZoomOut, IconMaximize, IconArrowsMove } from '@tabler/icons-react';
 
 interface FlowBuilderDrawerProps {
     opened: boolean;
@@ -35,9 +37,9 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
     const [activeTab, setActiveTab] = React.useState<string | null>('design');
     const [isActive, setIsActive] = React.useState(true);
 
-    // Category Creation State
     const [searchValue, setSearchValue] = useState('');
     const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+    const [zoom, setZoom] = useState(1);
 
     const [steps, setSteps] = React.useState<{ id: number, name: string, rule: 'all' | 'any', approverType: string, specificUser?: any }[]>([
         { id: 1, name: "Duyệt lần 1", rule: 'any', approverType: 'ROLE_GVCN' }
@@ -118,7 +120,14 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
     }, [opened, initialData]);
 
     // Options
-    const categoryOptions = categoriesData?.map((c: any) => ({ value: c.id.toString(), label: c.ten })) || [];
+    const categoryOptions = React.useMemo(() => {
+        const baseOptions = categoriesData?.map((c: any) => ({ value: c.id.toString(), label: c.ten })) || [];
+        const query = searchValue.toLowerCase().trim();
+        if (query && !baseOptions.some(opt => opt.label.toLowerCase() === query)) {
+            return [...baseOptions, { value: '$create', label: searchValue }];
+        }
+        return baseOptions;
+    }, [categoriesData, searchValue]);
 
     const INPUT_TYPES = [
         { value: 'TEXT', label: tFields('text') },
@@ -153,6 +162,18 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
         setFormFields(prev => prev.map(f => f.id === id ? { ...f, [key]: value } : f));
     };
 
+    const handleDragEnd = (result: DropResult) => {
+        if (!result.destination) return;
+        const items = Array.from(formFields);
+        const [reorderedItem] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, reorderedItem);
+        setFormFields(items);
+    };
+
+    const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.1, 2));
+    const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.5));
+    const handleResetZoom = () => setZoom(1);
+
     // Fetch potential approvers (Teachers & Admins)
     const { data: usersData } = AppQuery.user.useList({ take: 1000 });
 
@@ -182,6 +203,8 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
     }, [usersData]);
 
     const handleCreateCategory = async (query: string) => {
+        if (!query) return;
+
         setIsCreatingCategory(true);
         try {
             const res = await createCategoryMutation.mutateAsync({ name: query, description: '' });
@@ -213,18 +236,12 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
     // Custom filter for category select to include "Create" option
     const optionsFilter: OptionsFilter = ({ options, search }) => {
         const query = search.toLowerCase().trim();
-        const parsedOptions = options as ComboboxItem[];
-        const filtered = parsedOptions.filter((item) => item.label.toLowerCase().includes(query));
-
-        const exactMatch = filtered.some((item) => item.label.toLowerCase() === query);
-        if (query.length > 0 && !exactMatch) {
-            return [...filtered, { value: '$create', label: query }];
-        }
-        return filtered;
+        return (options as ComboboxItem[]).filter((item) =>
+            item.label.toLowerCase().includes(query) || item.value === '$create'
+        );
     };
 
-    // Render Helpers (Moved inside render to avoid recreation if they were components, or just use direct JSX)
-    // To avoid focus loss, we simply render them directly in the main return or useMemo if strictly needed. 
+    // Render Helpers (Moved inside render to avoid recreation if they were components, or just useMemo if strictly needed. 
     // But since they depend on state, direct JSX is best for this complexity.
 
     const renderInfoPanel = () => (
@@ -350,84 +367,104 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
                             Thêm trường thông tin
                         </Button>
                     </Group>
-                    <Stack gap="md">
-                        {formFields.map((field, index) => (
-                            <Paper
-                                key={field.id}
-                                withBorder
-                                p="md"
-                                radius="lg"
-                                className="bg-white dark:bg-zinc-800 shadow-sm border-gray-200 dark:border-zinc-700 relative group"
-                            >
-                                <Box className="absolute left-0 top-0 bottom-0 w-1 bg-gray-200 group-hover:bg-indigo-400 transition-colors rounded-l-lg" />
-                                <Stack gap="sm" pl="xs">
-                                    <Group justify="space-between" wrap="nowrap">
-                                        <Group gap="sm" className="flex-1">
-                                            <ThemeIcon color="gray" variant="transparent" size="sm" className="cursor-grab text-gray-400 hover:text-gray-600">
-                                                <IconGripVertical size={16} />
-                                            </ThemeIcon>
-                                            <TextInput
-                                                value={field.label}
-                                                onChange={(e) => updateField(field.id, 'label', e.target.value)}
-                                                placeholder="Tên trường (Ví dụ: Lý do nghỉ)..."
-                                                variant="unstyled"
-                                                size="sm"
-                                                className="flex-1 font-semibold"
-                                                styles={{
-                                                    input: { fontSize: 15 }
-                                                }}
-                                            />
-                                        </Group>
-                                        <ActionIcon
-                                            color="red"
-                                            variant="subtle"
-                                            size="sm"
-                                            onClick={() => removeField(field.id)}
-                                            className="opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                            <IconTrash size={16} />
-                                        </ActionIcon>
-                                    </Group>
+                    <DragDropContext onDragEnd={handleDragEnd}>
+                        <Droppable droppableId="form-fields">
+                            {(provided) => (
+                                <Stack gap="md" {...provided.droppableProps} ref={provided.innerRef}>
+                                    {formFields.map((field, index) => (
+                                        <Draggable key={field.id.toString()} draggableId={field.id.toString()} index={index}>
+                                            {(provided, snapshot) => (
+                                                <Paper
+                                                    ref={provided.innerRef}
+                                                    {...provided.draggableProps}
+                                                    withBorder
+                                                    p="md"
+                                                    radius="lg"
+                                                    className={`
+                                                        bg-white dark:bg-zinc-800 shadow-sm border-gray-200 dark:border-zinc-700 relative group
+                                                        ${snapshot.isDragging ? 'shadow-xl scale-[1.02] border-indigo-500 z-50' : ''}
+                                                    `}
+                                                >
+                                                    <Box className="absolute left-0 top-0 bottom-0 w-1 bg-gray-200 group-hover:bg-indigo-400 transition-colors rounded-l-lg" />
+                                                    <Stack gap="sm" pl="xs">
+                                                        <Group justify="space-between" wrap="nowrap">
+                                                            <Group gap="sm" className="flex-1">
+                                                                <Box {...provided.dragHandleProps}>
+                                                                    <ThemeIcon color="gray" variant="transparent" size="sm" className="cursor-grab text-gray-400 hover:text-gray-600">
+                                                                        <IconGripVertical size={16} />
+                                                                    </ThemeIcon>
+                                                                </Box>
+                                                                <TextInput
+                                                                    value={field.label}
+                                                                    onChange={(e) => updateField(field.id, 'label', e.target.value)}
+                                                                    placeholder="Tên trường (Ví dụ: Lý do nghỉ)..."
+                                                                    variant="unstyled"
+                                                                    size="sm"
+                                                                    className="flex-1 font-semibold"
+                                                                    styles={{
+                                                                        input: { fontSize: 15 }
+                                                                    }}
+                                                                />
+                                                            </Group>
+                                                            <ActionIcon
+                                                                color="red"
+                                                                variant="subtle"
+                                                                size="sm"
+                                                                onClick={() => removeField(field.id)}
+                                                            >
+                                                                <IconTrash size={16} />
+                                                            </ActionIcon>
+                                                        </Group>
 
-                                    <Divider variant="dashed" />
+                                                        <Divider variant="dashed" />
 
-                                    <Group gap="md">
-                                        <Select
-                                            data={INPUT_TYPES}
-                                            value={field.type}
-                                            onChange={(val) => updateField(field.id, 'type', val)}
-                                            size="xs"
-                                            variant="filled"
-                                            placeholder="Loại dữ liệu"
-                                            className="w-32"
-                                            allowDeselect={false}
-                                        />
-                                        <Switch
-                                            label="Bắt buộc nhập"
-                                            checked={field.required}
-                                            onChange={(e) => updateField(field.id, 'required', e.currentTarget.checked)}
-                                            size="xs"
-                                        />
-                                    </Group>
+                                                        <Group gap="md">
+                                                            <Select
+                                                                data={INPUT_TYPES}
+                                                                value={field.type}
+                                                                onChange={(val) => updateField(field.id, 'type', val)}
+                                                                size="xs"
+                                                                variant="filled"
+                                                                placeholder="Loại dữ liệu"
+                                                                className="w-44"
+                                                                allowDeselect={false}
+                                                                styles={{
+                                                                    option: { fontSize: rem(13) },
+                                                                    input: { fontWeight: 600 }
+                                                                }}
+                                                            />
+                                                            <Switch
+                                                                label="Bắt buộc nhập"
+                                                                checked={field.required}
+                                                                onChange={(e) => updateField(field.id, 'required', e.currentTarget.checked)}
+                                                                size="xs"
+                                                            />
+                                                        </Group>
+                                                    </Stack>
+                                                </Paper>
+                                            )}
+                                        </Draggable>
+                                    ))}
+                                    {provided.placeholder}
                                 </Stack>
-                            </Paper>
-                        ))}
+                            )}
+                        </Droppable>
+                    </DragDropContext>
 
-                        {formFields.length === 0 && (
-                            <Paper p="xl" radius="lg" className="border-2 border-dashed border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
-                                <Stack align="center" gap="sm">
-                                    <ThemeIcon size={48} radius="xl" variant="light" color="gray">
-                                        <IconFileDescription size={24} />
-                                    </ThemeIcon>
-                                    <Text size="sm" c="dimmed" ta="center">
-                                        Chưa có trường nào được cấu hình.<br />
-                                        Nhấn <b>"Thêm trường thông tin"</b> để bắt đầu thiết kế form.
-                                    </Text>
-                                    <Button variant="light" size="xs" onClick={addField}>Thêm trường ngay</Button>
-                                </Stack>
-                            </Paper>
-                        )}
-                    </Stack>
+                    {formFields.length === 0 && (
+                        <Paper p="xl" radius="lg" className="border-2 border-dashed border-gray-200 dark:border-zinc-800 bg-gray-50/50 dark:bg-zinc-900/50">
+                            <Stack align="center" gap="sm">
+                                <ThemeIcon size={48} radius="xl" variant="light" color="gray">
+                                    <IconFileDescription size={24} />
+                                </ThemeIcon>
+                                <Text size="sm" c="dimmed" ta="center">
+                                    Chưa có trường nào được cấu hình.<br />
+                                    Nhấn <b>"Thêm trường thông tin"</b> để bắt đầu thiết kế form.
+                                </Text>
+                                <Button variant="light" size="xs" onClick={addField}>Thêm trường ngay</Button>
+                            </Stack>
+                        </Paper>
+                    )}
                 </Box>
             </Stack>
         </ScrollArea>
@@ -437,12 +474,30 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
         <Box className="h-full flex flex-col relative overflow-hidden bg-gray-50/50 dark:bg-zinc-900/50">
             <Box className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle, #6366f1 1px, transparent 1px)', backgroundSize: '20px 20px' }} />
 
-            <Box className="flex-1 overflow-auto">
+            <Box className="flex-1 overflow-auto relative">
+                {/* Zoom Controls */}
+                <Box className="absolute bottom-6 right-6 z-50 bg-white/90 dark:bg-zinc-800/90 backdrop-blur-md p-1 rounded-xl border border-gray-200 dark:border-zinc-700 shadow-xl flex gap-1">
+                    <Tooltip label="Phóng to">
+                        <ActionIcon variant="subtle" color="gray" onClick={handleZoomIn} size="lg"><IconZoomIn size={20} /></ActionIcon>
+                    </Tooltip>
+                    <Box className="w-px h-6 bg-gray-200 self-center" />
+                    <Tooltip label="Thu nhỏ">
+                        <ActionIcon variant="subtle" color="gray" onClick={handleZoomOut} size="lg"><IconZoomOut size={20} /></ActionIcon>
+                    </Tooltip>
+                    <Box className="w-px h-6 bg-gray-200 self-center" />
+                    <Tooltip label="Tỉ lệ mặc định">
+                        <ActionIcon variant="subtle" color="gray" onClick={handleResetZoom} size="lg"><IconMaximize size={18} /></ActionIcon>
+                    </Tooltip>
+                    <Box className="px-2 self-center">
+                        <Text size="xs" fw={700} c="dimmed" className="w-10 text-center">{Math.round(zoom * 100)}%</Text>
+                    </Box>
+                </Box>
+
                 <Box className="min-w-[800px] min-h-full relative bg-gray-50/30 dark:bg-zinc-900/30">
                     {/* Infinite Grid Background */}
-                    <Box className="absolute inset-0 opacity-[0.03] pointer-events-none z-0" style={{ backgroundImage: 'linear-gradient(#4f46e5 1px, transparent 1px), linear-gradient(90deg, #4f46e5 1px, transparent 1px)', backgroundSize: '20px 20px', width: '200%', height: '200%' }} />
+                    <Box className="absolute inset-0 opacity-[0.03] pointer-events-none z-0" style={{ backgroundImage: 'linear-gradient(#4f46e5 1px, transparent 1px), linear-gradient(90deg, #4f46e5 1px, transparent 1px)', backgroundSize: '20px 20px', width: '200%', height: '200%', transform: `scale(${1 / zoom})`, transformOrigin: 'top left' }} />
 
-                    <Box p="xl" className="min-w-fit min-h-full flex items-center md:items-start z-10 relative pb-32">
+                    <Box p="xl" className="min-w-fit min-h-full flex items-center md:items-start z-10 relative pb-48" style={{ transform: `scale(${zoom})`, transformOrigin: 'top left', transition: 'transform 0.2s ease-out' }}>
                         <Box className="flex flex-col md:flex-row items-center md:items-start gap-4 md:gap-0 pl-10 pr-20 py-20 min-w-[600px]">
 
                             {/* START NODE */}

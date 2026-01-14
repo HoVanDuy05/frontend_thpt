@@ -66,6 +66,8 @@ export const AppQuery = {
             useAppQuery({ url: { baseUrl: "/flow" }, options }),
         useFormFields: (id: number, options?: AppQueryOptions<"getFlowFormFields">) =>
             useAppQuery({ url: { baseUrl: "/flow/:id/form-fields", urlParams: { id } }, options }),
+        usePending: (options?: AppQueryOptions<"getPendingApprovals">) =>
+            useAppQuery({ url: { baseUrl: "/pending" }, options }),
         useMyFlows: (status?: string, options?: AppQueryOptions<"getMyFlows">) =>
             useAppQuery({ url: { baseUrl: "/my-flow", queryParams: { status } }, options }),
         useInstance: (id: number, options?: AppQueryOptions<"getFlowInstance">) =>

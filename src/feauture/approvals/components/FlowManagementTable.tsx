@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Badge, Group, ActionIcon, Switch, Text, Menu, Button } from '@mantine/core';
+import { Table, Badge, Group, ActionIcon, Switch, Text, Menu, Button, rem } from '@mantine/core';
 import { IconPencil, IconTrash, IconDotsVertical, IconCheck, IconX, IconTemplate } from '@tabler/icons-react';
 import { dayjs } from '@/shared/utils/date.util';
 
@@ -44,9 +44,6 @@ export function FlowManagementTable({ flows, onEdit, onDelete, onToggleStatus }:
             </Table.Td>
             <Table.Td>
                 <Group gap={0} justify="flex-end">
-                    <ActionIcon variant="subtle" color="gray" onClick={() => onEdit(flow)}>
-                        <IconPencil size={16} />
-                    </ActionIcon>
                     <Menu shadow="md" width={200} position="bottom-end">
                         <Menu.Target>
                             <ActionIcon variant="subtle" color="gray">
@@ -74,17 +71,19 @@ export function FlowManagementTable({ flows, onEdit, onDelete, onToggleStatus }:
     ));
 
     return (
-        <Table verticalSpacing="sm" withRowBorders>
-            <Table.Thead>
-                <Table.Tr>
-                    <Table.Th>Tên quy trình</Table.Th>
-                    <Table.Th>Danh mục</Table.Th>
-                    <Table.Th>Ngày tạo</Table.Th>
-                    <Table.Th>Trạng thái</Table.Th>
-                    <Table.Th style={{ textAlign: 'right' }}>Thao tác</Table.Th>
-                </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>{rows}</Table.Tbody>
-        </Table>
+        <Table.ScrollContainer minWidth={700}>
+            <Table verticalSpacing="md" horizontalSpacing="md" withRowBorders>
+                <Table.Thead bg="var(--mantine-color-default-hover)" className="border-b border-zinc-200 dark:border-zinc-800">
+                    <Table.Tr>
+                        <Table.Th py="md" style={{ borderTopLeftRadius: rem(12) }}>TÊN QUY TRÌNH</Table.Th>
+                        <Table.Th py="md">DANH MỤC</Table.Th>
+                        <Table.Th py="md">NGÀY TẠO</Table.Th>
+                        <Table.Th py="md">TRẠNG THÁI</Table.Th>
+                        <Table.Th py="md" style={{ borderTopRightRadius: rem(12), textAlign: 'right' }}>THAO TÁC</Table.Th>
+                    </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>{rows}</Table.Tbody>
+            </Table>
+        </Table.ScrollContainer>
     );
 }
