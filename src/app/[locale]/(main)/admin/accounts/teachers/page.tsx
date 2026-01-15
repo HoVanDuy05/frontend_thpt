@@ -9,7 +9,7 @@ import { IconPlus, IconAlertCircle } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { TUser } from "@/shared/types/user.type";
-import { Stack, Text, Box, Skeleton, Paper, rem } from "@mantine/core";
+import { Stack, Text, Box, Skeleton, Paper, rem, Group } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useEffect } from "react";
@@ -102,8 +102,14 @@ export default function TeacherPage() {
             title="Quản lý Giáo viên"
             description="Danh sách giáo viên trong hệ thống"
             actions={
-                <AppButton leftSection={<IconPlus size={18} />} onClick={handleOpenCreate}>
-                    Thêm Giáo viên
+                <AppButton
+                    onClick={handleOpenCreate}
+                    px={{ base: 12, sm: 16 }}
+                >
+                    <Group gap={6} wrap="nowrap">
+                        <IconPlus size={18} />
+                        <span className="hidden sm:inline">Thêm Giáo viên</span>
+                    </Group>
                 </AppButton>
             }
         >

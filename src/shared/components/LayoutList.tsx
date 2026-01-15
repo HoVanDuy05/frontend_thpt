@@ -67,45 +67,39 @@ export const LayoutList = React.forwardRef<HTMLDivElement, LayoutProps>(
                         >
                             <Stack gap="sm">
                                 {/* Title and Description */}
-                                <Group justify="space-between" align="flex-start" wrap="nowrap">
-                                    <Stack gap={4}>
+                                <Group justify="space-between" align="center" wrap="nowrap" gap="xs">
+                                    <Stack gap={0} style={{ flex: 1, minWidth: 0 }}>
                                         {backText && (
                                             <button
                                                 type="button"
                                                 onClick={handleBackClick}
-                                                className="text-xs font-semibold text-zinc-500 hover:text-blue-600 transition-colors inline-flex items-center gap-1 group w-fit"
+                                                className="text-[10px] font-bold text-zinc-400 hover:text-blue-600 transition-colors inline-flex items-center gap-1 group w-fit"
                                             >
-                                                <IconArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
+                                                <IconArrowLeft size={12} className="group-hover:-translate-x-0.5 transition-transform" />
                                                 {backText}
                                             </button>
                                         )}
                                         <Title
                                             order={2}
                                             fw={800}
-                                            style={{ color: 'var(--mantine-color-text)' }}
-                                            className="tracking-tight text-xl sm:text-2xl"
+                                            style={{ color: 'var(--mantine-color-text)', lineHeight: 1 }}
+                                            className="tracking-tighter text-lg sm:text-2xl truncate"
                                         >
                                             {title}
                                         </Title>
                                         {description && (
-                                            <Text size="xs" c="dimmed" fw={500}>
+                                            <Text size="xs" c="dimmed" fw={500} visibleFrom="sm">
                                                 {description}
                                             </Text>
                                         )}
                                     </Stack>
 
                                     {actions && (
-                                        <Box className="hidden sm:block">
+                                        <Box className="flex-none">
                                             {actions}
                                         </Box>
                                     )}
                                 </Group>
-
-                                {actions && (
-                                    <Box className="sm:hidden w-full">
-                                        {actions}
-                                    </Box>
-                                )}
                             </Stack>
                         </Paper>
                     )}
