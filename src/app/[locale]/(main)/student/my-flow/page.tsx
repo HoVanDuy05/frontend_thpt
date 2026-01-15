@@ -714,28 +714,22 @@ function DynamicRequestForm({ template, onBack, onSuccess }: { template: TQuyTri
                                             label: field.nhan,
                                             withAsterisk: field.batBuoc,
                                             placeholder: t('form.input.placeholder', { name: field.nhan.toLowerCase() }),
-                                            size: "md",
+                                            size: "md" as const,
                                             radius: "12px",
                                             className: "transition-all duration-200",
-                                            styles: (theme: any) => ({
+                                            styles: {
                                                 label: {
                                                     marginBottom: '8px',
                                                     fontWeight: 700,
                                                     fontSize: '14px',
-                                                    color: theme.colorScheme === 'dark' ? theme.colors.gray[0] : theme.colors.gray[8],
                                                     display: 'flex',
                                                     alignItems: 'center',
                                                     gap: '4px',
                                                     letterSpacing: '-0.01em'
                                                 },
-                                                required: {
-                                                    color: theme.colors.red[5],
-                                                    fontSize: '14px'
-                                                },
                                                 input: {
-                                                    backgroundColor: theme.colorScheme === 'dark' ? 'var(--mantine-color-zinc-900)' : '#f8fafc',
-                                                    border: '1px solid',
-                                                    borderColor: theme.colorScheme === 'dark' ? 'var(--mantine-color-zinc-800)' : '#e2e8f0',
+                                                    backgroundColor: 'var(--mantine-color-body)',
+                                                    border: '1px solid var(--mantine-color-default-border)',
                                                     height: '50px',
                                                     fontSize: '14px',
                                                     fontWeight: 500,
@@ -743,16 +737,16 @@ function DynamicRequestForm({ template, onBack, onSuccess }: { template: TQuyTri
                                                     transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                                                     borderRadius: '12px',
                                                     '&:focus': {
-                                                        borderColor: '#6366f1',
+                                                        borderColor: 'var(--mantine-color-indigo-6)',
                                                         boxShadow: '0 0 0 4px rgba(99, 102, 241, 0.08)',
-                                                        backgroundColor: '#fff'
+                                                        backgroundColor: 'var(--mantine-color-body)'
                                                     },
                                                     '&::placeholder': {
-                                                        color: '#94a3b8',
+                                                        color: 'var(--mantine-color-placeholder)',
                                                         fontSize: '13px'
                                                     }
                                                 }
-                                            })
+                                            }
                                         };
 
                                         const handleChange = (val: string | number | boolean | null) => setFormData(prev => ({ ...prev, [field.id]: val }));
@@ -760,7 +754,7 @@ function DynamicRequestForm({ template, onBack, onSuccess }: { template: TQuyTri
                                         switch (field.loai) {
                                             case LoaiTruongForm.TEXTAREA:
                                             case LoaiTruongForm.LONG_TEXT:
-                                                return <Textarea key={field.id} {...commonProps} minRows={4} onChange={(e) => handleChange(e.currentTarget.value)} styles={{ ...commonProps.styles, input: { ...commonProps.styles({}).input, height: 'auto', minHeight: '120px' } }} />;
+                                                return <Textarea key={field.id} {...commonProps} minRows={4} onChange={(e) => handleChange(e.currentTarget.value)} styles={{ ...commonProps.styles, input: { ...commonProps.styles.input, height: 'auto', minHeight: '120px' } }} />;
                                             case LoaiTruongForm.NUMBER: return <NumberInput key={field.id} {...commonProps} onChange={handleChange} />;
                                             case LoaiTruongForm.DATE: return <TextInput key={field.id} type="date" {...commonProps} onChange={(e) => handleChange(e.currentTarget.value)} />;
                                             case LoaiTruongForm.SELECT: return <Select key={field.id} {...commonProps} data={field.tuyChon ? (typeof field.tuyChon === 'string' ? JSON.parse(field.tuyChon) : field.tuyChon) : []} onChange={handleChange} searchable clearable />;
