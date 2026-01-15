@@ -1,7 +1,7 @@
 "use client";
 
-import { ActionIcon, Box, Group, Paper, Stack, Table, Text } from "@mantine/core";
-import { IconCalendar, IconEdit, IconPlus, IconTrash, IconCalendarTime } from "@tabler/icons-react";
+import { ActionIcon, Box, Group, Paper, Stack, Table, Text, SimpleGrid, Card, Badge, Tooltip } from "@mantine/core";
+import { IconCalendar, IconEdit, IconPlus, IconTrash, IconCalendarTime, IconSchool } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { AppQuery } from "@/api/AppQuery";
@@ -81,58 +81,63 @@ export default function YearsPage() {
             }
             loading={isLoading}
         >
-            <Paper radius="md" withBorder shadow="sm" className="overflow-hidden">
-                {namHocs && namHocs.length > 0 ? (
-                    <Table verticalSpacing="sm" horizontalSpacing="md" highlightOnHover>
-                        <Table.Thead
-                            style={{
-                                background: 'var(--mantine-color-default-hover)',
-                            }}
-                        >
-                            <Table.Tr>
-                                <Table.Th>{t("columns.name")}</Table.Th>
-                                <Table.Th>{t("columns.start_date")}</Table.Th>
-                                <Table.Th>{t("columns.end_date")}</Table.Th>
-                                <Table.Th>{t("columns.status")}</Table.Th>
-                                <Table.Th style={{ textAlign: 'right' }}>{t("columns.actions")}</Table.Th>
-                            </Table.Tr>
-                        </Table.Thead>
-                        <Table.Tbody>
-                            {namHocs.map((item) => (
-                                <Table.Tr key={item.id}>
-                                    <Table.Td fw={600} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                        <IconCalendarTime size={20} className="text-blue-600" />
-                                        {item.tenNamHoc}
-                                    </Table.Td>
-                                    <Table.Td>{item.ngayBatDau ? dayjs(item.ngayBatDau).format("DD/MM/YYYY") : "-"}</Table.Td>
-                                    <Table.Td>{item.ngayKetThuc ? dayjs(item.ngayKetThuc).format("DD/MM/YYYY") : "-"}</Table.Td>
-                                    <Table.Td>
-                                        {item.dangKichHoat ? (
-                                            <Text c="green" size="sm" fw={500} style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-                                                <Box w={6} h={6} style={{ borderRadius: '50%', background: 'var(--mantine-color-green-6)' }} />
-                                                {t("status.active")}
-                                            </Text>
-                                        ) : (
-                                            <Text c="dimmed" size="sm">
-                                                {t("status.inactive")}
-                                            </Text>
-                                        )}
-                                    </Table.Td>
-                                    <Table.Td>
-                                        <Group gap="xs" justify="flex-end">
-                                            <ActionIcon variant="light" color="indigo" onClick={() => handleOpenEdit(item)}>
-                                                <IconEdit size={16} />
-                                            </ActionIcon>
-                                            <ActionIcon variant="light" color="red" onClick={() => handleDelete(item.id)}>
-                                                <IconTrash size={16} />
-                                            </ActionIcon>
-                                        </Group>
-                                    </Table.Td>
-                                </Table.Tr>
-                            ))}
-                        </Table.Tbody>
-                    </Table>
-                ) : (
+            {namHocs && namHocs.length > 0 ? (
+                <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="md">
+                    {namHocs.map((item) => (
+                        <Card key={item.id} shadow="sm" padding="md" radius="md" withBorder className="relative hover:shadow-md transition-shadow">
+                            <Group justify="space-between" align="flex-start" mb="xs">
+                                <Badge
+                                    size="sm"
+                                    color={item.dangKichHoat ? "green" : "gray"}
+                                    variant="light"
+                                >
+                                    {item.dangKichHoat ? t("status.active") : t("status.inactive")}
+                                </Badge>
+
+                                <Group gap={0}>
+                                    <Tooltip label={t("actions.edit")}>
+                                        <ActionIcon variant="subtle" color="indigo" size="sm" onClick={() => handleOpenEdit(item)}>
+                                            <IconEdit size={16} />
+                                        </ActionIcon>
+                                    </Tooltip>
+                                    <Tooltip label={t("actions.delete")}>
+                                        <ActionIcon variant="subtle" color="red" size="sm" onClick={() => handleDelete(item.id)}>
+                                            <IconTrash size={16} />
+                                        </ActionIcon>
+                                    </Tooltip>
+                                </Group>
+                            </Group>
+
+                            <Stack align="center" gap={4} mb="xs">
+                                <Box
+                                    className="p-2 rounded-full bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+                                >
+                                    <IconSchool size={24} />
+                                </Box>
+                                <Text fw={600} size="md" ta="center">
+                                    {item.tenNamHoc}
+                                </Text>
+                            </Stack>
+
+                            <Group grow gap="xs" mt="auto">
+                                <Box className="p-1.5 rounded bg-gray-50 dark:bg-dark-600 text-center">
+                                    <Text size="10px" c="dimmed" tt="uppercase">{t("columns.start_date")}</Text>
+                                    <Text size="xs" fw={500}>
+                                        {item.ngayBatDau ? dayjs(item.ngayBatDau).format("DD/MM/YYYY") : "-"}
+                                    </Text>
+                                </Box>
+                                <Box className="p-1.5 rounded bg-gray-50 dark:bg-dark-600 text-center">
+                                    <Text size="10px" c="dimmed" tt="uppercase">{t("columns.end_date")}</Text>
+                                    <Text size="xs" fw={500}>
+                                        {item.ngayKetThuc ? dayjs(item.ngayKetThuc).format("DD/MM/YYYY") : "-"}
+                                    </Text>
+                                </Box>
+                            </Group>
+                        </Card>
+                    ))}
+                </SimpleGrid>
+            ) : (
+                <Paper radius="md" withBorder shadow="sm" className="overflow-hidden">
                     <Stack align="center" py={80} gap="md">
                         <Box
                             style={{ background: 'var(--mantine-color-default-hover)' }}
@@ -145,8 +150,8 @@ export default function YearsPage() {
                             <Text size="sm" c="dimmed">{t("no_data_subtitle")}</Text>
                         </Stack>
                     </Stack>
-                )}
-            </Paper>
+                </Paper>
+            )}
 
             <YearModal
                 opened={opened}

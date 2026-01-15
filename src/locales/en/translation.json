@@ -13,7 +13,9 @@
             "classes": "Classes",
             "subjects": "Subjects",
             "courses": "Courses",
-            "schedule": "Schedule"
+            "schedule": "Schedule",
+            "years": "Academic Years",
+            "semesters": "Semesters"
         },
         "examination": {
             "title": "Examination",
@@ -234,6 +236,95 @@
             },
             "no_data": "No schedules available",
             "no_data_subtitle": "Start by creating your first timetable"
+        },
+        "years": {
+            "title": "Academic Years",
+            "subtitle": "Manage list of academic years",
+            "create": "Create Year",
+            "create_title": "Create Academic Year",
+            "edit_title": "Edit Academic Year",
+            "columns": {
+                "name": "Year Name",
+                "start_date": "Start Date",
+                "end_date": "End Date",
+                "status": "Status",
+                "actions": "Actions"
+            },
+            "status": {
+                "active": "Active",
+                "inactive": "Inactive"
+            },
+            "actions": {
+                "edit": "Edit",
+                "delete": "Delete"
+            },
+            "fields": {
+                "name": "Year Name",
+                "start_date": "Start Date",
+                "end_date": "End Date",
+                "active": "Active",
+                "active_desc": "Set this academic year as active"
+            },
+            "placeholders": {
+                "name": "Enter year name (e.g., 2023-2024)",
+                "date": "Select date"
+            },
+            "errors": {
+                "required": "This field is required"
+            },
+            "no_data": "No academic years yet",
+            "no_data_subtitle": "Create a new year to start managing",
+            "messages": {
+                "create_success": "Academic year created successfully",
+                "update_success": "Academic year updated successfully",
+                "delete_success": "Academic year deleted successfully"
+            }
+        },
+        "semesters": {
+            "title": "Semesters",
+            "subtitle": "Manage list of semesters",
+            "create": "Create Semester",
+            "create_title": "Create Semester",
+            "edit_title": "Edit Semester",
+            "columns": {
+                "name": "Semester Name",
+                "year": "Academic Year",
+                "start_date": "Start Date",
+                "end_date": "End Date",
+                "status": "Status",
+                "actions": "Actions"
+            },
+            "status": {
+                "active": "Active",
+                "inactive": "Inactive"
+            },
+            "actions": {
+                "edit": "Edit",
+                "delete": "Delete"
+            },
+            "fields": {
+                "name": "Semester Name",
+                "year": "Academic Year",
+                "start_date": "Start Date",
+                "end_date": "End Date",
+                "active": "Active",
+                "active_desc": "Set this semester as active"
+            },
+            "placeholders": {
+                "name": "Enter semester name (e.g., Semester 1)",
+                "year": "Select academic year",
+                "date": "Select date"
+            },
+            "errors": {
+                "required": "This field is required"
+            },
+            "no_data": "No semesters yet",
+            "no_data_subtitle": "Create a new semester to start managing",
+            "messages": {
+                "create_success": "Semester created successfully",
+                "update_success": "Semester updated successfully",
+                "delete_success": "Semester deleted successfully"
+            }
         }
     },
     "portal": {

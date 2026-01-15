@@ -13,7 +13,9 @@
             "classes": "Lớp học",
             "subjects": "Môn học",
             "courses": "Khóa học",
-            "schedule": "Lịch học"
+            "schedule": "Lịch học",
+            "years": "Năm học",
+            "semesters": "Học kỳ"
         },
         "examination": {
             "title": "Khảo thí",
@@ -231,6 +233,95 @@
             },
             "no_data": "Chưa có lịch học nào",
             "no_data_subtitle": "Bắt đầu bằng cách tạo thời khóa biểu đầu tiên"
+        },
+        "years": {
+            "title": "Quản lý Năm học",
+            "subtitle": "Danh sách và quản lý các năm học",
+            "create": "Tạo năm học",
+            "create_title": "Tạo năm học mới",
+            "edit_title": "Chỉnh sửa năm học",
+            "columns": {
+                "name": "Tên năm học",
+                "start_date": "Ngày bắt đầu",
+                "end_date": "Ngày kết thúc",
+                "status": "Trạng thái",
+                "actions": "Thao tác"
+            },
+            "status": {
+                "active": "Đang hoạt động",
+                "inactive": "Ngưng hoạt động"
+            },
+            "actions": {
+                "edit": "Chỉnh sửa",
+                "delete": "Xóa"
+            },
+            "fields": {
+                "name": "Tên năm học",
+                "start_date": "Ngày bắt đầu",
+                "end_date": "Ngày kết thúc",
+                "active": "Kích hoạt",
+                "active_desc": "Đặt năm học này làm năm học hiện tại"
+            },
+            "placeholders": {
+                "name": "Nhập tên năm học (VD: 2023-2024)",
+                "date": "Chọn ngày"
+            },
+            "errors": {
+                "required": "Vui lòng nhập thông tin này"
+            },
+            "no_data": "Chưa có năm học nào",
+            "no_data_subtitle": "Tạo năm học mới để bắt đầu quản lý",
+            "messages": {
+                "create_success": "Tạo năm học thành công",
+                "update_success": "Cập nhật năm học thành công",
+                "delete_success": "Xóa năm học thành công"
+            }
+        },
+        "semesters": {
+            "title": "Quản lý Học kỳ",
+            "subtitle": "Danh sách và quản lý các học kỳ",
+            "create": "Tạo học kỳ",
+            "create_title": "Tạo học kỳ mới",
+            "edit_title": "Chỉnh sửa học kỳ",
+            "columns": {
+                "name": "Tên học kỳ",
+                "year": "Năm học",
+                "start_date": "Ngày bắt đầu",
+                "end_date": "Ngày kết thúc",
+                "status": "Trạng thái",
+                "actions": "Thao tác"
+            },
+            "status": {
+                "active": "Đang hoạt động",
+                "inactive": "Ngưng hoạt động"
+            },
+            "actions": {
+                "edit": "Chỉnh sửa",
+                "delete": "Xóa"
+            },
+            "fields": {
+                "name": "Tên học kỳ",
+                "year": "Năm học",
+                "start_date": "Ngày bắt đầu",
+                "end_date": "Ngày kết thúc",
+                "active": "Kích hoạt",
+                "active_desc": "Đặt học kỳ này làm học kỳ hiện tại"
+            },
+            "placeholders": {
+                "name": "Nhập tên học kỳ (VD: Học kỳ 1)",
+                "year": "Chọn năm học",
+                "date": "Chọn ngày"
+            },
+            "errors": {
+                "required": "Vui lòng nhập thông tin này"
+            },
+            "no_data": "Chưa có học kỳ nào",
+            "no_data_subtitle": "Tạo học kỳ mới để bắt đầu quản lý",
+            "messages": {
+                "create_success": "Tạo học kỳ thành công",
+                "update_success": "Cập nhật học kỳ thành công",
+                "delete_success": "Xóa học kỳ thành công"
+            }
         }
     },
     "portal": {

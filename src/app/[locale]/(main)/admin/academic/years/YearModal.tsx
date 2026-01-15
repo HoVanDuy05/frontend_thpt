@@ -46,8 +46,8 @@ export const YearModal = ({ opened, onClose, onSubmit, initialData, loading }: Y
     const handleSubmit = (values: typeof form.values) => {
         const payload = {
             ...values,
-            ngayBatDau: values.ngayBatDau ? (values.ngayBatDau as Date).toISOString() : undefined,
-            ngayKetThuc: values.ngayKetThuc ? (values.ngayKetThuc as Date).toISOString() : undefined,
+            ngayBatDau: values.ngayBatDau ? new Date(values.ngayBatDau).toISOString() : undefined,
+            ngayKetThuc: values.ngayKetThuc ? new Date(values.ngayKetThuc).toISOString() : undefined,
         };
         onSubmit(payload);
     };

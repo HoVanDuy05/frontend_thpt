@@ -59,8 +59,8 @@ export const SemesterModal = ({ opened, onClose, onSubmit, initialData, loading 
         const payload = {
             ...values,
             namHocId: parseInt(values.namHocId),
-            ngayBatDau: values.ngayBatDau ? (values.ngayBatDau as Date).toISOString() : undefined,
-            ngayKetThuc: values.ngayKetThuc ? (values.ngayKetThuc as Date).toISOString() : undefined,
+            ngayBatDau: values.ngayBatDau ? new Date(values.ngayBatDau).toISOString() : undefined,
+            ngayKetThuc: values.ngayKetThuc ? new Date(values.ngayKetThuc).toISOString() : undefined,
         };
         onSubmit(payload);
     };

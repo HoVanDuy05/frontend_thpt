@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { AppShell, Burger, Group, Title, ActionIcon, useMantineColorScheme, Menu, Avatar, UnstyledButton } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { AdminSidebar } from "@/shared/components/layout/AdminSidebar";
@@ -22,10 +24,19 @@ const AdminLayout = ({
     const [desktopCollapsed, { toggle: toggleDesktop }] = useDisclosure(false);
     const { colorScheme, toggleColorScheme } = useMantineColorScheme();
     const { user } = useAppStore();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (user?.vaiTro === USER_ROLES.STUDENT) {
+            router.push("/auth/callback");
+        }
+    }, [user, router]);
 
     const userRole = (user?.vaiTro as UserRole) || USER_ROLES.ADMIN;
+
+    if (userRole === USER_ROLES.STUDENT) return null;
+
     const dashboardTitle = ROLE_LABELS[userRole]?.dashboardTitle || "Hệ thống Quản lý";
-    const router = useRouter();
     const t = useTranslations("admin.header");
 
     const handleLogout = () => {

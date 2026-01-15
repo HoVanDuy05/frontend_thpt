@@ -10,6 +10,8 @@
         },
         "academic": {
             "title": "Academic",
+            "years": "Academic Years",
+            "semesters": "Semesters",
             "classes": "Classes",
             "subjects": "Subjects",
             "courses": "Courses",
