@@ -6,7 +6,7 @@
             "students": "Students",
             "teachers": "Teachers",
             "staff": "Staff",
-            "roles": "Roles & Permissions"
+            "roles": "Roles \u0026 Permissions"
         },
         "academic": {
             "title": "Academic",
@@ -75,7 +75,7 @@
             "save": "Save"
         },
         "create_post": "New Thread",
-        "create_placeholder": "What's new?",
+        "create_placeholder": "What\u0027s new?",
         "cancel": "Cancel",
         "done": "Done",
         "post": "Post",
@@ -154,9 +154,9 @@
             },
             "empty": {
                 "received_title": "No requests yet",
-                "received_subtitle": "You don't have any pending friend requests to see",
+                "received_subtitle": "You don\u0027t have any pending friend requests to see",
                 "sent_title": "No sent requests",
-                "sent_subtitle": "You haven't sent any friend requests yet"
+                "sent_subtitle": "You haven\u0027t sent any friend requests yet"
             }
         }
     },
@@ -179,7 +179,7 @@
         },
         "builder": {
             "title": "Create New Workflow",
-            "subtitle": "Configure approval steps & submission form",
+            "subtitle": "Configure approval steps \u0026 submission form",
             "basic_info": "Basic Information",
             "info_tab": "Basic Info",
             "flow_steps": "Approval Flow",
@@ -194,7 +194,7 @@
             "required": "Required",
             "empty_fields": "No fields added yet",
             "cancel": "Cancel",
-            "submit": "Complete & Initialize",
+            "submit": "Complete \u0026 Initialize",
             "name_label": "Workflow Name",
             "desc_label": "Summary",
             "approver_role_placeholder": "Select approver role..."
@@ -221,7 +221,7 @@
     "academic": {
         "schedule": {
             "title": "Schedule Management",
-            "subtitle": "Manage the school's timetable",
+            "subtitle": "Manage the school\u0027s timetable",
             "create": "Add Schedule",
             "columns": {
                 "day": "Day",
@@ -281,7 +281,7 @@
             "select_post": "Please select a post",
             "select_post_subtitle": "Select a post on the left to manage comments",
             "no_comments": "No comments yet",
-            "no_comments_subtitle": "Users haven't left any comments on this post",
+            "no_comments_subtitle": "Users haven\u0027t left any comments on this post",
             "count_suffix": "comments",
             "reply": "Reply"
         }
@@ -356,10 +356,10 @@
         },
         "verify": {
             "title": "Account Verification",
-            "subtitle": "We've sent a 6-digit verification code to {email}",
+            "subtitle": "We\u0027ve sent a 6-digit verification code to {email}",
             "code_label": "Verification Code",
             "submit": "Verify Account",
-            "resend_text": "Didn't receive the code?",
+            "resend_text": "Didn\u0027t receive the code?",
             "resend_link": "Resend code",
             "success": "Activation successful!",
             "error": "Incorrect verification code"
@@ -568,7 +568,7 @@
             "gpa": "GPA",
             "assignments": "Assignments",
             "notifications": "Notifications",
-            "today_schedule": "Today's Schedule",
+            "today_schedule": "Today\u0027s Schedule",
             "upcoming_assignments": "Upcoming Assignments",
             "due_date": "Due: {date}",
             "new_announcements": "New Announcements",
@@ -670,7 +670,7 @@
             "media_files": "Media, files and links",
             "media_files_links": "Media, files and links",
             "view_all": "View all",
-            "privacy_support": "Privacy & Support",
+            "privacy_support": "Privacy \u0026 Support",
             "block": "Block",
             "report": "Report",
             "delete_chat": "Delete conversation"
@@ -682,7 +682,7 @@
             "title": "Settings",
             "general": "General",
             "profile": "Profile",
-            "privacy_security": "Privacy & Security",
+            "privacy_security": "Privacy \u0026 Security",
             "notifications": "Notifications",
             "pms": "Learning System",
             "social": "Social Network",
@@ -721,18 +721,18 @@
             "push_status_off": "Disabled",
             "push_permission_warning": "You need to allow notifications in your browser before subscribing.",
             "push_permission_btn": "ALLOW NOTIFICATIONS",
-            "push_sync_tip": "After installing the App, tap the button below to sync this device with the school's notification system.",
+            "push_sync_tip": "After installing the App, tap the button below to sync this device with the school\u0027s notification system.",
             "push_subscribe_btn": "SUBSCRIBE TO PUSH NOTIFICATIONS",
             "push_success": "Notification subscription successful!",
             "push_error": "Subscription failed. Please ensure you are using a supported browser (Chrome/Safari) and have installed the app.",
             "features_title": "Why use the App version?",
-            "feature_clean_title": "Clean & Organized",
+            "feature_clean_title": "Clean \u0026 Organized",
             "feature_clean_desc": "Completely remove unnecessary browser toolbars.",
             "feature_push_title": "Instant Notifications",
             "feature_push_desc": "Receive messages and schedules even when the app is closed.",
             "continue_web": "Continue using Web version",
             "support_title": "Technical Support",
-            "support_desc": "Having trouble installing? Contact the school's IT Department via Zalo or Hotline:",
+            "support_desc": "Having trouble installing? Contact the school\u0027s IT Department via Zalo or Hotline:",
             "update_title": "New version ready!",
             "update_body": "Update now to experience the latest features.",
             "update_btn": "Update",
@@ -832,6 +832,67 @@
             "success_msg": "Your request has been submitted and is pending approval.",
             "error_title": "Request Submission Failed",
             "error_msg": "An error occurred. Please try again later."
+        }
+    },
+    "accounts": {
+        "drawer": {
+            "title_create": "Create New {role}",
+            "title_edit": "Edit {role}",
+            "subtitle": "Fill in the information below to manage the account.",
+            "tabs": {
+                "account": "Account",
+                "profile": "Profile",
+                "family": "Family"
+            },
+            "account_mode": {
+                "label": "Account Creation Mode",
+                "new": "New Account",
+                "existing": "Link Existing Account",
+                "tip_new": "A new login account will be created.",
+                "tip_existing": "Search and link to an existing user."
+            },
+            "fields": {
+                "email": "Email",
+                "password": "Password",
+                "password_placeholder": "Min 6 characters",
+                "fullname": "Full Name",
+                "id": "Custom ID",
+                "gender": "Gender",
+                "dob": "Date of Birth",
+                "phone": "Phone Number",
+                "cccd": "National ID (CCCD)",
+                "year": "Academic Year",
+                "class": "Class",
+                "admission_date": "Admission Date",
+                "academic_status": "Status",
+                "specialization": "Specialization",
+                "degree": "Degree",
+                "join_date": "Join Date",
+                "work_email": "Work Email",
+                "address": "Address",
+                "ethnicity": "Ethnicity",
+                "religion": "Religion",
+                "native_place": "Native Place",
+                "permanent_address": "Permanent Address",
+                "temporary_address": "Temporary Address",
+                "father_name": "Father's Name",
+                "father_name_placeholder": "Enter father's name",
+                "father_phone": "Father's Phone",
+                "father_phone_placeholder": "09xx xxx xxx",
+                "father_job": "Father's Job",
+                "father_job_placeholder": "Job title, position...",
+                "mother_name": "Mother's Name",
+                "mother_name_placeholder": "Enter mother's name",
+                "mother_phone": "Mother's Phone",
+                "mother_phone_placeholder": "09xx xxx xxx",
+                "mother_job": "Mother's Job",
+                "mother_job_placeholder": "Job title, position..."
+            },
+            "actions": {
+                "cancel": "Cancel",
+                "submit_create": "Create Account",
+                "submit_edit": "Save Changes"
+            }
         }
     }
 }

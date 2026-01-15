@@ -176,7 +176,7 @@
         },
         "builder": {
             "title": "Thiết lập Quy trình mới",
-            "subtitle": "Cấu hình luồng duyệt & biểu mẫu",
+            "subtitle": "Cấu hình luồng duyệt \u0026 biểu mẫu",
             "basic_info": "Thông tin cơ bản",
             "info_tab": "Thông tin cơ bản",
             "flow_steps": "Luồng phê duyệt",
@@ -191,7 +191,7 @@
             "required": "Bắt buộc",
             "empty_fields": "Chưa có trường dữ liệu nào",
             "cancel": "Hủy bỏ",
-            "submit": "Hoàn tất & Khởi tạo",
+            "submit": "Hoàn tất \u0026 Khởi tạo",
             "name_label": "Tên quy trình",
             "desc_label": "Bản tóm tắt",
             "approver_role_placeholder": "Chọn vai trò duyệt..."
@@ -665,7 +665,7 @@
             "media_files": "File phương tiện, file và liên kết",
             "media_files_links": "File phương tiện, file và liên kết",
             "view_all": "Xem tất cả",
-            "privacy_support": "Quyền riêng tư & hỗ trợ",
+            "privacy_support": "Quyền riêng tư \u0026 hỗ trợ",
             "block": "Chặn",
             "report": "Báo cáo",
             "delete_chat": "Xóa cuộc trò chuyện"
@@ -677,7 +677,7 @@
             "title": "Cài đặt",
             "general": "Chung",
             "profile": "Trang cá nhân",
-            "privacy_security": "Quyền riêng tư & bảo mật",
+            "privacy_security": "Quyền riêng tư \u0026 bảo mật",
             "notifications": "Thông báo",
             "pms": "Hệ thống học tập",
             "social": "Mạng xã hội",
@@ -721,7 +721,7 @@
             "push_success": "Đăng ký thông báo thành công!",
             "push_error": "Đăng ký không thành công. Hãy đảm bảo bạn sử dụng trình duyệt hỗ trợ (Chrome/Safari) và đã cài đặt ứng dụng.",
             "features_title": "Tại sao nên dùng bản App?",
-            "feature_clean_title": "Sạch sẽ & Gọn gàng",
+            "feature_clean_title": "Sạch sẽ \u0026 Gọn gàng",
             "feature_clean_desc": "Loại bỏ hoàn toàn các thanh công cụ thừa từ trình duyệt.",
             "feature_push_title": "Thông báo tức thì",
             "feature_push_desc": "Nhận tin nhắn, lịch học ngay khi app đang đóng.",
@@ -827,6 +827,67 @@
             "success_msg": "Yêu cầu của bạn đã được gửi và đang chờ phê duyệt.",
             "error_title": "Gửi yêu cầu thất bại",
             "error_msg": "Đã có lỗi xảy ra. Vui lòng thử lại sau."
+        }
+    },
+    "accounts": {
+        "drawer": {
+            "title_create": "Tạo mới {role}",
+            "title_edit": "Chỉnh sửa {role}",
+            "subtitle": "Điền đầy đủ thông tin bên dưới để quản lý tài khoản.",
+            "tabs": {
+                "account": "Tài khoản",
+                "profile": "Hồ sơ",
+                "family": "Gia đình"
+            },
+            "account_mode": {
+                "label": "Chế độ tạo tài khoản",
+                "new": "Tài khoản mới",
+                "existing": "Liên kết tài khoản cũ",
+                "tip_new": "Hệ thống sẽ tạo một tài khoản đăng nhập mới.",
+                "tip_existing": "Tìm kiếm và liên kết với một người dùng đã có sẵn."
+            },
+            "fields": {
+                "email": "Email",
+                "password": "Mật khẩu",
+                "password_placeholder": "Ít nhất 6 ký tự",
+                "fullname": "Họ và tên",
+                "id": "Mã số định danh",
+                "gender": "Giới tính",
+                "dob": "Ngày sinh",
+                "phone": "Số điện thoại",
+                "cccd": "Số CCCD",
+                "year": "Năm học",
+                "class": "Lớp học",
+                "admission_date": "Ngày nhập học",
+                "academic_status": "Trạng thái",
+                "specialization": "Chuyên môn",
+                "degree": "Trình độ",
+                "join_date": "Ngày vào làm",
+                "work_email": "Email liên hệ",
+                "address": "Địa chỉ",
+                "ethnicity": "Dân tộc",
+                "religion": "Tôn giáo",
+                "native_place": "Quê quán",
+                "permanent_address": "Địa chỉ thường trú",
+                "temporary_address": "Địa chỉ tạm trú",
+                "father_name": "Họ tên cha",
+                "father_name_placeholder": "Nhập họ tên cha",
+                "father_phone": "SĐT cha",
+                "father_phone_placeholder": "09xx xxx xxx",
+                "father_job": "Nghề nghiệp cha",
+                "father_job_placeholder": "Công nhân, viên chức...",
+                "mother_name": "Họ tên mẹ",
+                "mother_name_placeholder": "Nhập họ tên mẹ",
+                "mother_phone": "SĐT mẹ",
+                "mother_phone_placeholder": "09xx xxx xxx",
+                "mother_job": "Nghề nghiệp mẹ",
+                "mother_job_placeholder": "Nội trợ, buôn bán..."
+            },
+            "actions": {
+                "cancel": "Hủy bỏ",
+                "submit_create": "Tạo tài khoản",
+                "submit_edit": "Lưu thay đổi"
+            }
         }
     }
 }

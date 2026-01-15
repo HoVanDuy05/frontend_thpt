@@ -162,9 +162,9 @@ export default function VerifyPage() {
                                 p={0}
                                 fw={700}
                                 onClick={handleResend}
-                                disabled={resendTimer > 0 || resendMutation.isPending}
+                                loading={resendMutation.isPending}
+                                disabled={resendTimer > 0}
                                 className="text-indigo-600 hover:text-indigo-700 disabled:text-zinc-400"
-                                leftSection={resendMutation.isPending ? <Loader size={12} /> : null}
                             >
                                 {resendTimer > 0
                                     ? `${t("resend_link")} (${resendTimer}s)`

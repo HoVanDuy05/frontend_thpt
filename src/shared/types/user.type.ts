@@ -22,6 +22,7 @@ export interface TUser {
 
     hoSoGiaoVien?: THoSoGiaoVien;
     hoSoHocSinh?: THoSoHocSinh;
+    hoSoNhanVien?: THoSoNhanVien;
     hoSoXaHoi?: THoSoXaHoi;
 }
 
@@ -48,7 +49,17 @@ export interface THoSoGiaoVien {
     userId: number;
     maSoGv: string;
     hoTen: string;
+    ngaySinh?: string | Date;
+    gioiTinh?: string;
+    diaChi?: string;
+    soDienThoai?: string;
+    emailLienHe?: string;
+    cccd?: string;
+    ngayCapCccd?: string | Date;
+    noiCapCccd?: string;
+    trinhDo?: string;
     chuyenMon?: string;
+    ngayVaoLam?: string | Date;
     avatar?: string;
 }
 
@@ -57,13 +68,42 @@ export interface THoSoHocSinh {
     userId: number;
     maSoHs: string;
     hoTen: string;
-    ngaySinh?: string;
+    ngaySinh?: string | Date;
+    gioiTinh?: string;
+    noiSinh?: string;
+    danToc?: string;
+    tonGiao?: string;
+    diaChiThuongTru?: string;
+    diaChiTamTru?: string;
+    soDienThoai?: string;
+    cccd?: string;
+    ngayCapCccd?: string | Date;
+    noiCapCccd?: string;
+    hoTenCha?: string;
+    ngheNghiepCha?: string;
+    sdtCha?: string;
+    hoTenMe?: string;
+    ngheNghiepMe?: string;
+    sdtMe?: string;
+    ngayNhapHoc?: string | Date;
+    trangThai?: string;
     lopId?: number;
     avatar?: string;
     lopHoc?: TLopHoc;
-    gioiTinh?: string;
-    soDienThoai?: string;
     diaChi?: string;
+}
+
+export interface THoSoNhanVien {
+    id: number;
+    userId: number;
+    maSo: string;
+    hoTen: string;
+    ngaySinh?: string | Date;
+    gioiTinh?: string;
+    diaChi?: string;
+    soDienThoai?: string;
+    emailLienHe?: string;
+    cccd?: string;
 }
 
 export interface THoSoXaHoi {

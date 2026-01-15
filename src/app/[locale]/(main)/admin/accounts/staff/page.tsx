@@ -11,6 +11,8 @@ import { useState } from "react";
 import { TUser } from "@/shared/types/user.type";
 import { Stack, Text, Box, Skeleton, Paper } from "@mantine/core";
 import { modals } from "@mantine/modals";
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { useEffect } from "react";
 
 export default function StaffPage() {
     // NHAN_VIEN usually refers to staff/officials in school context
@@ -18,14 +20,51 @@ export default function StaffPage() {
     const [opened, { open, close }] = useDisclosure(false);
     const [editingUser, setEditingUser] = useState<TUser | null>(null);
 
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const pathname = usePathname();
+
+    const updateUrl = (id?: string | number | null) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (id) {
+            params.set('userId', id.toString());
+        } else {
+            params.delete('userId');
+        }
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    };
+
     const handleOpenCreate = () => {
         setEditingUser(null);
+        updateUrl('new');
         open();
     };
 
     const handleOpenEdit = (user: TUser) => {
         setEditingUser(user);
+        updateUrl(user.id);
         open();
+    };
+
+    useEffect(() => {
+        const userId = searchParams.get('userId');
+        if (userId) {
+            if (userId === 'new') {
+                setEditingUser(null);
+                open();
+            } else {
+                const user = users?.find(u => u.id === Number(userId));
+                if (user) {
+                    setEditingUser(user);
+                    open();
+                }
+            }
+        }
+    }, [searchParams, users]);
+
+    const handleClose = () => {
+        updateUrl(null);
+        close();
     };
 
     const confirmDelete = (id: number) => {
@@ -94,10 +133,10 @@ export default function StaffPage() {
 
             <UserDrawer
                 opened={opened}
-                onClose={close}
+                onClose={handleClose}
                 onSubmit={handleSubmit}
                 initialData={editingUser}
-                role="Nhân viên"
+                role="NHAN_VIEN"
                 loading={isCreating}
             />
         </LayoutList>

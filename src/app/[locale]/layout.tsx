@@ -94,9 +94,7 @@ export default async function RootLayout({
         className={`${beVietnamPro.variable} antialiased`}
       >
         <AppProvider locale={locale} messages={messages}>
-          <div className="app-content">
-            {children}
-          </div>
+          {children}
         </AppProvider>
       </body>
     </html>
