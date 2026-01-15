@@ -190,12 +190,63 @@ export function UserDrawer({ opened, onClose, onSubmit, initialData, role, loadi
     }, [classes, selectedYear]);
 
     const handleFormSubmit = (values: any) => {
-        const submission = {
-            ...values,
+        // Base account and profile fields
+        const {
+            email, matKhau, isNewAccount, hoTen, ngaySinh, gioiTinh,
+            diaChi, soDienThoai, cccd, ngayCapCccd, noiCapCccd
+        } = values;
+
+        let submission: any = {
+            email,
+            matKhau,
             isNewAccount: accountMode === 'new',
-            // Ensure numeric IDs
-            lopId: values.lopId ? Number(values.lopId) : undefined,
+            hoTen,
+            ngaySinh,
+            gioiTinh,
+            diaChi,
+            soDienThoai,
+            cccd,
+            ngayCapCccd,
+            noiCapCccd
         };
+
+        // Role specific fields
+        if (role === 'HOC_SINH') {
+            submission = {
+                ...submission,
+                maSoHs: values.maSoHs,
+                noiSinh: values.noiSinh,
+                danToc: values.danToc,
+                tonGiao: values.tonGiao,
+                diaChiThuongTru: values.diaChiThuongTru,
+                diaChiTamTru: values.diaChiTamTru,
+                hoTenCha: values.hoTenCha,
+                ngheNghiepCha: values.ngheNghiepCha,
+                sdtCha: values.sdtCha,
+                hoTenMe: values.hoTenMe,
+                ngheNghiepMe: values.ngheNghiepMe,
+                sdtMe: values.sdtMe,
+                ngayNhapHoc: values.ngayNhapHoc,
+                trangThai: values.trangThai,
+                lopId: values.lopId ? Number(values.lopId) : undefined,
+            };
+        } else if (role === 'GIAO_VIEN') {
+            submission = {
+                ...submission,
+                maSoGv: values.maSoGv,
+                emailLienHe: values.emailLienHe,
+                trinhDo: values.trinhDo,
+                chuyenMon: values.chuyenMon,
+                ngayVaoLam: values.ngayVaoLam,
+            };
+        } else if (role === 'NHAN_VIEN') {
+            submission = {
+                ...submission,
+                maSo: values.maSo,
+                emailLienHe: values.emailLienHe,
+            };
+        }
+
         onSubmit(submission);
     };
 

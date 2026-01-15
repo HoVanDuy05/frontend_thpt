@@ -9,7 +9,7 @@ import { IconPlus, IconAlertCircle } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { TUser } from "@/shared/types/user.type";
-import { Stack, Text, Box, Skeleton, Paper } from "@mantine/core";
+import { Stack, Text, Box, Skeleton, Paper, rem } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { useEffect } from "react";
@@ -106,12 +106,24 @@ export default function StudentPage() {
                 </AppButton>
             }
         >
-            <Paper radius="md" withBorder shadow="sm" className="overflow-hidden">
+            <Paper
+                radius="lg"
+                withBorder
+                shadow="sm"
+                className="overflow-hidden flex flex-col flex-1 shadow-[0_4px_20px_rgba(0,0,0,0.03)]"
+                w="100%"
+                style={{
+                    borderColor: 'var(--mantine-color-gray-2)',
+                    background: 'var(--mantine-color-white)',
+                    minHeight: rem(400),
+                }}
+            >
                 {isLoading ? (
-                    <Stack p="md">
-                        <Skeleton h={50} />
-                        <Skeleton h={50} />
-                        <Skeleton h={50} />
+                    <Stack p="xl">
+                        <Skeleton h={60} radius="md" />
+                        <Skeleton h={60} radius="md" />
+                        <Skeleton h={60} radius="md" />
+                        <Skeleton h={60} radius="md" />
                     </Stack>
                 ) : users && users.length > 0 ? (
                     <UserTable
@@ -121,14 +133,23 @@ export default function StudentPage() {
                         role="HOC_SINH"
                     />
                 ) : (
-                    <Stack align="center" py={60} gap="md">
+                    <Stack align="center" py={100} gap="lg">
                         <Box
-                            style={{ background: 'var(--mantine-color-default-hover)' }}
-                            className="p-6 rounded-full"
+                            className="p-8 rounded-full bg-slate-50 border border-slate-100"
                         >
-                            <IconAlertCircle size={48} className="text-[var(--mantine-color-dimmed)]" />
+                            <IconAlertCircle size={56} className="text-slate-300" />
                         </Box>
-                        <Text fw={500} c="dimmed">Chưa có dữ liệu học sinh</Text>
+                        <Stack gap={4} align="center">
+                            <Text fw={700} size="lg">Chưa có dữ liệu học sinh</Text>
+                            <Text size="sm" c="dimmed">Bắt đầu bằng việc thêm học sinh mới vào hệ thống</Text>
+                        </Stack>
+                        <AppButton
+                            variant="light"
+                            leftSection={<IconPlus size={18} />}
+                            onClick={handleOpenCreate}
+                        >
+                            Thêm Học sinh ngay
+                        </AppButton>
                     </Stack>
                 )}
             </Paper>

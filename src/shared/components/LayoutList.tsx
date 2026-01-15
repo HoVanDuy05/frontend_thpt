@@ -67,36 +67,42 @@ export const LayoutList = React.forwardRef<HTMLDivElement, LayoutProps>(
                         >
                             <Stack gap="sm">
                                 {/* Title and Description */}
-                                <Stack gap={4}>
-                                    {backText && (
-                                        <button
-                                            type="button"
-                                            aria-label={`Go back to ${backText}`}
-                                            onClick={handleBackClick}
-                                            className="text-xs font-semibold text-zinc-500 hover:text-blue-600 transition-colors inline-flex items-center gap-1 group w-fit"
+                                <Group justify="space-between" align="flex-start" wrap="nowrap">
+                                    <Stack gap={4}>
+                                        {backText && (
+                                            <button
+                                                type="button"
+                                                onClick={handleBackClick}
+                                                className="text-xs font-semibold text-zinc-500 hover:text-blue-600 transition-colors inline-flex items-center gap-1 group w-fit"
+                                            >
+                                                <IconArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
+                                                {backText}
+                                            </button>
+                                        )}
+                                        <Title
+                                            order={2}
+                                            fw={800}
+                                            style={{ color: 'var(--mantine-color-text)' }}
+                                            className="tracking-tight text-xl sm:text-2xl"
                                         >
-                                            <IconArrowLeft size={14} className="group-hover:-translate-x-0.5 transition-transform" />
-                                            {backText}
-                                        </button>
-                                    )}
-                                    <Title
-                                        order={2}
-                                        fw={800}
-                                        style={{ color: 'var(--mantine-color-text)' }}
-                                        className="tracking-tight text-xl sm:text-2xl"
-                                    >
-                                        {title}
-                                    </Title>
-                                    {description && (
-                                        <Text size="xs" c="dimmed" fw={500}>
-                                            {description}
-                                        </Text>
-                                    )}
-                                </Stack>
+                                            {title}
+                                        </Title>
+                                        {description && (
+                                            <Text size="xs" c="dimmed" fw={500}>
+                                                {description}
+                                            </Text>
+                                        )}
+                                    </Stack>
 
-                                {/* Actions - Stack on mobile, inline on desktop */}
+                                    {actions && (
+                                        <Box className="hidden sm:block">
+                                            {actions}
+                                        </Box>
+                                    )}
+                                </Group>
+
                                 {actions && (
-                                    <Box className="flex-none">
+                                    <Box className="sm:hidden w-full">
                                         {actions}
                                     </Box>
                                 )}
