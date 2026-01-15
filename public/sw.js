@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pms-cache-v5';
+const CACHE_NAME = 'pms-cache-v6';
 const ASSETS_TO_CACHE = [
     '/offline.html',
     '/manifest.json',

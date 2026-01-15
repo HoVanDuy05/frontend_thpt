@@ -9,6 +9,7 @@ import { SplashScreen } from "@/shared/components/SplashScreen";
 import { PWAProvider } from "@/providers/PWAProvider";
 import { GlobalSocketHandler } from "@/shared/components/GlobalSocketHandler";
 import { ThemeSync } from "@/shared/components/ThemeSync";
+import { PWAUpdateNotification } from "@/shared/components/PWAUpdateNotification";
 
 interface AppProviderProps {
     children: React.ReactNode;
@@ -152,6 +153,7 @@ export function AppProvider({ children, messages, locale }: AppProviderProps) {
                         <Suspense fallback={null}>
                             <GlobalSocketHandler />
                         </Suspense>
+                        <PWAUpdateNotification />
                         {children}
                     </PWAProvider>
                 </MantineProvider>
