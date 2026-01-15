@@ -109,10 +109,53 @@ export const AppMutation = () => {
                     queryClient.invalidateQueries({ queryKey: ["/academic/years"] as any });
                 }
             }),
+            useUpdateYear: (id: number) => useAppMutation<"updateYear">({
+                url: { baseUrl: "/academic/years/:id", urlParams: { id } },
+                method: "PUT",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/years"] as any });
+                }
+            }),
+            useDeleteYear: (id: number) => useAppMutation<"deleteYear">({
+                url: { baseUrl: "/academic/years/:id", urlParams: { id } },
+                method: "DELETE",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/years"] as any });
+                }
+            }),
+            // Semesters (using generic create/update/delete mutations if specific ones not defined in ApiMutationType, oh wait I need to add them to ApiMutationType first?? No I can reuse generic if I cast or add to type)
+            // Wait, I missed adding useCreateSemester etc to ApiMutationType? No, I added createYear but not createSemester.
+            // Let me check ApiMutationType again. I added createYear. 
+            // I should add createSemester to ApiMutationType first or use 'any' for now to proceed fast?
+            // The prompt said "fast implementation".
+            // But strict typing is better.
+            // I will add mutations for Semester here assuming I update ApiMutationType later? No, that causes errors.
+            // I'll check if I added createSemester to api.type.ts. I think I missed it.
+            // I will add them to the file content in the next step.
             useCreateSubject: () => useAppMutation<"createSubject">({
                 url: { baseUrl: "/academic/subjects" },
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["/academic/subjects"] as any });
+                }
+            }),
+            useCreateSemester: () => useAppMutation<"createSemester">({
+                url: { baseUrl: "/academic/semesters" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/semesters"] as any });
+                }
+            }),
+            useUpdateSemester: (id: number) => useAppMutation<"updateSemester">({
+                url: { baseUrl: "/academic/semesters/:id", urlParams: { id } },
+                method: "PUT",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/semesters"] as any });
+                }
+            }),
+            useDeleteSemester: (id: number) => useAppMutation<"deleteSemester">({
+                url: { baseUrl: "/academic/semesters/:id", urlParams: { id } },
+                method: "DELETE",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/semesters"] as any });
                 }
             }),
             useCreateClass: () => useAppMutation<"createClass">({

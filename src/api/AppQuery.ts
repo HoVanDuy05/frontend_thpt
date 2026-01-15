@@ -20,6 +20,12 @@ export const AppQuery = {
     academic: {
         useYears: (params?: TQueryConfig, options?: AppQueryOptions<"getNamHocs">) =>
             useAppQuery({ url: { baseUrl: "/academic/years", queryParams: params }, options }),
+        useYearDetail: (id: number, options?: AppQueryOptions<"getNamHocById">) =>
+            useAppQuery({ url: { baseUrl: "/academic/years/:id", urlParams: { id } }, options }),
+        useHocKys: (params?: TQueryConfig, options?: AppQueryOptions<"getHocKys">) =>
+            useAppQuery({ url: { baseUrl: "/academic/semesters", queryParams: params }, options }),
+        useHocKyDetail: (id: number, options?: AppQueryOptions<"getHocKyById">) =>
+            useAppQuery({ url: { baseUrl: "/academic/semesters/:id", urlParams: { id } }, options }),
         useSubjects: (params?: TQueryConfig, options?: AppQueryOptions<"getMonHocs">) =>
             useAppQuery({ url: { baseUrl: "/academic/subjects", queryParams: params }, options }),
         useClasses: (params?: TQueryConfig, options?: AppQueryOptions<"getLopHocs">) =>

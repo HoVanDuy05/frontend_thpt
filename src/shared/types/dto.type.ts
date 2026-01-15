@@ -31,6 +31,17 @@ export interface TCreateStudentDto {
 // Academic DTOs
 export interface TCreateNamHocDto {
     tenNamHoc: string;
+    ngayBatDau?: string;
+    ngayKetThuc?: string;
+    dangKichHoat?: boolean;
+}
+
+export interface TCreateHocKyDto {
+    tenHocKy: string;
+    namHocId: number;
+    ngayBatDau?: string;
+    ngayKetThuc?: string;
+    dangKichHoat?: boolean;
 }
 
 export interface TCreateMonHocDto {

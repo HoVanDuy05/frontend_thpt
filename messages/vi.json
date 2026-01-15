@@ -10,6 +10,8 @@
         },
         "academic": {
             "title": "Học tập",
+            "years": "Năm học",
+            "semesters": "Học kỳ",
             "classes": "Lớp học",
             "subjects": "Môn học",
             "courses": "Khóa học",

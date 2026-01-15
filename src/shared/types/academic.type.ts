@@ -1,6 +1,20 @@
 export interface TNamHoc {
     id: number;
     tenNamHoc: string;
+    ngayBatDau?: string;
+    ngayKetThuc?: string;
+    dangKichHoat?: boolean;
+    cacHocKy?: THocKy[];
+}
+
+export interface THocKy {
+    id: number;
+    tenHocKy: string;
+    namHocId: number;
+    ngayBatDau?: string;
+    ngayKetThuc?: string;
+    dangKichHoat?: boolean;
+    namHoc?: TNamHoc;
 }
 
 export interface TMonHoc {

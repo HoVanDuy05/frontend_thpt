@@ -1,11 +1,11 @@
 import { TUser, THoSoGiaoVien, THoSoHocSinh, TNotification } from "@/shared/types/user.type";
-import { TNamHoc, TMonHoc, TLopHoc } from "@/shared/types/academic.type";
+import { TNamHoc, TMonHoc, TLopHoc, THocKy } from "@/shared/types/academic.type";
 import { TNganHangCauHoi, TDeKiemTra } from "@/shared/types/assessment.type";
 import { TLichSuNopBai } from "@/shared/types/submission.type";
 import { TKetQuaChamDiem } from "@/shared/types/grading.type";
 import { TQueryConfig } from "@/shared/types/common.type";
 import { TLoginRequest, TLoginResponse } from "@/shared/types/auth.type";
-import { TCreateUserDto, TCreateTeacherDto, TCreateStudentDto, TCreateNamHocDto, TCreateMonHocDto, TCreateLopHocDto, TCreateQuestionDto, TCreateExamDto, TCreateSubmissionDto, TCreateGradingDto } from "@/shared/types/dto.type";
+import { TCreateUserDto, TCreateTeacherDto, TCreateStudentDto, TCreateNamHocDto, TCreateMonHocDto, TCreateLopHocDto, TCreateQuestionDto, TCreateExamDto, TCreateSubmissionDto, TCreateGradingDto, TCreateHocKyDto } from "@/shared/types/dto.type";
 import { TBanner, TBaiViet, TBinhLuan, ELoaiBaiViet } from "@/shared/types/portal.type";
 import { TQuyTrinh, TPhienQuyTrinh, TNhatKyPheDuyetQuyTrinh, TTruongFormQuyTrinh } from "@/shared/types/approval.type";
 import {
@@ -82,6 +82,14 @@ export type ApiQueryType = {
     getNamHocs: {
         url: { baseUrl: "/academic/years"; queryParams?: TQueryConfig };
         response: TNamHoc[];
+    };
+    getHocKys: {
+        url: { baseUrl: "/academic/semesters"; queryParams?: TQueryConfig };
+        response: THocKy[];
+    };
+    getHocKyById: {
+        url: { baseUrl: "/academic/semesters/:id"; urlParams: { id: number } };
+        response: THocKy;
     };
     // ...
     getNamHocById: {
@@ -350,6 +358,21 @@ export type ApiMutationType = {
     };
     deleteYear: {
         url: { baseUrl: "/academic/years/:id"; urlParams: { id: number } };
+        payload: undefined;
+        response: void;
+    };
+    createSemester: {
+        url: { baseUrl: "/academic/semesters" };
+        payload: TCreateHocKyDto;
+        response: THocKy;
+    };
+    updateSemester: {
+        url: { baseUrl: "/academic/semesters/:id"; urlParams: { id: number } };
+        payload: Partial<TCreateHocKyDto>;
+        response: THocKy;
+    };
+    deleteSemester: {
+        url: { baseUrl: "/academic/semesters/:id"; urlParams: { id: number } };
         payload: undefined;
         response: void;
     };
