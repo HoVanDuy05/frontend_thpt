@@ -56,11 +56,13 @@ export function ClassDrawer({ opened, onClose, lopNamModel, gradeId, yearId }: C
             moTa: '',
             namHocId: '',
             gvChuNhiemId: null as string | null,
+            siSo: 0,
         },
         validate: {
             tenLop: (value) => (value.length < 2 ? t('validation.name_short', { defaultMessage: 'Tên lớp quá ngắn' }) : null),
             khoiId: (value) => (!value ? t('validation.grade_required', { defaultMessage: 'Vui lòng chọn khối' }) : null),
             namHocId: (value) => (!value ? t('validation.year_required', { defaultMessage: 'Vui lòng chọn năm học' }) : null),
+            siSo: (value) => (value < 0 ? t('validation.siso_negative', { defaultMessage: 'Sĩ số không được âm' }) : null),
         },
     });
 
@@ -72,6 +74,7 @@ export function ClassDrawer({ opened, onClose, lopNamModel, gradeId, yearId }: C
                 moTa: lopNamModel.lopHoc.moTa || '',
                 namHocId: lopNamModel.namHocId.toString(),
                 gvChuNhiemId: lopNamModel.gvChuNhiemId?.toString() || null,
+                siSo: lopNamModel.siSo || 0,
             });
         } else {
             form.reset();
@@ -104,6 +107,7 @@ export function ClassDrawer({ opened, onClose, lopNamModel, gradeId, yearId }: C
                 await updateClassYearMutation.mutateAsync({
                     namHocId: parseInt(values.namHocId),
                     gvChuNhiemId: values.gvChuNhiemId ? parseInt(values.gvChuNhiemId) : null,
+                    siSo: values.siSo,
                     urlParams: { id: lopNamModel.id }
                 } as any);
 
@@ -118,6 +122,7 @@ export function ClassDrawer({ opened, onClose, lopNamModel, gradeId, yearId }: C
                     lopId: (newLopHoc as any).id,
                     namHocId: parseInt(values.namHocId),
                     gvChuNhiemId: values.gvChuNhiemId ? parseInt(values.gvChuNhiemId) : undefined,
+                    siSo: values.siSo,
                 });
 
                 notifications.show({
@@ -193,6 +198,13 @@ export function ClassDrawer({ opened, onClose, lopNamModel, gradeId, yearId }: C
                             searchable
                             clearable
                             {...form.getInputProps('gvChuNhiemId')}
+                        />
+
+                        <NumberInput
+                            label={t('fields.si_so', { defaultMessage: 'Sĩ số' })}
+                            placeholder={t('placeholders.si_so', { defaultMessage: 'Nhập sĩ số (tùy chọn)' })}
+                            min={0}
+                            {...form.getInputProps('siSo')}
                         />
 
                         <Textarea

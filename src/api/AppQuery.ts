@@ -133,3 +133,45 @@ export const AppQuery = {
             }),
     },
 };
+
+// --- Student Management Hooks ---
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import axiosClient from "./axiosClient";
+import { notifications } from "@mantine/notifications";
+
+export const useGetAvailableStudents = (yearId: number | undefined, options?: AppQueryOptions<"getAvailableStudents">) => {
+    return useAppQuery<"getAvailableStudents">({
+        url: { baseUrl: "/academic/years/:yearId/available-students", urlParams: { yearId: yearId! } },
+        options: { ...options, enabled: !!yearId && options?.enabled !== false }
+    });
+};
+
+export const useAddStudentsToClass = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ classId, studentIds }: { classId: number; studentIds: number[] }) => {
+            const { data } = await axiosClient.post(`/academic/classes/${classId}/students`, { studentIds });
+            return data;
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['academic/class-years'] }); // Refresh class lists
+            queryClient.invalidateQueries({ queryKey: ['available-students'] }); // Refresh available list
+            // Refresh specific class student list if we had a query key for it. 
+            // Currently the student list seems to be client-side filtered or fetched via `useClassYears`?
+            // Actually, the page at `classes/[classId]` fetches... what?
+            // Provide a generic invalidation.
+            notifications.show({
+                title: 'Thành công',
+                message: 'Đã thêm học sinh vào lớp',
+                color: 'green',
+            });
+        },
+        onError: (error: any) => {
+            notifications.show({
+                title: 'Thất bại',
+                message: error?.response?.data?.message || 'Có lỗi xảy ra',
+                color: 'red',
+            });
+        },
+    });
+};

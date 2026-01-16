@@ -65,6 +65,7 @@ export interface TCreateLopNamDto {
     lopId: number;
     namHocId: number;
     gvChuNhiemId?: number;
+    siSo?: number;
 }
 
 

@@ -5,9 +5,11 @@ import { IconSearch, IconUserPlus, IconChevronLeft, IconSchool, IconUsers, IconC
 import { useTranslations } from 'next-intl';
 import { AppQuery } from '@/api/AppQuery';
 import { useParams } from 'next/navigation';
-import { Link } from '@/i18n/routing';
+import { Link, useRouter } from '@/i18n/routing';
 import { useState } from 'react';
 import { SkeletonLoader } from '@/shared/components/SkeletonLoader';
+import { AddStudentModal } from './AddStudentModal';
+import { useDisclosure } from '@mantine/hooks';
 
 export default function ClassDetailPage() {
     const t = useTranslations('academic.grades');
@@ -17,6 +19,8 @@ export default function ClassDetailPage() {
     const yearId = Number(params.yearId);
     const classId = Number(params.classId);
 
+    const router = useRouter();
+    const [opened, { open, close }] = useDisclosure(false);
     const [search, setSearch] = useState('');
 
     const { data: grade } = AppQuery.academic.useKhoiDetail(gradeId);
@@ -32,7 +36,7 @@ export default function ClassDetailPage() {
     const filteredStudents = currentClass?.hocSinhs?.filter(hsln =>
         hsln.hocSinh?.hoTen?.toLowerCase().includes(search.toLowerCase()) ||
         hsln.hocSinh?.maSoHs?.toLowerCase().includes(search.toLowerCase())
-    ) || [];
+    ).sort((a, b) => (a.hocSinh?.hoTen || '').localeCompare(b.hocSinh?.hoTen || '', 'vi')) || [];
 
     const breadcrumbs = [
         { title: t('title'), href: `/admin/academic/grades` },
@@ -165,6 +169,7 @@ export default function ClassDetailPage() {
                                     size="xs"
                                     variant="filled"
                                     color="indigo"
+                                    onClick={open}
                                 >
                                     {t('add_student')}
                                 </Button>
@@ -185,17 +190,25 @@ export default function ClassDetailPage() {
                             <Table verticalSpacing="sm" highlightOnHover>
                                 <Table.Thead>
                                     <Table.Tr>
-                                        <Table.Th style={{ fontSize: rem(12), paddingLeft: 'var(--mantine-spacing-md)' }}>{t('student_name')}</Table.Th>
-                                        <Table.Th style={{ fontSize: rem(12) }}>{t('student_id')}</Table.Th>
-                                        <Table.Th style={{ fontSize: rem(12) }}>{t('gender')}</Table.Th>
-                                        <Table.Th style={{ fontSize: rem(12) }}>{t('status')}</Table.Th>
-                                        <Table.Th align="right" style={{ fontSize: rem(12), paddingRight: 'var(--mantine-spacing-md)' }}>{common('actions_header')}</Table.Th>
+                                        <Table.Th w={60} style={{ paddingLeft: 'var(--mantine-spacing-md)' }}>#</Table.Th>
+                                        <Table.Th>{t('student_name')}</Table.Th>
+                                        <Table.Th>{t('student_id')}</Table.Th>
+                                        <Table.Th>{t('gender')}</Table.Th>
+                                        <Table.Th>{t('status')}</Table.Th>
+                                        <Table.Th align="right" style={{ paddingRight: 'var(--mantine-spacing-md)' }}>{common('actions_header')}</Table.Th>
                                     </Table.Tr>
                                 </Table.Thead>
                                 <Table.Tbody>
-                                    {filteredStudents.map((hsln) => (
-                                        <Table.Tr key={hsln.id}>
+                                    {filteredStudents.map((hsln, index) => (
+                                        <Table.Tr
+                                            key={hsln.id}
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => router.push(`/admin/students/${hsln.hocSinh.userId}`)}
+                                        >
                                             <Table.Td style={{ paddingLeft: 'var(--mantine-spacing-md)' }}>
+                                                <Text size="sm" c="dimmed">{index + 1}</Text>
+                                            </Table.Td>
+                                            <Table.Td>
                                                 <Group gap="xs">
                                                     <Avatar size={24} radius="xl" src={hsln.hocSinh?.nguoiDung?.avatar} />
                                                     <Text size="sm" fw={500}>{hsln.hocSinh?.hoTen}</Text>
@@ -213,7 +226,16 @@ export default function ClassDetailPage() {
                                                 </Badge>
                                             </Table.Td>
                                             <Table.Td align="right" style={{ paddingRight: 'var(--mantine-spacing-md)' }}>
-                                                <Button variant="subtle" size="compact-sm">{common('details')}</Button>
+                                                <Button
+                                                    variant="subtle"
+                                                    size="compact-sm"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        router.push(`/admin/students/${hsln.hocSinh.userId}`);
+                                                    }}
+                                                >
+                                                    {common('details')}
+                                                </Button>
                                             </Table.Td>
                                         </Table.Tr>
                                     ))}
@@ -229,6 +251,12 @@ export default function ClassDetailPage() {
                     </Paper>
                 </Stack>
             </Stack>
+            <AddStudentModal
+                opened={opened}
+                onClose={close}
+                yearId={yearId}
+                classId={classId}
+            />
         </Stack>
     );
 }

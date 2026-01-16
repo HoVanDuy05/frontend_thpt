@@ -129,6 +129,10 @@ export type ApiQueryType = {
         url: { baseUrl: "/academic/grades/:id"; urlParams: { id: number } };
         response: TKhoi;
     };
+    getAvailableStudents: {
+        url: { baseUrl: "/academic/years/:yearId/available-students"; urlParams: { yearId: number } };
+        response: TUser[];
+    };
 
     // Assessments
     getQuestions: {
