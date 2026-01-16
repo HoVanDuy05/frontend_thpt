@@ -160,7 +160,6 @@ export default function ClassDetailPage() {
                         <Card withBorder radius="md" p="xs" w="100%">
                             <Group justify="space-between" align="center">
                                 <Title order={4}>{t('student_list')}</Title>
-
                                 <Button
                                     leftSection={<IconUserPlus size={18} />}
                                     size="xs"
@@ -182,43 +181,45 @@ export default function ClassDetailPage() {
                     </Group>
 
                     <Paper withBorder radius="md">
-                        <Table verticalSpacing="sm" highlightOnHover>
-                            <Table.Thead>
-                                <Table.Tr>
-                                    <Table.Th style={{ fontSize: rem(12) }}>{t('student_name')}</Table.Th>
-                                    <Table.Th style={{ fontSize: rem(12) }}>{t('student_id')}</Table.Th>
-                                    <Table.Th style={{ fontSize: rem(12) }}>{t('gender')}</Table.Th>
-                                    <Table.Th style={{ fontSize: rem(12) }}>{t('status')}</Table.Th>
-                                    <Table.Th align="right" style={{ fontSize: rem(12) }}>{common('actions_header')}</Table.Th>
-                                </Table.Tr>
-                            </Table.Thead>
-                            <Table.Tbody>
-                                {filteredStudents.map((hsln) => (
-                                    <Table.Tr key={hsln.id}>
-                                        <Table.Td>
-                                            <Group gap="xs">
-                                                <Avatar size={24} radius="xl" src={hsln.hocSinh?.nguoiDung?.avatar} />
-                                                <Text size="sm" fw={500}>{hsln.hocSinh?.hoTen}</Text>
-                                            </Group>
-                                        </Table.Td>
-                                        <Table.Td>
-                                            <Text size="sm">{hsln.hocSinh?.maSoHs}</Text>
-                                        </Table.Td>
-                                        <Table.Td>
-                                            <Text size="sm">{hsln.hocSinh?.gioiTinh}</Text>
-                                        </Table.Td>
-                                        <Table.Td>
-                                            <Badge variant="dot" size="sm" color={hsln.trangThai === 'DANG_HOC' ? 'green' : 'gray'}>
-                                                {hsln.trangThai}
-                                            </Badge>
-                                        </Table.Td>
-                                        <Table.Td align="right">
-                                            <Button variant="subtle" size="compact-sm">{common('details')}</Button>
-                                        </Table.Td>
+                        <Table.ScrollContainer minWidth={800}>
+                            <Table verticalSpacing="sm" highlightOnHover>
+                                <Table.Thead>
+                                    <Table.Tr>
+                                        <Table.Th style={{ fontSize: rem(12), paddingLeft: 'var(--mantine-spacing-md)' }}>{t('student_name')}</Table.Th>
+                                        <Table.Th style={{ fontSize: rem(12) }}>{t('student_id')}</Table.Th>
+                                        <Table.Th style={{ fontSize: rem(12) }}>{t('gender')}</Table.Th>
+                                        <Table.Th style={{ fontSize: rem(12) }}>{t('status')}</Table.Th>
+                                        <Table.Th align="right" style={{ fontSize: rem(12), paddingRight: 'var(--mantine-spacing-md)' }}>{common('actions_header')}</Table.Th>
                                     </Table.Tr>
-                                ))}
-                            </Table.Tbody>
-                        </Table>
+                                </Table.Thead>
+                                <Table.Tbody>
+                                    {filteredStudents.map((hsln) => (
+                                        <Table.Tr key={hsln.id}>
+                                            <Table.Td style={{ paddingLeft: 'var(--mantine-spacing-md)' }}>
+                                                <Group gap="xs">
+                                                    <Avatar size={24} radius="xl" src={hsln.hocSinh?.nguoiDung?.avatar} />
+                                                    <Text size="sm" fw={500}>{hsln.hocSinh?.hoTen}</Text>
+                                                </Group>
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <Text size="sm">{hsln.hocSinh?.maSoHs}</Text>
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <Text size="sm">{hsln.hocSinh?.gioiTinh}</Text>
+                                            </Table.Td>
+                                            <Table.Td>
+                                                <Badge variant="dot" size="sm" color={hsln.trangThai === 'DANG_HOC' ? 'green' : 'gray'}>
+                                                    {hsln.trangThai}
+                                                </Badge>
+                                            </Table.Td>
+                                            <Table.Td align="right" style={{ paddingRight: 'var(--mantine-spacing-md)' }}>
+                                                <Button variant="subtle" size="compact-sm">{common('details')}</Button>
+                                            </Table.Td>
+                                        </Table.Tr>
+                                    ))}
+                                </Table.Tbody>
+                            </Table>
+                        </Table.ScrollContainer>
 
                         {filteredStudents.length === 0 && (
                             <Text p="xl" c="dimmed" ta="center" size="sm">
