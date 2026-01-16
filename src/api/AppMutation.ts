@@ -176,6 +176,8 @@ export const AppMutation = () => {
                 url: { baseUrl: "/academic/classes" },
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["/academic/classes"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/academic/grades"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/academic/class-years"] as any });
                 }
             }),
             useUpdateClass: (id: number) => useAppMutation<"updateClass">({
@@ -183,6 +185,8 @@ export const AppMutation = () => {
                 method: "PUT",
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["/academic/classes"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/academic/grades"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/academic/class-years"] as any });
                 }
             }),
             useDeleteClass: (id: number) => useAppMutation<"deleteClass">({
@@ -190,12 +194,16 @@ export const AppMutation = () => {
                 method: "DELETE",
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["/academic/classes"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/academic/grades"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/academic/class-years"] as any });
                 }
             }),
             useCreateClassYear: () => useAppMutation<"createClassYear">({
                 url: { baseUrl: "/academic/class-years" },
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["/academic/class-years"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/academic/classes"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/academic/grades"] as any });
                 }
             }),
             useUpdateClassYear: (id: number) => useAppMutation<"updateClassYear">({
@@ -203,6 +211,7 @@ export const AppMutation = () => {
                 method: "PATCH",
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["/academic/class-years"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/academic/classes"] as any });
                 }
             }),
             useDeleteClassYear: () => useAppMutation<"deleteClassYear">({
@@ -210,6 +219,8 @@ export const AppMutation = () => {
                 method: "DELETE",
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["/academic/class-years"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/academic/classes"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/academic/grades"] as any });
                 }
             }),
             useCloneClasses: () => useAppMutation<"cloneClasses">({

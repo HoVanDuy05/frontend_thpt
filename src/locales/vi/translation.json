@@ -259,12 +259,19 @@
             "status": "Trạng thái",
             "students": "học sinh",
             "no_students": "Chưa có học sinh nào trong lớp này",
+            "si_so": "Sỉ số",
+            "view_info": "Xem thông tin",
+            "class_info": "Thông tin lớp học",
+            "statistics": "Thống kê",
+            "gender_male": "Nam",
+            "gender_female": "Nữ",
             "create_title": "Tạo khối học mới",
             "edit_title": "Chỉnh sửa khối học",
             "fields": {
                 "name": "Tên khối",
                 "code": "Mã khối (Số)",
-                "description": "Mô tả"
+                "description": "Mô tả",
+                "homeroom_teacher": "Giáo viên chủ nhiệm"
             },
             "placeholders": {
                 "name": "Nhập tên khối (VD: Khối 10)",
@@ -678,7 +685,9 @@
         },
         "no_data": "Không có dữ liệu",
         "confirm_delete": "Bạn có chắc chắn muốn xóa mục này? Hành động này không thể hoàn tác.",
-        "delete_title": "Xác nhận xóa"
+        "delete_title": "Xác nhận xóa",
+        "details": "Chi tiết",
+        "actions_header": "Hành động"
     },
     "splash": {
         "init": "Đang khởi tạo hệ thống...",

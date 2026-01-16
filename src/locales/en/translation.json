@@ -262,12 +262,19 @@
             "status": "Status",
             "students": "students",
             "no_students": "No students in this class yet",
+            "si_so": "Class Size",
+            "view_info": "View Info",
+            "class_info": "Class Info",
+            "statistics": "Statistics",
+            "gender_male": "Male",
+            "gender_female": "Female",
             "create_title": "Create New Grade",
             "edit_title": "Edit Grade",
             "fields": {
                 "name": "Grade Name",
                 "code": "Grade Code (Integer)",
-                "description": "Description"
+                "description": "Description",
+                "homeroom_teacher": "Homeroom Teacher"
             },
             "placeholders": {
                 "name": "Enter grade name (e.g. Grade 10)",
@@ -681,7 +688,9 @@
         },
         "no_data": "No data available",
         "confirm_delete": "Are you sure you want to delete this item? This action cannot be undone.",
-        "delete_title": "Confirm Deletion"
+        "delete_title": "Confirm Deletion",
+        "details": "Details",
+        "actions_header": "Actions"
     },
     "splash": {
         "init": "Initializing system...",

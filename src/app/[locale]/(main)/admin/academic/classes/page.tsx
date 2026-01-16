@@ -151,7 +151,7 @@ export default function ClassesPage() {
                         </Tabs.List>
 
                         {[10, 11, 12].map((khoi) => {
-                            const lopNamsInGrade = filteredLopNams.filter(ln => ln.lopHoc?.khoiLop === khoi);
+                            const lopNamsInGrade = filteredLopNams.filter(ln => ln.lopHoc?.khoi?.maKhoi === khoi);
 
                             return (
                                 <Tabs.Panel key={khoi} value={khoi.toString()}>

@@ -37,8 +37,7 @@ export interface TKhoi {
 export interface TLopHoc {
     id: number;
     tenLop: string;
-    khoiId: number; // NEW
-    khoiLop?: number; // Deprecated
+    khoiId: number;
     moTa?: string;
 
     // Relations

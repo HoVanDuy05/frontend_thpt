@@ -84,7 +84,7 @@ export default function ClassStudentsPage() {
             <Stack p={{ base: 'sm', sm: 'md', md: 'xl' }} gap="lg">
                 <Group justify="space-between" align="center" gap="xs">
                     <TextInput
-                        placeholder={common('search')}
+                        placeholder={common('actions.search')}
                         leftSection={<IconSearch size={16} />}
                         value={search}
                         onChange={(e) => setSearch(e.currentTarget.value)}
@@ -108,7 +108,7 @@ export default function ClassStudentsPage() {
                                 <Table.Th style={{ fontSize: rem(12) }}>{t('student_id')}</Table.Th>
                                 <Table.Th style={{ fontSize: rem(12) }}>{t('gender')}</Table.Th>
                                 <Table.Th style={{ fontSize: rem(12) }}>{t('status')}</Table.Th>
-                                <Table.Th align="right" style={{ fontSize: rem(12) }}>{common('actions')}</Table.Th>
+                                <Table.Th align="right" style={{ fontSize: rem(12) }}>{common('actions_header')}</Table.Th>
                             </Table.Tr>
                         </Table.Thead>
                         <Table.Tbody>

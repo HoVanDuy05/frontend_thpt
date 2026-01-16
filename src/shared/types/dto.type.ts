@@ -50,8 +50,7 @@ export interface TCreateMonHocDto {
 
 export interface TCreateLopHocDto {
     tenLop: string;
-    khoiId: number; // NEW
-    khoiLop?: number; // Deprecated
+    khoiId: number;
     moTa?: string;
 }
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Title, Text, Paper, SimpleGrid, Group, Stack, ThemeIcon, Breadcrumbs, Anchor, Loader, ActionIcon, Box, rem, Button, Menu, Badge } from '@mantine/core';
+import { Title, Text, Paper, SimpleGrid, Group, Stack, ThemeIcon, Breadcrumbs, Anchor, Loader, Badge, ActionIcon, Box, rem, Button, Menu, Skeleton } from '@mantine/core';
 import { IconCalendar, IconArrowRight, IconChevronLeft, IconPlus, IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 import { AppQuery } from '@/api/AppQuery';
@@ -13,11 +13,13 @@ import { useParams } from 'next/navigation';
 import { Link } from '@/i18n/routing';
 import { YearModal } from '../../../years/YearModal';
 import { TNamHoc } from '@/shared/types/academic.type';
+import { SkeletonLoader } from '@/shared/components/SkeletonLoader';
 
 export default function GradeYearsPage() {
     const t = useTranslations('academic.grades');
     const tYear = useTranslations('academic.years');
     const params = useParams();
+    const common = useTranslations('common');
     const gradeId = Number(params.gradeId);
 
     const [opened, { open, close }] = useDisclosure(false);
@@ -100,9 +102,8 @@ export default function GradeYearsPage() {
         }
     };
 
-    const common = useTranslations('common');
 
-    if (isLoadingGrade || isLoadingYears) return <Loader />;
+    // if (isLoadingGrade || isLoadingYears) return <Loader />; // Removed early return
 
     const breadcrumbs = [
         { title: t('title'), href: `/admin/academic/grades` },
@@ -163,57 +164,71 @@ export default function GradeYearsPage() {
             <Stack p={{ base: 'sm', sm: 'md', md: 'xl' }} gap="lg">
 
                 <SimpleGrid cols={{ base: 2, xs: 2, sm: 3, md: 4, lg: 5 }} spacing="md">
-                    {years?.map((year) => (
-                        <Paper
-                            key={year.id}
-                            withBorder
-                            p="sm"
-                            radius="md"
-                            className="hover-card"
-                            style={{ position: 'relative' }}
-                        >
-                            <Menu position="bottom-end" withinPortal>
-                                <Menu.Target>
-                                    <ActionIcon
-                                        variant="subtle"
-                                        color="gray"
-                                        size="xs"
-                                        style={{ position: 'absolute', top: 5, right: 5, zIndex: 10 }}
-                                    >
-                                        <IconDotsVertical size={14} />
-                                    </ActionIcon>
-                                </Menu.Target>
-                                <Menu.Dropdown>
-                                    <Menu.Item leftSection={<IconEdit size={14} />} onClick={() => handleOpenEdit(year)}>
-                                        {common('edit')}
-                                    </Menu.Item>
-                                    <Menu.Item leftSection={<IconTrash size={14} />} color="red" onClick={() => handleDelete(year.id, year.tenNamHoc)}>
-                                        {common('delete')}
-                                    </Menu.Item>
-                                </Menu.Dropdown>
-                            </Menu>
-
-                            <Link
-                                href={`/admin/academic/grades/${gradeId}/years/${year.id}/classes`}
-                                style={{ textDecoration: 'none', color: 'inherit' }}
-                            >
-                                <Stack gap="xs" align="center" style={{ textAlign: 'center' }}>
-                                    <ThemeIcon size="md" radius="md" color={year.dangKichHoat ? "teal" : "gray"} variant="light">
-                                        <IconCalendar size={18} />
-                                    </ThemeIcon>
-
-                                    <Stack gap={2}>
-                                        <Title order={5} size="sm" lineClamp={1}>{year.tenNamHoc}</Title>
-                                        {year.dangKichHoat && (
-                                            <Badge color="teal" variant="light" size="xs" radius="xs">
-                                                {tYear('status.active')}
-                                            </Badge>
-                                        )}
+                    {isLoadingYears ? (
+                        Array(5).fill(0).map((_, i) => (
+                            <Paper key={i} withBorder p="sm" radius="md">
+                                <Stack gap="xs" align="center">
+                                    <Skeleton h={30} w={30} radius="md" />
+                                    <Stack gap={2} w="100%" align="center">
+                                        <Skeleton h={16} w="60%" />
+                                        <Skeleton h={14} w="30%" />
                                     </Stack>
                                 </Stack>
-                            </Link>
-                        </Paper>
-                    ))}
+                            </Paper>
+                        ))
+                    ) : (
+                        years?.map((year) => (
+                            <Paper
+                                key={year.id}
+                                withBorder
+                                p="sm"
+                                radius="md"
+                                className="hover-card"
+                                style={{ position: 'relative' }}
+                            >
+                                <Menu position="bottom-end" withinPortal>
+                                    <Menu.Target>
+                                        <ActionIcon
+                                            variant="subtle"
+                                            color="gray"
+                                            size="xs"
+                                            style={{ position: 'absolute', top: 5, right: 5, zIndex: 10 }}
+                                        >
+                                            <IconDotsVertical size={14} />
+                                        </ActionIcon>
+                                    </Menu.Target>
+                                    <Menu.Dropdown>
+                                        <Menu.Item leftSection={<IconEdit size={14} />} onClick={() => handleOpenEdit(year)}>
+                                            {common('edit')}
+                                        </Menu.Item>
+                                        <Menu.Item leftSection={<IconTrash size={14} />} color="red" onClick={() => handleDelete(year.id, year.tenNamHoc)}>
+                                            {common('delete')}
+                                        </Menu.Item>
+                                    </Menu.Dropdown>
+                                </Menu>
+
+                                <Link
+                                    href={`/admin/academic/grades/${gradeId}/years/${year.id}/classes`}
+                                    style={{ textDecoration: 'none', color: 'inherit' }}
+                                >
+                                    <Stack gap="xs" align="center" style={{ textAlign: 'center' }}>
+                                        <ThemeIcon size="md" radius="md" color={year.dangKichHoat ? "teal" : "gray"} variant="light">
+                                            <IconCalendar size={18} />
+                                        </ThemeIcon>
+
+                                        <Stack gap={2}>
+                                            <Title order={5} size="sm" lineClamp={1}>{year.tenNamHoc}</Title>
+                                            {year.dangKichHoat && (
+                                                <Badge color="teal" variant="light" size="xs" radius="xs">
+                                                    {tYear('status.active')}
+                                                </Badge>
+                                            )}
+                                        </Stack>
+                                    </Stack>
+                                </Link>
+                            </Paper>
+                        ))
+                    )}
                 </SimpleGrid>
             </Stack>
 
