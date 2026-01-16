@@ -90,6 +90,7 @@ export interface THoSoHocSinh {
     lopId?: number;
     avatar?: string;
     lopHoc?: TLopHoc;
+    cacLopNam?: any[]; // Since importing THocSinhLopNam here might cause circularity, we can use any[] or move types
     diaChi?: string;
 }
 

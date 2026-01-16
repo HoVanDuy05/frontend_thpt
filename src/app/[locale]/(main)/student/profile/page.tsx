@@ -117,11 +117,11 @@ export default function StudentProfilePage() {
                                     </Group>
                                 </Box>
                                 <Stack gap={0}>
-                                    <InfoRow icon={IconSchool} label={t('current_class')} value={studentInfo?.lopHoc?.tenLop || t('not_assigned')} />
+                                    <InfoRow icon={IconSchool} label={t('current_class')} value={studentInfo?.cacLopNam?.[0]?.lopNam?.lopHoc?.tenLop || studentInfo?.lopHoc?.tenLop || t('not_assigned')} />
                                     <Divider className="border-gray-100 dark:border-zinc-800" />
-                                    <InfoRow icon={IconSchool} label={t('course')} value="2023 - 2026" />
+                                    <InfoRow icon={IconSchool} label={t('course')} value={studentInfo?.cacLopNam?.[0]?.lopNam?.namHoc?.tenNamHoc || "2023 - 2026"} />
                                     <Divider className="border-gray-100 dark:border-zinc-800" />
-                                    <InfoRow icon={IconUser} label={t('homeroom_teacher')} value={studentInfo?.lopHoc?.gvChuNhiem?.hoTen || t('not_available')} isLast />
+                                    <InfoRow icon={IconUser} label={t('homeroom_teacher')} value={studentInfo?.cacLopNam?.[0]?.lopNam?.gvChuNhiem?.hoTen || t('not_available')} isLast />
                                 </Stack>
                             </Paper>
 
@@ -284,7 +284,7 @@ function StudentCard({ user, profile, studentInfo, qrUrl, t }: { user: any, prof
                                     </div>
                                     <div>
                                         <Text size="xs" className="opacity-60">{t('card_class_label')}</Text>
-                                        <Text fw={600}>{studentInfo?.lopHoc?.tenLop || "---"}</Text>
+                                        <Text fw={600}>{studentInfo?.cacLopNam?.[0]?.lopNam?.lopHoc?.tenLop || studentInfo?.lopHoc?.tenLop || "---"}</Text>
                                     </div>
                                 </Group>
                             </div>

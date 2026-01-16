@@ -249,6 +249,7 @@
             "classes_subtitle": "Quản lý các lớp học trong khối và năm học đã chọn",
             "view_students": "Danh sách học sinh",
             "no_classes": "Không tìm thấy lớp học nào",
+            "no_classes_subtitle": "Chưa có lớp học nào được tạo cho khối này trong năm học đã chọn.",
             "student_list": "Danh sách học sinh",
             "student_list_subtitle": "Học sinh lớp trong năm học {year}",
             "add_student": "Thêm học sinh",

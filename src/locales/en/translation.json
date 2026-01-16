@@ -252,6 +252,7 @@
             "classes_subtitle": "Manage classes for the selected grade and year",
             "view_students": "View Students",
             "no_classes": "No classes found",
+            "no_classes_subtitle": "No classes have been created for this grade in the selected academic year.",
             "student_list": "Student List",
             "student_list_subtitle": "Students of class in academic year {year}",
             "add_student": "Add Student",
