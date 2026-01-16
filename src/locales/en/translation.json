@@ -10,12 +10,13 @@
         },
         "academic": {
             "title": "Academic",
+            "grades": "Grades",
+            "years": "Years",
+            "semesters": "Semesters",
             "classes": "Classes",
             "subjects": "Subjects",
             "courses": "Courses",
-            "schedule": "Schedule",
-            "years": "Academic Years",
-            "semesters": "Semesters"
+            "schedule": "Schedule"
         },
         "examination": {
             "title": "Examination",
@@ -237,6 +238,51 @@
             "no_data": "No schedules available",
             "no_data_subtitle": "Start by creating your first timetable"
         },
+        "grades": {
+            "title": "Grade Management",
+            "subtitle": "Directory of grade levels in the school",
+            "create_button": "Add Grade",
+            "class_count": "classes",
+            "view_years": "View Academic Years",
+            "no_description": "No description for this grade",
+            "empty": "No grade levels created yet",
+            "select_year_title": "Select Academic Year",
+            "select_year_subtitle": "Select a year to view classes for this grade",
+            "classes_in": "Class List",
+            "classes_subtitle": "Manage classes for the selected grade and year",
+            "view_students": "View Students",
+            "no_classes": "No classes found",
+            "student_list": "Student List",
+            "student_list_subtitle": "Students of class in academic year {year}",
+            "add_student": "Add Student",
+            "student_name": "Full Name",
+            "student_id": "Student ID",
+            "gender": "Gender",
+            "status": "Status",
+            "students": "students",
+            "no_students": "No students in this class yet",
+            "create_title": "Create New Grade",
+            "edit_title": "Edit Grade",
+            "fields": {
+                "name": "Grade Name",
+                "code": "Grade Code (Integer)",
+                "description": "Description"
+            },
+            "placeholders": {
+                "name": "Enter grade name (e.g. Grade 10)",
+                "code": "Enter code (e.g. 10)",
+                "description": "Short description of the grade"
+            },
+            "validation": {
+                "name_required": "Grade name is required",
+                "code_required": "Grade code is required"
+            },
+            "messages": {
+                "create_success": "Grade created successfully",
+                "update_success": "Grade updated successfully",
+                "delete_success": "Grade deleted successfully"
+            }
+        },
         "years": {
             "title": "Academic Years",
             "subtitle": "Manage list of academic years",
@@ -393,6 +439,56 @@
             "light_mode": "Light Mode",
             "language": "Language",
             "logout": "Logout"
+        },
+        "academic": {
+            "classes": {
+                "title": "Class Management",
+                "subtitle": "Manage list of classes",
+                "create": "Create Class",
+                "search_placeholder": "Search classes...",
+                "no_data": "No classes yet",
+                "no_data_subtitle": "Create a new class to start managing",
+                "fields": {
+                    "name": "Class Name",
+                    "grade": "Grade",
+                    "year": "Academic Year",
+                    "homeroom_teacher": "Homeroom Teacher",
+                    "description": "Description"
+                },
+                "placeholders": {
+                    "name": "Enter class name (e.g., 10A1)",
+                    "grade": "Select grade",
+                    "year": "Select academic year",
+                    "teacher": "Select homeroom teacher",
+                    "description": "Enter description (optional)"
+                },
+                "actions": {
+                    "create": "Create Class",
+                    "edit": "Edit",
+                    "delete": "Delete",
+                    "filter": "Filter",
+                    "cancel": "Cancel",
+                    "update": "Update",
+                    "create_confirm": "Create Class"
+                },
+                "validation": {
+                    "name_short": "Class name is too short",
+                    "grade_required": "Please select a grade",
+                    "year_required": "Please select an academic year"
+                }
+            },
+            "subjects": {
+                "title": "Subject Management",
+                "subtitle": "List of {count} subjects in the system",
+                "search_placeholder": "Search subjects...",
+                "no_desc": "No description for this subject.",
+                "actions": {
+                    "create": "Add New",
+                    "edit": "Edit",
+                    "delete": "Delete",
+                    "filter": "Filter"
+                }
+            }
         }
     },
     "error_page": {
@@ -546,6 +642,15 @@
             "please_wait": "Please wait a moment",
             "smart_system": "Smart Education System"
         },
+        "edit": "Edit",
+        "delete": "Delete",
+        "save": "Save",
+        "cancel": "Cancel",
+        "success": "Success",
+        "error": "Error",
+        "delete_confirm": "Confirm Deletion",
+        "delete_message_named": "Are you sure you want to delete {name}?",
+        "not_assigned": "Not assigned",
         "student_portal": "Student Portal",
         "light_mode": "Light Mode",
         "dark_mode": "Dark Mode",

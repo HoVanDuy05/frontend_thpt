@@ -10,12 +10,13 @@
         },
         "academic": {
             "title": "Học thuật",
+            "grades": "Khối học",
+            "years": "Năm học",
+            "semesters": "Học kỳ",
             "classes": "Lớp học",
             "subjects": "Môn học",
             "courses": "Khóa học",
-            "schedule": "Lịch học",
-            "years": "Năm học",
-            "semesters": "Học kỳ"
+            "schedule": "Lịch học"
         },
         "examination": {
             "title": "Khảo thí",
@@ -234,6 +235,51 @@
             "no_data": "Chưa có lịch học nào",
             "no_data_subtitle": "Bắt đầu bằng cách tạo thời khóa biểu đầu tiên"
         },
+        "grades": {
+            "title": "Quản lý Khối học",
+            "subtitle": "Danh mục các khối lớp trong trường",
+            "create_button": "Thêm khối",
+            "class_count": "lớp học",
+            "view_years": "Xem năm học",
+            "no_description": "Chưa có mô tả cho khối này",
+            "empty": "Chưa có khối học nào được tạo",
+            "select_year_title": "Chọn năm học",
+            "select_year_subtitle": "Chọn năm học để xem danh sách lớp của khối này",
+            "classes_in": "Danh sách lớp học",
+            "classes_subtitle": "Quản lý các lớp học trong khối và năm học đã chọn",
+            "view_students": "Danh sách học sinh",
+            "no_classes": "Không tìm thấy lớp học nào",
+            "student_list": "Danh sách học sinh",
+            "student_list_subtitle": "Học sinh lớp trong năm học {year}",
+            "add_student": "Thêm học sinh",
+            "student_name": "Họ và tên",
+            "student_id": "Mã số HS",
+            "gender": "Giới tính",
+            "status": "Trạng thái",
+            "students": "học sinh",
+            "no_students": "Chưa có học sinh nào trong lớp này",
+            "create_title": "Tạo khối học mới",
+            "edit_title": "Chỉnh sửa khối học",
+            "fields": {
+                "name": "Tên khối",
+                "code": "Mã khối (Số)",
+                "description": "Mô tả"
+            },
+            "placeholders": {
+                "name": "Nhập tên khối (VD: Khối 10)",
+                "code": "Nhập số (VD: 10)",
+                "description": "Mô tả ngắn về khối học"
+            },
+            "validation": {
+                "name_required": "Vui lòng nhập tên khối",
+                "code_required": "Vui lòng nhập mã khối"
+            },
+            "messages": {
+                "create_success": "Tạo khối học thành công",
+                "update_success": "Cập nhật khối học thành công",
+                "delete_success": "Xóa khối học thành công"
+            }
+        },
         "years": {
             "title": "Quản lý Năm học",
             "subtitle": "Danh sách và quản lý các năm học",
@@ -390,6 +436,56 @@
             "light_mode": "Chế độ sáng",
             "language": "Ngôn ngữ",
             "logout": "Đăng xuất"
+        },
+        "academic": {
+            "classes": {
+                "title": "Quản lý Lớp học",
+                "subtitle": "Danh sách và quản lý các lớp học",
+                "create": "Tạo lớp học",
+                "search_placeholder": "Tìm kiếm lớp học...",
+                "no_data": "Chưa có lớp học nào",
+                "no_data_subtitle": "Tạo lớp học mới để bắt đầu quản lý",
+                "fields": {
+                    "name": "Tên lớp",
+                    "grade": "Khối",
+                    "year": "Năm học",
+                    "homeroom_teacher": "Giáo viên chủ nhiệm",
+                    "description": "Mô tả"
+                },
+                "placeholders": {
+                    "name": "Nhập tên lớp (VD: 10A1)",
+                    "grade": "Chọn khối",
+                    "year": "Chọn năm học",
+                    "teacher": "Chọn giáo viên chủ nhiệm",
+                    "description": "Nhập mô tả (tùy chọn)"
+                },
+                "actions": {
+                    "create": "Tạo lớp học",
+                    "edit": "Chỉnh sửa",
+                    "delete": "Xóa",
+                    "filter": "Bộ lọc",
+                    "cancel": "Hủy",
+                    "update": "Cập nhật",
+                    "create_confirm": "Tạo lớp học"
+                },
+                "validation": {
+                    "name_short": "Tên lớp quá ngắn",
+                    "grade_required": "Vui lòng chọn khối",
+                    "year_required": "Vui lòng chọn năm học"
+                }
+            },
+            "subjects": {
+                "title": "Quản lý Môn học",
+                "subtitle": "Danh sách {count} môn học trong hệ thống",
+                "search_placeholder": "Tìm kiếm môn học...",
+                "no_desc": "Chưa có mô tả cho môn học này.",
+                "actions": {
+                    "create": "Thêm mới",
+                    "edit": "Chỉnh sửa",
+                    "delete": "Xóa",
+                    "filter": "Bộ lọc"
+                }
+            }
         }
     },
     "error_page": {
@@ -543,6 +639,15 @@
             "please_wait": "Vui lòng đợi trong giây lát",
             "smart_system": "Hệ thống Giáo dục Thông minh"
         },
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
+        "save": "Lưu",
+        "cancel": "Hủy",
+        "success": "Thành công",
+        "error": "Lỗi",
+        "delete_confirm": "Xác nhận xóa",
+        "delete_message_named": "Bạn có chắc chắn muốn xóa {name}?",
+        "not_assigned": "Chưa bàn giao",
         "student_portal": "Cổng thông tin học sinh",
         "light_mode": "Chế độ sáng",
         "dark_mode": "Chế độ tối",

@@ -99,8 +99,15 @@ export const useMenu = () => {
                     showMenu: hasScreen(EScreen.ACADEMIC_MANAGEMENT),
                     children: [
                         {
+                            key: "grades",
+                            label: t("menu.academic.grades"),
+                            path: PMS_PATH.ACADEMIC.GRADES,
+                            icon: IconSchool,
+                            showMenu: true,
+                        },
+                        {
                             key: "years",
-                            label: t("menu.academic.years"), // Ensure these keys exist in translation file
+                            label: t("menu.academic.years"),
                             path: PMS_PATH.ACADEMIC.YEARS,
                             icon: IconCalendar,
                             showMenu: true,

@@ -50,9 +50,24 @@ export interface TCreateMonHocDto {
 
 export interface TCreateLopHocDto {
     tenLop: string;
-    namHocId?: number;
+    khoiId: number; // NEW
+    khoiLop?: number; // Deprecated
+    moTa?: string;
+}
+
+export interface TCreateKhoiDto {
+    tenKhoi: string;
+    maKhoi: number;
+    moTa?: string;
+}
+
+// NEW: DTO for creating ClassYear
+export interface TCreateLopNamDto {
+    lopId: number;
+    namHocId: number;
     gvChuNhiemId?: number;
 }
+
 
 // Assessment DTOs
 export interface TCreateQuestionDto {

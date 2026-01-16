@@ -10,6 +10,7 @@ export const PMS_PATH = {
     },
     ACADEMIC: {
         ROOT: "/admin/academic",
+        GRADES: "/admin/academic/grades",
         YEARS: "/admin/academic/years",
         SEMESTERS: "/admin/academic/semesters",
         CLASSES: "/admin/academic/classes",

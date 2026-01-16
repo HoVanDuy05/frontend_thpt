@@ -1,11 +1,11 @@
 import { TUser, THoSoGiaoVien, THoSoHocSinh, TNotification } from "@/shared/types/user.type";
-import { TNamHoc, TMonHoc, TLopHoc, THocKy } from "@/shared/types/academic.type";
+import { TNamHoc, TMonHoc, TLopHoc, THocKy, TLopNam, TKhoi } from "@/shared/types/academic.type";
 import { TNganHangCauHoi, TDeKiemTra } from "@/shared/types/assessment.type";
 import { TLichSuNopBai } from "@/shared/types/submission.type";
 import { TKetQuaChamDiem } from "@/shared/types/grading.type";
 import { TQueryConfig } from "@/shared/types/common.type";
 import { TLoginRequest, TLoginResponse } from "@/shared/types/auth.type";
-import { TCreateUserDto, TCreateTeacherDto, TCreateStudentDto, TCreateNamHocDto, TCreateMonHocDto, TCreateLopHocDto, TCreateQuestionDto, TCreateExamDto, TCreateSubmissionDto, TCreateGradingDto, TCreateHocKyDto } from "@/shared/types/dto.type";
+import { TCreateUserDto, TCreateTeacherDto, TCreateStudentDto, TCreateNamHocDto, TCreateMonHocDto, TCreateLopHocDto, TCreateLopNamDto, TCreateQuestionDto, TCreateExamDto, TCreateSubmissionDto, TCreateGradingDto, TCreateHocKyDto, TCreateKhoiDto } from "@/shared/types/dto.type";
 import { TBanner, TBaiViet, TBinhLuan, ELoaiBaiViet } from "@/shared/types/portal.type";
 import { TQuyTrinh, TPhienQuyTrinh, TNhatKyPheDuyetQuyTrinh, TTruongFormQuyTrinh } from "@/shared/types/approval.type";
 import {
@@ -111,6 +111,23 @@ export type ApiQueryType = {
     getLopHocById: {
         url: { baseUrl: "/academic/classes/:id"; urlParams: { id: number } };
         response: TLopHoc;
+    };
+    // NEW: LopNam (ClassYear) queries
+    getLopNams: {
+        url: { baseUrl: "/academic/class-years"; queryParams?: TQueryConfig & { namHocId?: number } };
+        response: TLopNam[];
+    };
+    getLopNamById: {
+        url: { baseUrl: "/academic/class-years/:id"; urlParams: { id: number } };
+        response: TLopNam;
+    };
+    getKhois: {
+        url: { baseUrl: "/academic/grades"; queryParams?: TQueryConfig };
+        response: TKhoi[];
+    };
+    getKhoiById: {
+        url: { baseUrl: "/academic/grades/:id"; urlParams: { id: number } };
+        response: TKhoi;
     };
 
     // Assessments
@@ -403,6 +420,43 @@ export type ApiMutationType = {
     };
     deleteClass: {
         url: { baseUrl: "/academic/classes/:id"; urlParams: { id: number } };
+        payload: undefined;
+        response: void;
+    };
+    cloneClasses: {
+        url: { baseUrl: "/academic/classes/clone" };
+        payload: { fromNamHocId: number; toNamHocId: number };
+        response: { count: number; message?: string };
+    };
+    // NEW: ClassYear mutations
+    createClassYear: {
+        url: { baseUrl: "/academic/class-years" };
+        payload: TCreateLopNamDto;
+        response: TLopNam;
+    };
+    updateClassYear: {
+        url: { baseUrl: "/academic/class-years/:id"; urlParams: { id: number } };
+        payload: Partial<TCreateLopNamDto>;
+        response: TLopNam;
+    };
+    deleteClassYear: {
+        url: { baseUrl: "/academic/class-years/:id" };
+        payload: { urlParams: { id: number } };
+        response: void;
+    };
+    // NEW: Khoi (Grades) mutations
+    createKhoi: {
+        url: { baseUrl: "/academic/grades" };
+        payload: { tenKhoi: string; maKhoi: number; moTa?: string };
+        response: TKhoi;
+    };
+    updateKhoi: {
+        url: { baseUrl: "/academic/grades/:id"; urlParams: { id: number } };
+        payload: { tenKhoi?: string; maKhoi?: number; moTa?: string };
+        response: TKhoi;
+    };
+    deleteKhoi: {
+        url: { baseUrl: "/academic/grades/:id"; urlParams: { id: number } };
         payload: undefined;
         response: void;
     };

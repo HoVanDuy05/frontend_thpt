@@ -138,6 +138,20 @@ export const AppMutation = () => {
                     queryClient.invalidateQueries({ queryKey: ["/academic/subjects"] as any });
                 }
             }),
+            useUpdateSubject: (id: number) => useAppMutation<"updateSubject">({
+                url: { baseUrl: "/academic/subjects/:id", urlParams: { id } },
+                method: "PUT",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/subjects"] as any });
+                }
+            }),
+            useDeleteSubject: (id: number) => useAppMutation<"deleteSubject">({
+                url: { baseUrl: "/academic/subjects/:id", urlParams: { id } },
+                method: "DELETE",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/subjects"] as any });
+                }
+            }),
             useCreateSemester: () => useAppMutation<"createSemester">({
                 url: { baseUrl: "/academic/semesters" },
                 onSuccess: () => {
@@ -164,6 +178,47 @@ export const AppMutation = () => {
                     queryClient.invalidateQueries({ queryKey: ["/academic/classes"] as any });
                 }
             }),
+            useUpdateClass: (id: number) => useAppMutation<"updateClass">({
+                url: { baseUrl: "/academic/classes/:id", urlParams: { id } },
+                method: "PUT",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/classes"] as any });
+                }
+            }),
+            useDeleteClass: (id: number) => useAppMutation<"deleteClass">({
+                url: { baseUrl: "/academic/classes/:id", urlParams: { id } },
+                method: "DELETE",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/classes"] as any });
+                }
+            }),
+            useCreateClassYear: () => useAppMutation<"createClassYear">({
+                url: { baseUrl: "/academic/class-years" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/class-years"] as any });
+                }
+            }),
+            useUpdateClassYear: (id: number) => useAppMutation<"updateClassYear">({
+                url: { baseUrl: "/academic/class-years/:id", urlParams: { id } },
+                method: "PATCH",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/class-years"] as any });
+                }
+            }),
+            useDeleteClassYear: () => useAppMutation<"deleteClassYear">({
+                url: { baseUrl: "/academic/class-years/:id" } as any,
+                method: "DELETE",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/class-years"] as any });
+                }
+            }),
+            useCloneClasses: () => useAppMutation<"cloneClasses">({
+                url: { baseUrl: "/academic/classes/clone" },
+                method: "POST",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/classes"] as any });
+                }
+            }),
             useCreateCalendar: () => useAppMutation<"createCalendar">({
                 url: { baseUrl: "/calendar" },
                 onSuccess: () => {
@@ -182,6 +237,26 @@ export const AppMutation = () => {
                 method: "DELETE",
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["/calendar"] as any });
+                }
+            }),
+            useCreateKhoi: () => useAppMutation<"createKhoi">({
+                url: { baseUrl: "/academic/grades" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/grades"] as any });
+                }
+            }),
+            useUpdateKhoi: (id: number) => useAppMutation<"updateKhoi">({
+                url: { baseUrl: "/academic/grades/:id", urlParams: { id } },
+                method: "PUT",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/grades"] as any });
+                }
+            }),
+            useDeleteKhoi: (id: number) => useAppMutation<"deleteKhoi">({
+                url: { baseUrl: "/academic/grades/:id", urlParams: { id } },
+                method: "DELETE",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/grades"] as any });
                 }
             }),
         },
