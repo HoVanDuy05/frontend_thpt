@@ -1,6 +1,6 @@
 {
     "id": "com.nguyenhue.school.student",
-    "name": "NHers Social - THPT Nguyễn Huệ",
+    "name": "NHers Social",
     "short_name": "NHers Student",
     "description": "Hệ thống mạng xã hội và quản lý học tập dành riêng cho học sinh trường THPT Nguyễn Huệ.",
     "start_url": "/?utm_source=pwa",
