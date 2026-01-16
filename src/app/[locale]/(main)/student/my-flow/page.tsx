@@ -24,6 +24,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { TPhienQuyTrinh, TQuyTrinh, TTruongFormQuyTrinh, LoaiTruongForm } from "@/shared/types/approval.type";
 import { dayjs } from "@/shared/utils/date.util";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 export default function MyFlowPage() {
     const t = useTranslations('student_flow');
@@ -210,9 +211,10 @@ export default function MyFlowPage() {
                                                 return (
                                                     <Paper
                                                         key={flow.id}
+                                                        component={Link}
+                                                        href={`${pathname}/${flow.id}`}
                                                         radius="24px"
                                                         className="group hover:shadow-xl hover:scale-[1.01] transition-all duration-300 bg-white dark:bg-zinc-900 border border-gray-100 dark:border-zinc-800 hover:border-indigo-100 dark:hover:border-indigo-900 cursor-pointer overflow-hidden p-0"
-                                                        onClick={() => {/* detail view handling */ }}
                                                     >
                                                         <Group gap={0} wrap="nowrap" align="stretch">
                                                             {/* Left indicator bar */}
