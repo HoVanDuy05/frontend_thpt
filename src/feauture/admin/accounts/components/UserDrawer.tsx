@@ -25,12 +25,12 @@ export function UserDrawer({ opened, onClose, onSubmit, initialData, role, loadi
     const router = useRouter();
     const pathname = usePathname();
 
-    // Queries
-    const { data: years } = AppQuery.academic.useYears();
-    const { data: classes } = AppQuery.academic.useClasses();
-
     const [selectedYear, setSelectedYear] = useState<string | null>(null);
     const [accountMode, setAccountMode] = useState<'new' | 'existing'>('new');
+
+    // Queries
+    const { data: years } = AppQuery.academic.useYears();
+    const { data: classYears } = AppQuery.academic.useClassYears({ namHocId: selectedYear ? Number(selectedYear) : undefined });
 
     const activeTab = searchParams.get('tab') || 'account';
 
@@ -139,13 +139,13 @@ export function UserDrawer({ opened, onClose, onSubmit, initialData, role, loadi
                     sdtMe: hs.sdtMe || '',
                     ngayNhapHoc: hs.ngayNhapHoc ? new Date(hs.ngayNhapHoc) : null,
                     trangThai: hs.trangThai || 'DANG_HOC',
-                    lopId: hs.lopHoc?.id?.toString() || '',
+                    lopId: hs.cacLopNam?.[0]?.lopNamId?.toString() || '',
                     cccd: hs.cccd || '',
                     ngayCapCccd: hs.ngayCapCccd ? new Date(hs.ngayCapCccd) : null,
                     noiCapCccd: hs.noiCapCccd || '',
                 });
-                if (hs.lopHoc?.namHocId) {
-                    setSelectedYear(hs.lopHoc.namHocId.toString());
+                if (hs.cacLopNam?.[0]?.lopNam?.namHocId) {
+                    setSelectedYear(hs.cacLopNam[0].lopNam.namHocId.toString());
                 }
             } else if (role === 'GIAO_VIEN' && initialData.hoSoGiaoVien) {
                 const gv = initialData.hoSoGiaoVien;
@@ -181,13 +181,8 @@ export function UserDrawer({ opened, onClose, onSubmit, initialData, role, loadi
     const yearOptions = useMemo(() => years?.map(y => ({ value: y.id.toString(), label: y.tenNamHoc })) || [], [years]);
 
     const classOptions = useMemo(() => {
-        if (!classes) return [];
-        let filtered = classes;
-        if (selectedYear) {
-            filtered = classes.filter(c => c.namHocId === Number(selectedYear));
-        }
-        return filtered.map(c => ({ value: c.id.toString(), label: c.tenLop }));
-    }, [classes, selectedYear]);
+        return classYears?.map(cy => ({ value: cy.id.toString(), label: cy.lopHoc?.tenLop || 'N/A' })) || [];
+    }, [classYears]);
 
     const handleFormSubmit = (values: any) => {
         // Base account and profile fields
