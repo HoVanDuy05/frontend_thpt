@@ -463,6 +463,11 @@
                     "homeroom_teacher": "Homeroom Teacher",
                     "description": "Description"
                 },
+                "add_student": "Add Student",
+                "add_student_description": "Select students to add to this class. Only students not enrolled in any class for this year are shown.",
+                "select_students": "Select Students",
+                "search_student_placeholder": "Search by name or student ID...",
+                "no_students_found": "No available students found",
                 "placeholders": {
                     "name": "Enter class name (e.g., 10A1)",
                     "grade": "Select grade",

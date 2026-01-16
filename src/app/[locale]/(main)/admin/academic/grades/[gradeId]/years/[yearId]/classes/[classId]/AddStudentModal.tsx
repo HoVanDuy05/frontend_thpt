@@ -3,7 +3,8 @@
 import { useAddStudentsToClass, useGetAvailableStudents } from "@/api/AppQuery";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { Modal, Button, MultiSelect, Stack, Group, Text, Loader, Avatar } from "@mantine/core";
+import { Modal, Button, MultiSelect, Stack, Group, Text, Loader, Avatar, Skeleton, Badge, Box } from "@mantine/core";
+import { IconUserPlus, IconSearch } from "@tabler/icons-react";
 import { notifications } from "@mantine/notifications";
 
 interface AddStudentModalProps {
@@ -60,44 +61,70 @@ export const AddStudentModal = ({ opened, onClose, yearId, classId }: AddStudent
                 </Text>
 
                 {isLoading ? (
-                    <Group justify="center" py="xl">
-                        <Loader size="sm" />
-                    </Group>
-                ) : (
-                    <MultiSelect
-                        data={selectData}
-                        value={selectedStudents}
-                        onChange={setSelectedStudents}
-                        label={t('select_students')}
-                        placeholder={t('search_student_placeholder')}
-                        searchable
-                        clearable
-                        nothingFoundMessage={t('no_students_found')}
-                        maxDropdownHeight={300}
-                        leftSection={selectedStudents.length > 0 ? null : undefined}
-                        renderOption={({ option }) => {
-                            const student = (Array.isArray(students) ? students : []).find(s => s.id.toString() === option.value);
-                            return (
-                                <Group gap="sm">
-                                    <Avatar src={student?.avatar} size={24} radius="xl" />
-                                    <Text size="sm">{option.label}</Text>
+                    <Stack gap="md">
+                        <Skeleton height={40} radius="md" />
+                        <Stack gap="xs">
+                            {[1, 2, 3].map((i) => (
+                                <Group key={i} gap="sm" p="xs">
+                                    <Skeleton height={32} circle />
+                                    <Skeleton height={20} width="70%" />
                                 </Group>
-                            );
-                        }}
-                    />
+                            ))}
+                        </Stack>
+                    </Stack>
+                ) : (
+                    <Box>
+                        <MultiSelect
+                            data={selectData}
+                            value={selectedStudents}
+                            onChange={setSelectedStudents}
+                            label={t('select_students')}
+                            placeholder={t('search_student_placeholder')}
+                            searchable
+                            clearable
+                            nothingFoundMessage={t('no_students_found')}
+                            maxDropdownHeight={300}
+                            leftSection={<IconSearch size={16} />}
+                            renderOption={({ option }) => {
+                                const student = (Array.isArray(students) ? students : []).find(s => s.id.toString() === option.value);
+                                return (
+                                    <Group gap="sm" wrap="nowrap">
+                                        <Avatar src={student?.avatar} size={32} radius="xl" />
+                                        <Box style={{ flex: 1 }}>
+                                            <Text size="sm" fw={500}>{student?.hoTen}</Text>
+                                            <Text size="xs" c="dimmed">{student?.maSo || 'No ID'}</Text>
+                                        </Box>
+                                    </Group>
+                                );
+                            }}
+                        />
+                        {selectedStudents.length > 0 && (
+                            <Group gap="xs" mt="xs">
+                                <Badge size="sm" variant="light" color="blue">
+                                    {selectedStudents.length} {selectedStudents.length === 1 ? 'student' : 'students'} selected
+                                </Badge>
+                            </Group>
+                        )}
+                    </Box>
                 )}
 
-                <Group justify="flex-end" mt="md">
-                    <Button variant="default" onClick={onClose} disabled={addMutation.isPending}>
-                        {common('actions.cancel')}
-                    </Button>
-                    <Button
-                        onClick={handleSubmit}
-                        loading={addMutation.isPending}
-                        disabled={selectedStudents.length === 0}
-                    >
-                        {common('actions.add')}
-                    </Button>
+                <Group justify="space-between" mt="xl">
+                    <Text size="sm" c="dimmed">
+                        {selectData.length} available students
+                    </Text>
+                    <Group gap="sm">
+                        <Button variant="default" onClick={onClose} disabled={addMutation.isPending}>
+                            {common('actions.cancel')}
+                        </Button>
+                        <Button
+                            onClick={handleSubmit}
+                            loading={addMutation.isPending}
+                            disabled={selectedStudents.length === 0}
+                            leftSection={<IconUserPlus size={16} />}
+                        >
+                            {common('actions.add')}
+                        </Button>
+                    </Group>
                 </Group>
             </Stack>
         </Modal>
