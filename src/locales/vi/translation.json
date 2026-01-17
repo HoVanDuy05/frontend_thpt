@@ -721,6 +721,38 @@
             "title": "Hoạt động gần đây"
         }
     },
+    "students": {
+        "breadcrumb_title": "Học sinh",
+        "not_found": "Không tìm thấy học sinh",
+        "no_current_class": "Chưa có lớp hiện tại",
+        "personal_info": "Thông tin cá nhân",
+        "contact_info": "Thông tin liên hệ",
+        "parent_guardian_info": "Thông tin phụ huynh/người giám hộ",
+        "current": "Hiện tại",
+        "no_academic_history": "Chưa có lịch sử học tập",
+        "not_available": "Không có",
+        "no_info": "Chưa có thông tin",
+        "no_father_info": "Chưa có thông tin về bố",
+        "no_mother_info": "Chưa có thông tin về mẹ",
+        "tabs": {
+            "overview": "Tổng quan",
+            "academic_history": "Lịch sử học tập"
+        },
+        "fields": {
+            "gender": "Giới tính",
+            "date_of_birth": "Ngày sinh",
+            "place_of_birth": "Nơi sinh",
+            "ethnicity": "Dân tộc",
+            "religion": "Tôn giáo",
+            "permanent_address": "Địa chỉ thường trú",
+            "temporary_address": "Địa chỉ tạm trú",
+            "father": "Bố",
+            "mother": "Mẹ",
+            "name": "Họ tên",
+            "occupation": "Nghề nghiệp",
+            "phone": "Số điện thoại"
+        }
+    },
     "profile": {
         "edit": "Chỉnh sửa",
         "share": "Chia sẻ",

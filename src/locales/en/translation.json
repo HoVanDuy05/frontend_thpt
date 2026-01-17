@@ -726,6 +726,38 @@
             "title": "Recent Activity"
         }
     },
+    "students": {
+        "breadcrumb_title": "Students",
+        "not_found": "Student not found",
+        "no_current_class": "No Current Class",
+        "personal_info": "Personal Information",
+        "contact_info": "Contact Information",
+        "parent_guardian_info": "Parent/Guardian Information",
+        "current": "Current",
+        "no_academic_history": "No academic history available",
+        "not_available": "N/A",
+        "no_info": "No information available",
+        "no_father_info": "No father information available",
+        "no_mother_info": "No mother information available",
+        "tabs": {
+            "overview": "Overview",
+            "academic_history": "Academic History"
+        },
+        "fields": {
+            "gender": "Gender",
+            "date_of_birth": "Date of Birth",
+            "place_of_birth": "Place of Birth",
+            "ethnicity": "Ethnicity",
+            "religion": "Religion",
+            "permanent_address": "Permanent Address",
+            "temporary_address": "Temporary Address",
+            "father": "Father",
+            "mother": "Mother",
+            "name": "Name",
+            "occupation": "Occupation",
+            "phone": "Phone"
+        }
+    },
     "profile": {
         "edit": "Edit",
         "share": "Share",
