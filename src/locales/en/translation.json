@@ -735,7 +735,38 @@
         "parent_guardian_info": "Parent/Guardian Information",
         "current": "Current",
         "no_academic_history": "No academic history available",
+        "academic_year": "Academic Year",
+        "current_active_year": "Current Active Academic Year",
+        "class_assignment": "Class Assignment",
+        "year_schedule": "Year Schedule",
+        "enrollment_timeline": "Enrollment Timeline",
+        "academic_semesters": "Academic Semesters",
+        "no_semesters_configured": "No semesters configured for this academic year",
+        "timeline": {
+            "enrolled": "Student Enrolled",
+            "current_status": "Current Status",
+            "currently_status": "The student is currently",
+            "student_left": "Student Left",
+            "recorded_exit": "Recorded exit",
+            "joined_class": "Joined class {className} on {date}"
+        },
+        "status": {
+            "dang_hoc": "Currently studying",
+            "da_tot_nghiep": "Graduated",
+            "tam_ngung": "Suspended",
+            "current": "Current",
+            "currently_studying": "The student is currently",
+            "graduated": "Graduated",
+            "inactive": "Inactive",
+            "pending": "Pending",
+            "completed": "Completed",
+            "error": "Error",
+            "success": "Success",
+            "loading": "Loading..."
+        },
         "not_available": "N/A",
+        "no_grades_available": "No grades available",
+        "no_students_available": "No students available",
         "no_info": "No information available",
         "no_father_info": "No father information available",
         "no_mother_info": "No mother information available",
@@ -755,8 +786,27 @@
             "mother": "Mother",
             "name": "Name",
             "occupation": "Occupation",
-            "phone": "Phone"
-        }
+            "phone": "Phone",
+            "class_name": "Class Name",
+            "grade": "Grade",
+            "homeroom_teacher": "Homeroom Teacher",
+            "study_status": "Study Status",
+            "start_date": "Start Date",
+            "end_date": "End Date",
+            "completion_rate": "Completion Rate",
+            "payment_rate": "Payment Rate"
+        },
+        "semester_status": {
+            "active": "Active",
+            "inactive": "Inactive"
+        },
+        "back_to_year": "Back to Year",
+        "semester_overview": "Semester Overview",
+        "class_info": "Class Information",
+        "semester_duration": "Duration",
+        "semester_status_title": "Status",
+        "semester_description": "Description",
+        "to": "to"
     },
     "profile": {
         "edit": "Edit",

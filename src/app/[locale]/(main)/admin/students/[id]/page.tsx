@@ -234,7 +234,7 @@ export default function StudentDetailPage() {
 
                     <Tabs.Panel value="history" pt="md">
                         <Card withBorder radius="md" p="md">
-                            <Title order={4} mb="md">{t('tabs.academic_history')}</Title>
+                            <Title order={4} mb="md">{t('academic_history')}</Title>
                             {studentProfile.cacLopNam && studentProfile.cacLopNam.length > 0 ? (
                                 <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="md">
                                     {studentProfile.cacLopNam.map((hsln: any) => (
@@ -268,7 +268,7 @@ export default function StudentDetailPage() {
                                                     variant="light"
                                                     color={hsln.trangThai === 'DANG_HOC' ? 'green' : 'gray'}
                                                 >
-                                                    {hsln.trangThai}
+                                                    {t(`status.${hsln.trangThai.toLowerCase()}`)}
                                                 </Badge>
                                                 <Group justify="flex-end">
                                                     <IconChevronRight size={16} />

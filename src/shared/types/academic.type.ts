@@ -15,6 +15,7 @@ export interface THocKy {
     ngayBatDau?: string;
     ngayKetThuc?: string;
     dangKichHoat?: boolean;
+    moTa?: string;
     namHoc?: TNamHoc;
 }
 

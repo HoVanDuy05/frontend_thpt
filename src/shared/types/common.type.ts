@@ -4,6 +4,8 @@ export interface TQueryConfig {
     include?: Record<string, boolean | object>;
     skip?: number;
     take?: number;
+    hocKyId?: number;
+    hocSinhId?: number;
 }
 
 export interface TApiResponse<T> {
