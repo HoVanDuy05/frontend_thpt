@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pms-cache-v7';
+const CACHE_NAME = 'thpt-nguyen-he-cache-1';
 const ASSETS_TO_CACHE = [
     '/offline.html',
     '/manifest.json',
