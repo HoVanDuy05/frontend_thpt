@@ -14,6 +14,7 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { Suspense } from "react";
+import { GlobalPullToRefresh } from "@/shared/components/layout/GlobalPullToRefresh";
 
 export const metadata: Metadata = {
   title: "NHers - Nguyễn Huệ Academy",
@@ -94,7 +95,9 @@ export default async function RootLayout({
         className={`${beVietnamPro.variable} antialiased`}
       >
         <AppProvider locale={locale} messages={messages}>
-          {children}
+          <GlobalPullToRefresh>
+            {children}
+          </GlobalPullToRefresh>
         </AppProvider>
       </body>
     </html>

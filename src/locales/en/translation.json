@@ -500,8 +500,17 @@
                 "fields": {
                     "name": "Subject Name",
                     "name_placeholder": "e.g., Mathematics, Literature",
+                    "code": "Subject Code",
                     "description": "Description",
                     "description_placeholder": "Brief description of the subject..."
+                },
+                "columns": {
+                    "name": "Subject Name",
+                    "code": "Subject Code",
+                    "classes": "Classes",
+                    "teachers": "Teachers",
+                    "description": "Description",
+                    "actions": "Actions"
                 },
                 "actions": {
                     "create": "Add New",
@@ -511,7 +520,8 @@
                     "filter": "Filter",
                     "cancel": "Cancel",
                     "create_confirm": "Create Subject"
-                }
+                },
+                "no_data": "No subjects found"
             }
         }
     },
@@ -744,6 +754,7 @@
         "parent_guardian_info": "Parent/Guardian Information",
         "current": "Current",
         "no_academic_history": "No academic history available",
+        "academic_history": "Academic History",
         "academic_year": "Academic Year",
         "current_active_year": "Current Active Academic Year",
         "class_assignment": "Class Assignment",
@@ -751,6 +762,7 @@
         "enrollment_timeline": "Enrollment Timeline",
         "academic_semesters": "Academic Semesters",
         "no_semesters_configured": "No semesters configured for this academic year",
+        "view_details": "View details",
         "timeline": {
             "enrolled": "Student Enrolled",
             "current_status": "Current Status",

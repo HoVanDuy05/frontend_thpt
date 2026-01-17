@@ -91,7 +91,7 @@ export function DataTable<T extends Record<string, any>>({
                                     <Table.Th
                                         key={col.key}
                                         w={col.width}
-                                        style={{ textAlign: col.align || 'left' }}
+                                        style={{ textAlign: 'center' }}
                                     >
                                         {col.header}
                                     </Table.Th>
