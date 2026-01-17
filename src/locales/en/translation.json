@@ -497,11 +497,20 @@
                 "subtitle": "List of {count} subjects in the system",
                 "search_placeholder": "Search subjects...",
                 "no_desc": "No description for this subject.",
+                "fields": {
+                    "name": "Subject Name",
+                    "name_placeholder": "e.g., Mathematics, Literature",
+                    "description": "Description",
+                    "description_placeholder": "Brief description of the subject..."
+                },
                 "actions": {
                     "create": "Add New",
                     "edit": "Edit",
+                    "update": "Update",
                     "delete": "Delete",
-                    "filter": "Filter"
+                    "filter": "Filter",
+                    "cancel": "Cancel",
+                    "create_confirm": "Create Subject"
                 }
             }
         }
@@ -766,6 +775,14 @@
         },
         "not_available": "N/A",
         "no_grades_available": "No grades available",
+        "grades_overview": "Grades Overview",
+        "subject": "Subject",
+        "midterm": "Midterm",
+        "final": "Final",
+        "gpa": "GPA",
+        "overall_gpa": "Overall GPA",
+        "start_date": "Start Date",
+        "end_date": "End Date",
         "no_students_available": "No students available",
         "no_info": "No information available",
         "no_father_info": "No father information available",

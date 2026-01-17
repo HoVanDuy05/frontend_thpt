@@ -1,24 +1,41 @@
 'use client';
 
-import { Title, Text, Paper, Group, Stack, Breadcrumbs, Anchor, Skeleton, Badge, Card, Grid, Timeline, ThemeIcon, Alert, Divider, Button, Tabs, Table, Progress } from '@mantine/core';
+import { Title, Text, Group, Stack, Breadcrumbs, Badge, Card, Grid, ThemeIcon, Button, Tabs, Table } from '@mantine/core';
 import { IconSchool, IconCalendar, IconInfoCircle, IconUser, IconChevronLeft, IconClock, IconAward, IconUsers, IconReceipt, IconChartBar, IconBook, IconArrowLeft } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 import { formatDate, formatDateWithWeekday, formatDateRange } from '@/shared/common/date';
 import { AppQuery } from '@/api/AppQuery';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Link } from '@/i18n/routing';
+import { SemesterGradesTable } from '@/feauture/admin/students/components/SemesterGradesTable';
+import { useBreadcrumbs } from '@/shared/hooks/useBreadcrumbs';
+import { SkeletonLoader } from '@/shared/components/SkeletonLoader';
 
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 
 export default function SemesterDetailPage() {
     const t = useTranslations('students');
     const common = useTranslations('common');
     const params = useParams();
     const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
     const studentId = parseInt(params.id as string);
     const yearId = parseInt(params.yearId as string);
     const semesterId = parseInt(params.semesterId as string);
-    const [activeTab, setActiveTab] = useState<string | null>('overview');
+
+    const allowedTabs = useMemo(() => ['overview', 'grades', 'schedule', 'finance'], []);
+    const activeTab = useMemo(() => {
+        const tab = searchParams.get('tab');
+        return tab && allowedTabs.includes(tab) ? tab : 'overview';
+    }, [allowedTabs, searchParams]);
+
+    const handleTabChange = (value: string | null) => {
+        if (!value) return;
+        const next = new URLSearchParams(searchParams.toString());
+        next.set('tab', value);
+        router.replace(`${pathname}?${next.toString()}`, { scroll: false });
+    };
 
     const { data: user, isLoading: isLoadingUser } = AppQuery.user.useDetail(studentId);
     const { data: semester, isLoading: isLoadingSemester } = AppQuery.academic.useHocKyDetail(semesterId);
@@ -34,19 +51,20 @@ export default function SemesterDetailPage() {
 
     const { data: calendarData, isLoading: isLoadingCalendar } = AppQuery.calendar.useByClass(yearRecord?.lopNam?.lopId || 0);
 
-    if (isLoadingUser || isLoadingSemester || isLoadingGrading || isLoadingSubmissions || isLoadingCalendar) return <Skeleton />;
-    if (!user || !studentProfile || !yearRecord || !semester) return <Text>{t('not_found')}</Text>;
+    const breadcrumbItems = useMemo(
+        () => [
+            { title: 'Học sinh', href: '/admin/students' },
+            { title: studentProfile?.hoTen || '', href: `/admin/students/${studentId}` },
+            { title: yearRecord?.lopNam?.namHoc?.tenNamHoc || '', href: `/admin/students/${studentId}/years/${yearId}` },
+            { title: semester?.tenHocKy || '', href: '#' },
+        ],
+        [studentId, yearId, studentProfile?.hoTen, yearRecord?.lopNam?.namHoc?.tenNamHoc, semester?.tenHocKy]
+    );
 
-    const breadcrumbs = [
-        { title: 'Học sinh', href: '/admin/students' },
-        { title: studentProfile.hoTen, href: `/admin/students/${studentId}` },
-        { title: yearRecord.lopNam?.namHoc?.tenNamHoc, href: `/admin/students/${studentId}/years/${yearId}` },
-        { title: semester.tenHocKy, href: '#' },
-    ].map((item, index) => (
-        <Anchor component={Link} href={item.href} key={index}>
-            {item.title}
-        </Anchor>
-    ));
+    const breadcrumbs = useBreadcrumbs(breadcrumbItems, { LinkComponent: Link });
+
+    if (isLoadingUser || isLoadingSemester || isLoadingGrading || isLoadingSubmissions || isLoadingCalendar) return <SkeletonLoader type="cards" count={4} />;
+    if (!user || !studentProfile || !yearRecord || !semester) return <Text>{t('not_found')}</Text>;
 
     return (
         <Stack gap="md" p="md">
@@ -119,7 +137,7 @@ export default function SemesterDetailPage() {
                 {/* Main Content */}
                 <Grid.Col span={{ base: 12, md: 8 }}>
                     <Stack>
-                        <Tabs value={activeTab} onChange={setActiveTab} variant="outline" color="indigo">
+                        <Tabs value={activeTab} onChange={handleTabChange} variant="pills" radius="xl" color="indigo">
                             <Tabs.List grow>
                                 <Tabs.Tab value="overview" leftSection={<IconInfoCircle size={14} />}>
                                     Tổng quan
@@ -191,44 +209,7 @@ export default function SemesterDetailPage() {
                             <Tabs.Panel value="grades" pt="md">
                                 <Stack gap="md">
                                     <Title order={5}>{t('grades_overview')}</Title>
-                                    {gradingData && gradingData.length > 0 ? (
-                                        <Table striped highlightOnHover>
-                                            <Table.Thead>
-                                                <Table.Tr>
-                                                    <Table.Th>{t('subject')}</Table.Th>
-                                                    <Table.Th>{t('midterm')}</Table.Th>
-                                                    <Table.Th>{t('final')}</Table.Th>
-                                                    <Table.Th>{t('gpa')}</Table.Th>
-                                                </Table.Tr>
-                                            </Table.Thead>
-                                            <Table.Tbody>
-                                                {gradingData.map((grade: any, index: number) => (
-                                                    <Table.Tr key={index}>
-                                                        <Table.Td>{grade.monHoc?.tenMon || t('not_available')}</Table.Td>
-                                                        <Table.Td>{grade.giuaKy || '-'}</Table.Td>
-                                                        <Table.Td>{grade.cuoiKy || '-'}</Table.Td>
-                                                        <Table.Td>
-                                                            {grade.trungBinh ? (
-                                                                <Badge color={grade.trungBinh >= 8 ? 'green' : grade.trungBinh >= 6.5 ? 'yellow' : 'red'}>
-                                                                    {grade.trungBinh}
-                                                                </Badge>
-                                                            ) : '-'}
-                                                        </Table.Td>
-                                                    </Table.Tr>
-                                                ))}
-                                            </Table.Tbody>
-                                        </Table>
-                                    ) : (
-                                        <Text c="dimmed">{t('no_grades_available')}</Text>
-                                    )}
-                                    {gradingData && gradingData.length > 0 && (
-                                        <Group justify="space-between">
-                                            <Text fw={500}>{t('overall_gpa')}</Text>
-                                            <Badge size="lg" color="green">
-                                                {(gradingData.reduce((acc: number, grade: any) => acc + (grade.trungBinh || 0), 0) / gradingData.length).toFixed(2)}
-                                            </Badge>
-                                        </Group>
-                                    )}
+                                    <SemesterGradesTable gradingData={gradingData} />
                                 </Stack>
                             </Tabs.Panel>
 
