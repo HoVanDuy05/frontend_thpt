@@ -461,7 +461,8 @@
                     "grade": "Grade",
                     "year": "Academic Year",
                     "homeroom_teacher": "Homeroom Teacher",
-                    "description": "Description"
+                    "description": "Description",
+                    "si_so": "Class Size"
                 },
                 "add_student": "Add Student",
                 "add_student_description": "Select students to add to this class. Only students not enrolled in any class for this year are shown.",
@@ -473,7 +474,8 @@
                     "grade": "Select grade",
                     "year": "Select academic year",
                     "teacher": "Select homeroom teacher",
-                    "description": "Enter description (optional)"
+                    "description": "Enter description (optional)",
+                    "si_so": "Enter class size (optional)"
                 },
                 "actions": {
                     "create": "Create Class",

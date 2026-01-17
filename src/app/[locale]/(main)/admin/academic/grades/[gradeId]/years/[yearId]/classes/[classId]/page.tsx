@@ -1,15 +1,16 @@
 'use client';
 
-import { Title, Text, Paper, Group, Stack, Breadcrumbs, Anchor, Loader, Table, Avatar, Badge, Button, TextInput, Box, rem, ActionIcon, Grid, Card, ThemeIcon, Divider, SimpleGrid } from '@mantine/core';
+import { Title, Text, Paper, Group, Stack, Breadcrumbs, Anchor, Loader, Avatar, Badge, Button, Box, rem, ActionIcon, Grid, Card, ThemeIcon, Divider, SimpleGrid, Skeleton } from '@mantine/core';
 import { IconSearch, IconUserPlus, IconChevronLeft, IconSchool, IconUsers, IconCalendar, IconInfoCircle, IconUser } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 import { AppQuery } from '@/api/AppQuery';
 import { useParams } from 'next/navigation';
 import { Link, useRouter } from '@/i18n/routing';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { SkeletonLoader } from '@/shared/components/SkeletonLoader';
 import { AddStudentModal } from './AddStudentModal';
 import { useDisclosure } from '@mantine/hooks';
+import { DataTable, DataTableColumn } from '@/shared/components/DataTable';
 
 export default function ClassDetailPage() {
     const t = useTranslations('academic.grades');
@@ -21,22 +22,84 @@ export default function ClassDetailPage() {
 
     const router = useRouter();
     const [opened, { open, close }] = useDisclosure(false);
-    const [search, setSearch] = useState('');
 
     const { data: grade } = AppQuery.academic.useKhoiDetail(gradeId);
     const { data: year } = AppQuery.academic.useYearDetail(yearId);
     // Note: Ideally we'd have a specific useClassYearDetail hook, but relying on caching/list for now
     const { data: classNam, isLoading } = AppQuery.academic.useClassYears({ namHocId: yearId });
+    const { data: semesters, isLoading: isLoadingSemesters } = AppQuery.academic.useHocKys({ namHocId: yearId });
 
     const currentClass = classNam?.find(c => c.id === classId);
 
+    // Define columns before any conditional returns (Rules of Hooks)
+    const studentColumns = useMemo<DataTableColumn<any>[]>(() => [
+        {
+            key: 'index',
+            header: '#',
+            width: 60,
+            align: 'center',
+            render: (_, index) => (
+                <Text size="sm" c="dimmed">{index + 1}</Text>
+            )
+        },
+        {
+            key: 'name',
+            header: t('student_name'),
+            align: 'left',
+            render: (hsln) => (
+                <Group gap="xs">
+                    <Avatar size={24} radius="xl" src={hsln.hocSinh?.nguoiDung?.avatar} />
+                    <Text size="sm" fw={500}>{hsln.hocSinh?.hoTen}</Text>
+                </Group>
+            )
+        },
+        {
+            key: 'studentId',
+            header: t('student_id'),
+            align: 'center',
+            render: (hsln) => (
+                <Text size="sm">{hsln.hocSinh?.maSoHs}</Text>
+            )
+        },
+        {
+            key: 'gender',
+            header: t('gender'),
+            align: 'center',
+            render: (hsln) => (
+                <Text size="sm">{hsln.hocSinh?.gioiTinh}</Text>
+            )
+        },
+        {
+            key: 'status',
+            header: t('status'),
+            align: 'center',
+            render: (hsln) => (
+                <Badge variant="dot" size="sm" color={hsln.trangThai === 'DANG_HOC' ? 'green' : 'gray'}>
+                    {hsln.trangThai}
+                </Badge>
+            )
+        },
+        {
+            key: 'actions',
+            header: common('actions_header'),
+            align: 'center',
+            render: (hsln) => (
+                <Button
+                    variant="subtle"
+                    size="compact-sm"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        router.push(`/admin/students/${hsln.hocSinh.userId}`);
+                    }}
+                >
+                    {common('details')}
+                </Button>
+            )
+        }
+    ], [t, common, router]);
+
     if (isLoading) return <Loader />;
     if (!currentClass) return <Text>{t('no_classes')}</Text>; // Handle not found better in production
-
-    const filteredStudents = currentClass?.hocSinhs?.filter(hsln =>
-        hsln.hocSinh?.hoTen?.toLowerCase().includes(search.toLowerCase()) ||
-        hsln.hocSinh?.maSoHs?.toLowerCase().includes(search.toLowerCase())
-    ).sort((a, b) => (a.hocSinh?.hoTen || '').localeCompare(b.hocSinh?.hoTen || '', 'vi')) || [];
 
     const breadcrumbs = [
         { title: t('title'), href: `/admin/academic/grades` },
@@ -158,97 +221,73 @@ export default function ClassDetailPage() {
                     </Grid.Col>
                 </Grid>
 
+                {/* Semester Cards Section */}
+                <Stack gap="md">
+                    <Title order={4}>Học kì - {year?.tenNamHoc}</Title>
+                    <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="md">
+                        {isLoadingSemesters ? (
+                            Array(3).fill(0).map((_, i) => (
+                                <Skeleton key={i} height={120} radius="md" />
+                            ))
+                        ) : (semesters || []).sort((a: any, b: any) => {
+                            return new Date(a.ngayBatDau).getTime() - new Date(b.ngayBatDau).getTime();
+                        }).length > 0 ? (
+                            (semesters || []).sort((a: any, b: any) => {
+                                return new Date(a.ngayBatDau).getTime() - new Date(b.ngayBatDau).getTime();
+                            }).map((semester: any) => (
+                                <Card key={semester.id} withBorder radius="md" padding="md">
+                                    <Group justify="space-between" mb="xs">
+                                        <Text fw={600} size="lg">{semester.tenHocKy}</Text>
+                                        <Badge
+                                            variant="light"
+                                            color={semester.trangThai === 'ACTIVE' ? 'green' : 'gray'}
+                                        >
+                                            {semester.trangThai === 'ACTIVE' ? 'Active' : 'Inactive'}
+                                        </Badge>
+                                    </Group>
+                                    <Stack gap="xs">
+                                        <Group gap="xs">
+                                            <IconCalendar size={14} style={{ opacity: 0.7 }} />
+                                            <Text size="xs" c="dimmed">
+                                                {new Date(semester.ngayBatDau).toLocaleDateString('vi-VN')} - {new Date(semester.ngayKetThuc).toLocaleDateString('vi-VN')}
+                                            </Text>
+                                        </Group>
+                                    </Stack>
+                                </Card>
+                            ))
+                        ) : (
+                            <Text c="dimmed" size="sm">No semesters found for this academic year</Text>
+                        )}
+                    </SimpleGrid>
+                </Stack>
+
                 {/* Student List Section */}
                 <Stack gap="sm">
-                    <Group justify="space-between" align="center">
-                        <Card withBorder radius="md" p="xs" w="100%">
-                            <Group justify="space-between" align="center">
-                                <Title order={4}>{t('student_list')}</Title>
-                                <Button
-                                    leftSection={<IconUserPlus size={18} />}
-                                    size="xs"
-                                    variant="filled"
-                                    color="indigo"
-                                    onClick={open}
-                                >
-                                    {t('add_student')}
-                                </Button>
-                            </Group>
-                        </Card>
-                        <TextInput
-                            placeholder={common('actions.search')}
-                            leftSection={<IconSearch size={16} />}
-                            value={search}
-                            onChange={(e) => setSearch(e.currentTarget.value)}
-                            size="sm"
-                            w={250}
-                        />
-                    </Group>
+                    <Card withBorder radius="md" p="xs">
+                        <Group justify="space-between" align="center">
+                            <Title order={4}>{t('student_list')}</Title>
+                            <Button
+                                leftSection={<IconUserPlus size={18} />}
+                                size="xs"
+                                variant="filled"
+                                color="indigo"
+                                onClick={open}
+                            >
+                                {t('add_student')}
+                            </Button>
+                        </Group>
+                    </Card>
 
-                    <Paper withBorder radius="md">
-                        <Table.ScrollContainer minWidth={800}>
-                            <Table verticalSpacing="sm" highlightOnHover>
-                                <Table.Thead>
-                                    <Table.Tr>
-                                        <Table.Th w={60} style={{ paddingLeft: 'var(--mantine-spacing-md)' }}>#</Table.Th>
-                                        <Table.Th>{t('student_name')}</Table.Th>
-                                        <Table.Th>{t('student_id')}</Table.Th>
-                                        <Table.Th>{t('gender')}</Table.Th>
-                                        <Table.Th>{t('status')}</Table.Th>
-                                        <Table.Th align="right" style={{ paddingRight: 'var(--mantine-spacing-md)' }}>{common('actions_header')}</Table.Th>
-                                    </Table.Tr>
-                                </Table.Thead>
-                                <Table.Tbody>
-                                    {filteredStudents.map((hsln, index) => (
-                                        <Table.Tr
-                                            key={hsln.id}
-                                            style={{ cursor: 'pointer' }}
-                                            onClick={() => router.push(`/admin/students/${hsln.hocSinh.userId}`)}
-                                        >
-                                            <Table.Td style={{ paddingLeft: 'var(--mantine-spacing-md)' }}>
-                                                <Text size="sm" c="dimmed">{index + 1}</Text>
-                                            </Table.Td>
-                                            <Table.Td>
-                                                <Group gap="xs">
-                                                    <Avatar size={24} radius="xl" src={hsln.hocSinh?.nguoiDung?.avatar} />
-                                                    <Text size="sm" fw={500}>{hsln.hocSinh?.hoTen}</Text>
-                                                </Group>
-                                            </Table.Td>
-                                            <Table.Td>
-                                                <Text size="sm">{hsln.hocSinh?.maSoHs}</Text>
-                                            </Table.Td>
-                                            <Table.Td>
-                                                <Text size="sm">{hsln.hocSinh?.gioiTinh}</Text>
-                                            </Table.Td>
-                                            <Table.Td>
-                                                <Badge variant="dot" size="sm" color={hsln.trangThai === 'DANG_HOC' ? 'green' : 'gray'}>
-                                                    {hsln.trangThai}
-                                                </Badge>
-                                            </Table.Td>
-                                            <Table.Td align="right" style={{ paddingRight: 'var(--mantine-spacing-md)' }}>
-                                                <Button
-                                                    variant="subtle"
-                                                    size="compact-sm"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        router.push(`/admin/students/${hsln.hocSinh.userId}`);
-                                                    }}
-                                                >
-                                                    {common('details')}
-                                                </Button>
-                                            </Table.Td>
-                                        </Table.Tr>
-                                    ))}
-                                </Table.Tbody>
-                            </Table>
-                        </Table.ScrollContainer>
-
-                        {filteredStudents.length === 0 && (
-                            <Text p="xl" c="dimmed" ta="center" size="sm">
-                                {t('no_students')}
-                            </Text>
-                        )}
-                    </Paper>
+                    <DataTable
+                        data={currentClass?.hocSinhs || []}
+                        columns={studentColumns}
+                        isLoading={isLoading}
+                        searchable
+                        searchPlaceholder={common('actions.search')}
+                        searchKeys={['hocSinh.hoTen', 'hocSinh.maSoHs'] as any}
+                        onRowClick={(hsln) => router.push(`/admin/students/${hsln.hocSinh.userId}`)}
+                        emptyMessage={t('no_students')}
+                    />
                 </Stack>
             </Stack>
             <AddStudentModal

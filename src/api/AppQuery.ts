@@ -22,7 +22,7 @@ export const AppQuery = {
             useAppQuery({ url: { baseUrl: "/academic/years", queryParams: params }, options }),
         useYearDetail: (id: number, options?: AppQueryOptions<"getNamHocById">) =>
             useAppQuery({ url: { baseUrl: "/academic/years/:id", urlParams: { id } }, options }),
-        useHocKys: (params?: TQueryConfig, options?: AppQueryOptions<"getHocKys">) =>
+        useHocKys: (params?: TQueryConfig & { namHocId?: number }, options?: AppQueryOptions<"getHocKys">) =>
             useAppQuery({ url: { baseUrl: "/academic/semesters", queryParams: params }, options }),
         useHocKyDetail: (id: number, options?: AppQueryOptions<"getHocKyById">) =>
             useAppQuery({ url: { baseUrl: "/academic/semesters/:id", urlParams: { id } }, options }),
@@ -154,12 +154,9 @@ export const useAddStudentsToClass = () => {
             return data;
         },
         onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({ queryKey: ['academic/class-years'] }); // Refresh class lists
-            queryClient.invalidateQueries({ queryKey: ['available-students'] }); // Refresh available list
-            // Refresh specific class student list if we had a query key for it. 
-            // Currently the student list seems to be client-side filtered or fetched via `useClassYears`?
-            // Actually, the page at `classes/[classId]` fetches... what?
-            // Provide a generic invalidation.
+            // Invalidate with the correct query key format used by useAppQuery
+            queryClient.invalidateQueries({ queryKey: ['/academic/class-years'] }); // Refresh class lists
+            queryClient.invalidateQueries({ queryKey: ['/academic/years'] }); // Refresh available students list
             notifications.show({
                 title: 'Thành công',
                 message: 'Đã thêm học sinh vào lớp',

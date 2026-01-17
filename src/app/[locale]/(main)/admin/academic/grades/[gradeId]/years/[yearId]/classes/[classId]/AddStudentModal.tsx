@@ -15,7 +15,7 @@ interface AddStudentModalProps {
 }
 
 export const AddStudentModal = ({ opened, onClose, yearId, classId }: AddStudentModalProps) => {
-    const t = useTranslations('admin.academic');
+    const t = useTranslations('admin.academic.classes');
     const common = useTranslations('common');
 
     // Fetch available students
