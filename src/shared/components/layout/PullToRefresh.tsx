@@ -27,6 +27,7 @@ export function PullToRefresh({
 
     const [pullPx, setPullPx] = useState(0);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [isReleasing, setIsReleasing] = useState(false);
 
     const findScrollableAncestor = useCallback((target: EventTarget | null) => {
         const container = containerRef.current;
@@ -52,14 +53,17 @@ export function PullToRefresh({
     const reset = useCallback(() => {
         startYRef.current = null;
         pullingRef.current = false;
+        setIsReleasing(true);
         setPullPx(0);
+        window.setTimeout(() => setIsReleasing(false), 200);
     }, []);
 
     const triggerRefresh = useCallback(async () => {
         if (isRefreshing) return;
 
         setIsRefreshing(true);
-        setPullPx(thresholdPx);
+        // Keep the spinner fixed while refreshing (do not keep the content pulled down)
+        setPullPx(0);
 
         try {
             router.refresh();
@@ -132,7 +136,8 @@ export function PullToRefresh({
     const showLoader = isRefreshing || pullPx > 0;
     const progress = Math.min(1, pullPx / thresholdPx);
 
-    const loaderTranslateY = Math.max(-28, Math.min(12, pullPx - 28));
+    const loaderOpacity = isRefreshing ? 1 : Math.max(0.15, progress);
+    const loaderScale = isRefreshing ? 1 : 0.7 + 0.3 * progress;
 
     return (
         <div ref={containerRef} className={className} style={{ WebkitOverflowScrolling: "touch" }}>
@@ -147,11 +152,15 @@ export function PullToRefresh({
                         justifyContent: "center",
                         pointerEvents: "none",
                         zIndex: 9999,
-                        transform: `translateY(${loaderTranslateY}px)`,
-                        transition: isRefreshing ? "transform 200ms ease" : undefined,
                     }}
                 >
-                    <div style={{ opacity: isRefreshing ? 1 : 0.4 + 0.6 * progress }}>
+                    <div
+                        style={{
+                            opacity: loaderOpacity,
+                            transform: `scale(${loaderScale})`,
+                            transition: isRefreshing ? "opacity 120ms ease, transform 120ms ease" : undefined,
+                        }}
+                    >
                         <Loader size="sm" color="indigo" />
                     </div>
                 </div>
@@ -160,7 +169,7 @@ export function PullToRefresh({
             <div
                 style={{
                     transform: `translateY(${pullPx}px)`,
-                    transition: isRefreshing ? "transform 200ms ease" : undefined,
+                    transition: isRefreshing || isReleasing ? "transform 200ms ease" : undefined,
                     willChange: "transform",
                 }}
             >

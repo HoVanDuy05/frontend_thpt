@@ -46,6 +46,25 @@ export interface TCreateHocKyDto {
 
 export interface TCreateMonHocDto {
     tenMon: string;
+    maMon?: string;
+    moTa?: string;
+    isActive?: boolean;
+}
+
+export interface TCreatePhanCongGvDto {
+    giaoVienId: number;
+    monHocId: number;
+    lopNamId: number;
+    namHocId: number;
+}
+
+export interface TCreateDiemDto {
+    hocSinhId: number;
+    monHocId: number;
+    hocKyId: number;
+    giuaKy?: number;
+    cuoiKy?: number;
+    trungBinh?: number;
 }
 
 export interface TCreateLopHocDto {

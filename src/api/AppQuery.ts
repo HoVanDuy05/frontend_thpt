@@ -36,6 +36,14 @@ export const AppQuery = {
             useAppQuery({ url: { baseUrl: "/academic/grades", queryParams: params }, options }),
         useKhoiDetail: (id: number, options?: AppQueryOptions<"getKhoiById">) =>
             useAppQuery({ url: { baseUrl: "/academic/grades/:id", urlParams: { id } }, options }),
+        useAssignments: (params?: TQueryConfig & { giaoVienId?: number; monHocId?: number; lopNamId?: number; namHocId?: number }, options?: AppQueryOptions<"getAssignments">) =>
+            useAppQuery({ url: { baseUrl: "/academic/assignments", queryParams: params }, options }),
+        useAssignmentDetail: (id: number, options?: AppQueryOptions<"getAssignmentById">) =>
+            useAppQuery({ url: { baseUrl: "/academic/assignments/:id", urlParams: { id } }, options }),
+        useGradeRecords: (params?: TQueryConfig & { hocSinhId?: number; monHocId?: number; hocKyId?: number }, options?: AppQueryOptions<"getGradeRecords">) =>
+            useAppQuery({ url: { baseUrl: "/academic/grades-records", queryParams: params }, options }),
+        useGradeRecordDetail: (id: number, options?: AppQueryOptions<"getGradeRecordById">) =>
+            useAppQuery({ url: { baseUrl: "/academic/grades-records/:id", urlParams: { id } }, options }),
     },
     calendar: {
         useList: (options?: AppQueryOptions<"getCalendars">) =>

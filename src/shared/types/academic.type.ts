@@ -22,6 +22,16 @@ export interface THocKy {
 export interface TMonHoc {
     id: number;
     tenMon: string;
+    maMon?: string;
+    moTa?: string;
+    isActive?: boolean;
+    createdAt?: string;
+    updatedAt?: string;
+
+    _count?: {
+        lopHoc?: number;
+        giaoVien?: number;
+    };
 }
 
 export interface TKhoi {
@@ -32,6 +42,35 @@ export interface TKhoi {
     _count?: {
         lopHocs?: number;
     };
+}
+
+export interface TPhanCongGv {
+    id: number;
+    giaoVienId: number;
+    monHocId: number;
+    lopNamId: number;
+    namHocId: number;
+    createdAt?: string;
+    updatedAt?: string;
+    giaoVien?: any;
+    monHoc?: TMonHoc;
+    lopNam?: TLopNam;
+    namHoc?: TNamHoc;
+}
+
+export interface TDiem {
+    id: number;
+    hocSinhId: number;
+    monHocId: number;
+    hocKyId: number;
+    giuaKy?: number;
+    cuoiKy?: number;
+    trungBinh?: number;
+    createdAt?: string;
+    updatedAt?: string;
+    hocSinh?: any;
+    monHoc?: TMonHoc;
+    hocKy?: THocKy;
 }
 
 // Updated: LopHoc is now permanent class structure

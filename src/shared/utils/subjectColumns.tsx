@@ -9,8 +9,8 @@ export type SubjectType = {
     maMon?: string;
     moTa?: string;
     _count?: {
-        lopHoc: number;
-        giaoVien: number;
+        lopHoc?: number;
+        giaoVien?: number;
     };
 };
 

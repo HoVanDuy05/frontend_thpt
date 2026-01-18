@@ -263,6 +263,51 @@ export const AppMutation = () => {
                     queryClient.invalidateQueries({ queryKey: ["/academic/grades"] as any });
                 }
             }),
+            useCreateAssignment: () => useAppMutation<"createAssignment">({
+                url: { baseUrl: "/academic/assignments" },
+                method: "POST",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/assignments"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/academic/subjects"] as any });
+                }
+            }),
+            useUpdateAssignment: (id: number) => useAppMutation<"updateAssignment">({
+                url: { baseUrl: "/academic/assignments/:id", urlParams: { id } },
+                method: "PUT",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/assignments"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/academic/subjects"] as any });
+                }
+            }),
+            useDeleteAssignment: (id: number) => useAppMutation<"deleteAssignment">({
+                url: { baseUrl: "/academic/assignments/:id", urlParams: { id } },
+                method: "DELETE",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/assignments"] as any });
+                    queryClient.invalidateQueries({ queryKey: ["/academic/subjects"] as any });
+                }
+            }),
+            useCreateGradeRecord: () => useAppMutation<"createGradeRecord">({
+                url: { baseUrl: "/academic/grades-records" },
+                method: "POST",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/grades-records"] as any });
+                }
+            }),
+            useUpdateGradeRecord: (id: number) => useAppMutation<"updateGradeRecord">({
+                url: { baseUrl: "/academic/grades-records/:id", urlParams: { id } },
+                method: "PUT",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/grades-records"] as any });
+                }
+            }),
+            useDeleteGradeRecord: (id: number) => useAppMutation<"deleteGradeRecord">({
+                url: { baseUrl: "/academic/grades-records/:id", urlParams: { id } },
+                method: "DELETE",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/academic/grades-records"] as any });
+                }
+            }),
             useDeleteKhoi: (id: number) => useAppMutation<"deleteKhoi">({
                 url: { baseUrl: "/academic/grades/:id", urlParams: { id } },
                 method: "DELETE",

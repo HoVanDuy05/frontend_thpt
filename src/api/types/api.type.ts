@@ -1,11 +1,11 @@
 import { TUser, THoSoGiaoVien, THoSoHocSinh, TNotification } from "@/shared/types/user.type";
-import { TNamHoc, TMonHoc, TLopHoc, THocKy, TLopNam, TKhoi } from "@/shared/types/academic.type";
+import { TNamHoc, TMonHoc, TLopHoc, THocKy, TLopNam, TKhoi, TPhanCongGv, TDiem } from "@/shared/types/academic.type";
 import { TNganHangCauHoi, TDeKiemTra } from "@/shared/types/assessment.type";
 import { TLichSuNopBai } from "@/shared/types/submission.type";
 import { TKetQuaChamDiem } from "@/shared/types/grading.type";
 import { TQueryConfig } from "@/shared/types/common.type";
 import { TLoginRequest, TLoginResponse } from "@/shared/types/auth.type";
-import { TCreateUserDto, TCreateTeacherDto, TCreateStudentDto, TCreateNamHocDto, TCreateMonHocDto, TCreateLopHocDto, TCreateLopNamDto, TCreateQuestionDto, TCreateExamDto, TCreateSubmissionDto, TCreateGradingDto, TCreateHocKyDto, TCreateKhoiDto } from "@/shared/types/dto.type";
+import { TCreateUserDto, TCreateTeacherDto, TCreateStudentDto, TCreateNamHocDto, TCreateMonHocDto, TCreateLopHocDto, TCreateLopNamDto, TCreateQuestionDto, TCreateExamDto, TCreateSubmissionDto, TCreateGradingDto, TCreateHocKyDto, TCreateKhoiDto, TCreatePhanCongGvDto, TCreateDiemDto } from "@/shared/types/dto.type";
 import { TBanner, TBaiViet, TBinhLuan, ELoaiBaiViet } from "@/shared/types/portal.type";
 import { TQuyTrinh, TPhienQuyTrinh, TNhatKyPheDuyetQuyTrinh, TTruongFormQuyTrinh } from "@/shared/types/approval.type";
 import {
@@ -128,6 +128,22 @@ export type ApiQueryType = {
     getKhoiById: {
         url: { baseUrl: "/academic/grades/:id"; urlParams: { id: number } };
         response: TKhoi;
+    };
+    getAssignments: {
+        url: { baseUrl: "/academic/assignments"; queryParams?: TQueryConfig & { giaoVienId?: number; monHocId?: number; lopNamId?: number; namHocId?: number } };
+        response: TPhanCongGv[];
+    };
+    getAssignmentById: {
+        url: { baseUrl: "/academic/assignments/:id"; urlParams: { id: number } };
+        response: TPhanCongGv;
+    };
+    getGradeRecords: {
+        url: { baseUrl: "/academic/grades-records"; queryParams?: TQueryConfig & { hocSinhId?: number; monHocId?: number; hocKyId?: number } };
+        response: TDiem[];
+    };
+    getGradeRecordById: {
+        url: { baseUrl: "/academic/grades-records/:id"; urlParams: { id: number } };
+        response: TDiem;
     };
     getAvailableStudents: {
         url: { baseUrl: "/academic/years/:yearId/available-students"; urlParams: { yearId: number } };
@@ -461,6 +477,36 @@ export type ApiMutationType = {
     };
     deleteKhoi: {
         url: { baseUrl: "/academic/grades/:id"; urlParams: { id: number } };
+        payload: undefined;
+        response: void;
+    };
+    createAssignment: {
+        url: { baseUrl: "/academic/assignments" };
+        payload: TCreatePhanCongGvDto;
+        response: TPhanCongGv;
+    };
+    updateAssignment: {
+        url: { baseUrl: "/academic/assignments/:id"; urlParams: { id: number } };
+        payload: Partial<TCreatePhanCongGvDto>;
+        response: TPhanCongGv;
+    };
+    deleteAssignment: {
+        url: { baseUrl: "/academic/assignments/:id"; urlParams: { id: number } };
+        payload: undefined;
+        response: void;
+    };
+    createGradeRecord: {
+        url: { baseUrl: "/academic/grades-records" };
+        payload: TCreateDiemDto;
+        response: TDiem;
+    };
+    updateGradeRecord: {
+        url: { baseUrl: "/academic/grades-records/:id"; urlParams: { id: number } };
+        payload: Partial<TCreateDiemDto>;
+        response: TDiem;
+    };
+    deleteGradeRecord: {
+        url: { baseUrl: "/academic/grades-records/:id"; urlParams: { id: number } };
         payload: undefined;
         response: void;
     };
