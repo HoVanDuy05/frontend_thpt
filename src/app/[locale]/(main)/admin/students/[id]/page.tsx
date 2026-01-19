@@ -2,13 +2,16 @@
 
 import React from 'react';
 import { Title, Text, Paper, Group, Stack, Breadcrumbs, Anchor, Skeleton, Avatar, Badge, Card, Grid, Tabs, Timeline, ThemeIcon, SimpleGrid, Divider, Button, Container, ActionIcon } from '@mantine/core';
-import { IconUser, IconSchool, IconCalendar, IconPhone, IconMail, IconMapPin, IconUsers, IconChevronRight, IconArrowLeft } from '@tabler/icons-react';
+import { IconUser, IconSchool, IconCalendar, IconPhone, IconMail, IconMapPin, IconUsers, IconChevronRight, IconArrowLeft, IconEdit } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 import { AppQuery } from '@/api/AppQuery';
 import { useParams } from 'next/navigation';
 import { Link, useRouter } from '@/i18n/routing';
 import { useMemo } from 'react';
 import { SkeletonLoader } from '@/shared/components/SkeletonLoader';
+import { useDisclosure } from '@mantine/hooks';
+import { useUserManager } from '@/feauture/admin/accounts/hooks/useUserManager';
+import { UserDrawer } from '@/feauture/admin/accounts/components/UserDrawer';
 
 export default function StudentDetailPage() {
     const t = useTranslations('students');
@@ -17,13 +20,25 @@ export default function StudentDetailPage() {
     const router = useRouter();
     const studentId = parseInt(params.id as string);
 
-    const { data: user, isLoading } = AppQuery.user.useDetail(studentId);
+    const { data: user, isLoading, refetch } = AppQuery.user.useDetail(studentId);
+    const { handleUpdate, isUpdating } = useUserManager('HOC_SINH');
+    const [opened, { open, close }] = useDisclosure(false);
 
     const studentProfile = user?.hoSoHocSinh;
     const currentYear = useMemo(() =>
         studentProfile?.cacLopNam?.find(ln => ln.lopNam?.namHoc?.dangKichHoat),
         [studentProfile]
     );
+
+    const handleUpdateSubmit = async (values: any) => {
+        try {
+            await handleUpdate(studentId, values);
+            await refetch();
+            close();
+        } catch (error) {
+            console.error('Update student error:', error);
+        }
+    };
 
     if (isLoading) return <StudentDetailSkeleton />;
     if (!user || !studentProfile) return <Text>{t('not_found')}</Text>;
@@ -39,37 +54,11 @@ export default function StudentDetailPage() {
 
     return (
         <>
-            {/* Sticky Header */}
-            <Container
-                fluid
-                p="md"
-                style={{
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 1000,
-                    backgroundColor: 'white',
-                    borderBottom: '1px solid #e9ecef'
-                }}
-            >
-                <Group>
-                    <ActionIcon
-                        variant="subtle"
-                        size="lg"
-                        onClick={() => router.back()}
-                    >
-                        <IconArrowLeft size={20} />
-                    </ActionIcon>
-                    <Title order={3}>
-                        {user.vaiTro === 'HOC_SINH' ? 'HS' : user.vaiTro} - {studentProfile.hoTen}
-                    </Title>
-                </Group>
-            </Container>
-
             <Stack gap="md" p="md">
                 <Breadcrumbs>{breadcrumbs}</Breadcrumbs>
 
                 {/* Student Header */}
-                <Paper withBorder radius="md" p="xl">
+                <Paper withBorder radius="md" p="xl" pos="relative">
                     <Group>
                         <Avatar src={user.avatar} size={100} radius="md" />
                         <Stack gap="xs">
@@ -94,6 +83,17 @@ export default function StudentDetailPage() {
                             )}
                         </Stack>
                     </Group>
+                    <Button
+                        pos="absolute"
+                        top={20}
+                        right={20}
+                        leftSection={<IconEdit size={16} />}
+                        onClick={open}
+                        variant="light"
+                        radius="md"
+                    >
+                        {common('actions.edit')}
+                    </Button>
                 </Paper>
 
                 <Tabs defaultValue="overview">
@@ -284,6 +284,15 @@ export default function StudentDetailPage() {
                     </Tabs.Panel>
                 </Tabs>
             </Stack>
+
+            <UserDrawer
+                opened={opened}
+                onClose={close}
+                onSubmit={handleUpdateSubmit}
+                initialData={user as any}
+                role="HOC_SINH"
+                loading={isUpdating}
+            />
         </>
     );
 }

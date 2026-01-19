@@ -125,6 +125,11 @@ export function UserDrawer({ opened, onClose, onSubmit, initialData, role, loadi
             if (role === 'HOC_SINH' && initialData.hoSoHocSinh) {
                 const hs = initialData.hoSoHocSinh;
                 form.setValues({
+                    hoTen: hs.hoTen || initialData.hoTen || '',
+                    gioiTinh: hs.gioiTinh || initialData.gioiTinh || 'NAM',
+                    ngaySinh: hs.ngaySinh ? new Date(hs.ngaySinh) : (initialData.ngaySinh ? new Date(initialData.ngaySinh) : null),
+                    diaChi: hs.diaChi || initialData.diaChi || '',
+                    soDienThoai: hs.soDienThoai || initialData.soDienThoai || '',
                     maSoHs: hs.maSoHs || '',
                     noiSinh: hs.noiSinh || '',
                     danToc: hs.danToc || 'Kinh',
@@ -150,6 +155,11 @@ export function UserDrawer({ opened, onClose, onSubmit, initialData, role, loadi
             } else if (role === 'GIAO_VIEN' && initialData.hoSoGiaoVien) {
                 const gv = initialData.hoSoGiaoVien;
                 form.setValues({
+                    hoTen: gv.hoTen || initialData.hoTen || '',
+                    gioiTinh: gv.gioiTinh || initialData.gioiTinh || 'NAM',
+                    ngaySinh: gv.ngaySinh ? new Date(gv.ngaySinh) : (initialData.ngaySinh ? new Date(initialData.ngaySinh) : null),
+                    diaChi: gv.diaChi || initialData.diaChi || '',
+                    soDienThoai: gv.soDienThoai || initialData.soDienThoai || '',
                     maSoGv: gv.maSoGv || '',
                     emailLienHe: gv.emailLienHe || '',
                     trinhDo: gv.trinhDo || 'DAI_HOC',
@@ -158,17 +168,18 @@ export function UserDrawer({ opened, onClose, onSubmit, initialData, role, loadi
                     cccd: gv.cccd || '',
                     ngayCapCccd: gv.ngayCapCccd ? new Date(gv.ngayCapCccd) : null,
                     noiCapCccd: gv.noiCapCccd || '',
-                    diaChi: gv.diaChi || '',
-                    soDienThoai: gv.soDienThoai || '',
                 });
             } else if (role === 'NHAN_VIEN' && initialData.hoSoNhanVien) {
                 const nv = initialData.hoSoNhanVien;
                 form.setValues({
+                    hoTen: nv.hoTen || initialData.hoTen || '',
+                    gioiTinh: nv.gioiTinh || initialData.gioiTinh || 'NAM',
+                    ngaySinh: nv.ngaySinh ? new Date(nv.ngaySinh) : (initialData.ngaySinh ? new Date(initialData.ngaySinh) : null),
+                    diaChi: nv.diaChi || initialData.diaChi || '',
+                    soDienThoai: nv.soDienThoai || initialData.soDienThoai || '',
                     maSo: nv.maSo || '',
                     emailLienHe: nv.emailLienHe || '',
                     cccd: nv.cccd || '',
-                    diaChi: nv.diaChi || '',
-                    soDienThoai: nv.soDienThoai || '',
                 });
             }
         } else {

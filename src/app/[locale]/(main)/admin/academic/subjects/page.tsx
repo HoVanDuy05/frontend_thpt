@@ -1,134 +1,116 @@
-"use client";
+'use client';
 
-import { useTranslations } from "next-intl";
-import { useState } from "react";
-import {
-    Box, Title, Text, Button, Group, Stack
-} from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { SubjectDrawer } from "./SubjectDrawer";
-import { SubjectsTable } from "@/feauture/admin/subjects/components/SubjectsTable";
-import { SkeletonLoader } from "@/shared/components/SkeletonLoader";
-import {
-    IconPlus, IconBooks
-} from "@tabler/icons-react";
-import { AppQuery } from "@/api/AppQuery";
-import { AppMutation } from "@/api/AppMutation";
-import { notifications } from "@mantine/notifications";
-import { type SubjectType } from "@/shared/utils/subjectColumns";
+import { Title, Text, Button, Paper, SimpleGrid, Group, Stack, ThemeIcon, Box, Skeleton } from '@mantine/core';
+import { IconSchool, IconBooks, IconArrowRight } from '@tabler/icons-react';
+import { useTranslations } from 'next-intl';
+import { AppQuery } from '@/api/AppQuery';
+import { useRouter } from '@/i18n/routing';
+import { SkeletonLoader } from '@/shared/components/SkeletonLoader';
 
 export default function SubjectsPage() {
     const t = useTranslations('admin.academic.subjects');
+    const router = useRouter();
 
-    // Drawer control
-    const [opened, { open, close }] = useDisclosure(false);
-    const [selectedSubject, setSelectedSubject] = useState<SubjectType | null>(null);
-
-    // Queries
-    const { data: subjects, isLoading } = AppQuery.academic.useSubjects();
-
-    const mutations = AppMutation();
-    const deleteMutation = mutations.academic.useDeleteSubject();
-
-    const handleCreate = () => {
-        setSelectedSubject(null);
-        open();
-    };
-
-    const handleEdit = (subject: SubjectType) => {
-        setSelectedSubject(subject);
-        open();
-    };
-
-    const handleDelete = (subject: SubjectType) => {
-        const modalId = notifications.show({
-            title: t('delete_confirm_title', { defaultMessage: 'Xác nhận xóa' }),
-            message: (
-                <Stack>
-                    <Text size="sm">
-                        {t('delete_confirm_message', { name: subject.tenMon, defaultMessage: `Bạn có chắc chắn muốn xóa môn học "${subject.tenMon}"?` })}
-                    </Text>
-                    <Group justify="end" mt="xs">
-                        <Button variant="default" size="xs" onClick={() => notifications.hide(modalId)}>
-                            {t('actions.cancel', { defaultMessage: 'Hủy' })}
-                        </Button>
-                        <Button
-                            color="red"
-                            size="xs"
-                            onClick={() => {
-                                deleteMutation.mutate({ urlParams: { id: subject.id } } as any, {
-                                    onSuccess: () => {
-                                        notifications.show({ title: 'Thành công', message: 'Xóa môn học thành công', color: 'green' });
-                                        notifications.hide(modalId);
-                                    },
-                                    onError: (error: any) => {
-                                        notifications.show({ title: 'Thất bại', message: error?.message || 'Có lỗi xảy ra', color: 'red' });
-                                        notifications.hide(modalId);
-                                    }
-                                });
-                            }}
-                        >
-                            {t('actions.delete_confirm', { defaultMessage: 'Xóa' })}
-                        </Button>
-                    </Group>
-                </Stack>
-            ),
-            color: 'red',
-            autoClose: false,
-        });
-    };
-
-    if (isLoading) {
-        return <SkeletonLoader type="table" count={5} />;
-    }
+    const { data: grades, isLoading } = AppQuery.academic.useGrades();
 
     return (
-        <Box className="w-full min-h-screen bg-[#fcfcfd] dark:bg-[#09090b]">
-            {/* Header */}
-            <Box className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-zinc-800 px-6 py-6 sticky top-0 z-40">
-                <Group justify="space-between">
-                    <Group gap="md">
+        <Stack gap={0} pos="relative" className="w-full min-h-screen bg-[#fcfcfd] dark:bg-[#09090b]">
+            <Box
+                pos="sticky"
+                top={0}
+                pt={{ base: 'md', sm: 'xl' }}
+                pb="md"
+                px={{ base: 'md', sm: 'xl' }}
+                bg="white"
+                style={{
+                    zIndex: 100,
+                    borderBottom: '1px solid var(--mantine-color-default-border)',
+                    backdropFilter: 'blur(8px)',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)'
+                }}
+                className="dark:bg-zinc-900/80 dark:border-zinc-800"
+            >
+                <Group justify="space-between" align="center" wrap="nowrap">
+                    <Group align="center" gap="md" style={{ flex: 1, minWidth: 0 }}>
                         <Box className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-900/20">
-                            <IconBooks size={24} className="text-indigo-600 dark:text-indigo-400" />
+                            <IconBooks size={28} className="text-indigo-600 dark:text-indigo-400" />
                         </Box>
-                        <div>
-                            <Title order={2} className="text-xl sm:text-2xl font-black tracking-tight text-gray-900 dark:text-white">
+                        <Stack gap={0} style={{ flex: 1, minWidth: 0 }}>
+                            <Title order={2} size="h3" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                 {t('title', { defaultMessage: 'Quản lý Môn học' })}
                             </Title>
-                            <Text size="sm" c="dimmed" fw={500}>
-                                {t('subtitle', { count: subjects?.length || 0, defaultMessage: `Danh sách ${subjects?.length || 0} môn học trong hệ thống` })}
+                            <Text c="dimmed" size="xs" lineClamp={1}>
+                                {t('grade_selection_subtitle', { defaultMessage: 'Chọn khối lớp để quản lý danh sách môn học' })}
                             </Text>
-                        </div>
+                        </Stack>
                     </Group>
-
-                    <Button
-                        leftSection={<IconPlus size={18} stroke={2.5} />}
-                        radius="xl"
-                        size="md"
-                        color="indigo"
-                        className="shadow-lg shadow-indigo-500/20 hover:scale-105 transition-all"
-                        onClick={handleCreate}
-                    >
-                        {t('actions.create', { defaultMessage: 'Thêm mới' })}
-                    </Button>
                 </Group>
             </Box>
 
-            {/* Content */}
-            <Box className="p-6 max-w-7xl mx-auto">
-                <SubjectsTable
-                    subjects={subjects}
-                    isLoading={isLoading}
-                    onEdit={handleEdit}
-                    onDelete={handleDelete}
-                />
-            </Box>
+            <Stack p={{ base: 'sm', sm: 'md', md: 'xl' }} gap="lg" className="max-w-7xl mx-auto w-full">
+                <SimpleGrid cols={{ base: 1, xs: 2, sm: 2, md: 3, lg: 4 }} spacing="md">
+                    {isLoading ? (
+                        Array(8).fill(0).map((_, i) => (
+                            <Paper key={i} withBorder p="md" radius="md">
+                                <Skeleton h={38} w={38} radius="md" mb="xs" />
+                                <Stack gap={4} mt="xs">
+                                    <Skeleton h={20} w="70%" />
+                                    <Skeleton h={14} w="40%" />
+                                </Stack>
+                                <Group justify="end" mt="md">
+                                    <Skeleton h={30} w={100} radius="md" />
+                                </Group>
+                            </Paper>
+                        ))
+                    ) : (
+                        grades?.map((grade) => (
+                            <Paper
+                                key={grade.id}
+                                withBorder
+                                p="md"
+                                radius="md"
+                                className="hover:shadow-md transition-all duration-300 bg-white dark:bg-zinc-900 dark:border-zinc-800"
+                            >
+                                <Group justify="space-between" align="center" mb="xs">
+                                    <ThemeIcon size={38} radius="md" variant="light" color="blue">
+                                        <IconSchool size={20} />
+                                    </ThemeIcon>
+                                </Group>
 
-            <SubjectDrawer opened={opened} onClose={close} subject={selectedSubject} />
-        </Box>
+                                <Stack gap={4} mt="xs">
+                                    <Title order={4} size="h5">{grade.tenKhoi}</Title>
+                                    {grade.moTa ? (
+                                        <Text size="xs" c="dimmed" lineClamp={2}>
+                                            {grade.moTa}
+                                        </Text>
+                                    ) : (
+                                        <Text size="xs" c="dimmed"><i>{t('no_description', { defaultMessage: 'Chưa có mô tả' })}</i></Text>
+                                    )}
+                                </Stack>
+
+                                <Group justify="end" mt="md">
+                                    <Button
+                                        variant="light"
+                                        color="indigo"
+                                        size="xs"
+                                        radius="md"
+                                        rightSection={<IconArrowRight size={14} />}
+                                        onClick={() => router.push(`/admin/academic/subjects/${grade.id}`)}
+                                    >
+                                        {t('view_subjects', { defaultMessage: 'Xem môn học' })}
+                                    </Button>
+                                </Group>
+                            </Paper>
+                        ))
+                    )}
+                </SimpleGrid>
+
+                {grades?.length === 0 && !isLoading && (
+                    <Paper p="xl" withBorder radius="md" style={{ textAlign: 'center' }}>
+                        <Text c="dimmed">Không tìm thấy khối lớp nào</Text>
+                    </Paper>
+                )}
+            </Stack>
+        </Stack>
     );
-
-    if (isLoading) {
-        return <SkeletonLoader type="table" count={5} />;
-    }
 }

@@ -13,9 +13,10 @@ interface SubjectDrawerProps {
     opened: boolean;
     onClose: () => void;
     subject?: SubjectType | null;
+    khoiId?: number;
 }
 
-export function SubjectDrawer({ opened, onClose, subject }: SubjectDrawerProps) {
+export function SubjectDrawer({ opened, onClose, subject, khoiId }: SubjectDrawerProps) {
     const t = useTranslations('admin.academic.subjects');
 
     // Mutations
@@ -49,7 +50,7 @@ export function SubjectDrawer({ opened, onClose, subject }: SubjectDrawerProps) 
     const handleSubmit = (values: typeof form.values) => {
         const payload = {
             ...values,
-            // Assuming simplified payload for now, adjust if backend expects more
+            khoiId: subject ? undefined : khoiId, // Pass khoiId only when creating
         };
 
         if (subject) {
@@ -91,12 +92,16 @@ export function SubjectDrawer({ opened, onClose, subject }: SubjectDrawerProps) 
             <LoadingOverlay visible={isSubmitting} />
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack gap="md">
-                    <TextInput
-                        label={t('fields.code', { defaultMessage: 'Mã môn học' })}
-                        description={t('fields.code_desc', { defaultMessage: 'Mã định danh duy nhất (ví dụ: MATH, LIT)' })}
-                        placeholder={t('fields.code_placeholder', { defaultMessage: 'Nhập mã môn...' })}
-                        {...form.getInputProps('maMon')}
-                    />
+                    {/* Only show maMon when editing, and make it disabled */}
+                    {subject && (
+                        <TextInput
+                            label={t('fields.code', { defaultMessage: 'Mã môn học' })}
+                            description={t('fields.code_desc', { defaultMessage: 'Mã định danh duy nhất (ví dụ: MATH, LIT)' })}
+                            placeholder={t('fields.code_placeholder', { defaultMessage: 'Nhập mã môn...' })}
+                            {...form.getInputProps('maMon')}
+                            disabled
+                        />
+                    )}
 
                     <TextInput
                         label={t('fields.name', { defaultMessage: 'Tên môn học' })}

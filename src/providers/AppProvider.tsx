@@ -10,6 +10,12 @@ import { PWAProvider } from "@/providers/PWAProvider";
 import { GlobalSocketHandler } from "@/shared/components/GlobalSocketHandler";
 import { ThemeSync } from "@/shared/components/ThemeSync";
 import { PWAUpdateNotification } from "@/shared/components/PWAUpdateNotification";
+import { DatesProvider } from '@mantine/dates';
+import dayjs from 'dayjs';
+import 'dayjs/locale/vi';
+import 'dayjs/locale/en';
+
+dayjs.locale('vi');
 
 interface AppProviderProps {
     children: React.ReactNode;
@@ -144,18 +150,20 @@ export function AppProvider({ children, messages, locale }: AppProviderProps) {
         >
             <QueryClientProvider client={queryClient}>
                 <MantineProvider defaultColorScheme="auto" theme={theme}>
-                    <Notifications position="top-right" zIndex={1000} />
-                    <SplashScreen />
-                    <Suspense fallback={null}>
-                        <ThemeSync />
-                    </Suspense>
-                    <PWAProvider>
+                    <DatesProvider settings={{ locale }}>
+                        <Notifications position="top-right" zIndex={1000} />
+                        <SplashScreen />
                         <Suspense fallback={null}>
-                            <GlobalSocketHandler />
+                            <ThemeSync />
                         </Suspense>
-                        <PWAUpdateNotification />
-                        {children}
-                    </PWAProvider>
+                        <PWAProvider>
+                            <Suspense fallback={null}>
+                                <GlobalSocketHandler />
+                            </Suspense>
+                            <PWAUpdateNotification />
+                            {children}
+                        </PWAProvider>
+                    </DatesProvider>
                 </MantineProvider>
             </QueryClientProvider>
         </NextIntlClientProvider>

@@ -26,13 +26,15 @@ export const AppQuery = {
             useAppQuery({ url: { baseUrl: "/academic/semesters", queryParams: params }, options }),
         useHocKyDetail: (id: number, options?: AppQueryOptions<"getHocKyById">) =>
             useAppQuery({ url: { baseUrl: "/academic/semesters/:id", urlParams: { id } }, options }),
-        useSubjects: (params?: TQueryConfig, options?: AppQueryOptions<"getMonHocs">) =>
+        useSubjects: (params?: TQueryConfig & { khoiId?: string | number }, options?: AppQueryOptions<"getMonHocs">) =>
             useAppQuery({ url: { baseUrl: "/academic/subjects", queryParams: params }, options }),
         useClasses: (params?: TQueryConfig, options?: AppQueryOptions<"getLopHocs">) =>
             useAppQuery({ url: { baseUrl: "/academic/classes", queryParams: params }, options }),
         useClassYears: (params?: TQueryConfig & { namHocId?: number }, options?: AppQueryOptions<"getLopNams">) =>
             useAppQuery({ url: { baseUrl: "/academic/class-years", queryParams: params }, options }),
         useKhois: (params?: TQueryConfig, options?: AppQueryOptions<"getKhois">) =>
+            useAppQuery({ url: { baseUrl: "/academic/grades", queryParams: params }, options }),
+        useGrades: (params?: TQueryConfig, options?: AppQueryOptions<"getKhois">) =>
             useAppQuery({ url: { baseUrl: "/academic/grades", queryParams: params }, options }),
         useKhoiDetail: (id: number, options?: AppQueryOptions<"getKhoiById">) =>
             useAppQuery({ url: { baseUrl: "/academic/grades/:id", urlParams: { id } }, options }),

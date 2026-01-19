@@ -494,24 +494,27 @@
             },
             "subjects": {
                 "title": "Subject Management",
+                "title_mobile": "Subjects",
                 "subtitle": "List of {count} subjects in the system",
+                "grade_selection_subtitle": "Select a grade level to manage its subjects",
                 "search_placeholder": "Search subjects...",
                 "no_desc": "No description for this subject.",
+                "no_description": "No description provided",
+                "no_data": "No subjects found",
+                "not_available": "N/A",
+                "view_subjects": "View subjects",
                 "fields": {
-                    "name": "Subject Name",
-                    "name_placeholder": "e.g., Mathematics, Literature",
                     "code": "Subject Code",
                     "code_desc": "Unique identifier (e.g., MATH, LIT)",
                     "code_placeholder": "Enter subject code...",
+                    "name": "Subject Name",
+                    "name_placeholder": "e.g., Mathematics, Literature",
                     "description": "Description",
                     "description_placeholder": "Brief description of the subject..."
                 },
                 "columns": {
-                    "name": "Subject Name",
-                    "code": "Subject Code",
                     "classes": "Classes",
                     "teachers": "Teachers",
-                    "description": "Description",
                     "actions": "Actions"
                 },
                 "actions": {
@@ -520,10 +523,17 @@
                     "update": "Update",
                     "delete": "Delete",
                     "filter": "Filter",
+                    "back": "Back",
                     "cancel": "Cancel",
-                    "create_confirm": "Create Subject"
+                    "create_confirm": "Create Subject",
+                    "create_short": "Add",
+                    "delete_confirm": "Confirm Delete"
                 },
-                "no_data": "No subjects found"
+                "validation": {
+                    "name_short": "Subject name is too short"
+                },
+                "delete_confirm_title": "Confirm Deletion",
+                "delete_confirm_message": "Are you sure you want to delete the subject \"{name}\"?"
             }
         }
     },

@@ -140,40 +140,35 @@ export function PullToRefresh({
     const loaderScale = isRefreshing ? 1 : 0.7 + 0.3 * progress;
 
     return (
-        <div ref={containerRef} className={className} style={{ WebkitOverflowScrolling: "touch" }}>
+        <div ref={containerRef} className={className} style={{ position: "relative", WebkitOverflowScrolling: "touch" }}>
             {showLoader && (
                 <div
                     style={{
-                        position: "fixed",
-                        top: 16,
+                        position: "absolute",
+                        top: isRefreshing ? 20 : Math.max(-40, pullPx - 40),
                         left: 0,
                         right: 0,
                         display: "flex",
                         justifyContent: "center",
                         pointerEvents: "none",
                         zIndex: 9999,
+                        transition: isRefreshing || isReleasing ? "top 200ms ease" : undefined,
                     }}
                 >
                     <div
-                        className="bg-white dark:bg-zinc-800 shadow-lg rounded-full p-2 flex items-center justify-center"
+                        className="bg-white dark:bg-zinc-800 shadow-xl rounded-full p-2.5 flex items-center justify-center border border-gray-100 dark:border-zinc-700"
                         style={{
                             opacity: loaderOpacity,
                             transform: `scale(${loaderScale})`,
-                            transition: isRefreshing ? "opacity 120ms ease, transform 120ms ease" : undefined,
+                            transition: isRefreshing ? "opacity 150ms ease, transform 150ms ease" : undefined,
                         }}
                     >
-                        <Loader size="xs" color="blue" />
+                        <Loader size="xs" color="indigo" />
                     </div>
                 </div>
             )}
 
-            <div
-                style={{
-                    position: "relative",
-                    top: `${pullPx}px`,
-                    transition: isRefreshing || isReleasing ? "top 200ms ease" : undefined,
-                }}
-            >
+            <div>
                 {children}
             </div>
         </div>

@@ -489,15 +489,46 @@
             },
             "subjects": {
                 "title": "Quản lý Môn học",
+                "title_mobile": "Môn học",
                 "subtitle": "Danh sách {count} môn học trong hệ thống",
+                "grade_selection_subtitle": "Chọn khối lớp để quản lý danh sách môn học",
                 "search_placeholder": "Tìm kiếm môn học...",
                 "no_desc": "Chưa có mô tả cho môn học này.",
+                "no_description": "Chưa có mô tả",
+                "no_data": "Không tìm thấy môn học nào",
+                "not_available": "Không khả dụng",
+                "view_subjects": "Xem môn học",
+                "fields": {
+                    "code": "Mã môn học",
+                    "code_desc": "Mã định danh duy nhất (ví dụ: MATH, LIT)",
+                    "code_placeholder": "Nhập mã môn...",
+                    "name": "Tên môn học",
+                    "name_placeholder": "Ví dụ: Toán học, Ngữ văn",
+                    "description": "Mô tả",
+                    "description_placeholder": "Mô tả ngắn về môn học..."
+                },
+                "columns": {
+                    "classes": "Lớp học",
+                    "teachers": "Giáo viên",
+                    "actions": "Thao tác"
+                },
                 "actions": {
                     "create": "Thêm mới",
                     "edit": "Chỉnh sửa",
+                    "update": "Cập nhật",
                     "delete": "Xóa",
-                    "filter": "Bộ lọc"
-                }
+                    "filter": "Bộ lọc",
+                    "back": "Quay lại",
+                    "cancel": "Hủy",
+                    "create_confirm": "Tạo môn học",
+                    "create_short": "Thêm",
+                    "delete_confirm": "Xác nhận xóa"
+                },
+                "validation": {
+                    "name_short": "Tên môn học quá ngắn"
+                },
+                "delete_confirm_title": "Xác nhận xóa",
+                "delete_confirm_message": "Bạn có chắc chắn muốn xóa môn học \"{name}\"?"
             }
         }
     },
