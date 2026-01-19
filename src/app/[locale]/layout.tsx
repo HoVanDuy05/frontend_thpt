@@ -15,7 +15,6 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { Suspense } from "react";
 import { GlobalPullToRefresh } from "@/shared/components/layout/GlobalPullToRefresh";
-
 export const metadata: Metadata = {
   title: "NHers - Nguyễn Huệ Academy",
   description: "Hệ thống Quản lý Trường học Thông minh THPT Nguyễn Huệ",

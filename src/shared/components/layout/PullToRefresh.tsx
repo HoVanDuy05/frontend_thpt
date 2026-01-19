@@ -145,7 +145,7 @@ export function PullToRefresh({
                 <div
                     style={{
                         position: "fixed",
-                        top: 8,
+                        top: 16,
                         left: 0,
                         right: 0,
                         display: "flex",
@@ -155,22 +155,23 @@ export function PullToRefresh({
                     }}
                 >
                     <div
+                        className="bg-white dark:bg-zinc-800 shadow-lg rounded-full p-2 flex items-center justify-center"
                         style={{
                             opacity: loaderOpacity,
                             transform: `scale(${loaderScale})`,
                             transition: isRefreshing ? "opacity 120ms ease, transform 120ms ease" : undefined,
                         }}
                     >
-                        <Loader size="sm" color="indigo" />
+                        <Loader size="xs" color="blue" />
                     </div>
                 </div>
             )}
 
             <div
                 style={{
-                    transform: `translateY(${pullPx}px)`,
-                    transition: isRefreshing || isReleasing ? "transform 200ms ease" : undefined,
-                    willChange: "transform",
+                    position: "relative",
+                    top: `${pullPx}px`,
+                    transition: isRefreshing || isReleasing ? "top 200ms ease" : undefined,
                 }}
             >
                 {children}

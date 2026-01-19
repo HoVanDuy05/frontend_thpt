@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import {
-    Box, Title, Text, Button, Group
+    Box, Title, Text, Button, Group, Stack
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { SubjectDrawer } from "./SubjectDrawer";
@@ -13,42 +13,69 @@ import {
     IconPlus, IconBooks
 } from "@tabler/icons-react";
 import { AppQuery } from "@/api/AppQuery";
+import { AppMutation } from "@/api/AppMutation";
 import { notifications } from "@mantine/notifications";
-
-// Define Types (Ideally import from types folder)
-interface Subject {
-    id: number;
-    tenMon: string;
-    maMon?: string;
-    moTa?: string;
-    _count?: {
-        lopHoc: number;
-        giaoVien: number;
-    }
-}
+import { type SubjectType } from "@/shared/utils/subjectColumns";
 
 export default function SubjectsPage() {
     const t = useTranslations('admin.academic.subjects');
 
     // Drawer control
     const [opened, { open, close }] = useDisclosure(false);
-    const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
+    const [selectedSubject, setSelectedSubject] = useState<SubjectType | null>(null);
 
     // Queries
     const { data: subjects, isLoading } = AppQuery.academic.useSubjects();
+
+    const mutations = AppMutation();
+    const deleteMutation = mutations.academic.useDeleteSubject();
 
     const handleCreate = () => {
         setSelectedSubject(null);
         open();
     };
 
-    const handleEdit = (subject: Subject) => {
+    const handleEdit = (subject: SubjectType) => {
         setSelectedSubject(subject);
         open();
     };
 
-    const handleDelete = (id: number, name: string) => {
-        notifications.show({ title: 'Info', message: 'Tính năng xóa đang được cập nhật', color: 'blue' });
+    const handleDelete = (subject: SubjectType) => {
+        const modalId = notifications.show({
+            title: t('delete_confirm_title', { defaultMessage: 'Xác nhận xóa' }),
+            message: (
+                <Stack>
+                    <Text size="sm">
+                        {t('delete_confirm_message', { name: subject.tenMon, defaultMessage: `Bạn có chắc chắn muốn xóa môn học "${subject.tenMon}"?` })}
+                    </Text>
+                    <Group justify="end" mt="xs">
+                        <Button variant="default" size="xs" onClick={() => notifications.hide(modalId)}>
+                            {t('actions.cancel', { defaultMessage: 'Hủy' })}
+                        </Button>
+                        <Button
+                            color="red"
+                            size="xs"
+                            onClick={() => {
+                                deleteMutation.mutate({ urlParams: { id: subject.id } } as any, {
+                                    onSuccess: () => {
+                                        notifications.show({ title: 'Thành công', message: 'Xóa môn học thành công', color: 'green' });
+                                        notifications.hide(modalId);
+                                    },
+                                    onError: (error: any) => {
+                                        notifications.show({ title: 'Thất bại', message: error?.message || 'Có lỗi xảy ra', color: 'red' });
+                                        notifications.hide(modalId);
+                                    }
+                                });
+                            }}
+                        >
+                            {t('actions.delete_confirm', { defaultMessage: 'Xóa' })}
+                        </Button>
+                    </Group>
+                </Stack>
+            ),
+            color: 'red',
+            autoClose: false,
+        });
     };
 
     if (isLoading) {
@@ -89,7 +116,12 @@ export default function SubjectsPage() {
 
             {/* Content */}
             <Box className="p-6 max-w-7xl mx-auto">
-                <SubjectsTable subjects={subjects} isLoading={isLoading} />
+                <SubjectsTable
+                    subjects={subjects}
+                    isLoading={isLoading}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                />
             </Box>
 
             <SubjectDrawer opened={opened} onClose={close} subject={selectedSubject} />

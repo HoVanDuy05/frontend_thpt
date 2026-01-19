@@ -2,6 +2,8 @@
 
 import { useMemo } from 'react';
 import type { TableColumn } from '@/shared/hooks/useDynamicTable';
+import { Button, Group } from '@mantine/core';
+import { IconEdit, IconTrash } from '@tabler/icons-react';
 
 export type SubjectType = {
     id: number;
@@ -22,7 +24,12 @@ type BaseColumnsParams<T = SubjectType> = {
 export const subjectBaseColumns = <T = SubjectType>({
     t,
     omitColumns = [],
-}: BaseColumnsParams<T>): TableColumn<T>[] =>
+    onEdit,
+    onDelete,
+}: BaseColumnsParams<T> & {
+    onEdit?: (item: T) => void;
+    onDelete?: (item: T) => void;
+}): TableColumn<T>[] =>
     (
         [
             {
@@ -54,6 +61,37 @@ export const subjectBaseColumns = <T = SubjectType>({
                 title: t('columns.teachers'),
                 align: 'right',
                 render: (subject: SubjectType) => subject._count?.giaoVien || 0,
+            },
+            {
+                accessor: 'actions',
+                title: t('columns.actions'),
+                align: 'right',
+                render: (subject: SubjectType) => (
+                    <Group gap="xs" justify="flex-end">
+                        {onEdit && (
+                            <Button
+                                variant="outline"
+                                color="indigo"
+                                size="xs"
+                                leftSection={<IconEdit size={14} />}
+                                onClick={() => onEdit(subject as unknown as T)}
+                            >
+                                <span className="sm:hidden">{t('actions.edit')}</span>
+                            </Button>
+                        )}
+                        {onDelete && (
+                            <Button
+                                variant="outline"
+                                size="xs"
+                                color="red"
+                                leftSection={<IconTrash size={14} />}
+                                onClick={() => onDelete(subject as unknown as T)}
+                            >
+                                <span className="sm:hidden">{t('actions.delete')}</span>
+                            </Button>
+                        )}
+                    </Group>
+                ),
             },
         ] as TableColumn<T>[]
     ).filter((column) => !omitColumns.includes(column.accessor));

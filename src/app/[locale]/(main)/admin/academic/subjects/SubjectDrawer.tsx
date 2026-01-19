@@ -7,14 +7,12 @@ import { useEffect } from "react";
 import { AppMutation } from "@/api/AppMutation";
 import { notifications } from "@mantine/notifications";
 
+import { type SubjectType } from "@/shared/utils/subjectColumns";
+
 interface SubjectDrawerProps {
     opened: boolean;
     onClose: () => void;
-    subject?: {
-        id: number;
-        tenMon: string;
-        moTa?: string;
-    } | null;
+    subject?: SubjectType | null;
 }
 
 export function SubjectDrawer({ opened, onClose, subject }: SubjectDrawerProps) {
@@ -28,6 +26,7 @@ export function SubjectDrawer({ opened, onClose, subject }: SubjectDrawerProps) 
     const form = useForm({
         initialValues: {
             tenMon: '',
+            maMon: '',
             moTa: ''
         },
         validate: {
@@ -39,6 +38,7 @@ export function SubjectDrawer({ opened, onClose, subject }: SubjectDrawerProps) 
         if (subject) {
             form.setValues({
                 tenMon: subject.tenMon,
+                maMon: subject.maMon || '',
                 moTa: subject.moTa || ''
             });
         } else {
@@ -91,6 +91,13 @@ export function SubjectDrawer({ opened, onClose, subject }: SubjectDrawerProps) 
             <LoadingOverlay visible={isSubmitting} />
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack gap="md">
+                    <TextInput
+                        label={t('fields.code', { defaultMessage: 'Mã môn học' })}
+                        description={t('fields.code_desc', { defaultMessage: 'Mã định danh duy nhất (ví dụ: MATH, LIT)' })}
+                        placeholder={t('fields.code_placeholder', { defaultMessage: 'Nhập mã môn...' })}
+                        {...form.getInputProps('maMon')}
+                    />
+
                     <TextInput
                         label={t('fields.name', { defaultMessage: 'Tên môn học' })}
                         placeholder={t('fields.name_placeholder', { defaultMessage: 'Ví dụ: Toán học, Ngữ văn' })}

@@ -11,7 +11,7 @@ import { useState } from 'react';
 import { Link } from '@/i18n/routing';
 import { useParams } from 'next/navigation';
 import { useDisclosure } from '@mantine/hooks';
-import { GradeModal } from './GradeModal';
+import { GradeModal } from '../../../../../../feauture/admin/GradeModal';
 import { TKhoi } from '@/shared/types/academic.type';
 import { SkeletonLoader } from '@/shared/components/SkeletonLoader';
 
@@ -116,14 +116,6 @@ export default function GradesPage() {
             >
                 <Group justify="space-between" align="center" wrap="nowrap">
                     <Group align="center" gap="xs" style={{ flex: 1, minWidth: 0 }}>
-                        <ActionIcon
-                            variant="subtle"
-                            color="gray"
-                            onClick={() => window.history.back()}
-                            size="md"
-                        >
-                            <IconChevronLeft size={20} />
-                        </ActionIcon>
                         <Stack gap={0} style={{ flex: 1, minWidth: 0 }}>
                             <Title order={2} size="h3" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                 {t('title')}
@@ -170,49 +162,31 @@ export default function GradesPage() {
                     ) : (
                         grades?.map((grade) => (
                             <Paper key={grade.id} withBorder p="md" radius="md" className="hover-card">
-                                <Group justify="space-between" align="flex-start" mb="xs">
+                                <Group justify="space-between" align="center" mb="xs">
                                     <ThemeIcon size={38} radius="md" variant="light" color="blue">
                                         <IconSchool size={20} />
                                     </ThemeIcon>
 
                                     <Group gap="xs">
-                                        {/* Desktop Actions */}
-                                        <Group gap={5} visibleFrom="sm">
-                                            <ActionIcon
-                                                variant="light"
-                                                color="blue"
-                                                onClick={() => handleOpenEdit(grade)}
-                                                title={common('edit')}
-                                            >
-                                                <IconEdit size={16} />
-                                            </ActionIcon>
-                                            <ActionIcon
-                                                variant="light"
-                                                color="red"
-                                                onClick={() => handleDelete(grade.id, grade.tenKhoi)}
-                                                title={common('delete')}
-                                            >
-                                                <IconTrash size={16} />
-                                            </ActionIcon>
-                                        </Group>
-
-                                        {/* Mobile Actions */}
-                                        <Menu position="bottom-end" withinPortal>
-                                            <Menu.Target>
-                                                <ActionIcon variant="subtle" color="gray" hiddenFrom="sm">
-                                                    <IconDotsVertical size={16} />
-                                                </ActionIcon>
-                                            </Menu.Target>
-                                            <Menu.Dropdown>
-                                                <Menu.Item leftSection={<IconEdit size={14} />} onClick={() => handleOpenEdit(grade)}>
-                                                    {common('edit')}
-                                                </Menu.Item>
-                                                <Menu.Item leftSection={<IconTrash size={14} />} color="red" onClick={() => handleDelete(grade.id, grade.tenKhoi)}>
-                                                    {common('delete')}
-                                                </Menu.Item>
-                                            </Menu.Dropdown>
-                                        </Menu>
-                                        group     </Group>
+                                        <Button
+                                            variant="outline"
+                                            color="indigo"
+                                            size="xs"
+                                            leftSection={<IconEdit size={14} />}
+                                            onClick={() => handleOpenEdit(grade)}
+                                        >
+                                            <span className="sm:hidden">{common('edit')}</span>
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="xs"
+                                            color="red"
+                                            leftSection={<IconTrash size={14} />}
+                                            onClick={() => handleDelete(grade.id, grade.tenKhoi)}
+                                        >
+                                            <span className="sm:hidden">{common('delete')}</span>
+                                        </Button>
+                                    </Group>
                                 </Group>
 
                                 <Stack gap={4} mt="xs">

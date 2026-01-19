@@ -145,8 +145,8 @@ export const AppMutation = () => {
                     queryClient.invalidateQueries({ queryKey: ["/academic/subjects"] as any });
                 }
             }),
-            useDeleteSubject: (id: number) => useAppMutation<"deleteSubject">({
-                url: { baseUrl: "/academic/subjects/:id", urlParams: { id } },
+            useDeleteSubject: () => useAppMutation<"deleteSubject">({
+                url: { baseUrl: "/academic/subjects/:id" } as any,
                 method: "DELETE",
                 onSuccess: () => {
                     queryClient.invalidateQueries({ queryKey: ["/academic/subjects"] as any });

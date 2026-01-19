@@ -501,6 +501,8 @@
                     "name": "Subject Name",
                     "name_placeholder": "e.g., Mathematics, Literature",
                     "code": "Subject Code",
+                    "code_desc": "Unique identifier (e.g., MATH, LIT)",
+                    "code_placeholder": "Enter subject code...",
                     "description": "Description",
                     "description_placeholder": "Brief description of the subject..."
                 },

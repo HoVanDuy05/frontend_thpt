@@ -4,11 +4,19 @@ import { useTranslations } from 'next-intl';
 import { subjectBaseColumns, type SubjectType } from '@/shared/utils/subjectColumns';
 import type { DataTableColumn } from '@/shared/components/DataTable';
 
-export const useSubjectsTable = (subjects?: SubjectType[]) => {
+export const useSubjectsTable = (
+    subjects?: SubjectType[],
+    onEdit?: (subject: SubjectType) => void,
+    onDelete?: (subject: SubjectType) => void
+) => {
     const t = useTranslations('admin.academic.subjects');
 
     // Convert from TableColumn to DataTableColumn format
-    const columns: DataTableColumn<SubjectType>[] = subjectBaseColumns({ t }).map(col => ({
+    const columns: DataTableColumn<SubjectType>[] = subjectBaseColumns({
+        t,
+        onEdit,
+        onDelete
+    }).map(col => ({
         key: col.accessor as string,
         header: col.title,
         width: col.width,
