@@ -5,8 +5,12 @@ import axiosClient from "../axiosClient";
 import { ApiMutationType } from "../types/api.type";
 import { replaceDynamicValues } from "@/shared/utils/api.util";
 
+type ExtractPayload<T extends keyof ApiMutationType> = ApiMutationType[T] extends { payload: infer P } ? P : undefined;
+type ExtractResponse<T extends keyof ApiMutationType> = ApiMutationType[T] extends { response: infer R } ? R : any;
+type ExtractUrl<T extends keyof ApiMutationType> = ApiMutationType[T] extends { url: infer U } ? U : any;
+
 export type AppMutationOptions<T extends keyof ApiMutationType> = Omit<
-    UseMutationOptions<ApiMutationType[T]["response"], Error, ApiMutationType[T]["payload"]>,
+    UseMutationOptions<ExtractResponse<T>, Error, ExtractPayload<T>>,
     "mutationFn"
 >;
 
@@ -17,15 +21,15 @@ export const useAppMutation = <T extends keyof ApiMutationType>({
     onSuccess,
     onError,
 }: {
-    url: ApiMutationType[T]["url"];
+    url: ExtractUrl<T>;
     method?: "POST" | "PUT" | "PATCH" | "DELETE";
     options?: AppMutationOptions<T>;
-    onSuccess?: (data: ApiMutationType[T]["response"], payload: ApiMutationType[T]["payload"]) => void;
-    onError?: (error: any, payload: ApiMutationType[T]["payload"]) => void;
+    onSuccess?: (data: ExtractResponse<T>, payload: ExtractPayload<T>) => void;
+    onError?: (error: any, payload: ExtractPayload<T>) => void;
 }) => {
-    return useMutation<ApiMutationType[T]["response"], Error, ApiMutationType[T]["payload"]>({
+    return useMutation<ExtractResponse<T>, Error, ExtractPayload<T>>({
         ...options,
-        mutationFn: async (payload: ApiMutationType[T]["payload"]): Promise<ApiMutationType[T]["response"]> => {
+        mutationFn: async (payload: ExtractPayload<T>): Promise<ExtractResponse<T>> => {
             // merge urlParams from definition and payload if payload is a plain object and contains urlParams
             const mergedParams = {
                 ...(url as any)?.urlParams,
@@ -34,7 +38,7 @@ export const useAppMutation = <T extends keyof ApiMutationType>({
             };
 
             const urlApi = replaceDynamicValues(
-                url.baseUrl,
+                (url as any).baseUrl,
                 mergedParams
             );
 
@@ -53,13 +57,12 @@ export const useAppMutation = <T extends keyof ApiMutationType>({
                     default:
                         response = await axiosClient.post(urlApi, payload);
                 }
-                const data = response as ApiMutationType[T]["response"];
+                const data = response as ExtractResponse<T>;
                 onSuccess?.(data, payload);
                 return data;
             } catch (error) {
                 onError?.(error, payload);
                 return Promise.reject(error);
-            } finally {
             }
         },
     });

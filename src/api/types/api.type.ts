@@ -369,12 +369,12 @@ export type ApiMutationType = {
     };
     markNotificationAsRead: {
         url: { baseUrl: "/communication/notifications/:id/read"; urlParams: { id: number } };
-        payload: undefined;
+        payload: { urlParams?: { id: number } } | undefined;
         response: any;
     };
     markAllNotificationsAsRead: {
         url: { baseUrl: "/communication/notifications/read-all" };
-        payload: undefined;
+        payload: { urlParams?: { id: number } } | undefined;
         response: any;
     };
 
@@ -401,7 +401,7 @@ export type ApiMutationType = {
     };
     deleteUser: {
         url: { baseUrl: "/users/:id"; urlParams: { id: number } };
-        payload: undefined;
+        payload: { urlParams?: { id: number } } | undefined;
         response: void;
     };
 
@@ -418,7 +418,7 @@ export type ApiMutationType = {
     };
     deleteYear: {
         url: { baseUrl: "/academic/years/:id"; urlParams: { id: number } };
-        payload: undefined;
+        payload: { urlParams?: { id: number } } | undefined;
         response: void;
     };
     createSemester: {
@@ -433,7 +433,7 @@ export type ApiMutationType = {
     };
     deleteSemester: {
         url: { baseUrl: "/academic/semesters/:id"; urlParams: { id: number } };
-        payload: undefined;
+        payload: { urlParams?: { id: number } } | undefined;
         response: void;
     };
     createSubject: {
@@ -448,7 +448,7 @@ export type ApiMutationType = {
     };
     deleteSubject: {
         url: { baseUrl: "/academic/subjects/:id"; urlParams: { id: number } };
-        payload: undefined;
+        payload: { urlParams?: { id: number } } | undefined;
         response: void;
     };
     createClass: {
@@ -463,7 +463,7 @@ export type ApiMutationType = {
     };
     deleteClass: {
         url: { baseUrl: "/academic/classes/:id"; urlParams: { id: number } };
-        payload: undefined;
+        payload: { urlParams?: { id: number } } | undefined;
         response: void;
     };
     cloneClasses: {
@@ -484,7 +484,7 @@ export type ApiMutationType = {
     };
     deleteClassYear: {
         url: { baseUrl: "/academic/class-years/:id"; urlParams: { id: number } };
-        payload: undefined;
+        payload: { urlParams?: { id: number } } | undefined;
         response: void;
     };
     // NEW: Khoi (Grades) mutations
@@ -500,7 +500,7 @@ export type ApiMutationType = {
     };
     deleteKhoi: {
         url: { baseUrl: "/academic/grades/:id"; urlParams: { id: number } };
-        payload: undefined;
+        payload: { urlParams?: { id: number } } | undefined;
         response: void;
     };
     createAssignment: {
@@ -515,7 +515,7 @@ export type ApiMutationType = {
     };
     deleteAssignment: {
         url: { baseUrl: "/academic/assignments/:id"; urlParams: { id: number } };
-        payload: undefined;
+        payload: { urlParams?: { id: number } } | undefined;
         response: void;
     };
     createGradeRecord: {
@@ -530,7 +530,7 @@ export type ApiMutationType = {
     };
     deleteGradeRecord: {
         url: { baseUrl: "/academic/grades-records/:id"; urlParams: { id: number } };
-        payload: undefined;
+        payload: { urlParams?: { id: number } } | undefined;
         response: void;
     };
 
@@ -572,7 +572,7 @@ export type ApiMutationType = {
     };
     removeQuestionFromExam: {
         url: { baseUrl: "/assessments/exams/:id/questions/:questionId"; urlParams: { id: number; questionId: number } };
-        payload: undefined;
+        payload: { urlParams?: { id: number; questionId: number } } | undefined;
         response: void;
     };
 
@@ -607,12 +607,12 @@ export type ApiMutationType = {
     };
     updateBanner: {
         url: { baseUrl: "/portal/banners/:id"; urlParams?: { id: number } };
-        payload: Partial<TBanner> & { id: number };
+        payload: Partial<TBanner> & { id: number; urlParams?: { id: number } } | undefined;
         response: TBanner;
     };
     deleteBanner: {
         url: { baseUrl: "/portal/banners/:id"; urlParams?: { id: number } };
-        payload: { id: number };
+        payload: { id: number; urlParams?: { id: number } } | undefined;
         response: void;
     };
     createPost: {
@@ -622,12 +622,12 @@ export type ApiMutationType = {
     };
     updatePost: {
         url: { baseUrl: "/portal/posts/:id"; urlParams?: { id: number } };
-        payload: Partial<TBaiViet> & { id: number };
+        payload: Partial<TBaiViet> & { id: number; urlParams?: { id: number } } | undefined;
         response: TBaiViet;
     };
     deletePost: {
         url: { baseUrl: "/portal/posts/:id"; urlParams?: { id: number } };
-        payload: { id: number };
+        payload: { id: number; urlParams?: { id: number } } | undefined;
         response: void;
     };
     createComment: {
@@ -637,7 +637,7 @@ export type ApiMutationType = {
     };
     deleteComment: {
         url: { baseUrl: "/portal/comments/:id"; urlParams?: { id: number } };
-        payload: { id: number };
+        payload: { id: number; urlParams?: { id: number } } | undefined;
         response: void;
     };
     // Upload
@@ -664,7 +664,7 @@ export type ApiMutationType = {
     };
     deleteCalendar: {
         url: { baseUrl: "/calendar/:id"; urlParams: { id: number } };
-        payload: undefined;
+        payload: { urlParams?: { id: number } } | undefined;
         response: void;
     };
 
@@ -723,19 +723,19 @@ export type ApiMutationType = {
     };
     likeThread: {
         url: { baseUrl: "/social/threads/:id/like"; urlParams?: { id: number } };
-        payload: { urlParams?: { id: number } };
+        payload: { urlParams?: { id: number } } | undefined;
         response: { liked: boolean };
     };
     followUser: {
         url: { baseUrl: "/social/users/:id/follow"; urlParams?: { id: number } };
-        payload: { urlParams?: { id: number } };
+        payload: { urlParams?: { id: number } } | undefined;
         response: { following: boolean };
     };
 
     // Friends
     sendFriendRequest: {
         url: { baseUrl: "/friends/request/:id"; urlParams: { id: number } };
-        payload: undefined;
+        payload: { urlParams?: { id: number } } | undefined;
         response: any;
     };
     handleFriendRequest: {
@@ -745,7 +745,7 @@ export type ApiMutationType = {
     };
     unfriend: {
         url: { baseUrl: "/friends/:id"; urlParams: { id: number } };
-        payload: undefined;
+        payload: { urlParams?: { id: number } } | undefined;
         response: any;
     };
     // --- Chat ---
@@ -772,7 +772,7 @@ export type ApiMutationType = {
     };
     deleteOrganization: {
         url: { baseUrl: "/organizations/:id"; urlParams: { id: number } };
-        payload: undefined;
+        payload: { urlParams?: { id: number } } | undefined;
         response: any;
     };
     addOrgMember: {
@@ -782,6 +782,7 @@ export type ApiMutationType = {
     };
     removeOrgMember: {
         url: { baseUrl: "/organizations/:id/members/:userId"; urlParams: { id: number; userId: number } };
+        payload: { urlParams?: { id: number; userId: number } } | undefined;
         response: any;
     };
     updateOrgMemberRole: {
