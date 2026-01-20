@@ -10,7 +10,7 @@ export default function AdminDashboard() {
         { title: t("stats.total_students"), value: "1,234", icon: IconUsers, color: "blue", trend: "+12%" },
         { title: t("stats.active_courses"), value: "45", icon: IconBooks, color: "green", trend: "+5%" },
         { title: t("stats.pending_requests"), value: "12", icon: IconAlertCircle, color: "orange", trend: "-2%" },
-        { title: t("stats.total_students"), value: "890", icon: IconCheck, color: "teal", trend: "+18%" },
+        { title: t("stats.total_teachers"), value: "89", icon: IconCheck, color: "teal", trend: "+18%" },
     ];
 
     return (

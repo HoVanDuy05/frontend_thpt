@@ -1,9 +1,9 @@
-const CACHE_NAME = 'thpt-nguyen-he-cache-1';
+const CACHE_NAME = 'thpt-nguyen-he-cache-2';
 const ASSETS_TO_CACHE = [
     '/offline.html',
     '/manifest.json',
     '/favicon.png',
-    '/icons/icon-192x192.png',
+    '/icons/icon-512x512.png',
     '/icons/icon-512x512.png',
 ];
 

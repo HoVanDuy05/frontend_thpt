@@ -178,7 +178,7 @@ export interface TApproveStepDto {
 // Organization DTOs
 export interface TCreateOrganizationDto {
     ten: string;
-    ma: string;
+    ma?: string;
     moTa?: string;
     hinhAnh?: string;
     loaiToChuc?: string;

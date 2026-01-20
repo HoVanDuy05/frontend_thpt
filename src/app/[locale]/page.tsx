@@ -64,73 +64,6 @@ export default function LandingPage() {
 
                         <Container size="xl" className="relative z-10 px-4">
                             <Stack gap={60}>
-                                <Box className="text-center max-w-4xl mx-auto">
-                                    <Group gap="xs" mb="xl" justify="center">
-                                        <Badge
-                                            size="lg"
-                                            variant="filled"
-                                            className="bg-blue-600/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-200 px-5 py-2 uppercase tracking-[0.2em] font-black border-none rounded-full h-auto text-[10px] sm:text-xs"
-                                        >
-                                            Elite Education
-                                        </Badge>
-                                        <Badge
-                                            size="lg"
-                                            variant="outline"
-                                            color="indigo"
-                                            className="px-5 py-2 uppercase tracking-[0.2em] font-black rounded-full h-auto text-[10px] sm:text-xs border-blue-500/20"
-                                        >
-                                            since 1975
-                                        </Badge>
-                                    </Group>
-
-                                    <Title className="text-5xl sm:text-8xl lg:text-9xl font-[1000] leading-[0.9] tracking-tight text-zinc-900 dark:text-white mb-8 sm:mb-12 text-balance">
-                                        Kiến Tạo <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent italic">Tương Lai</span> Vững Bước.
-                                    </Title>
-
-                                    <Text className="text-zinc-600 dark:text-zinc-400 font-bold leading-relaxed max-w-2xl mx-auto text-lg sm:text-2xl mb-12">
-                                        Nơi hội tụ tri thức, bản lĩnh và lòng nhân ái. Chúng tôi xây dựng môi trường giáo dục khai phóng để mỗi cá nhân tỏa sáng.
-                                    </Text>
-
-                                    <Group gap="md" justify="center">
-                                        {!isLoggedIn ? (
-                                            <>
-                                                <Button
-                                                    size="xl"
-                                                    radius="2rem"
-                                                    className="bg-zinc-900 dark:bg-white dark:text-zinc-900 hover:scale-[1.02] active:scale-95 h-16 sm:h-20 px-10 sm:px-14 text-lg sm:text-xl font-black shadow-2xl transition-all duration-300 flex-1 sm:flex-none border-none"
-                                                    component={Link}
-                                                    href="/auth/register"
-                                                    rightSection={<IconArrowRight size={26} stroke={3} />}
-                                                >
-                                                    Gia nhập ngay
-                                                </Button>
-                                                <Button
-                                                    size="xl"
-                                                    radius="2rem"
-                                                    variant="white"
-                                                    className="border border-zinc-200 dark:border-zinc-800 dark:bg-zinc-900 dark:text-white h-16 sm:h-20 px-10 sm:px-14 text-lg sm:text-xl font-bold hover:bg-zinc-50 dark:hover:bg-zinc-800 flex-1 sm:flex-none shadow-sm"
-                                                    component={Link}
-                                                    href="/auth/login"
-                                                    leftSection={<IconLogin size={24} stroke={2.5} />}
-                                                >
-                                                    Đăng nhập
-                                                </Button>
-                                            </>
-                                        ) : (
-                                            <Button
-                                                size="xl"
-                                                radius="2rem"
-                                                className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:scale-[1.02] active:scale-95 h-16 sm:h-20 px-12 sm:px-20 text-lg sm:text-xl font-black shadow-2xl shadow-blue-600/20 transition-all duration-300 flex-1 sm:flex-none border-none"
-                                                onClick={handleAccessPortal}
-                                                leftSection={<IconLayoutDashboard size={28} stroke={3} />}
-                                                rightSection={<IconArrowRight size={24} stroke={3} />}
-                                            >
-                                                Truy cập Hệ thống
-                                            </Button>
-                                        )}
-                                    </Group>
-                                </Box>
-
                                 <Box className="relative w-full max-w-6xl mx-auto h-[400px] sm:h-[600px] lg:h-[700px]">
                                     {/* Slider Implementation */}
                                     {isLoadingBanners ? (
@@ -202,6 +135,73 @@ export default function LandingPage() {
                                         <IconAward size={40} className="text-yellow-500" stroke={3} />
                                         <Text fw={1000} size="sm" className="text-center">TOP SCHOOL</Text>
                                     </Box>
+                                </Box>
+
+                                <Box className="text-center max-w-4xl mx-auto">
+                                    <Group gap="xs" mb="xl" justify="center">
+                                        <Badge
+                                            size="lg"
+                                            variant="filled"
+                                            className="bg-blue-600/10 text-blue-600 dark:bg-blue-400/10 dark:text-blue-200 px-5 py-2 uppercase tracking-[0.2em] font-black border-none rounded-full h-auto text-[10px] sm:text-xs"
+                                        >
+                                            Elite Education
+                                        </Badge>
+                                        <Badge
+                                            size="lg"
+                                            variant="outline"
+                                            color="indigo"
+                                            className="px-5 py-2 uppercase tracking-[0.2em] font-black rounded-full h-auto text-[10px] sm:text-xs border-blue-500/20"
+                                        >
+                                            since 1975
+                                        </Badge>
+                                    </Group>
+
+                                    <Title className="text-5xl sm:text-8xl lg:text-9xl font-[1000] leading-[0.9] tracking-tight text-zinc-900 dark:text-white mb-8 sm:mb-12 text-balance">
+                                        Kiến Tạo <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent italic">Tương Lai</span> Vững Bước.
+                                    </Title>
+
+                                    <Text className="text-zinc-600 dark:text-zinc-400 font-bold leading-relaxed max-w-2xl mx-auto text-lg sm:text-2xl mb-12">
+                                        Nơi hội tụ tri thức, bản lĩnh và lòng nhân ái. Chúng tôi xây dựng môi trường giáo dục khai phóng để mỗi cá nhân tỏa sáng.
+                                    </Text>
+
+                                    <Group gap="md" justify="center">
+                                        {!isLoggedIn ? (
+                                            <>
+                                                <Button
+                                                    size="xl"
+                                                    radius="2rem"
+                                                    className="bg-zinc-900 dark:bg-white dark:text-zinc-900 hover:scale-[1.02] active:scale-95 h-16 sm:h-20 px-10 sm:px-14 text-lg sm:text-xl font-black shadow-2xl transition-all duration-300 flex-1 sm:flex-none border-none"
+                                                    component={Link}
+                                                    href="/auth/register"
+                                                    rightSection={<IconArrowRight size={26} stroke={3} />}
+                                                >
+                                                    Gia nhập ngay
+                                                </Button>
+                                                <Button
+                                                    size="xl"
+                                                    radius="2rem"
+                                                    variant="white"
+                                                    className="border border-zinc-200 dark:border-zinc-800 dark:bg-zinc-900 dark:text-white h-16 sm:h-20 px-10 sm:px-14 text-lg sm:text-xl font-bold hover:bg-zinc-50 dark:hover:bg-zinc-800 flex-1 sm:flex-none shadow-sm"
+                                                    component={Link}
+                                                    href="/auth/login"
+                                                    leftSection={<IconLogin size={24} stroke={2.5} />}
+                                                >
+                                                    Đăng nhập
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <Button
+                                                size="xl"
+                                                radius="2rem"
+                                                className="bg-gradient-to-r from-blue-600 to-indigo-700 hover:scale-[1.02] active:scale-95 h-16 sm:h-20 px-12 sm:px-20 text-lg sm:text-xl font-black shadow-2xl shadow-blue-600/20 transition-all duration-300 flex-1 sm:flex-none border-none"
+                                                onClick={handleAccessPortal}
+                                                leftSection={<IconLayoutDashboard size={28} stroke={3} />}
+                                                rightSection={<IconArrowRight size={24} stroke={3} />}
+                                            >
+                                                Truy cập Hệ thống
+                                            </Button>
+                                        )}
+                                    </Group>
                                 </Box>
 
                                 <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg" className="max-w-xl mx-auto">

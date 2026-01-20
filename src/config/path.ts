@@ -33,7 +33,9 @@ export const PMS_PATH = {
         BANNERS: "/admin/portal/banners",
         POSTS: "/admin/portal/posts",
         COMMENTS: "/admin/portal/comments",
-        ORGANIZATIONS: "/admin/portal/organizations",
+    },
+    ORGANIZATIONS: {
+        ROOT: "/admin/organizations",
     },
     COMMUNICATION: {
         ROOT: "/admin/communication",

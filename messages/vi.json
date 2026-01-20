@@ -31,9 +31,9 @@
             "title": "Cổng thông tin",
             "banners": "Banners",
             "posts": "Bài viết",
-            "comments": "Bình luận",
-            "organizations": "Tổ chức"
+            "comments": "Bình luận"
         },
+        "organizations": "Tổ chức",
         "communication": {
             "title": "Liên lạc",
             "notifications": "Thông báo",

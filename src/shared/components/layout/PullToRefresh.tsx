@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, Suspense } from "react";
 import { Loader } from "@mantine/core";
 import { useRouter } from "next/navigation";
 
@@ -72,7 +72,7 @@ export function PullToRefresh({
             setIsRefreshing(false);
             reset();
         }
-    }, [isRefreshing, reset, router, thresholdPx]);
+    }, [isRefreshing, reset, router]);
 
     useEffect(() => {
         const el = containerRef.current;
@@ -131,7 +131,7 @@ export function PullToRefresh({
             el.removeEventListener("touchend", onTouchEnd);
             el.removeEventListener("touchcancel", onTouchEnd);
         };
-    }, [canStartPull, isRefreshing, maxPullPx, pullPx, reset, thresholdPx, triggerRefresh]);
+    }, [canStartPull, findScrollableAncestor, isRefreshing, maxPullPx, pullPx, reset, thresholdPx, triggerRefresh]);
 
     const showLoader = isRefreshing || pullPx > 0;
     const progress = Math.min(1, pullPx / thresholdPx);
@@ -168,9 +168,9 @@ export function PullToRefresh({
                 </div>
             )}
 
-            <div>
+            <Suspense fallback={null}>
                 {children}
-            </div>
+            </Suspense>
         </div>
     );
 }

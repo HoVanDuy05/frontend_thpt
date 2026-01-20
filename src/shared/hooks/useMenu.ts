@@ -203,14 +203,15 @@ export const useMenu = () => {
                             icon: IconMessage,
                             showMenu: true,
                         },
-                        {
-                            key: "organizations",
-                            label: t("menu.portal.organizations"),
-                            path: PMS_PATH.PORTAL.ORGANIZATIONS,
-                            icon: IconHierarchy,
-                            showMenu: hasScreen(EScreen.ORGANIZATION_MANAGEMENT),
-                        },
                     ],
+                },
+                {
+                    key: "organizations",
+                    label: t("menu.organizations"),
+                    path: PMS_PATH.ORGANIZATIONS.ROOT,
+                    icon: IconHierarchy,
+                    color: "#fab005",
+                    showMenu: hasScreen(EScreen.ORGANIZATION_MANAGEMENT),
                 },
                 {
                     key: "communication",

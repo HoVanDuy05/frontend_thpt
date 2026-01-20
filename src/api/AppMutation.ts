@@ -1,6 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useAppStore } from "@/providers/store/useAppStore";
 import { useAppMutation } from "./hooks/useAppMutation";
+import { notifications } from "@mantine/notifications";
 
 export const AppMutation = () => {
     const queryClient = useQueryClient();
@@ -537,6 +538,73 @@ export const AppMutation = () => {
                     queryClient.invalidateQueries({ queryKey: ["/communication/chat/channels"] as any });
                 }
             })
+        },
+        organization: {
+            useCreate: () => useAppMutation<"createOrganization">({
+                url: { baseUrl: "/organizations" },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/organizations"] as any });
+                    notifications.show({ title: 'Thành công', message: 'Đã tạo tổ chức mới', color: 'green' });
+                },
+                onError: (error) => {
+                    notifications.show({ title: 'Thất bại', message: error?.response?.data?.message || 'Không thể tạo tổ chức', color: 'red' });
+                }
+            }),
+            useUpdate: (id: number) => useAppMutation<"updateOrganization">({
+                url: { baseUrl: "/organizations/:id", urlParams: { id } },
+                method: "PATCH",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/organizations"] as any });
+                    queryClient.invalidateQueries({ queryKey: [`/organizations/${id}`] as any });
+                    notifications.show({ title: 'Thành công', message: 'Đã cập nhật tổ chức', color: 'green' });
+                },
+                onError: (error) => {
+                    notifications.show({ title: 'Thất bại', message: error?.response?.data?.message || 'Không thể cập nhật tổ chức', color: 'red' });
+                }
+            }),
+            useDelete: (id: number) => useAppMutation<"deleteOrganization">({
+                url: { baseUrl: "/organizations/:id", urlParams: { id } },
+                method: "DELETE",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ["/organizations"] as any });
+                    notifications.show({ title: 'Thành công', message: 'Đã xóa tổ chức', color: 'green' });
+                },
+                onError: (error) => {
+                    notifications.show({ title: 'Thất bại', message: error?.response?.data?.message || 'Không thể xóa tổ chức', color: 'red' });
+                }
+            }),
+            useAddMember: (id: number) => useAppMutation<"addOrgMember">({
+                url: { baseUrl: "/organizations/:id/members", urlParams: { id } },
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: [`/organizations/${id}`] as any });
+                    notifications.show({ title: 'Thành công', message: 'Đã thêm thành viên', color: 'green' });
+                },
+                onError: (error) => {
+                    notifications.show({ title: 'Thất bại', message: error?.response?.data?.message || 'Không thể thêm thành viên', color: 'red' });
+                }
+            }),
+            useRemoveMember: (id: number, userId: number) => useAppMutation<"removeOrgMember">({
+                url: { baseUrl: "/organizations/:id/members/:userId", urlParams: { id, userId } },
+                method: "DELETE",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: [`/organizations/${id}`] as any });
+                    notifications.show({ title: 'Thành công', message: 'Đã xóa thành viên', color: 'green' });
+                },
+                onError: (error) => {
+                    notifications.show({ title: 'Thất bại', message: error?.response?.data?.message || 'Không thể xóa thành viên', color: 'red' });
+                }
+            }),
+            useUpdateMemberRole: (id: number, userId: number) => useAppMutation<"updateOrgMemberRole">({
+                url: { baseUrl: "/organizations/:id/members/:userId/role", urlParams: { id, userId } },
+                method: "PATCH",
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: [`/organizations/${id}`] as any });
+                    notifications.show({ title: 'Thành công', message: 'Đã cập nhật vai trò', color: 'green' });
+                },
+                onError: (error) => {
+                    notifications.show({ title: 'Thất bại', message: error?.response?.data?.message || 'Không thể cập nhật vai trò', color: 'red' });
+                }
+            }),
         }
     };
 };
