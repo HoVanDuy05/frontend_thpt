@@ -5,7 +5,8 @@ import { TLichSuNopBai } from "@/shared/types/submission.type";
 import { TKetQuaChamDiem } from "@/shared/types/grading.type";
 import { TQueryConfig } from "@/shared/types/common.type";
 import { TLoginRequest, TLoginResponse } from "@/shared/types/auth.type";
-import { TCreateUserDto, TCreateTeacherDto, TCreateStudentDto, TCreateNamHocDto, TCreateMonHocDto, TCreateLopHocDto, TCreateLopNamDto, TCreateQuestionDto, TCreateExamDto, TCreateSubmissionDto, TCreateGradingDto, TCreateHocKyDto, TCreateKhoiDto, TCreatePhanCongGvDto, TCreateDiemDto } from "@/shared/types/dto.type";
+import { TToChuc, TThanhVienToChuc, ELoaiToChuc, EVaiTroToChuc } from "@/shared/types/organization.type";
+import { TCreateUserDto, TCreateTeacherDto, TCreateStudentDto, TCreateNamHocDto, TCreateMonHocDto, TCreateLopHocDto, TCreateLopNamDto, TCreateQuestionDto, TCreateExamDto, TCreateSubmissionDto, TCreateGradingDto, TCreateHocKyDto, TCreateKhoiDto, TCreatePhanCongGvDto, TCreateDiemDto, TCreateOrganizationDto, TAddMemberDto } from "@/shared/types/dto.type";
 import { TBanner, TBaiViet, TBinhLuan, ELoaiBaiViet } from "@/shared/types/portal.type";
 import { TQuyTrinh, TPhienQuyTrinh, TNhatKyPheDuyetQuyTrinh, TTruongFormQuyTrinh } from "@/shared/types/approval.type";
 import {
@@ -41,7 +42,11 @@ export type FriendRequest = {
 };
 
 export type ApiQueryType = {
-    // ... (rest remains same)
+    // Auth
+    login: {
+        url: { baseUrl: "/auth/login" };
+        response: TLoginResponse;
+    };
     getAllUsers: {
         url: { baseUrl: "/users"; queryParams?: TQueryConfig & { role?: string } };
         response: TUser[];
@@ -58,6 +63,15 @@ export type ApiQueryType = {
     getUserById: {
         url: { baseUrl: "/users/:id"; urlParams: { id: number } };
         response: TUser;
+    };
+    getStats: {
+        url: { baseUrl: "/stats" };
+        response: {
+            totalStudents: number;
+            totalTeachers: number;
+            totalClasses: number;
+            totalYears: number;
+        };
     };
 
     // Portal
@@ -91,7 +105,6 @@ export type ApiQueryType = {
         url: { baseUrl: "/academic/semesters/:id"; urlParams: { id: number } };
         response: THocKy;
     };
-    // ...
     getNamHocById: {
         url: { baseUrl: "/academic/years/:id"; urlParams: { id: number } };
         response: TNamHoc;
@@ -300,6 +313,16 @@ export type ApiQueryType = {
         url: { baseUrl: "/communication/chat/channels/:id/messages"; urlParams: { id: number }; queryParams?: { page?: number } };
         response: TMessage[];
     };
+
+    // Organizations
+    getOrganizations: {
+        url: { baseUrl: "/organizations" };
+        response: TToChuc[];
+    };
+    getOrganizationById: {
+        url: { baseUrl: "/organizations/:id"; urlParams: { id: number } };
+        response: TToChuc;
+    };
 };
 
 export type ApiMutationType = {
@@ -460,8 +483,8 @@ export type ApiMutationType = {
         response: TLopNam;
     };
     deleteClassYear: {
-        url: { baseUrl: "/academic/class-years/:id" };
-        payload: { urlParams: { id: number } };
+        url: { baseUrl: "/academic/class-years/:id"; urlParams: { id: number } };
+        payload: undefined;
         response: void;
     };
     // NEW: Khoi (Grades) mutations
@@ -735,6 +758,36 @@ export type ApiMutationType = {
         url: { baseUrl: "/communication/chat/messages" };
         payload: { kenhChatId: number; noiDung?: string; loai?: 'VAN_BAN' | 'HINH_ANH' | 'TEP' | 'GHI_AM'; duongDanTep?: string };
         response: TMessage;
+    };
+
+    createOrganization: {
+        url: { baseUrl: "/organizations" };
+        payload: TCreateOrganizationDto;
+        response: TToChuc;
+    };
+    updateOrganization: {
+        url: { baseUrl: "/organizations/:id"; urlParams: { id: number } };
+        payload: Partial<TCreateOrganizationDto>;
+        response: TToChuc;
+    };
+    deleteOrganization: {
+        url: { baseUrl: "/organizations/:id"; urlParams: { id: number } };
+        payload: undefined;
+        response: any;
+    };
+    addOrgMember: {
+        url: { baseUrl: "/organizations/:id/members"; urlParams: { id: number } };
+        payload: TAddMemberDto;
+        response: TThanhVienToChuc;
+    };
+    removeOrgMember: {
+        url: { baseUrl: "/organizations/:id/members/:userId"; urlParams: { id: number; userId: number } };
+        response: any;
+    };
+    updateOrgMemberRole: {
+        url: { baseUrl: "/organizations/:id/members/:userId/role"; urlParams: { id: number; userId: number } };
+        payload: { vaiTro: EVaiTroToChuc };
+        response: TThanhVienToChuc;
     };
 };
 

@@ -1,5 +1,6 @@
 import { UserRole } from "./user.type";
 import { LoaiCauHoi } from "./assessment.type";
+import { EVaiTroToChuc } from "./organization.type";
 
 // User DTOs
 export interface TCreateUserDto {
@@ -172,4 +173,18 @@ export interface TSubmitFlowInstanceDto {
 
 export interface TApproveStepDto {
     note?: string;
+}
+
+// Organization DTOs
+export interface TCreateOrganizationDto {
+    ten: string;
+    ma: string;
+    moTa?: string;
+    hinhAnh?: string;
+    loaiToChuc?: string;
+}
+
+export interface TAddMemberDto {
+    userId: number;
+    vaiTroTrongToChuc?: EVaiTroToChuc;
 }

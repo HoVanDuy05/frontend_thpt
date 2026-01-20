@@ -2,6 +2,8 @@ import { useAppQuery, AppQueryOptions } from "./hooks/useAppQuery";
 import { ApiQueryType } from "./types/api.type";
 import { TQueryConfig } from "@/shared/types/common.type";
 import { ELoaiBaiViet } from "@/shared/types/portal.type";
+import { TCreateOrganizationDto, TAddMemberDto } from "@/shared/types/dto.type";
+import { EVaiTroToChuc } from "@/shared/types/organization.type";
 
 export const AppQuery = {
     auth: {
@@ -142,6 +144,16 @@ export const AppQuery = {
                 refetchInterval: options?.refetchInterval
             }),
     },
+    status: {
+        useStats: (options?: AppQueryOptions<"getStats">) =>
+            useAppQuery({ url: { baseUrl: "/stats" }, options }),
+    },
+    organization: {
+        useOrganizations: (options?: AppQueryOptions<"getOrganizations">) =>
+            useAppQuery<"getOrganizations">({ url: { baseUrl: "/organizations" }, options }),
+        useOrganization: (id: number, options?: AppQueryOptions<"getOrganizationById">) =>
+            useAppQuery<"getOrganizationById">({ url: { baseUrl: "/organizations/:id", urlParams: { id } }, options }),
+    },
 };
 
 // --- Student Management Hooks ---
@@ -179,6 +191,91 @@ export const useAddStudentsToClass = () => {
                 message: error?.response?.data?.message || 'Có lỗi xảy ra',
                 color: 'red',
             });
+        },
+    });
+};
+
+export const useCreateOrganization = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (payload: TCreateOrganizationDto) => {
+            const { data } = await axiosClient.post('/organizations', payload);
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['/organizations'] });
+            notifications.show({ title: 'Thành công', message: 'Đã tạo tổ chức mới', color: 'green' });
+        },
+    });
+};
+
+export const useUpdateOrganization = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ id, payload }: { id: number; payload: Partial<TCreateOrganizationDto> }) => {
+            const { data } = await axiosClient.patch(`/organizations/${id}`, payload);
+            return data;
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: ['/organizations'] });
+            queryClient.invalidateQueries({ queryKey: [`/organizations/${variables.id}`] });
+            notifications.show({ title: 'Thành công', message: 'Đã cập nhật tổ chức', color: 'green' });
+        },
+    });
+};
+
+export const useDeleteOrganization = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async (id: number) => {
+            const { data } = await axiosClient.delete(`/organizations/${id}`);
+            return data;
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['/organizations'] });
+            notifications.show({ title: 'Thành công', message: 'Đã xóa tổ chức', color: 'green' });
+        },
+    });
+};
+
+export const useAddOrgMember = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ orgId, payload }: { orgId: number; payload: TAddMemberDto }) => {
+            const { data } = await axiosClient.post(`/organizations/${orgId}/members`, payload);
+            return data;
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: [`/organizations/${variables.orgId}`] });
+            notifications.show({ title: 'Thành công', message: 'Đã thêm thành viên', color: 'green' });
+        },
+    });
+};
+
+export const useRemoveOrgMember = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ orgId, userId }: { orgId: number; userId: number }) => {
+            const { data } = await axiosClient.delete(`/organizations/${orgId}/members/${userId}`);
+            return data;
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: [`/organizations/${variables.orgId}`] });
+            notifications.show({ title: 'Thành công', message: 'Đã xóa thành viên', color: 'green' });
+        },
+    });
+};
+
+export const useUpdateOrgMemberRole = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: async ({ orgId, userId, vaiTro }: { orgId: number; userId: number; vaiTro: EVaiTroToChuc }) => {
+            const { data } = await axiosClient.patch(`/organizations/${orgId}/members/${userId}/role`, { vaiTro });
+            return data;
+        },
+        onSuccess: (_, variables) => {
+            queryClient.invalidateQueries({ queryKey: [`/organizations/${variables.orgId}`] });
+            notifications.show({ title: 'Thành công', message: 'Đã cập nhật vai trò', color: 'green' });
         },
     });
 };
