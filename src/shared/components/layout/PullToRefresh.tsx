@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useRef, useState, Suspense } from "react";
+import * as React from "react";
 import { Loader } from "@mantine/core";
 import { useRouter } from "next/navigation";
 
@@ -19,17 +19,17 @@ export function PullToRefresh({
     maxPullPx = 140,
 }: PullToRefreshProps) {
     const router = useRouter();
-    const containerRef = useRef<HTMLDivElement | null>(null);
-    const activeScrollElRef = useRef<HTMLElement | null>(null);
+    const containerRef = React.useRef<HTMLDivElement | null>(null);
+    const activeScrollElRef = React.useRef<HTMLElement | null>(null);
 
-    const startYRef = useRef<number | null>(null);
-    const pullingRef = useRef(false);
+    const startYRef = React.useRef<number | null>(null);
+    const pullingRef = React.useRef(false);
 
-    const [pullPx, setPullPx] = useState(0);
-    const [isRefreshing, setIsRefreshing] = useState(false);
-    const [isReleasing, setIsReleasing] = useState(false);
+    const [pullPx, setPullPx] = React.useState(0);
+    const [isRefreshing, setIsRefreshing] = React.useState(false);
+    const [isReleasing, setIsReleasing] = React.useState(false);
 
-    const findScrollableAncestor = useCallback((target: EventTarget | null) => {
+    const findScrollableAncestor = React.useCallback((target: EventTarget | null) => {
         const container = containerRef.current;
         let node = target as HTMLElement | null;
 
@@ -44,13 +44,13 @@ export function PullToRefresh({
         return null;
     }, []);
 
-    const canStartPull = useCallback(() => {
+    const canStartPull = React.useCallback(() => {
         const activeScrollEl = activeScrollElRef.current;
         if (activeScrollEl) return activeScrollEl.scrollTop <= 0;
         return window.scrollY <= 0;
     }, []);
 
-    const reset = useCallback(() => {
+    const reset = React.useCallback(() => {
         startYRef.current = null;
         pullingRef.current = false;
         setIsReleasing(true);
@@ -58,7 +58,7 @@ export function PullToRefresh({
         window.setTimeout(() => setIsReleasing(false), 200);
     }, []);
 
-    const triggerRefresh = useCallback(async () => {
+    const triggerRefresh = React.useCallback(async () => {
         if (isRefreshing) return;
 
         setIsRefreshing(true);
@@ -74,7 +74,7 @@ export function PullToRefresh({
         }
     }, [isRefreshing, reset, router]);
 
-    useEffect(() => {
+    React.useEffect(() => {
         const el = containerRef.current;
         if (!el) return;
 
@@ -168,9 +168,9 @@ export function PullToRefresh({
                 </div>
             )}
 
-            <Suspense fallback={null}>
+            <React.Suspense fallback={null}>
                 {children}
-            </Suspense>
+            </React.Suspense>
         </div>
     );
 }

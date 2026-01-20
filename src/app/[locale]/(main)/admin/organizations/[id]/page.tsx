@@ -1,10 +1,10 @@
 "use client";
 
-import { Box, Button, Card, Container, Group, Stack, Text, Title, Badge, ActionIcon, SimpleGrid, TextInput, LoadingOverlay, Avatar, Divider, Select, Breadcrumbs, Anchor, Paper, Modal } from "@mantine/core";
+import { Box, Button, Card, Container, Group, Stack, Text, Title, Badge, ActionIcon, SimpleGrid, TextInput, LoadingOverlay, Avatar, Divider, Select, Breadcrumbs, Anchor, Paper, Modal, Checkbox, ScrollArea } from "@mantine/core";
 import { AppQuery } from "@/api/AppQuery";
 import { AppMutation } from "@/api/AppMutation";
 import { useRBAC } from "@/shared/hooks/useRBAC";
-import { IconUsers, IconTrash, IconPlus, IconSearch, IconChevronLeft } from "@tabler/icons-react";
+import { IconUsers, IconTrash, IconPlus, IconSearch, IconChevronLeft, IconCheck, IconDeviceFloppy } from "@tabler/icons-react";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
@@ -13,6 +13,7 @@ import { Link, useRouter } from "@/i18n/routing";
 import { PMS_PATH } from "@/config/path";
 import { DataTable } from "@/shared/components/DataTable/DataTable";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 
 export default function OrganizationDetailPage() {
     const params = useParams();
@@ -25,23 +26,40 @@ export default function OrganizationDetailPage() {
     const { data: users } = AppQuery.user.useList();
     const [opened, { open, close }] = useDisclosure(false);
     const isMobile = useMediaQuery("(max-width: 768px)");
+    const [selectedUserIds, setSelectedUserIds] = useState<number[]>([]);
 
     const queryClient = useQueryClient();
     const addMemberMutation = mutation.organization.useAddMember(id);
     const removeMemberMutation = mutation.organization.useRemoveMember(id, 0);
     const updateRoleMutation = mutation.organization.useUpdateMemberRole(id, 0);
 
-    const handleAddMember = (userId: number) => {
-        addMemberMutation.mutate({
-            userId: userId,
-            vaiTroTrongToChuc: EVaiTroToChuc.THANH_VIEN
-        }, {
-            onSuccess: () => {
-                queryClient.invalidateQueries({ queryKey: ["/organizations", id] });
-                setSearch("");
-                close();
-            }
-        });
+    const toggleUserSelection = (userId: number) => {
+        setSelectedUserIds(prev =>
+            prev.includes(userId)
+                ? prev.filter(id => id !== userId)
+                : [...prev, userId]
+        );
+    };
+
+    const handleAddMembers = async () => {
+        if (selectedUserIds.length === 0) return;
+
+        const promises = selectedUserIds.map(userId =>
+            addMemberMutation.mutateAsync({
+                userId,
+                vaiTroTrongToChuc: EVaiTroToChuc.THANH_VIEN
+            })
+        );
+
+        try {
+            await Promise.all(promises);
+            queryClient.invalidateQueries({ queryKey: ["/organizations", id] });
+            setSelectedUserIds([]);
+            setSearch("");
+            close();
+        } catch (error) {
+            // Error is handled by Individual mutations notifications
+        }
     };
 
     const handleRemoveMember = (userId: number) => {
@@ -63,9 +81,11 @@ export default function OrganizationDetailPage() {
     };
 
     const filteredUsers = users?.filter(u =>
+        u.vaiTro === 'GIAO_VIEN' &&
+        (!u.thanhVienToChucs || u.thanhVienToChucs.length === 0) &&
         (u.hoTen?.toLowerCase().includes(search.toLowerCase()) || u.email?.toLowerCase().includes(search.toLowerCase())) &&
         !org?.thanhViens?.some(m => m.nguoiDungId === u.id)
-    ).slice(0, 5);
+    );
 
     if (isLoading) return <LoadingOverlay visible overlayProps={{ blur: 2 }} />;
 
@@ -187,59 +207,108 @@ export default function OrganizationDetailPage() {
 
             <Modal
                 opened={opened}
-                onClose={close}
-                title="Thêm thành viên vào tổ chức"
+                onClose={() => {
+                    close();
+                    setSelectedUserIds([]);
+                }}
+                title="Thêm thành viên"
                 size="md"
                 radius="md"
                 fullScreen={isMobile}
+                padding={12}
                 overlayProps={{
                     backgroundOpacity: 0.55,
                     blur: 3,
                 }}
+                styles={{
+                    content: { height: isMobile ? '100dvh' : 'auto', display: 'flex', flexDirection: 'column' },
+                    body: { flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', padding: 0 }
+                }}
             >
-                <Stack gap="md">
-                    <TextInput
-                        placeholder="Tìm kiếm theo tên hoặc email..."
-                        leftSection={<IconSearch size={16} />}
-                        value={search}
-                        onChange={(e) => setSearch(e.currentTarget.value)}
-                        radius="md"
-                        autoFocus
-                    />
+                <Stack gap={0} style={{ flex: 1, overflow: 'hidden' }}>
+                    <Box p="md" style={{ borderBottom: '1px solid var(--mantine-color-gray-2)' }}>
+                        <TextInput
+                            placeholder="Tìm kiếm theo tên hoặc email..."
+                            leftSection={<IconSearch size={16} />}
+                            value={search}
+                            onChange={(e) => setSearch(e.currentTarget.value)}
+                            radius="md"
+                            autoFocus
+                        />
+                    </Box>
 
-                    <Text size="xs" fw={700} c="dimmed" tt="uppercase">Kết quả tìm kiếm</Text>
+                    <ScrollArea style={{ flex: 1 }} p="md">
+                        <Stack gap="md">
+                            <Group justify="space-between">
+                                <Text size="xs" fw={700} c="dimmed" tt="uppercase">
+                                    {search ? `Kết quả (${filteredUsers?.length || 0})` : 'Gợi ý thành viên'}
+                                </Text>
+                                {selectedUserIds.length > 0 && (
+                                    <Text size="xs" c="indigo" fw={600}>
+                                        Đã chọn {selectedUserIds.length}
+                                    </Text>
+                                )}
+                            </Group>
 
-                    <Stack gap="sm">
-                        {search && filteredUsers?.map(user => (
-                            <Paper key={user.id} withBorder p="xs" radius="md" style={{ cursor: 'pointer' }}
-                                onClick={() => handleAddMember(user.id)}
-                                className="hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
+                            <Stack gap="sm">
+                                {(search ? filteredUsers : users?.slice(0, 10))?.map(user => (
+                                    <Paper key={user.id} withBorder p="xs" radius="md"
+                                        onClick={() => toggleUserSelection(user.id)}
+                                        style={{
+                                            cursor: 'pointer',
+                                            backgroundColor: selectedUserIds.includes(user.id) ? 'var(--mantine-color-indigo-light)' : undefined,
+                                            borderColor: selectedUserIds.includes(user.id) ? 'var(--mantine-color-indigo-filled)' : undefined
+                                        }}
+                                        className="hover:bg-gray-50 dark:hover:bg-zinc-800 transition-colors"
+                                    >
+                                        <Group justify="space-between" wrap="nowrap">
+                                            <Group gap="sm" wrap="nowrap" style={{ flex: 1 }}>
+                                                <Avatar src={user.avatar} radius="xl" size="sm" />
+                                                <Box style={{ flex: 1 }}>
+                                                    <Text size="xs" fw={600} lineClamp={1}>{user.hoTen}</Text>
+                                                    <Text size="calc(10px)" c="dimmed" lineClamp={1}>{user.email}</Text>
+                                                </Box>
+                                            </Group>
+                                            <Checkbox
+                                                radius="xl"
+                                                checked={selectedUserIds.includes(user.id)}
+                                                onChange={() => { }} // Controlled by Paper click
+                                                tabIndex={-1}
+                                                styles={{ input: { cursor: 'pointer' } }}
+                                                color="indigo"
+                                            />
+                                        </Group>
+                                    </Paper>
+                                ))}
+                                {(search && (!filteredUsers || filteredUsers.length === 0)) && (
+                                    <Text size="sm" c="dimmed" ta="center" py="xl">Không tìm thấy</Text>
+                                )}
+                                {(!search && (!users || users.length === 0)) && (
+                                    <Text size="sm" c="dimmed" ta="center" py="xl">Không có dữ liệu</Text>
+                                )}
+                            </Stack>
+                        </Stack>
+                    </ScrollArea>
+
+                    <Box p="md" style={{ borderTop: '1px solid var(--mantine-color-gray-2)' }}>
+                        <Group justify="flex-end" grow={isMobile}>
+                            <Button variant="subtle" color="gray" onClick={close} radius="md">Hủy</Button>
+                            <Button
+                                color="indigo"
+                                radius="md"
+                                disabled={selectedUserIds.length === 0}
+                                loading={addMemberMutation.isPending}
+                                onClick={handleAddMembers}
+                                leftSection={<IconDeviceFloppy size={18} />}
                             >
-                                <Group justify="space-between">
-                                    <Group gap="sm">
-                                        <Avatar src={user.avatar} radius="xl" size="sm" />
-                                        <Box style={{ flex: 1 }}>
-                                            <Text size="xs" fw={600} lineClamp={1}>{user.hoTen}</Text>
-                                            <Text size="calc(10px)" c="dimmed" lineClamp={1}>{user.email}</Text>
-                                        </Box>
-                                    </Group>
-                                    <ActionIcon variant="light" color="indigo" size="sm" radius="md">
-                                        <IconPlus size={14} />
-                                    </ActionIcon>
-                                </Group>
-                            </Paper>
-                        ))}
-                        {search && (!filteredUsers || filteredUsers.length === 0) && (
-                            <Text size="sm" c="dimmed" ta="center" py="xl">Không tìm thấy người dùng phù hợp</Text>
-                        )}
-                        {!search && (
-                            <Text size="sm" c="dimmed" ta="center" py="xl">Nhập tên hoặc email để tìm kiếm thành viên</Text>
-                        )}
-                    </Stack>
+                                Lưu {selectedUserIds.length > 0 ? `(${selectedUserIds.length})` : ''}
+                            </Button>
+                        </Group>
+                    </Box>
                 </Stack>
             </Modal>
 
-            <LoadingOverlay visible={addMemberMutation.isPending || removeMemberMutation.isPending || updateRoleMutation.isPending} />
+            <LoadingOverlay visible={removeMemberMutation.isPending || updateRoleMutation.isPending} />
         </Container>
     );
 }

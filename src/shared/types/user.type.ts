@@ -24,6 +24,7 @@ export interface TUser {
     hoSoHocSinh?: THoSoHocSinh;
     hoSoNhanVien?: THoSoNhanVien;
     hoSoXaHoi?: THoSoXaHoi;
+    thanhVienToChucs?: { toChucId: number; nguoiDungId: number; vaiTroTrongToChuc: string }[];
 }
 
 export interface TNotification {
