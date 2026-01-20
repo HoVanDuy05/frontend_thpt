@@ -20,6 +20,7 @@ import {
     IconPhoto,
     IconChecklist,
     IconShare,
+    IconHierarchy,
     IconProps,
 } from "@tabler/icons-react";
 import { useTranslations } from "next-intl";
@@ -201,6 +202,13 @@ export const useMenu = () => {
                             path: PMS_PATH.PORTAL.COMMENTS,
                             icon: IconMessage,
                             showMenu: true,
+                        },
+                        {
+                            key: "organizations",
+                            label: t("menu.portal.organizations"),
+                            path: PMS_PATH.PORTAL.ORGANIZATIONS,
+                            icon: IconHierarchy,
+                            showMenu: hasScreen(EScreen.ORGANIZATION_MANAGEMENT),
                         },
                     ],
                 },

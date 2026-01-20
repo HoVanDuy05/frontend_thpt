@@ -21,6 +21,7 @@ export function useRBAC() {
                     EScreen.REPORT_MANAGEMENT,
                     EScreen.COMMUNICATION_MANAGEMENT, // Teacher can use chat/notifications
                     EScreen.PORTAL_MANAGEMENT, // Teacher can post articles
+                    EScreen.ORGANIZATION_MANAGEMENT,
                 ];
                 return teacherScreens.includes(screen);
             }

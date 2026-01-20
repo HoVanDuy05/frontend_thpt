@@ -32,7 +32,8 @@
             "title": "Portal",
             "banners": "Banners",
             "posts": "Posts",
-            "comments": "Comments"
+            "comments": "Comments",
+            "organizations": "Organizations"
         },
         "communication": {
             "title": "Communication",
