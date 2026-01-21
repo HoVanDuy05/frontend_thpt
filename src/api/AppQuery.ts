@@ -76,7 +76,7 @@ export const AppQuery = {
     portal: {
         useBanners: (activeOnly?: boolean, options?: AppQueryOptions<"getBanners">) =>
             useAppQuery({ url: { baseUrl: "/portal/banners", queryParams: { activeOnly } }, options }),
-        usePosts: (params?: { activeOnly?: boolean; type?: ELoaiBaiViet }, options?: AppQueryOptions<"getPosts">) =>
+        usePosts: (params?: { activeOnly?: boolean; type?: ELoaiBaiViet; role?: string }, options?: AppQueryOptions<"getPosts">) =>
             useAppQuery({ url: { baseUrl: "/portal/posts", queryParams: params }, options }),
         usePostDetail: (slugOrId: string | number, options?: AppQueryOptions<"getPostDetail">) =>
             useAppQuery({ url: { baseUrl: "/portal/posts/:slugOrId", urlParams: { slugOrId } }, options }),

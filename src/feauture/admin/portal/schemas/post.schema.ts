@@ -9,6 +9,7 @@ export const postSchema = z.object({
     anhBia: z.string().nullable().optional(),
     loai: z.nativeEnum(ELoaiBaiViet),
     daXuatBan: z.boolean().default(false),
+    doiTuong: z.array(z.string()).optional(),
 });
 
 export type TPostSchema = z.infer<typeof postSchema>;

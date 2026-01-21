@@ -1,6 +1,6 @@
 "use client";
 
-import { TextInput, Textarea, Select, Switch, Button, Stack, Group, Paper, Title, Text, Grid, Box, ActionIcon, Space, rem } from "@mantine/core";
+import { TextInput, Textarea, Select, MultiSelect, Switch, Button, Stack, Group, Paper, Title, Text, Grid, Box, ActionIcon, Space, rem } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useTranslations } from "next-intl";
 import { postSchema, TPostSchema } from "../schemas/post.schema";
@@ -84,6 +84,7 @@ export function PostForm({ initialData, onSubmit, loading, title }: PostFormProp
                 anhBia: initialData.anhBia || "",
                 loai: initialData.loai,
                 daXuatBan: initialData.daXuatBan,
+                doiTuong: initialData.doiTuong || [],
             });
             form.resetDirty(initialData as any);
         }
@@ -266,6 +267,23 @@ export function PostForm({ initialData, onSubmit, loading, title }: PostFormProp
                                         leftSection={<IconCategory size={18} />}
                                         {...form.getInputProps("loai")}
                                     />
+
+                                    {form.values.loai === ELoaiBaiViet.THONG_BAO_CHUNG && (
+                                        <MultiSelect
+                                            label={t("target_audience_label") || "Đối tượng nhận"}
+                                            placeholder="Chọn đối tượng (Để trống = Tất cả)"
+                                            data={[
+                                                { value: "HOC_SINH", label: "Học sinh" },
+                                                { value: "GIAO_VIEN", label: "Giáo viên" },
+                                                { value: "NHAN_VIEN", label: "Nhân viên" },
+                                                { value: "PHU_HUYNH", label: "Phụ huynh" },
+                                            ]}
+                                            clearable
+                                            searchable
+                                            hidePickedOptions
+                                            {...form.getInputProps("doiTuong")}
+                                        />
+                                    )}
                                 </Stack>
                             </Paper>
 

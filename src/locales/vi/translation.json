@@ -407,7 +407,8 @@
                 "publish_description": "Bài viết sẽ hiển thị trên web",
                 "category_label": "Chuyên mục",
                 "thumbnail_label": "Ảnh bìa",
-                "thumbnail_description": "Tỉ lệ khuyến nghị 16:9. Dung lượng tối đa 5MB."
+                "thumbnail_description": "Tỉ lệ khuyến nghị 16:9. Dung lượng tối đa 5MB.",
+                "target_audience_label": "Đối tượng nhận"
             },
             "tabs": {
                 "news": "Tin tức",

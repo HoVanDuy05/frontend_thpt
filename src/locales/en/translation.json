@@ -410,7 +410,8 @@
                 "publish_description": "The post will be visible on the website",
                 "category_label": "Category",
                 "thumbnail_label": "Thumbnail",
-                "thumbnail_description": "Recommended ratio 16:9. Max size 5MB."
+                "thumbnail_description": "Recommended ratio 16:9. Max size 5MB.",
+                "target_audience_label": "Target Audience"
             },
             "tabs": {
                 "news": "News",

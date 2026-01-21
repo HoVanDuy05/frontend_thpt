@@ -1,3 +1,4 @@
+"use client";
 import { Container, Stack, Title, Text, Group, Button, SimpleGrid, Card, ThemeIcon, Badge, Avatar, rem, Progress, Box, Divider } from "@mantine/core";
 import { IconUsers, IconBooks, IconAlertCircle, IconCheck, IconActivity, IconSettings, IconChartBar, IconBell, IconBuildingSkyscraper, IconNews, IconClipboardCheck, IconArrowRight, IconCalendarStats, IconFingerprint, IconChevronRight } from "@tabler/icons-react";
 import { useTranslations } from "next-intl";

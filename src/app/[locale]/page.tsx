@@ -47,7 +47,7 @@ export default function LandingPage() {
             <Box component="main" className="flex-1">
                 <Box className="overflow-hidden bg-white dark:bg-zinc-950">
                     {/* Hero Section */}
-                    <section className="relative pt-24 pb-8 sm:pt-32 sm:pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
+                    <section className="relative pt-4 pb-8 sm:pt-8 sm:pb-20 lg:pt-12 lg:pb-32 overflow-hidden">
                         {/* Advanced Background Ornaments */}
                         <Box className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
                             <div className="absolute top-[-10%] right-[-10%] w-[400px] sm:w-[800px] h-[400px] sm:h-[800px] bg-blue-500/10 dark:bg-blue-600/5 rounded-full blur-[80px] sm:blur-[160px] animate-[pulse_8s_infinite]" />
@@ -273,9 +273,11 @@ export default function LandingPage() {
                                     news.map((post) => (
                                         <Card
                                             key={post.id}
-                                            radius="16px"
+                                            radius="24px"
                                             padding={0}
-                                            className="group relative bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col"
+                                            className="group relative bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 overflow-hidden flex flex-col"
+                                            component={Link}
+                                            href={`/notifications/${post.duongDan}`}
                                         >
                                             <Box className="relative aspect-[16/10] overflow-hidden">
                                                 <Image

@@ -29,6 +29,7 @@ export interface TBaiViet {
     loai: ELoaiBaiViet;
     daXuatBan: boolean;
     luotXem: number;
+    doiTuong?: string[] | null;
     nguoiTaoId: number | null;
     ngayTao: string;
     ngayCapNhat: string;
