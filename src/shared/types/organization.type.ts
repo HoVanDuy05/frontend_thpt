@@ -23,6 +23,9 @@ export interface TToChuc {
     loaiToChuc: ELoaiToChuc;
     ngayTao: string;
     ngayCapNhat: string;
+    parentId?: number | null;
+    parent?: Partial<TToChuc> | null;
+    children?: Partial<TToChuc>[];
     thanhViens?: TThanhVienToChuc[];
     _count?: {
         thanhViens: number;
