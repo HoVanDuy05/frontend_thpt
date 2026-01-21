@@ -71,6 +71,9 @@ export type ApiQueryType = {
             totalTeachers: number;
             totalClasses: number;
             totalYears: number;
+            totalOrgs: number;
+            totalPosts: number;
+            pendingApprovals: number;
         };
     };
 

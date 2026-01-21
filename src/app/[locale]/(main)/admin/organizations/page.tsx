@@ -22,7 +22,7 @@ interface TreeItem extends TToChuc {
 }
 
 const OrgCard = ({ org, onEdit, onDelete, isAdmin }: { org: TToChuc; onEdit: (org: TToChuc) => void; onDelete: (id: number) => void; isAdmin: boolean }) => (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
+    <Card shadow="xs" padding="lg" radius="xl" withBorder className="border-zinc-100 hover:shadow-md transition-shadow">
         <Card.Section withBorder inheritPadding py="xs">
             <Group justify="space-between">
                 <Text fw={600} size="lg">{org.ten}</Text>
@@ -88,7 +88,7 @@ const TreeNode = ({ node, onEdit, onDelete, isAdmin }: { node: TreeItem; onEdit:
 
     return (
         <Box>
-            <Card withBorder radius="md" p="xs" className="hover:bg-gray-50 transition-colors">
+            <Card withBorder radius="xl" p="md" className="hover:bg-zinc-50 transition-colors border-zinc-100 shadow-sm">
                 <Group justify="space-between" wrap="nowrap">
                     <Group gap="xs" wrap="nowrap">
                         <ActionIcon
@@ -276,23 +276,28 @@ export default function OrganizationManagementPage() {
     return (
         <Container size="xl" py="md">
             <Stack gap="xl">
-                <Group justify="space-between" align="center">
-                    <Stack gap={0}>
-                        <Title order={2}>Quản lý Tổ chức & Phòng ban</Title>
-                        <Text c="dimmed">Quản lý cơ cấu tổ chức, các tổ chuyên môn và đoàn thể trong nhà trường</Text>
+                <Group justify="space-between" align="center" wrap="nowrap">
+                    <Stack gap={2}>
+                        <Title order={2} fw={800} size="h3">Cơ cấu Tổ chức</Title>
+                        <Text c="dimmed" size="sm" fw={500}>Quản lý nhân sự và phân cấp phòng ban</Text>
                     </Stack>
-                    <Group gap="sm">
+                    <Group gap="xs">
                         <TextInput
                             placeholder="Tìm kiếm..."
                             leftSection={<IconSearch size={16} />}
                             value={searchTerm}
                             onChange={(e) => setParam("search", e.currentTarget.value)}
-                            radius="md"
-                            w={{ base: '100%', sm: 250 }}
+                            radius="xl"
+                            w={{ base: 150, sm: 220 }}
                         />
                         {isAdmin && (
-                            <Button leftSection={<IconPlus size={18} />} onClick={open} radius="md">
-                                Thêm tổ chức
+                            <Button
+                                leftSection={<IconPlus size={18} />}
+                                onClick={open}
+                                radius="xl"
+                                className="bg-indigo-600 hover:bg-indigo-700 shadow-md"
+                            >
+                                Thêm mới
                             </Button>
                         )}
                     </Group>
@@ -332,91 +337,95 @@ export default function OrganizationManagementPage() {
                 opened={opened}
                 onClose={handleClose}
                 title={
-                    <Stack gap={0}>
-                        <Title order={3} fw={900}>{editingOrg ? "Cập nhật tổ chức" : "Thêm tổ chức mới"}</Title>
-                        <Text size="xs" c="dimmed" fw={500}>Thông tin sẽ được lưu trữ vào hệ thống cơ cấu nhà trường</Text>
+                    <Stack gap={2}>
+                        <Text fw={900} size="xl">{editingOrg ? "Cập nhật tổ chức" : "Tạo tổ chức mới"}</Text>
+                        <Text size="xs" c="dimmed" fw={500}>Nhập đầy đủ thông tin để định danh tổ chức trong hệ thống</Text>
                     </Stack>
                 }
                 centered
-                radius="lg"
+                radius="24px"
                 size="lg"
                 fullScreen={isMobile}
-                transitionProps={{ transition: 'fade', duration: 200 }}
+                padding="xl"
                 overlayProps={{
                     backgroundOpacity: 0.55,
-                    blur: 3,
+                    blur: 4,
                 }}
             >
                 <form onSubmit={form.onSubmit(handleCreate)}>
-                    <Stack gap="md" py="md">
-                        {editingOrg && (
+                    <Stack gap="lg">
+                        <SimpleGrid cols={{ base: 1, sm: editingOrg ? 2 : 1 }} spacing="md">
+                            {editingOrg && (
+                                <TextInput
+                                    label="Mã định danh"
+                                    disabled
+                                    variant="filled"
+                                    radius="lg"
+                                    {...form.getInputProps("ma")}
+                                />
+                            )}
                             <TextInput
-                                label="Mã tổ chức"
-                                disabled
-                                size="md"
-                                radius="md"
-                                {...form.getInputProps("ma")}
+                                label="Tên tổ chức"
+                                placeholder="Tổ Toán, Phòng Hành chính..."
+                                required
+                                radius="lg"
+                                {...form.getInputProps("ten")}
                             />
-                        )}
-                        <TextInput
-                            label="Tên tổ chức"
-                            placeholder="Ví dụ: Tổ Toán - Tin, Đoàn thanh niên..."
-                            required
-                            size="md"
-                            radius="md"
-                            {...form.getInputProps("ten")}
-                        />
+                        </SimpleGrid>
 
-                        <Select
-                            label="Loại tổ chức"
-                            placeholder="Chọn loại hình tổ chức"
-                            size="md"
-                            radius="md"
-                            data={[
-                                { value: ELoaiToChuc.CHUYEN_MON, label: "Tổ chuyên môn" },
-                                { value: ELoaiToChuc.HANH_CHINH, label: "Phòng ban hành chính" },
-                                { value: ELoaiToChuc.DOAN_THE, label: "Đoàn thể" },
-                                { value: ELoaiToChuc.KHAC, label: "Khác" },
-                            ]}
-                            {...form.getInputProps("loaiToChuc")}
-                        />
+                        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+                            <Select
+                                label="Loại hình"
+                                placeholder="Chọn loại..."
+                                radius="lg"
+                                data={[
+                                    { value: ELoaiToChuc.CHUYEN_MON, label: "Tổ chuyên môn" },
+                                    { value: ELoaiToChuc.HANH_CHINH, label: "Hành chính" },
+                                    { value: ELoaiToChuc.DOAN_THE, label: "Đoàn thể" },
+                                    { value: ELoaiToChuc.KHAC, label: "Khác" },
+                                ]}
+                                {...form.getInputProps("loaiToChuc")}
+                            />
 
-                        <Select
-                            label="Cấp trên"
-                            placeholder="Chọn tổ chức cấp trên (nếu có)"
-                            size="md"
-                            radius="md"
-                            clearable
-                            searchable
-                            data={organizations?.filter(o => o.id !== editingOrg?.id).map(o => ({
-                                value: String(o.id),
-                                label: o.ten
-                            })) || []}
-                            {...form.getInputProps("parentId")}
-                            onChange={(val) => form.setFieldValue("parentId", val ? Number(val) : null)}
-                        />
+                            <Select
+                                label="Trực thuộc (Cấp trên)"
+                                placeholder="Gốc (Không có)"
+                                radius="lg"
+                                clearable
+                                searchable
+                                data={organizations?.filter(o => o.id !== editingOrg?.id).map(o => ({
+                                    value: String(o.id),
+                                    label: o.ten
+                                })) || []}
+                                value={form.values.parentId ? String(form.values.parentId) : null}
+                                onChange={(val) => form.setFieldValue("parentId", val ? Number(val) : null)}
+                            />
+                        </SimpleGrid>
 
                         <Textarea
-                            label="Mô tả"
-                            placeholder="Nhập mô tả chi tiết về chức năng, nhiệm vụ..."
-                            size="md"
-                            radius="md"
+                            label="Mô tả nhiệm vụ"
+                            placeholder="Chức năng, quyền hạn và nhiệm vụ chính..."
+                            radius="lg"
                             minRows={3}
                             {...form.getInputProps("moTa")}
                         />
 
-                        <Box mt="xl">
+                        <Divider my="xs" label="Thao tác" labelPosition="center" />
+
+                        <Group justify="flex-end" gap="sm">
+                            <Button variant="subtle" color="gray" onClick={handleClose} radius="xl">
+                                Hủy bỏ
+                            </Button>
                             <Button
                                 type="submit"
                                 loading={createMutation.isPending || updateMutation.isPending}
-                                fullWidth
-                                size="lg"
-                                radius="md"
-                                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-lg shadow-blue-500/20"
+                                radius="xl"
+                                px="xl"
+                                className="bg-indigo-600 hover:bg-indigo-700 shadow-md shadow-indigo-100"
                             >
-                                {editingOrg ? "Lưu thay đổi" : "Tạo tổ chức"}
+                                {editingOrg ? "Lưu thay đổi" : "Xác nhận tạo"}
                             </Button>
-                        </Box>
+                        </Group>
                     </Stack>
                 </form>
             </Modal>

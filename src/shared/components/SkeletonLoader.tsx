@@ -3,7 +3,7 @@
 import { Skeleton, Stack, Table, Grid, Card, SimpleGrid, Group, Box, Paper } from "@mantine/core";
 
 interface SkeletonLoaderProps {
-    type: "table" | "cards" | "dashboard" | "form" | "stats" | "threads" | "users";
+    type: "table" | "cards" | "dashboard" | "form" | "stats" | "threads" | "users" | "list";
     count?: number;
 }
 
@@ -126,6 +126,30 @@ export function SkeletonLoader({ type, count = 5 }: SkeletonLoaderProps) {
                     </Box>
                 ))}
                 <Skeleton h={45} w={120} radius="md" />
+            </Stack>
+        );
+    }
+
+    if (type === "list") {
+        return (
+            <Stack gap="xs">
+                {Array(count).fill(0).map((_, i) => (
+                    <Paper key={i} p="md" radius="xl" bg="transparent" className="border border-zinc-100 dark:border-zinc-800">
+                        <Group justify="space-between" wrap="nowrap">
+                            <Group gap="md" wrap="nowrap" style={{ flex: 1 }}>
+                                <Skeleton height={54} circle />
+                                <Stack gap={4} style={{ flex: 1 }}>
+                                    <Group gap="xs">
+                                        <Skeleton height={16} width="40%" />
+                                        <Skeleton height={14} width={50} radius="xs" />
+                                    </Group>
+                                    <Skeleton height={12} width="30%" />
+                                </Stack>
+                            </Group>
+                            <Skeleton height={34} width={100} radius="md" />
+                        </Group>
+                    </Paper>
+                ))}
             </Stack>
         );
     }
