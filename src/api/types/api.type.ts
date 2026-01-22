@@ -217,7 +217,7 @@ export type ApiQueryType = {
         response: any[];
     };
     getMySchedule: {
-        url: { baseUrl: "/calendar/student/my-schedule" };
+        url: { baseUrl: "/calendar/student/my-schedule"; queryParams?: { from?: string; to?: string; namHocId?: number } };
         response: any[];
     };
 

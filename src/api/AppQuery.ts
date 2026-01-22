@@ -54,8 +54,8 @@ export const AppQuery = {
             useAppQuery({ url: { baseUrl: "/calendar", queryParams: params }, options }),
         useByLopNam: (id: number, options?: AppQueryOptions<"getCalendarByLopNam">) =>
             useAppQuery({ url: { baseUrl: "/calendar/lopnam/:id", urlParams: { id } }, options }),
-        useMySchedule: (options?: AppQueryOptions<"getMySchedule">) =>
-            useAppQuery({ url: { baseUrl: "/calendar/student/my-schedule" }, options }),
+        useMySchedule: (params?: { from?: string; to?: string; namHocId?: number }, options?: AppQueryOptions<"getMySchedule">) =>
+            useAppQuery({ url: { baseUrl: "/calendar/student/my-schedule", queryParams: params }, options }),
     },
     assessment: {
         useQuestions: (params?: TQueryConfig, options?: AppQueryOptions<"getQuestions">) =>

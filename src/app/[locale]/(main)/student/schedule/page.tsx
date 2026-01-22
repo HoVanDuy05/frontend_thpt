@@ -21,8 +21,26 @@ export default function SchedulePage() {
         return () => clearInterval(timer);
     }, []);
 
+    // Date calculations
+    const startOfWeek = useMemo(() => {
+        const day = selectedDate.day();
+        const diff = day === 0 ? -6 : 1 - day;
+        return selectedDate.add(diff, 'day').startOf('day');
+    }, [selectedDate]);
+
+    const weekDays = useMemo(() => Array.from({ length: 7 }).map((_, i) => ({
+        date: startOfWeek.add(i, 'day'),
+        dayName: startOfWeek.add(i, 'day').format('dd'),
+        dayNumber: startOfWeek.add(i, 'day').format('DD'),
+        isToday: startOfWeek.add(i, 'day').isSame(dayjs(), 'day'),
+        isSelected: startOfWeek.add(i, 'day').isSame(selectedDate, 'day')
+    })), [startOfWeek, selectedDate]);
+
     // Fetch student schedule
-    const { data: scheduleData, isLoading } = AppQuery.calendar.useMySchedule();
+    const { data: scheduleData, isLoading } = AppQuery.calendar.useMySchedule({
+        from: startOfWeek.format("YYYY-MM-DD"),
+        to: startOfWeek.add(6, 'day').format("YYYY-MM-DD")
+    });
 
     // Helper functions
     const COLORS = ['indigo', 'teal', 'blue', 'violet', 'grape', 'pink', 'orange', 'cyan', 'lime'];
@@ -54,21 +72,6 @@ export default function SchedulePage() {
         const endTime = now.hour(eh).minute(em).second(59);
         return now.isAfter(startTime) && now.isBefore(endTime);
     };
-
-    // Date calculations
-    const startOfWeek = useMemo(() => {
-        const day = selectedDate.day();
-        const diff = day === 0 ? -6 : 1 - day;
-        return selectedDate.add(diff, 'day').startOf('day');
-    }, [selectedDate]);
-
-    const weekDays = useMemo(() => Array.from({ length: 7 }).map((_, i) => ({
-        date: startOfWeek.add(i, 'day'),
-        dayName: startOfWeek.add(i, 'day').format('dd'),
-        dayNumber: startOfWeek.add(i, 'day').format('DD'),
-        isToday: startOfWeek.add(i, 'day').isSame(dayjs(), 'day'),
-        isSelected: startOfWeek.add(i, 'day').isSame(selectedDate, 'day')
-    })), [startOfWeek, selectedDate]);
 
     // Data Filtering
     const dailySchedule = useMemo(() => {
