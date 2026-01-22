@@ -212,6 +212,14 @@ export type ApiQueryType = {
         url: { baseUrl: "/calendar/class/:id", urlParams: { id: number } };
         response: any[];
     };
+    getCalendarByLopNam: {
+        url: { baseUrl: "/calendar/lopnam/:id", urlParams: { id: number } };
+        response: any[];
+    };
+    getMySchedule: {
+        url: { baseUrl: "/calendar/student/my-schedule" };
+        response: any[];
+    };
 
     // Approvals
     getAllFlows: {
