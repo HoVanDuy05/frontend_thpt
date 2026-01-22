@@ -17,6 +17,7 @@ import { AppQuery } from "@/api/AppQuery";
 import { AppMutation } from "@/api/AppMutation";
 import { notifications } from "@mantine/notifications";
 import { modals } from "@mantine/modals";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import { CalendarModal } from "../CalendarModal";
 import { useRouter, useParams } from "next/navigation";
@@ -45,6 +46,7 @@ export default function ClassSchedulePage() {
     const router = useRouter();
     const params = useParams();
     const lopNamId = params.id as string;
+    const queryClient = useQueryClient();
 
     // State
     const [opened, { open, close }] = useDisclosure(false);
@@ -54,9 +56,15 @@ export default function ClassSchedulePage() {
 
     const isMobile = useMediaQuery("(max-width: 48em)");
 
-    // Calculate start and end of week
-    const startOfWeek = currentDate.startOf('week').add(1, 'day'); // Monday
-    const endOfWeek = startOfWeek.add(6, 'days'); // Sunday
+    // Calculate start and end of week robustly
+    const startOfWeek = useMemo(() => {
+        // Find Monday of the week containing currentDate
+        const day = currentDate.day();
+        const diff = day === 0 ? -6 : 1 - day; // Adjust for Sunday (0)
+        return currentDate.add(diff, 'day').startOf('day');
+    }, [currentDate]);
+
+    const endOfWeek = useMemo(() => startOfWeek.add(6, 'days').endOf('day'), [startOfWeek]);
 
     const weekDays = useMemo(() => {
         return Array.from({ length: 7 }).map((_, i) => ({
@@ -96,6 +104,9 @@ export default function ClassSchedulePage() {
             onConfirm: async () => {
                 try {
                     await mutations.academic.useDeleteCalendar(id).mutateAsync({});
+                    queryClient.invalidateQueries({
+                        predicate: (query) => !!query.queryKey[0]?.toString().startsWith("/calendar")
+                    });
                     notifications.show({ title: 'Thành công', message: 'Đã xóa lịch học', color: 'green' });
                 } catch (error) {
                     notifications.show({ title: 'Thất bại', message: 'Không thể xóa lịch học', color: 'red' });
@@ -115,6 +126,9 @@ export default function ClassSchedulePage() {
                 await createMutation.mutateAsync(payload as any);
                 notifications.show({ title: 'Thành công', message: "Đã tạo lịch học mới", color: "green" });
             }
+            queryClient.invalidateQueries({
+                predicate: (query) => !!query.queryKey[0]?.toString().startsWith("/calendar")
+            });
             close();
         } catch (error) {
             notifications.show({ title: 'Thất bại', message: "Thao tác thất bại", color: "red" });
@@ -143,9 +157,13 @@ export default function ClassSchedulePage() {
         <Paper withBorder radius="md" className="overflow-x-auto relative min-h-[500px]">
             <LoadingOverlay visible={isLoadingSchedule} />
             <Box style={{ minWidth: 1000 }}>
-                <SimpleGrid cols={8} spacing={0} className="border-b dark:border-zinc-800 bg-gray-50 dark:bg-zinc-900/50">
+                <SimpleGrid
+                    cols={8}
+                    spacing={0}
+                    className="border-b dark:border-zinc-800 bg-gray-50/95 dark:bg-zinc-900/95 backdrop-blur-sm sticky top-0 z-30 shadow-sm"
+                >
                     <Box
-                        className="p-4 border-r dark:border-zinc-800 flex items-center justify-center sticky left-0 z-20 bg-gray-50 dark:bg-zinc-900"
+                        className="p-4 border-r dark:border-zinc-800 flex items-center justify-center sticky left-0 z-40 bg-gray-100 dark:bg-zinc-800"
                         style={{ left: 0 }}
                     >
                         <Text fw={700} c="dimmed" size="sm">Tiết / Thứ</Text>
@@ -196,34 +214,45 @@ export default function ClassSchedulePage() {
                                                 radius="md"
                                                 style={{
                                                     backgroundColor: `var(--mantine-color-${eventColor}-light)`,
-                                                    borderLeft: `4px solid var(--mantine-color-${eventColor}-filled)`
+                                                    border: `1px solid var(--mantine-color-${eventColor}-outline)`,
+                                                    borderLeftWidth: 4,
+                                                    borderLeftColor: `var(--mantine-color-${eventColor}-filled)`
                                                 }}
-                                                className="h-full cursor-pointer hover:brightness-95 transition-all z-10"
+                                                className="h-full cursor-pointer hover:brightness-95 transition-all z-10 overflow-visible"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleOpenEdit(event);
                                                 }}
                                             >
-                                                <Group justify="space-between" align="start" gap={2} wrap="nowrap">
-                                                    <Text fw={700} size="xs" lineClamp={2} title={event.monHoc?.tenMon}>
+                                                <Group justify="space-between" align="start" gap={2} wrap="nowrap" mb={4}>
+                                                    <Text fw={700} size="xs" lineClamp={2} title={event.monHoc?.tenMon} c={`${eventColor}.9`}>
                                                         {event.monHoc?.tenMon}
                                                     </Text>
-                                                    <Menu shadow="md" width={100}>
-                                                        <Menu.Target>
-                                                            <ActionIcon size="xs" variant="transparent" onClick={(e) => e.stopPropagation()}>
-                                                                <IconDots size={12} />
-                                                            </ActionIcon>
-                                                        </Menu.Target>
-                                                        <Menu.Dropdown>
-                                                            <Menu.Item leftSection={<IconTrash size={12} />} color="red" onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                handleDelete(event.id);
-                                                            }}>Xóa</Menu.Item>
-                                                        </Menu.Dropdown>
-                                                    </Menu>
+                                                    <ActionIcon
+                                                        size="xs"
+                                                        variant="transparent"
+                                                        color="red"
+                                                        className="opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDelete(event.id);
+                                                        }}
+                                                    >
+                                                        <IconTrash size={14} />
+                                                    </ActionIcon>
                                                 </Group>
-                                                <Text size="10px" c="dimmed" lineClamp={1}>{event.gvDay?.hoTen}</Text>
-                                                {event.phongHoc && <Text size="10px" c="dimmed">{event.phongHoc}</Text>}
+                                                <Stack gap={0}>
+                                                    <Group gap={4} wrap="nowrap">
+                                                        <IconUser size={10} />
+                                                        <Text size="10px" fw={500} lineClamp={1}>{event.gvDay?.hoTen}</Text>
+                                                    </Group>
+                                                    {event.phongHoc && (
+                                                        <Group gap={4} wrap="nowrap">
+                                                            <IconChalkboard size={10} />
+                                                            <Text size="10px" c="dimmed">{event.phongHoc}</Text>
+                                                        </Group>
+                                                    )}
+                                                </Stack>
                                             </Card>
                                         ) : (
                                             <Box
@@ -291,15 +320,22 @@ export default function ClassSchedulePage() {
                                     </Text>
                                     <Stack gap={2}>
                                         {scheduleData
-                                            ?.filter((item: any) => item.ngay && dayjs(item.ngay).isSame(date, 'day'))
+                                            ?.filter((item: any) => {
+                                                if (item.ngay) {
+                                                    return dayjs(item.ngay).isSame(date, 'day');
+                                                }
+                                                // If no specific date, but recurring day matches
+                                                // This handles recurring events if they exist
+                                                return item.thu === (date.day() === 0 ? 8 : date.day() + 1);
+                                            })
                                             .map((event: any) => (
                                                 <Badge
                                                     key={event.id}
-                                                    variant="dot"
+                                                    variant="filled"
                                                     color={getEventColor(event.monHocId)}
                                                     size="xs"
                                                     fullWidth
-                                                    styles={{ label: { textTransform: 'none' } }}
+                                                    styles={{ label: { textTransform: 'none', cursor: 'pointer' } }}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         handleOpenEdit(event);
@@ -351,7 +387,6 @@ export default function ClassSchedulePage() {
                             ]}
                             size="xs"
                             color="indigo"
-                            visibleFrom="sm"
                         />
 
                         <Group gap={5} wrap="nowrap">

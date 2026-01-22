@@ -234,21 +234,27 @@ export const AppMutation = () => {
             useCreateCalendar: () => useAppMutation<"createCalendar">({
                 url: { baseUrl: "/calendar" },
                 onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ["/calendar"] as any });
+                    queryClient.invalidateQueries({
+                        predicate: (query) => !!query.queryKey[0]?.toString().startsWith("/calendar")
+                    });
                 }
             }),
             useUpdateCalendar: (id: number) => useAppMutation<"updateCalendar">({
                 url: { baseUrl: "/calendar/:id", urlParams: { id } },
                 method: "PATCH",
                 onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ["/calendar"] as any });
+                    queryClient.invalidateQueries({
+                        predicate: (query) => !!query.queryKey[0]?.toString().startsWith("/calendar")
+                    });
                 }
             }),
             useDeleteCalendar: (id: number) => useAppMutation<"deleteCalendar">({
                 url: { baseUrl: "/calendar/:id", urlParams: { id } },
                 method: "DELETE",
                 onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ["/calendar"] as any });
+                    queryClient.invalidateQueries({
+                        predicate: (query) => !!query.queryKey[0]?.toString().startsWith("/calendar")
+                    });
                 }
             }),
             useCreateKhoi: () => useAppMutation<"createKhoi">({
