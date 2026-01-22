@@ -49,7 +49,7 @@ export default function SemesterDetailPage() {
         [studentProfile, yearId]
     );
 
-    const { data: calendarData, isLoading: isLoadingCalendar } = AppQuery.calendar.useByClass(yearRecord?.lopNam?.lopId || 0);
+    const { data: calendarData, isLoading: isLoadingCalendar } = AppQuery.calendar.useByLopNam(yearRecord?.lopNamId || 0);
 
     const breadcrumbItems = useMemo(
         () => [

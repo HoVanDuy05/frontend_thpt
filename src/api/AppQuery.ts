@@ -50,8 +50,8 @@ export const AppQuery = {
             useAppQuery({ url: { baseUrl: "/academic/grades-records/:id", urlParams: { id } }, options }),
     },
     calendar: {
-        useList: (options?: AppQueryOptions<"getCalendars">) =>
-            useAppQuery({ url: { baseUrl: "/calendar" }, options }),
+        useList: (params?: { from?: string; to?: string; lopNamId?: number }, options?: AppQueryOptions<"getCalendars">) =>
+            useAppQuery({ url: { baseUrl: "/calendar", queryParams: params }, options }),
         useByLopNam: (id: number, options?: AppQueryOptions<"getCalendarByLopNam">) =>
             useAppQuery({ url: { baseUrl: "/calendar/lopnam/:id", urlParams: { id } }, options }),
         useMySchedule: (options?: AppQueryOptions<"getMySchedule">) =>

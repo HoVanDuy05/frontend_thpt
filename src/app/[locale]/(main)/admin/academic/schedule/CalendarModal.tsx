@@ -1,9 +1,12 @@
 "use client";
 
 import { Modal, Select, NumberInput, TextInput, Button, Stack, Group } from "@mantine/core";
+import { DatePickerInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
+import { useMediaQuery } from "@mantine/hooks";
 import { useEffect } from "react";
 import { AppQuery } from "@/api/AppQuery";
+import dayjs from "dayjs";
 
 interface CalendarModalProps {
     opened: boolean;
@@ -41,6 +44,7 @@ export function CalendarModal({ opened, onClose, onSubmit, initialData, loading,
             tietBatDau: 1,
             soTiet: 1,
             phongHoc: "",
+            ngay: null as Date | null,
         },
         validate: {
             monHocId: (value) => (!value ? "Vui lòng chọn môn học" : null),
@@ -60,6 +64,7 @@ export function CalendarModal({ opened, onClose, onSubmit, initialData, loading,
                     tietBatDau: initialData.tietBatDau || 1,
                     soTiet: initialData.soTiet || 1,
                     phongHoc: initialData.phongHoc || "",
+                    ngay: initialData.ngay ? new Date(initialData.ngay) : null,
                 });
             } else {
                 form.reset();
@@ -75,6 +80,7 @@ export function CalendarModal({ opened, onClose, onSubmit, initialData, loading,
             tietBatDau: Number(values.tietBatDau),
             soTiet: Number(values.soTiet),
             phongHoc: values.phongHoc?.trim() || null,
+            ngay: values.ngay ? dayjs(values.ngay).format('YYYY-MM-DD') : null,
         };
 
         if (values.gvDayId && values.gvDayId !== "") {
@@ -86,6 +92,8 @@ export function CalendarModal({ opened, onClose, onSubmit, initialData, loading,
         onSubmit(payload);
     };
 
+    const isMobile = useMediaQuery("(max-width: 48em)");
+
     return (
         <Modal
             opened={opened}
@@ -93,10 +101,17 @@ export function CalendarModal({ opened, onClose, onSubmit, initialData, loading,
             title={initialData?.id ? "Chỉnh sửa lịch học" : "Thêm lịch học mới"}
             radius="md"
             size="lg"
-            fullScreen={(typeof window !== 'undefined' && window.innerWidth < 768)}
+            fullScreen={isMobile}
         >
             <form onSubmit={form.onSubmit(handleSubmit)}>
                 <Stack gap="md">
+                    <DatePickerInput
+                        label="Ngày"
+                        placeholder="Chọn ngày (tùy chọn)"
+                        valueFormat="DD/MM/YYYY"
+                        {...form.getInputProps("ngay")}
+                        clearable
+                    />
                     <Select
                         label="Môn học"
                         placeholder="Chọn môn học"
@@ -132,7 +147,10 @@ export function CalendarModal({ opened, onClose, onSubmit, initialData, loading,
                             ]}
                             {...form.getInputProps("thu")}
                             value={String(form.values.thu)}
-                            onChange={(val) => form.setFieldValue("thu", Number(val))}
+                            onChange={(val) => {
+                                form.setFieldValue("thu", Number(val));
+                                // If day is selected, maybe we don't need to update 'thu' manually but keep it in sync
+                            }}
                         />
                         <NumberInput
                             label="Tiết bắt đầu"

@@ -205,7 +205,7 @@ export type ApiQueryType = {
     };
     // Calendar
     getCalendars: {
-        url: { baseUrl: "/calendar" };
+        url: { baseUrl: "/calendar"; queryParams?: { from?: string; to?: string; lopNamId?: number } };
         response: any[];
     };
     getCalendarByClass: {
