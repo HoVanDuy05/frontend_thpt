@@ -1,46 +1,31 @@
-"use client";
-
-import { Container, Stack, Title, Card, Text, Badge, Group, Box, ScrollArea, ActionIcon, Timeline, ThemeIcon, LoadingOverlay } from "@mantine/core";
-import { IconBook, IconClock, IconMapPin, IconCalendarEvent, IconChevronLeft, IconChevronRight, IconUser } from "@tabler/icons-react";
+import { Container, Stack, Title, Card, Text, Badge, Group, Box, ScrollArea, ActionIcon, Timeline, ThemeIcon, LoadingOverlay, SegmentedControl, Button, Tooltip, SimpleGrid, Paper, Center } from "@mantine/core";
+import { IconBook, IconClock, IconMapPin, IconCalendarEvent, IconChevronLeft, IconChevronRight, IconUser, IconRefresh, IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { dayjs } from "@/shared/utils/date.util";
 import { useTranslations } from "next-intl";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { AppQuery } from "@/api/AppQuery";
 
 export default function SchedulePage() {
     const t = useTranslations("student.nav");
 
-    // Simulate current date state
+    // State
+    const [view, setView] = useState<'day' | 'week' | 'month'>('day');
     const [selectedDate, setSelectedDate] = useState(dayjs());
-    const startOfWeek = selectedDate.startOf('week');
+    const [now, setNow] = useState(dayjs());
+
+    // Update 'now' every minute to refresh "current class" highlight
+    useEffect(() => {
+        const timer = setInterval(() => setNow(dayjs()), 60000);
+        return () => clearInterval(timer);
+    }, []);
 
     // Fetch student schedule
     const { data: scheduleData, isLoading } = AppQuery.calendar.useMySchedule();
 
-    // Generate week days for the horizontal strip
-    const weekDays = Array.from({ length: 7 }).map((_, i) => {
-        const date = startOfWeek.add(i + 1, 'day'); // Start from Monday
-        return {
-            date: date,
-            dayName: date.format('dd'), // Mo, Tu, We... (need locale config for these to be VN)
-            dayNumber: date.format('DD'),
-            isToday: date.isSame(dayjs(), 'day'),
-            isSelected: date.isSame(selectedDate, 'day')
-        };
-    });
+    // Helper functions
+    const COLORS = ['indigo', 'teal', 'blue', 'violet', 'grape', 'pink', 'orange', 'cyan', 'lime'];
+    const getEventColor = (monHocId: number) => COLORS[(monHocId || 0) % COLORS.length];
 
-    // Map day of week (2-7, 8) to selected date's day
-    const selectedDayOfWeek = selectedDate.day() === 0 ? 8 : selectedDate.day() + 1; // Convert Sunday (0) to 8, others +1
-
-    // Filter schedule by selected day
-    const filteredSchedule = useMemo(() => {
-        if (!scheduleData) return [];
-        return scheduleData
-            .filter((item: any) => item.thu === selectedDayOfWeek)
-            .sort((a: any, b: any) => a.tietBatDau - b.tietBatDau);
-    }, [scheduleData, selectedDayOfWeek]);
-
-    // Helper to get time range for a period
     const getTimeRange = (tietBatDau: number, soTiet: number) => {
         const periods = [
             { start: '07:00', end: '07:45' },
@@ -55,137 +40,304 @@ export default function SchedulePage() {
             { start: '16:30', end: '17:15' },
         ];
         const startPeriod = periods[tietBatDau - 1];
-        const endPeriod = periods[tietBatDau + soTiet - 2];
-        if (!startPeriod || !endPeriod) return 'N/A';
-        return `${startPeriod.start} - ${endPeriod.end}`;
+        const endPeriod = periods[tietBatDau + (soTiet || 1) - 2];
+        if (!startPeriod || !endPeriod) return { startText: '--:--', endText: '--:--', startRaw: '00:00', endRaw: '00:00' };
+        return { startText: startPeriod.start, endText: endPeriod.end, startRaw: startPeriod.start, endRaw: endPeriod.end };
+    };
+
+    const isCurrentlyHappening = (startT: string, endT: string) => {
+        const [sh, sm] = startT.split(':').map(Number);
+        const [eh, em] = endT.split(':').map(Number);
+        const startTime = now.hour(sh).minute(sm);
+        const endTime = now.hour(eh).minute(em).second(59);
+        return now.isAfter(startTime) && now.isBefore(endTime);
+    };
+
+    // Date calculations
+    const startOfWeek = useMemo(() => {
+        const day = selectedDate.day();
+        const diff = day === 0 ? -6 : 1 - day;
+        return selectedDate.add(diff, 'day').startOf('day');
+    }, [selectedDate]);
+
+    const weekDays = useMemo(() => Array.from({ length: 7 }).map((_, i) => ({
+        date: startOfWeek.add(i, 'day'),
+        dayName: startOfWeek.add(i, 'day').format('dd'),
+        dayNumber: startOfWeek.add(i, 'day').format('DD'),
+        isToday: startOfWeek.add(i, 'day').isSame(dayjs(), 'day'),
+        isSelected: startOfWeek.add(i, 'day').isSame(selectedDate, 'day')
+    })), [startOfWeek, selectedDate]);
+
+    // Data Filtering
+    const dailySchedule = useMemo(() => {
+        if (!scheduleData) return [];
+        const dow = selectedDate.day() === 0 ? 8 : selectedDate.day() + 1;
+        return scheduleData
+            .filter((item: any) => {
+                const sameDay = item.thu === dow;
+                const matchesDate = item.ngay ? dayjs(item.ngay).isSame(selectedDate, 'day') : true;
+                // If it has a date, prioritize it. If not, it's a recurring weekly entry.
+                if (item.ngay) return dayjs(item.ngay).isSame(selectedDate, 'day');
+                return sameDay;
+            })
+            .sort((a: any, b: any) => a.tietBatDau - b.tietBatDau);
+    }, [scheduleData, selectedDate]);
+
+    // Navigation
+    const prevDate = () => setSelectedDate(prev => prev.subtract(1, view === 'day' ? 'day' : view === 'week' ? 'week' : 'month'));
+    const nextDate = () => setSelectedDate(prev => prev.add(1, view === 'day' ? 'day' : view === 'week' ? 'week' : 'month'));
+    const goToToday = () => setSelectedDate(dayjs());
+
+    // --- Render Components ---
+
+    const renderDayView = () => (
+        <Timeline active={-1} bulletSize={30} lineWidth={2}>
+            {dailySchedule.map((cls: any, index: number) => {
+                const time = getTimeRange(cls.tietBatDau, cls.soTiet);
+                const isNow = isCurrentlyHappening(time.startRaw, time.endRaw) && selectedDate.isSame(dayjs(), 'day');
+                const color = getEventColor(cls.monHocId);
+
+                return (
+                    <Timeline.Item
+                        key={cls.id}
+                        bullet={
+                            <Box className={`w-full h-full rounded-full flex items-center justify-center transition-all ${isNow ? 'bg-indigo-600 shadow-[0_0_10px_rgba(79,70,229,0.5)] scale-110' : 'bg-gray-200 dark:bg-zinc-800'}`}>
+                                <Text size="xs" fw={700} c={isNow ? "white" : "dimmed"}>{cls.tietBatDau}</Text>
+                            </Box>
+                        }
+                    >
+                        <Box className="ml-2 mb-8">
+                            <Group gap="xs" mb={8}>
+                                <Badge size="sm" variant="filled" color={isNow ? 'indigo' : 'gray'} className="font-mono">
+                                    {time.startText} - {time.endText}
+                                </Badge>
+                                {isNow && (
+                                    <Badge size="xs" color="red" variant="dot" className="animate-pulse">ĐANG DIỄN RA</Badge>
+                                )}
+                            </Group>
+
+                            <Card
+                                p="md"
+                                radius="xl"
+                                shadow={isNow ? "md" : "sm"}
+                                style={{
+                                    border: isNow ? '2px solid var(--mantine-color-indigo-6)' : '1px solid var(--mantine-color-gray-2)',
+                                    borderLeftWidth: 6,
+                                    borderLeftColor: `var(--mantine-color-${color}-filled)`,
+                                    backgroundColor: `var(--mantine-color-${color}-light)`
+                                }}
+                                className="hover:scale-[1.01] transition-transform cursor-pointer"
+                            >
+                                <Group justify="space-between" align="start">
+                                    <Stack gap={2}>
+                                        <Text fw={900} size="xl" color={`${color}.9`}>
+                                            {cls.monHoc?.tenMon}
+                                        </Text>
+                                        <Group gap="md">
+                                            <Group gap={4}>
+                                                <IconUser size={16} className="text-gray-500" />
+                                                <Text size="sm" fw={600}>{cls.gvDay?.hoTen || 'Giao viên tự do'}</Text>
+                                            </Group>
+                                            <Group gap={4}>
+                                                <IconMapPin size={16} className="text-gray-500" />
+                                                <Text size="sm" c="dimmed">{cls.phongHoc || 'Sân trường'}</Text>
+                                            </Group>
+                                        </Group>
+                                    </Stack>
+                                    <ThemeIcon size={40} radius="md" variant="white" color={color}>
+                                        <IconBook size={20} />
+                                    </ThemeIcon>
+                                </Group>
+                            </Card>
+                        </Box>
+                    </Timeline.Item>
+                );
+            })}
+            {dailySchedule.length === 0 && (
+                <Center h={300}>
+                    <Stack align="center" gap="xs" className="opacity-40">
+                        <IconCalendarEvent size={64} stroke={1} />
+                        <Text fw={500}>Hôm nay bạn không có lịch học</Text>
+                    </Stack>
+                </Center>
+            )}
+        </Timeline>
+    );
+
+    const renderWeekView = () => (
+        <Paper withBorder radius="md" p={0} className="overflow-x-auto relative min-h-[500px]">
+            <Box style={{ minWidth: 1000 }}>
+                {/* Header DOW */}
+                <SimpleGrid cols={8} spacing={0} className="border-b sticky top-0 z-30 bg-gray-50/95 dark:bg-zinc-900/95 backdrop-blur-sm">
+                    <Box className="p-4 border-r flex items-center justify-center sticky left-0 z-40 bg-gray-100">
+                        <Text fw={700} size="sm" c="dimmed">Tiết / Thứ</Text>
+                    </Box>
+                    {weekDays.map((day, i) => (
+                        <Box key={i} className={`p-4 border-r dark:border-zinc-800 text-center ${day.isToday ? 'bg-indigo-50/50' : ''}`}>
+                            <Text size="xs" fw={700} c="indigo" tt="uppercase">{day.dayName}</Text>
+                            <Text size="lg" fw={800}>{day.dayNumber}</Text>
+                        </Box>
+                    ))}
+                </SimpleGrid>
+
+                {/* Grid Content */}
+                {Array.from({ length: 10 }).map((_, periodIndex) => (
+                    <SimpleGrid key={periodIndex} cols={8} spacing={0} className="border-b dark:border-zinc-800 group h-24">
+                        <Box className="border-r dark:border-zinc-800 flex flex-col items-center justify-center sticky left-0 z-20 bg-gray-50">
+                            <Text fw={700} size="sm" c="dimmed">Tiết {periodIndex + 1}</Text>
+                        </Box>
+
+                        {weekDays.map((day, dayIndex) => {
+                            const dow = dayIndex + 2; // 2-8
+                            const events = scheduleData?.filter((item: any) => {
+                                const matchedDow = item.thu === dow;
+                                const matchedDate = item.ngay ? dayjs(item.ngay).isSame(day.date, 'day') : true;
+                                const matchedPeriod = item.tietBatDau === periodIndex + 1;
+                                if (item.ngay) return dayjs(item.ngay).isSame(day.date, 'day') && matchedPeriod;
+                                return matchedDow && matchedPeriod;
+                            });
+
+                            return (
+                                <Box key={dayIndex} className="p-1 border-r dark:border-zinc-800 min-h-[80px]">
+                                    {events?.map((event: any) => (
+                                        <Card
+                                            key={event.id}
+                                            p="xs"
+                                            radius="sm"
+                                            style={{
+                                                backgroundColor: `var(--mantine-color-${getEventColor(event.monHocId)}-light)`,
+                                                borderLeftWidth: 3,
+                                                borderLeftColor: `var(--mantine-color-${getEventColor(event.monHocId)}-filled)`
+                                            }}
+                                            className="h-full"
+                                        >
+                                            <Text fw={700} size="xs" lineClamp={2} c={`${getEventColor(event.monHocId)}.9`}>
+                                                {event.monHoc?.tenMon}
+                                            </Text>
+                                            <Text size="10px" truncate>{event.phongHoc}</Text>
+                                        </Card>
+                                    ))}
+                                </Box>
+                            );
+                        })}
+                    </SimpleGrid>
+                ))}
+            </Box>
+        </Paper>
+    );
+
+    const renderMonthView = () => {
+        // Very basic custom calendar for month
+        const firstDayOfMonth = selectedDate.startOf('month');
+        const startOfCalendar = firstDayOfMonth.startOf('week').add(1, 'day'); // Start from Monday
+        const days = Array.from({ length: 35 }).map((_, i) => startOfCalendar.add(i, 'day'));
+
+        return (
+            <SimpleGrid cols={7} spacing="xs">
+                {['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map(d => (
+                    <Text key={d} ta="center" fw={800} size="sm" c="dimmed" p="xs">{d}</Text>
+                ))}
+                {days.map((day, i) => {
+                    const isToday = day.isSame(dayjs(), 'day');
+                    const isOutside = !day.isSame(selectedDate, 'month');
+                    const dow = day.day() === 0 ? 8 : day.day() + 1;
+                    const events = scheduleData?.filter((item: any) => {
+                        if (item.ngay) return dayjs(item.ngay).isSame(day, 'day');
+                        return item.thu === dow;
+                    });
+
+                    return (
+                        <Paper
+                            key={i}
+                            withBorder
+                            p={4}
+                            radius="md"
+                            h={120}
+                            style={{ opacity: isOutside ? 0.4 : 1 }}
+                            bg={isToday ? 'indigo.0' : 'white'}
+                        >
+                            <Text size="xs" fw={700} ta="right" c={isToday ? 'indigo' : 'gray'}>
+                                {day.format('D')}
+                            </Text>
+                            <Stack gap={2} mt={2}>
+                                {events?.slice(0, 3).map((e: any) => (
+                                    <Badge key={e.id} size="xs" color={getEventColor(e.monHocId)} variant="filled" fullWidth styles={{ label: { textTransform: 'none' } }}>
+                                        {e.monHoc?.tenMon}
+                                    </Badge>
+                                ))}
+                                {events && events.length > 3 && (
+                                    <Text size="10px" ta="center">+{events.length - 3} thêm</Text>
+                                )}
+                            </Stack>
+                        </Paper>
+                    );
+                })}
+            </SimpleGrid>
+        );
     };
 
     return (
-        <Container size="lg" className="py-0 px-0 sm:px-4 flex flex-col h-[calc(100vh-64px-56px)] sm:h-auto">
-            {/* Header Section */}
-            <Box className="bg-white dark:bg-zinc-950 p-4 sticky top-0 z-10 border-b border-gray-100 dark:border-zinc-800">
-                <Group justify="space-between" align="center" mb="md">
+        <Container size="xl" className="py-6 px-4">
+            <Stack gap="xl">
+                {/* Title & View Switcher */}
+                <Group justify="space-between" align="center">
                     <div>
-                        <Title order={2} className="font-black">
-                            {t("schedule")}
+                        <Title className="bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent" fw={900}>
+                            Lịch Học Của Bạn
                         </Title>
-                        <Group gap={4}>
-                            <IconCalendarEvent size={14} className="text-gray-500" />
-                            <Text size="sm" c="dimmed" className="capitalize">
-                                {selectedDate.format("dddd, DD MMMM YYYY")}
-                            </Text>
-                        </Group>
+                        <Text size="sm" c="dimmed" fw={500}>Theo dõi thời gian biểu và phòng học thông minh</Text>
                     </div>
+
+                    <Group gap="xs">
+                        <SegmentedControl
+                            value={view}
+                            onChange={(val: any) => setView(val)}
+                            data={[
+                                { label: 'Ngày', value: 'day' },
+                                { label: 'Tuần', value: 'week' },
+                                { label: 'Tháng', value: 'month' },
+                            ]}
+                            color="indigo"
+                            radius="xl"
+                            size="sm"
+                        />
+                        <Tooltip label="Hôm nay">
+                            <ActionIcon variant="light" color="indigo" size="lg" radius="xl" onClick={goToToday}>
+                                <IconRefresh size={20} />
+                            </ActionIcon>
+                        </Tooltip>
+                    </Group>
                 </Group>
 
-                {/* Date Strip */}
-                <ScrollArea type="never" offsetScrollbars={false} className="-mx-4 px-4">
-                    <Group gap="sm" wrap="nowrap" className="pb-2">
-                        {weekDays.map((day, index) => (
-                            <Box
-                                key={index}
-                                onClick={() => setSelectedDate(day.date)}
-                                className={`
-                                    flex flex-col items-center justify-center p-2 rounded-2xl min-w-[56px] cursor-pointer transition-all duration-200 border
-                                    ${day.isSelected
-                                        ? "bg-indigo-600 border-indigo-600 shadow-md transform scale-105"
-                                        : "bg-white dark:bg-zinc-900 border-gray-200 dark:border-zinc-800 hover:border-indigo-300"
-                                    }
-                                `}
-                            >
-                                <Text
-                                    size="xs"
-                                    fw={600}
-                                    className={`uppercase mb-1 ${day.isSelected ? "text-indigo-100" : "text-gray-500"}`}
-                                >
-                                    {day.dayName}
-                                </Text>
-                                <Text
-                                    size="lg"
-                                    fw={800}
-                                    className={day.isSelected ? "text-white" : "text-gray-900 dark:text-gray-100"}
-                                >
-                                    {day.dayNumber}
-                                </Text>
-                                {day.isToday && (
-                                    <div className={`w-1.5 h-1.5 rounded-full mt-1 ${day.isSelected ? "bg-white" : "bg-indigo-600"}`} />
-                                )}
-                            </Box>
-                        ))}
+                {/* Sub Header (Navigation) */}
+                <Group justify="space-between">
+                    <Group>
+                        <ActionIcon variant="subtle" color="gray" onClick={prevDate}>
+                            <IconArrowLeft size={24} />
+                        </ActionIcon>
+                        <Text fw={800} size="xl" className="min-w-[200px] text-center">
+                            {view === 'day' ? selectedDate.format("dddd, DD/MM") :
+                                view === 'week' ? `Tuần ${selectedDate.format("DD/MM")} - ${selectedDate.add(6, 'day').format("DD/MM")}` :
+                                    selectedDate.format("MMMM YYYY")}
+                        </Text>
+                        <ActionIcon variant="subtle" color="gray" onClick={nextDate}>
+                            <IconArrowRight size={24} />
+                        </ActionIcon>
                     </Group>
-                </ScrollArea>
-            </Box>
 
-            {/* Schedule Timeline Content */}
-            <ScrollArea className="flex-1 bg-gray-50 dark:bg-black p-4">
-                <LoadingOverlay visible={isLoading} />
-                <Timeline active={1} bulletSize={24} lineWidth={2}>
-                    {filteredSchedule.map((cls: any, index: number) => (
-                        <Timeline.Item
-                            key={index}
-                            bullet={
-                                <Box className="bg-indigo-600 w-full h-full rounded-full flex items-center justify-center">
-                                    <Text size="xs" fw={700} c="white">{cls.tietBatDau}</Text>
-                                </Box>
-                            }
-                            lineVariant={index === filteredSchedule.length - 1 ? "dashed" : "solid"}
-                        >
-                            <Box className="ml-2 mb-6">
-                                <Group gap="xs" mb={4}>
-                                    <Text size="sm" fw={700} c="dimmed" className="font-mono">
-                                        {getTimeRange(cls.tietBatDau, cls.soTiet)}
-                                    </Text>
-                                    {cls.soTiet > 1 && (
-                                        <Badge size="xs" variant="dot" color="blue">{cls.soTiet} tiết</Badge>
-                                    )}
-                                </Group>
+                    <Button variant="light" color="indigo" radius="xl" leftSection={<IconClock size={16} />}>
+                        Cập nhật cuối: {now.format("HH:mm")}
+                    </Button>
+                </Group>
 
-                                <Card
-                                    padding="md"
-                                    radius="lg"
-                                    className="border-none shadow-sm hover:shadow-md transition-shadow cursor-pointer bg-white dark:bg-zinc-900 relative overflow-hidden group"
-                                >
-                                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 rounded-l-lg" />
-
-                                    <Group justify="space-between" align="start" wrap="nowrap">
-                                        <Stack gap={4} className="flex-1">
-                                            <Text fw={800} size="lg" className="group-hover:text-indigo-600 transition-colors">
-                                                {cls.monHoc?.tenMon || 'N/A'}
-                                            </Text>
-
-                                            <Group gap="lg" mt={2}>
-                                                <Group gap={4}>
-                                                    <IconUser size={14} className="text-gray-400" />
-                                                    <Text size="sm" c="dimmed">
-                                                        {cls.gvDay?.hoTen || 'Chưa phân công'}
-                                                    </Text>
-                                                </Group>
-                                                <Group gap={4}>
-                                                    <IconMapPin size={14} className="text-gray-400" />
-                                                    <Text size="sm" c="dimmed">
-                                                        {cls.phongHoc || 'N/A'}
-                                                    </Text>
-                                                </Group>
-                                            </Group>
-                                        </Stack>
-                                    </Group>
-                                </Card>
-                            </Box>
-                        </Timeline.Item>
-                    ))}
-                </Timeline>
-
-                {/* Empty State visual if no classes */}
-                {filteredSchedule.length === 0 && !isLoading && (
-                    <Stack align="center" className="py-12 opacity-50">
-                        <IconBook size={48} />
-                        <Text>Không có lịch học cho ngày này</Text>
-                    </Stack>
-                )}
-
-                {/* Bottom spacer for safe area */}
-                <div className="h-20" />
-            </ScrollArea>
+                {/* Content Area */}
+                <Box className="relative min-h-[600px]">
+                    <LoadingOverlay visible={isLoading} overlayProps={{ radius: 'md', blur: 2 }} />
+                    {view === 'day' && renderDayView()}
+                    {view === 'week' && renderWeekView()}
+                    {view === 'month' && renderMonthView()}
+                </Box>
+            </Stack>
         </Container>
     );
 }
