@@ -1,3 +1,5 @@
+"use client";
+
 import { Container, Stack, Title, Card, Text, Badge, Group, Box, ScrollArea, ActionIcon, Timeline, ThemeIcon, LoadingOverlay, SegmentedControl, Button, Tooltip, SimpleGrid, Paper, Center } from "@mantine/core";
 import { IconBook, IconClock, IconMapPin, IconCalendarEvent, IconChevronLeft, IconChevronRight, IconUser, IconRefresh, IconArrowLeft, IconArrowRight } from "@tabler/icons-react";
 import { dayjs } from "@/shared/utils/date.util";
