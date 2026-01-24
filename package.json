@@ -19,6 +19,7 @@
     "@mantine/modals": "^8.3.10",
     "@mantine/notifications": "^8.3.10",
     "@mantine/nprogress": "^8.3.10",
+    "@simplewebauthn/browser": "^13.2.2",
     "@tabler/icons-react": "^3.36.0",
     "@tanstack/react-query": "^5.90.15",
     "@tanstack/react-query-devtools": "^5.91.2",

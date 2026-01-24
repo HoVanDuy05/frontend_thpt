@@ -13,6 +13,9 @@ import { IconCheck, IconX, IconLock, IconUser, IconSchool, IconChevronRight, Ico
 import { useValidation } from "@/shared/common/useValidation";
 import { useTranslationError } from "@/shared/common/useTranslationError";
 import { usePWA } from "@/providers/PWAProvider";
+import { startAuthentication } from "@simplewebauthn/browser";
+import axiosClient from "@/api/axiosClient";
+import { IconFingerprint } from "@tabler/icons-react";
 
 export default function LoginPage() {
     const t = useTranslations("auth.login");
@@ -121,6 +124,57 @@ export default function LoginPage() {
 
     const handleGoogleLogin = () => {
         window.location.href = `${process.env.NEXT_PUBLIC_API_URL}`;
+    };
+
+    const handlePasskeyLogin = async () => {
+        try {
+            // 1. Get options
+            // Client asks user for email first? Or uses a default?
+            // WebAuthn usually needs username for "non-discoverable" keys.
+            // If discoverable, we don't need email. But our backend implementation asks for email in generateAuthenticationOptions.
+            // Let's use the email from form if available, or prompt user?
+            // For now, let's assume user entered email in the input field.
+            if (!form.values.email) {
+                notifications.show({ title: 'Lỗi', message: 'Vui lòng nhập Email để đăng nhập bằng Passkey', color: 'orange' });
+                return;
+            }
+
+            const resp = await axiosClient.post('/auth/webauthn/login/options', { email: form.values.email });
+            const options = resp.data.options;
+
+            // 2. Start Auth
+            const authResp = await startAuthentication(options);
+
+            // 3. Verify
+            const verifyResp = await axiosClient.post('/auth/webauthn/login/verify', {
+                email: form.values.email,
+                response: authResp
+            });
+
+            const data = verifyResp.data;
+            if (data.access_token) {
+                const payload = JSON.parse(atob(data.access_token.split('.')[1]));
+                useAppStore.getState().setToken(data.access_token);
+                setUser(data.user);
+
+                notifications.show({
+                    title: 'Thành công',
+                    message: `Chào mừng trở lại, ${data.user.hoTen}!`,
+                    color: 'teal',
+                    icon: <IconCheck size={16} />,
+                });
+
+                router.push("/student");
+            }
+
+        } catch (error: any) {
+            console.error(error);
+            notifications.show({
+                title: 'Lỗi xác thực',
+                message: error?.response?.data?.message || 'Không thể đăng nhập bằng thiết bị này.',
+                color: 'red',
+            });
+        }
     };
 
     return (
@@ -251,6 +305,19 @@ export default function LoginPage() {
                             className="border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all font-bold text-zinc-700 dark:text-zinc-300 shadow-sm"
                         >
                             {t("google_account")}
+                        </Button>
+
+                        <Button
+                            variant="light"
+                            fullWidth
+                            h={54}
+                            radius="18px"
+                            color="teal"
+                            leftSection={<IconFingerprint size={22} />}
+                            onClick={handlePasskeyLogin}
+                            className="font-bold shadow-sm"
+                        >
+                            Đăng nhập bằng Passkey (Vân tay/FaceID)
                         </Button>
 
                         {isInstallable && (

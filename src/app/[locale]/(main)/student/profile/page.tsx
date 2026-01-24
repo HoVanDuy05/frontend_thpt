@@ -10,6 +10,7 @@ import { dayjs } from "@/shared/utils/date.util";
 import { useRouter, Link } from "@/i18n/routing";
 import { notifications } from "@mantine/notifications";
 import { useTranslations } from "next-intl";
+import { BiometricSettings } from "./components/BiometricSettings";
 
 export default function StudentProfilePage() {
     const t = useTranslations("student.profile_page");
@@ -170,6 +171,8 @@ export default function StudentProfilePage() {
                                     >
                                         <Text fw={600}>{t('logout')}</Text>
                                     </Button>
+                                    {/* Biometric Settings */}
+                                    <BiometricSettings />
                                 </Stack>
                             </Paper>
                         </Stack>
