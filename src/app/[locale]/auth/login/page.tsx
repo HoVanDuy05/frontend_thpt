@@ -88,7 +88,11 @@ export default function LoginPage() {
                     }
 
                     targetUrl = targetUrl.replace(/^\/(vi|en)(\/|$)/, '/');
-                    router.push(targetUrl);
+
+                    // Small delay to ensure token persistence completes
+                    setTimeout(() => {
+                        router.push(targetUrl);
+                    }, 100);
                 } catch (e) {
                     notifications.show({
                         title: t("error"),
