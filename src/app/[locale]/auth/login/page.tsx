@@ -144,18 +144,16 @@ export default function LoginPage() {
             }
 
             const resp = await axiosClient.post('/auth/webauthn/login/options', { email: form.values.email });
-            const options = resp.data.options;
+            const options = resp.options;
 
             // 2. Start Auth
             const authResp = await startAuthentication(options);
 
             // 3. Verify
-            const verifyResp = await axiosClient.post('/auth/webauthn/login/verify', {
+            const data = await axiosClient.post('/auth/webauthn/login/verify', {
                 email: form.values.email,
                 response: authResp
             });
-
-            const data = verifyResp.data;
             if (data.access_token) {
                 const payload = JSON.parse(atob(data.access_token.split('.')[1]));
                 useAppStore.getState().setToken(data.access_token);
@@ -279,50 +277,34 @@ export default function LoginPage() {
                     </Stack>
 
                     <Stack gap="md" className="pt-2">
-                        <Button
-                            type="submit"
-                            fullWidth
-                            h={56}
-                            radius="18px"
-                            loading={loginMutation.isPending}
-                            className="bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-xl shadow-indigo-600/25 border-0"
-                            rightSection={<IconChevronRight size={18} stroke={3} />}
-                        >
-                            <Text fw={900} size="md" className="uppercase tracking-widest pl-4">
-                                {t("submit")}
-                            </Text>
-                        </Button>
+                        <Group gap="sm">
+                            <Button
+                                type="submit"
+                                h={56}
+                                radius="18px"
+                                loading={loginMutation.isPending}
+                                className="bg-indigo-600 hover:bg-indigo-700 active:scale-[0.98] transition-all shadow-xl shadow-indigo-600/25 border-0 flex-1"
+                                rightSection={<IconChevronRight size={18} stroke={3} />}
+                            >
+                                <Text fw={900} size="md" className="uppercase tracking-widest">
+                                    {t("submit")}
+                                </Text>
+                            </Button>
 
-                        <Divider
-                            label={<Text size="xs" fw={800} className="text-zinc-400 dark:text-zinc-600 uppercase tracking-widest px-4">{t("instant_login")}</Text>}
-                            labelPosition="center"
-                            className="my-3 opacity-60"
-                        />
-
-                        <Button
-                            variant="default"
-                            fullWidth
-                            h={54}
-                            radius="18px"
-                            leftSection={<IconBrandGoogle size={22} />}
-                            onClick={handleGoogleLogin}
-                            className="border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all font-bold text-zinc-700 dark:text-zinc-300 shadow-sm"
-                        >
-                            {t("google_account")}
-                        </Button>
-
-                        <Button
-                            variant="light"
-                            fullWidth
-                            h={54}
-                            radius="18px"
-                            color="teal"
-                            leftSection={<IconFingerprint size={22} />}
-                            onClick={handlePasskeyLogin}
-                            className="font-bold shadow-sm"
-                        >
-                            Đăng nhập bằng Passkey (Vân tay/FaceID)
-                        </Button>
+                            <Button
+                                variant="light"
+                                h={56}
+                                w={56}
+                                radius="18px"
+                                color="teal"
+                                onClick={handlePasskeyLogin}
+                                className="font-bold shadow-sm"
+                                title="Đăng nhập bằng Passkey (Vân tay/FaceID)"
+                                p={0}
+                            >
+                                <IconFingerprint size={28} stroke={2} />
+                            </Button>
+                        </Group>
 
                         {isInstallable && (
                             <Button
