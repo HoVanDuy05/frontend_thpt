@@ -13,8 +13,7 @@ export function BiometricSettings() {
         setLoading(true);
         try {
             // 1. Get options from backend
-            const resp = await axiosClient.post('/auth/webauthn/register/options');
-            const options = resp.data;
+            const options = await axiosClient.post('/auth/webauthn/register/options');
 
             // 2. Start registration with browser
             const attResp = await startRegistration(options);

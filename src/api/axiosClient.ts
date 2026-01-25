@@ -1,9 +1,18 @@
-import axios from "axios";
+import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from "axios";
 import { useAppStore } from "@/providers/store/useAppStore";
+
+// Custom Axios instance that unwraps response.data automatically
+interface UnwrappedAxiosInstance extends Omit<AxiosInstance, 'get' | 'post' | 'put' | 'patch' | 'delete'> {
+    get<T = any>(url: string, config?: any): Promise<T>;
+    post<T = any>(url: string, data?: any, config?: any): Promise<T>;
+    put<T = any>(url: string, data?: any, config?: any): Promise<T>;
+    patch<T = any>(url: string, data?: any, config?: any): Promise<T>;
+    delete<T = any>(url: string, config?: any): Promise<T>;
+}
 
 const axiosClient = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
-});
+}) as UnwrappedAxiosInstance;
 
 // Add a request interceptor
 axiosClient.interceptors.request.use(
