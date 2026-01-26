@@ -68,15 +68,12 @@ body {
   font-family: var(--font-be-vietnam), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
   font-size: var(--font-size-base);
 
-  min-height: 100dvh;
+  min-height: 100%;
   width: 100%;
-  max-width: 100vw;
   margin: 0;
   padding: 0;
-  overflow-x: hidden;
-
-  /* Proper Native App Behaviors */
-  overscroll-behavior-y: none;
+  
+  /* Proper Native App Behaviors but allow scrolling */
   -webkit-overflow-scrolling: touch;
   -webkit-tap-highlight-color: transparent;
   user-select: none;

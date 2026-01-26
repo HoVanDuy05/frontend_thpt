@@ -9,6 +9,7 @@ import { AppMutation } from '@/api/AppMutation';
 import { notifications } from '@mantine/notifications';
 import { useMediaQuery } from '@mantine/hooks';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import { LoaiTruongForm } from '@/shared/types/approval.type';
 import { IconZoomIn, IconZoomOut, IconMaximize, IconArrowsMove } from '@tabler/icons-react';
 
 interface FlowBuilderDrawerProps {
@@ -130,15 +131,19 @@ export function FlowBuilderDrawer({ opened, onClose, initialData, onSave, loadin
     }, [categoriesData, searchValue]);
 
     const INPUT_TYPES = [
-        { value: 'TEXT', label: tFields('text') },
-        { value: 'LONG_TEXT', label: tFields('long_text') },
-        { value: 'NUMBER', label: tFields('number') },
-        { value: 'DATE', label: tFields('date') },
-        { value: 'TIME', label: tFields('time') },
-        { value: 'SELECT', label: tFields('select') },
-        { value: 'CHECKBOX', label: tFields('checkbox') },
-        { value: 'RADIO', label: tFields('radio') },
-        { value: 'FILE', label: tFields('file') },
+        { value: LoaiTruongForm.TEXT, label: tFields('text') },
+        { value: LoaiTruongForm.LONG_TEXT, label: tFields('long_text') },
+        { value: LoaiTruongForm.TEXTAREA, label: tFields('textarea') },
+        { value: LoaiTruongForm.NUMBER, label: tFields('number') },
+        { value: LoaiTruongForm.DATE, label: tFields('date') },
+        { value: LoaiTruongForm.TIME, label: tFields('time') },
+        { value: LoaiTruongForm.DATETIME, label: tFields('datetime') },
+        { value: LoaiTruongForm.SELECT, label: tFields('select') },
+        { value: LoaiTruongForm.CHECKBOX, label: tFields('checkbox') },
+        { value: LoaiTruongForm.RADIO, label: tFields('radio') },
+        { value: LoaiTruongForm.FILE, label: tFields('file') },
+        { value: LoaiTruongForm.SECTION_HEADER, label: tFields('section_header') || "Tiêu đề phân đoạn" },
+        { value: LoaiTruongForm.QUILL, label: tFields('quill') || "Văn bản giàu định dạng (Rich Text)" },
     ];
 
     // Handlers

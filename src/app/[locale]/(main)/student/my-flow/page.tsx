@@ -5,8 +5,11 @@ import {
     Stack, Title, Text, Button, Tabs, Group,
     Badge, ThemeIcon, ActionIcon, Drawer, Box, Paper, LoadingOverlay,
     Select, TextInput, NumberInput, Textarea, ScrollArea, Stepper,
-    SimpleGrid, Table, UnstyledButton
+    Checkbox, Radio, FileInput,
+    SimpleGrid, Table, UnstyledButton,
+    Divider
 } from "@mantine/core";
+import { CheckTypeInput } from "@/feauture/approvals/components/CheckTypeInput";
 import {
     useMediaQuery,
     useDebouncedValue
@@ -15,10 +18,12 @@ import {
     IconPlus, IconFileDescription, IconClock, IconCheck, IconX,
     IconChevronRight, IconCalendar, IconChevronLeft, IconFiles,
     IconActivity, IconExternalLink, IconSearch, IconArrowRight,
-    IconTrendingUp, IconBriefcase, IconHistory, IconAlertCircle
+    IconTrendingUp, IconBriefcase, IconHistory, IconAlertCircle,
+    IconForms
 } from "@tabler/icons-react";
 import { AppQuery } from "@/api/AppQuery";
 import { AppMutation } from "@/api/AppMutation";
+import { DatePickerInput, DateTimePicker, TimeInput } from "@mantine/dates";
 import { notifications } from "@mantine/notifications";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { TPhienQuyTrinh, TQuyTrinh, TTruongFormQuyTrinh, LoaiTruongForm } from "@/shared/types/approval.type";
@@ -523,7 +528,7 @@ function DynamicRequestForm({ template, onBack, onSuccess }: { template: TQuyTri
     const { data: fields, isLoading } = AppQuery.approvals.useFormFields(flowId);
     const submitMutation = AppMutation().approvals.useSubmit();
 
-    const [formData, setFormData] = useState<Record<string, string | number | boolean | null>>({});
+    const [formData, setFormData] = useState<Record<string, string | number | boolean | string[] | null>>({});
 
     const hasSteps = Array.isArray(template.cacBuoc) && template.cacBuoc.length > 0;
 
@@ -711,58 +716,14 @@ function DynamicRequestForm({ template, onBack, onSuccess }: { template: TQuyTri
                                 </Box>
 
                                 <Stack gap={24}>
-                                    {fields && fields.length > 0 ? fields.map((field: TTruongFormQuyTrinh) => {
-                                        const commonProps = {
-                                            label: field.nhan,
-                                            withAsterisk: field.batBuoc,
-                                            placeholder: t('form.input.placeholder', { name: field.nhan.toLowerCase() }),
-                                            size: "md" as const,
-                                            radius: "12px",
-                                            className: "transition-all duration-200",
-                                            styles: {
-                                                label: {
-                                                    marginBottom: '8px',
-                                                    fontWeight: 700,
-                                                    fontSize: '14px',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    gap: '4px',
-                                                    letterSpacing: '-0.01em'
-                                                },
-                                                input: {
-                                                    backgroundColor: 'var(--mantine-color-body)',
-                                                    border: '1px solid var(--mantine-color-default-border)',
-                                                    height: '50px',
-                                                    fontSize: '14px',
-                                                    fontWeight: 500,
-                                                    paddingLeft: '16px',
-                                                    transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                                                    borderRadius: '12px',
-                                                    '&:focus': {
-                                                        borderColor: 'var(--mantine-color-indigo-6)',
-                                                        boxShadow: '0 0 0 4px rgba(99, 102, 241, 0.08)',
-                                                        backgroundColor: 'var(--mantine-color-body)'
-                                                    },
-                                                    '&::placeholder': {
-                                                        color: 'var(--mantine-color-placeholder)',
-                                                        fontSize: '13px'
-                                                    }
-                                                }
-                                            }
-                                        };
-
-                                        const handleChange = (val: string | number | boolean | null) => setFormData(prev => ({ ...prev, [field.id]: val }));
-
-                                        switch (field.loai) {
-                                            case LoaiTruongForm.TEXTAREA:
-                                            case LoaiTruongForm.LONG_TEXT:
-                                                return <Textarea key={field.id} {...commonProps} minRows={4} onChange={(e) => handleChange(e.currentTarget.value)} styles={{ ...commonProps.styles, input: { ...commonProps.styles.input, height: 'auto', minHeight: '120px' } }} />;
-                                            case LoaiTruongForm.NUMBER: return <NumberInput key={field.id} {...commonProps} onChange={handleChange} />;
-                                            case LoaiTruongForm.DATE: return <TextInput key={field.id} type="date" {...commonProps} onChange={(e) => handleChange(e.currentTarget.value)} />;
-                                            case LoaiTruongForm.SELECT: return <Select key={field.id} {...commonProps} data={field.tuyChon ? (typeof field.tuyChon === 'string' ? JSON.parse(field.tuyChon) : field.tuyChon) : []} onChange={handleChange} searchable clearable />;
-                                            default: return <TextInput key={field.id} {...commonProps} onChange={(e) => handleChange(e.currentTarget.value)} />;
-                                        }
-                                    }) : (
+                                    {fields && fields.length > 0 ? fields.map((field: TTruongFormQuyTrinh) => (
+                                        <CheckTypeInput
+                                            key={field.id}
+                                            field={field}
+                                            value={formData[field.id.toString()]}
+                                            onChange={(val) => setFormData(prev => ({ ...prev, [field.id.toString()]: val }))}
+                                        />
+                                    )) : (
                                         <Box py={60} className="text-center bg-gray-50/50 rounded-24px border border-dashed border-gray-200">
                                             <Text fw={850} size="sm" c="gray">{t('form.input.empty_fields')}</Text>
                                         </Box>

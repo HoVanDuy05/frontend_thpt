@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
     Box, ScrollArea, Group, ActionIcon, Title, Text, Stack,
@@ -14,7 +15,8 @@ import {
 } from "@tabler/icons-react";
 import { AppQuery } from "@/api/AppQuery";
 import { dayjs } from "@/shared/utils/date.util";
-import { TPhienQuyTrinh, TBuocQuyTrinh } from "@/shared/types/approval.type";
+import { TPhienQuyTrinh, TBuocQuyTrinh, TTruongFormQuyTrinh } from "@/shared/types/approval.type";
+import { CheckTypeDisplay } from "@/feauture/approvals/components/CheckTypeDisplay";
 
 export default function StudentFlowDetailPage() {
     const params = useParams();
@@ -22,8 +24,7 @@ export default function StudentFlowDetailPage() {
     const flowId = parseInt(params.id as string);
 
     // Queries
-    const { data: myFlows, isLoading: isLoadingFlows } = AppQuery.approvals.useMyFlows();
-    const flow = myFlows?.find((f: TPhienQuyTrinh) => f.id === flowId);
+    const { data: flow, isLoading: isLoadingFlow } = AppQuery.approvals.useInstance(flowId);
 
     const getStatusConfig = (status: string) => {
         switch (status) {
@@ -35,7 +36,42 @@ export default function StudentFlowDetailPage() {
         }
     };
 
-    if (isLoadingFlows) return (
+    // Parse form data from multiple possible fields
+    const formData = React.useMemo(() => {
+        let data: any = {};
+
+        if (!flow) return data;
+
+        // 1. Try doiTuongLienQuan (can be object or string)
+        if (flow.doiTuongLienQuan) {
+            try {
+                const parsed = typeof flow.doiTuongLienQuan === 'string' ? JSON.parse(flow.doiTuongLienQuan) : flow.doiTuongLienQuan;
+                data = { ...data, ...parsed };
+            } catch (e) {
+                console.error("Failed to parse doiTuongLienQuan", e);
+            }
+        }
+
+        // 2. Try duLieuForm (usually a JSON string from backend)
+        if (flow.duLieuForm) {
+            try {
+                const parsed = JSON.parse(flow.duLieuForm);
+                data = { ...data, ...parsed };
+            } catch (e) {
+                console.error("Failed to parse duLieuForm", e);
+            }
+        }
+
+        return data;
+    }, [flow]); // Using flow as dependency since it contains both data fields
+
+    // Helper to get value from formData using either ID or tenTruong
+    const getFieldValue = (field: TTruongFormQuyTrinh) => {
+        // Try tenTruong first (new standard), then id (legacy standard)
+        return formData[field.tenTruong] ?? formData[field.id.toString()] ?? formData[field.id];
+    };
+
+    if (isLoadingFlow) return (
         <Box h="calc(100vh - 60px)" className="relative bg-white dark:bg-black">
             <LoadingOverlay visible={true} overlayProps={{ blur: 1 }} loaderProps={{ color: 'indigo', type: 'bars' }} />
         </Box>
@@ -55,8 +91,6 @@ export default function StudentFlowDetailPage() {
     );
 
     const config = getStatusConfig(flow.trangThai);
-    // FIX: Using doiTuongLienQuan instead of duLieuForm
-    const formData = flow.doiTuongLienQuan ? (typeof flow.doiTuongLienQuan === 'string' ? JSON.parse(flow.doiTuongLienQuan) : flow.doiTuongLienQuan) : {};
 
     return (
         <Box h="calc(100vh - 60px)" className="flex flex-col bg-[#fcfcfd] dark:bg-[#09090b] selection:bg-indigo-100">
@@ -131,20 +165,35 @@ export default function StudentFlowDetailPage() {
                                         </Box>
 
                                         <SimpleGrid cols={{ base: 1, md: 2 }} spacing={40}>
-                                            {Object.keys(formData).length > 0 ? (
-                                                Object.entries(formData).map(([key, value]) => (
-                                                    <Box key={key} className="group">
-                                                        <Text size="xs" fw={850} c="dimmed" tt="uppercase" lts={1.2} mb={10} className="group-hover:text-indigo-600 transition-colors">{key}</Text>
-                                                        <Text fw={750} size="md" className="text-gray-900 dark:text-gray-100 leading-snug">
-                                                            {value as string || "N/A"}
-                                                        </Text>
-                                                        <Box h={2} className="bg-gray-50 dark:bg-zinc-800 mt-4 rounded-full" />
-                                                    </Box>
+                                            {flow.fields && flow.fields.length > 0 ? (
+                                                flow.fields.map((f) => (
+                                                    <CheckTypeDisplay
+                                                        key={f.submitFlowFieldID}
+                                                        field={{
+                                                            id: f.detailFlow.detailFlowId,
+                                                            nhan: f.detailFlow.fieldName,
+                                                            loai: f.detailFlow.fieldValue as any,
+                                                            batBuoc: f.detailFlow.optional === 'false',
+                                                            tuyChon: f.detailFlow.optionValue,
+                                                            tenTruong: f.detailFlow.key,
+                                                            quyTrinhId: flow.quyTrinhId,
+                                                            thuTu: f.detailFlow.order
+                                                        }}
+                                                        value={f.submitContent}
+                                                    />
+                                                ))
+                                            ) : flow.quyTrinh?.cacTruong && flow.quyTrinh.cacTruong.length > 0 ? (
+                                                flow.quyTrinh.cacTruong.map((field: TTruongFormQuyTrinh) => (
+                                                    <CheckTypeDisplay
+                                                        key={field.id}
+                                                        field={field}
+                                                        value={getFieldValue(field)}
+                                                    />
                                                 ))
                                             ) : (
                                                 <Stack align="center" gap="md" py={60} className="col-span-full opacity-40">
                                                     <IconInfoCircle size={48} stroke={1} className="text-gray-300" />
-                                                    <Text fw={800} size="sm" className="tracking-tight uppercase">Không có dữ liệu khai báo bổ sung</Text>
+                                                    <Text fw={800} size="sm" className="tracking-tight uppercase">Không có cấu hình trường dữ liệu</Text>
                                                 </Stack>
                                             )}
                                         </SimpleGrid>

@@ -454,21 +454,31 @@ export const AppMutation = () => {
             useSubmit: () => useAppMutation<"submitFlow">({
                 url: { baseUrl: "/submit-flow" },
                 onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ["/my-flow"] as any });
+                    queryClient.invalidateQueries({
+                        predicate: (query) => query.queryKey[0]?.toString().startsWith("/my-flow")
+                    });
                 }
             }),
             useApprove: (id: number) => useAppMutation<"approveStep">({
                 url: { baseUrl: "/flow-instance/:id/approve", urlParams: { id } },
                 onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ["/flow-instance"] as any });
-                    queryClient.invalidateQueries({ queryKey: ["/my-flow"] as any });
+                    queryClient.invalidateQueries({
+                        predicate: (query) =>
+                            query.queryKey[0]?.toString().startsWith("/flow-instance") ||
+                            query.queryKey[0]?.toString().startsWith("/my-flow") ||
+                            query.queryKey[0]?.toString().startsWith("/pending")
+                    });
                 }
             }),
             useReject: (id: number) => useAppMutation<"rejectStep">({
                 url: { baseUrl: "/flow-instance/:id/reject", urlParams: { id } },
                 onSuccess: () => {
-                    queryClient.invalidateQueries({ queryKey: ["/flow-instance"] as any });
-                    queryClient.invalidateQueries({ queryKey: ["/my-flow"] as any });
+                    queryClient.invalidateQueries({
+                        predicate: (query) =>
+                            query.queryKey[0]?.toString().startsWith("/flow-instance") ||
+                            query.queryKey[0]?.toString().startsWith("/my-flow") ||
+                            query.queryKey[0]?.toString().startsWith("/pending")
+                    });
                 }
             }),
             useCreateCategory: () => useAppMutation<"createCategory">({

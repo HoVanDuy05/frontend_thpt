@@ -217,6 +217,12 @@
             "checkbox": "Chọn nhiều (Checkbox)",
             "radio": "Chọn 1 (Radio)",
             "file": "Tệp đính kèm"
+        },
+        "form": {
+            "input": {
+                "placeholder": "Nhập {name}...",
+                "empty_fields": "KHÔNG YÊU CẦU DỮ LIỆU BỔ SUNG"
+            }
         }
     },
     "academic": {
@@ -914,7 +920,7 @@
             "profile": "Cá nhân"
         },
         "home": {
-            "greeting": "Chào buổi sáng",
+            "greeting": "Xin chào,",
             "attendance": "Điểm danh",
             "gpa": "ĐTB",
             "assignments": "Bài tập",
@@ -925,7 +931,16 @@
             "new_announcements": "Thông báo mới",
             "important": "Quan trọng",
             "exam": "Thi cử",
-            "event": "Sự kiện"
+            "event": "Sự kiện",
+            "academic_attendance": "Điểm danh học tập",
+            "classes_today": "Tiết học hôm nay",
+            "attended_classes": "Đã có mặt",
+            "attendance_status": "Trạng thái chuyên cần",
+            "status_all_present": "Đã có mặt đủ",
+            "status_partial": "Vắng {count} tiết",
+            "view_all": "Xem chi tiết",
+            "time_left": "Còn lại",
+            "now_studying": "Đang học"
         },
         "profile_page": {
             "header_title": "Hồ sơ học sinh",

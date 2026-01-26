@@ -22,7 +22,18 @@ export enum LoaiTruongForm {
     LONG_TEXT = 'LONG_TEXT',
     SELECT = 'SELECT',
     DATE = 'DATE',
-    DATETIME = 'DATETIME'
+    DATETIME = 'DATETIME',
+    TIME = 'TIME',
+    CHECKBOX = 'CHECKBOX',
+    RADIO = 'RADIO',
+    FILE = 'FILE',
+    SECTION_HEADER = 'SECTION_HEADER',
+    QUILL = 'QUILL',
+    MULTI_DATE = 'MULTI_DATE',
+    SELECT_AFFILIATION = 'SELECT_AFFILIATION',
+    SELECT_DATE_OFF_TYPE = 'SELECT_DATE_OFF_TYPE',
+    DEFAULT_INPUT = 'DEFAULT_INPUT',
+    IMAGE = 'IMAGE'
 }
 
 export enum TrangThaiPhien {
@@ -103,11 +114,27 @@ export interface TTruongFormQuyTrinh {
     thuTu: number;
 }
 
+export interface TFlowInstanceField {
+    submitContent: any;
+    submitFlowFieldID: number;
+    detailFlow: {
+        detailFlowId: number;
+        fieldName: string;
+        fieldValue: string;
+        optional: string;
+        optionValue: string;
+        order: number;
+        key: string;
+        parentKey: string | null;
+    };
+}
+
 export interface TPhienQuyTrinh {
     id: number;
     quyTrinhId: number;
     quyTrinh?: TQuyTrinh;
     doiTuongLienQuan?: any; // Form data
+    duLieuForm?: string; // Stored as JSON string
     trangThai: TrangThaiPhien;
     buocHienTai: number;
     nguoiTaoId: number;
@@ -122,6 +149,7 @@ export interface TPhienQuyTrinh {
     ngayCapNhat?: string;
     buocPhiens?: TBuocPhienQuyTrinh[];
     nhatKy?: TNhatKyPheDuyetQuyTrinh[];
+    fields?: TFlowInstanceField[]; // New structured fields
 }
 
 export interface TBuocPhienQuyTrinh {

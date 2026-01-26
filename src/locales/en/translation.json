@@ -220,6 +220,12 @@
             "checkbox": "Multiple Select (Checkbox)",
             "radio": "Single Select (Radio)",
             "file": "Attachment"
+        },
+        "form": {
+            "input": {
+                "placeholder": "Enter {name}...",
+                "empty_fields": "NO ADDITIONAL DATA REQUIRED"
+            }
         }
     },
     "academic": {
@@ -901,18 +907,27 @@
             "profile": "Profile"
         },
         "home": {
-            "greeting": "Good morning",
+            "greeting": "Hello,",
             "attendance": "Attendance",
             "gpa": "GPA",
             "assignments": "Assignments",
             "notifications": "Notifications",
-            "today_schedule": "Today\u0027s Schedule",
+            "today_schedule": "Today's Schedule",
             "upcoming_assignments": "Upcoming Assignments",
             "due_date": "Due: {date}",
             "new_announcements": "New Announcements",
             "important": "Important",
             "exam": "Exam",
-            "event": "Event"
+            "event": "Event",
+            "academic_attendance": "Academic Attendance",
+            "classes_today": "Classes Today",
+            "attended_classes": "Attended",
+            "attendance_status": "Attendance Status",
+            "status_all_present": "All present",
+            "status_partial": "Absence: {count} slots",
+            "view_all": "View All",
+            "time_left": "Time Left",
+            "now_studying": "Studying"
         },
         "profile_page": {
             "header_title": "Student Profile",
