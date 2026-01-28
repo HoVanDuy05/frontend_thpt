@@ -455,7 +455,7 @@ export const AppMutation = () => {
                 url: { baseUrl: "/submit-flow" },
                 onSuccess: () => {
                     queryClient.invalidateQueries({
-                        predicate: (query) => query.queryKey[0]?.toString().startsWith("/my-flow")
+                        predicate: (query) => !!query.queryKey[0]?.toString().startsWith("/my-flow")
                     });
                 }
             }),
@@ -464,9 +464,9 @@ export const AppMutation = () => {
                 onSuccess: () => {
                     queryClient.invalidateQueries({
                         predicate: (query) =>
-                            query.queryKey[0]?.toString().startsWith("/flow-instance") ||
-                            query.queryKey[0]?.toString().startsWith("/my-flow") ||
-                            query.queryKey[0]?.toString().startsWith("/pending")
+                            !!(query.queryKey[0]?.toString().startsWith("/flow-instance") ||
+                                query.queryKey[0]?.toString().startsWith("/my-flow") ||
+                                query.queryKey[0]?.toString().startsWith("/pending"))
                     });
                 }
             }),
@@ -475,9 +475,9 @@ export const AppMutation = () => {
                 onSuccess: () => {
                     queryClient.invalidateQueries({
                         predicate: (query) =>
-                            query.queryKey[0]?.toString().startsWith("/flow-instance") ||
-                            query.queryKey[0]?.toString().startsWith("/my-flow") ||
-                            query.queryKey[0]?.toString().startsWith("/pending")
+                            !!(query.queryKey[0]?.toString().startsWith("/flow-instance") ||
+                                query.queryKey[0]?.toString().startsWith("/my-flow") ||
+                                query.queryKey[0]?.toString().startsWith("/pending"))
                     });
                 }
             }),
