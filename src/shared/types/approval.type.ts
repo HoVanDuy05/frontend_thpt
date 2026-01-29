@@ -38,6 +38,7 @@ export enum LoaiTruongForm {
 
 export enum TrangThaiPhien {
     CHO_DUYET = 'CHO_DUYET',
+    DANG_XU_LY = 'DANG_XU_LY',
     DA_DUYET = 'DA_DUYET',
     TU_CHOI = 'TU_CHOI',
     HUY_BO = 'HUY_BO'

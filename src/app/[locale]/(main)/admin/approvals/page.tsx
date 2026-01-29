@@ -13,7 +13,8 @@ import { notifications } from '@mantine/notifications';
 import { IconPlus, IconStack, IconSchool, IconCategory2, IconClipboardList, IconClock, IconCheckbox, IconX, IconTrendingUp, IconFilter, IconFileDescription, IconTrash } from '@tabler/icons-react';
 import { useTranslations } from 'next-intl';
 import { dayjs } from "@/shared/utils/date.util";
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useRouter } from '@/i18n/routing';
 import { Drawer } from '@mantine/core';
 
 export default function ApprovalsPage() {
@@ -382,7 +383,7 @@ export default function ApprovalsPage() {
                                                 <ApprovalTable
                                                     requests={pendingRequests || []}
                                                     isAdmin
-                                                    onView={(req) => console.log('View:', req)}
+                                                    onView={(req) => router.push(`/admin/approvals/${req.id}`)}
                                                     onAction={(id, action) => action === 'APPROVE' ? handleApprove(id) : handleReject(id)}
                                                 />
                                             ) : (

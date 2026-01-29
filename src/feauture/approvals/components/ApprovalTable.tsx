@@ -13,6 +13,7 @@ interface ApprovalTableProps {
 
 const statusColors: Record<TrangThaiPhien, string> = {
     CHO_DUYET: 'indigo',
+    DANG_XU_LY: 'blue',
     DA_DUYET: 'green',
     TU_CHOI: 'red',
     HUY_BO: 'gray',
@@ -38,8 +39,8 @@ export const ApprovalTable: React.FC<ApprovalTableProps> = ({ requests, onAction
                         {req.nguoiTaoId}
                     </Box>
                     <Stack gap={0}>
-                        <Text size="sm" fw={600}>Người dùng #{req.nguoiTaoId}</Text>
-                        <Text size="xs" c="dimmed">Mã định danh</Text>
+                        <Text size="sm" fw={600}>{req.nguoiTao?.hoTen || req.nguoiTao?.taiKhoan || `Người dùng #${req.nguoiTaoId}`}</Text>
+                        <Text size="xs" c="dimmed">{req.nguoiTao?.email || 'Mã định danh'}</Text>
                     </Stack>
                 </Group>
             </Table.Td>
@@ -63,7 +64,7 @@ export const ApprovalTable: React.FC<ApprovalTableProps> = ({ requests, onAction
                         </ActionIcon>
                     </Tooltip>
 
-                    {isAdmin && req.trangThai === TrangThaiPhien.CHO_DUYET && (
+                    {isAdmin && (req.trangThai === TrangThaiPhien.CHO_DUYET || req.trangThai === TrangThaiPhien.DANG_XU_LY) && (
                         <>
                             <Tooltip label="Phê duyệt cưỡng bức">
                                 <ActionIcon variant="light" color="green" size="lg" radius="md" onClick={() => onAction?.(req.id, 'APPROVE')}>

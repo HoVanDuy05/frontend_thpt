@@ -25,11 +25,12 @@ import { AppQuery } from "@/api/AppQuery";
 import { AppMutation } from "@/api/AppMutation";
 import { DatePickerInput, DateTimePicker, TimeInput } from "@mantine/dates";
 import { notifications } from "@mantine/notifications";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useRouter, usePathname, Link } from "@/i18n/routing";
 import { TPhienQuyTrinh, TQuyTrinh, TTruongFormQuyTrinh, LoaiTruongForm } from "@/shared/types/approval.type";
 import { dayjs } from "@/shared/utils/date.util";
 import { useTranslations } from "next-intl";
-import Link from "next/link";
+
 
 export default function MyFlowPage() {
     const t = useTranslations('student_flow');
@@ -63,7 +64,7 @@ export default function MyFlowPage() {
 
         if (changed) {
             const query = params.toString();
-            router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
+            router.push(query ? `?${query}` : pathname, { scroll: false });
         }
     };
 
@@ -366,7 +367,7 @@ function CreateRequestDrawer({ opened, onClose, templates }: { opened: boolean, 
             if (value === null) params.delete(key);
             else params.set(key, value);
         });
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+        router.push(`?${params.toString()}`, { scroll: false });
     };
 
     const handleBack = () => {
@@ -546,7 +547,7 @@ function DynamicRequestForm({ template, onBack, onSuccess }: { template: TQuyTri
     const navigateToStep = (step: "flow" | "data") => {
         const params = new URLSearchParams(searchParams.toString());
         params.set("step", step);
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+        router.push(`?${params.toString()}`, { scroll: false });
     };
 
     const handleSubmit = async () => {

@@ -11,7 +11,8 @@ import { useState } from "react";
 import { TUser } from "@/shared/types/user.type";
 import { Stack, Text, Box, Skeleton, Paper, rem, Group } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import { useSearchParams, useRouter, usePathname } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { useRouter, usePathname } from '@/i18n/routing';
 import { useEffect } from "react";
 
 export default function TeacherPage() {
@@ -30,7 +31,7 @@ export default function TeacherPage() {
         } else {
             params.delete('userId');
         }
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+        router.push(`?${params.toString()}`, { scroll: false });
     };
 
     const handleOpenCreate = () => {
