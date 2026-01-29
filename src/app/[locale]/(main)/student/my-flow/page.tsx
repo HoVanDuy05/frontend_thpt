@@ -46,14 +46,25 @@ export default function MyFlowPage() {
 
     const updateParams = (updates: Record<string, string | null>) => {
         const params = new URLSearchParams(searchParams.toString());
+        let changed = false;
         Object.entries(updates).forEach(([key, value]) => {
             if (value === null) {
-                params.delete(key);
+                if (params.has(key)) {
+                    params.delete(key);
+                    changed = true;
+                }
             } else {
-                params.set(key, value);
+                if (params.get(key) !== value) {
+                    params.set(key, value);
+                    changed = true;
+                }
             }
         });
-        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+
+        if (changed) {
+            const query = params.toString();
+            router.push(query ? `${pathname}?${query}` : pathname, { scroll: false });
+        }
     };
 
     const setActiveTab = (status: string) => updateParams({ status });
@@ -110,7 +121,7 @@ export default function MyFlowPage() {
 
 
     return (
-        <Box h="calc(100vh - 60px)" className="flex flex-col bg-[#fcfcfd] dark:bg-[#09090b] translate-z-0">
+        <Box className="flex flex-col flex-1 min-h-0 bg-[#fcfcfd] dark:bg-[#09090b]">
             {/* Optimized Navigation Bar */}
             <Box className="h-[70px] sm:h-[90px] bg-white/90 dark:bg-zinc-950/90 backdrop-blur-2xl border-b border-gray-100 dark:border-zinc-800 px-4 md:px-8 flex items-center shrink-0 z-40 relative">
                 <Box className="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent" />

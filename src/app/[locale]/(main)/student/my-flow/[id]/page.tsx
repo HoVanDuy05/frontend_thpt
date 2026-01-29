@@ -93,7 +93,7 @@ export default function StudentFlowDetailPage() {
     const config = getStatusConfig(flow.trangThai);
 
     return (
-        <Box h="calc(100vh - 60px)" className="flex flex-col bg-[#fcfcfd] dark:bg-[#09090b] selection:bg-indigo-100">
+        <Box className="flex flex-col flex-1 min-h-0 bg-[#fcfcfd] dark:bg-[#09090b] selection:bg-indigo-100">
             {/* Header Masterpiece */}
             <Box className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl border-b border-gray-100 dark:border-zinc-800/50 px-6 md:px-10 py-6 md:py-8 shrink-0 z-40">
                 <div className="max-w-7xl mx-auto w-full">
