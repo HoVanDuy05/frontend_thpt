@@ -3,7 +3,6 @@
 import { Box, Group, Stack, Text, Avatar, Badge, Grid, Button, ThemeIcon, Divider, Title, Paper, Image } from "@mantine/core";
 import { IconUser, IconEdit, IconSchool, IconId, IconPhone, IconMapPin, IconCalendar, IconMail, IconLogout, IconSettings, IconChevronRight, IconGitPullRequest } from "@tabler/icons-react";
 import { AppQuery } from "@/api/AppQuery";
-import { useState } from "react";
 import { useAppStore } from "@/providers/store/useAppStore";
 import { EditProfileModal } from "@/feauture/social/components/EditProfileModal";
 import { dayjs } from "@/shared/utils/date.util";
@@ -11,6 +10,7 @@ import { useRouter, Link } from "@/i18n/routing";
 import { notifications } from "@mantine/notifications";
 import { useTranslations } from "next-intl";
 import { BiometricSettings } from "./components/BiometricSettings";
+import { useEffect, useState } from "react";
 
 export default function StudentProfilePage() {
     const t = useTranslations("student.profile_page");
@@ -20,20 +20,30 @@ export default function StudentProfilePage() {
     const router = useRouter();
 
     const studentInfo = profile?.hoSoHocSinh;
+    const [hydrated, setHydrated] = useState(false);
+
+    useEffect(() => {
+        setHydrated(true);
+    }, []);
+
+    // Get current user ID from profile (most reliable) or store
+    const currentUserId = profile?.id || user?.id;
 
     // QR Code Data: Public info URL
-    const qrData = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.host}/info/${user?.id}` : `https://thpt-portal.edu.vn/info/${user?.id}`;
+    const qrData = typeof window !== 'undefined' ? `${window.location.protocol}//${window.location.host}/info/${currentUserId}` : `https://thpt-portal.edu.vn/info/${currentUserId}`;
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrData)}`;
 
     const handleLogout = () => {
         logout();
-        router.push("/auth/login");
+        router.push("/auth/login" as any);
         notifications.show({
             title: t('logout_success_title'),
             message: t('logout_success_message'),
             color: "blue"
         });
     };
+
+    if (!hydrated) return null;
 
     return (
         <Box className="pb-24">
@@ -103,7 +113,7 @@ export default function StudentProfilePage() {
                                     <Divider className="border-gray-100 dark:border-zinc-800" />
                                     <InfoRow icon={IconMail} label={t('email')} value={profile?.email || user?.email} />
                                     <Divider className="border-gray-100 dark:border-zinc-800" />
-                                    <InfoRow icon={IconMapPin} label={t('address')} value={profile?.diaChi || t('not_updated')} isLast />
+                                    <InfoRow icon={IconMapPin} label={t('address')} value={profile?.diaChi || studentInfo?.diaChi || studentInfo?.diaChiThuongTru || t('not_updated')} isLast />
                                 </Stack>
                             </Paper>
 

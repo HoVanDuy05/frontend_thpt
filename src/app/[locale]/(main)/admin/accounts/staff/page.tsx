@@ -32,8 +32,7 @@ export default function StaffPage() {
         } else {
             params.delete('userId');
         }
-        const query = params.toString();
-        router.push(`${pathname}?${query}` as any, { scroll: false });
+        router.push(`?${params.toString()}`, { scroll: false });
     };
 
     const handleOpenCreate = () => {
