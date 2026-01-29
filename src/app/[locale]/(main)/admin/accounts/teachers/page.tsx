@@ -31,7 +31,8 @@ export default function TeacherPage() {
         } else {
             params.delete('userId');
         }
-        router.push(`?${params.toString()}`, { scroll: false });
+        const query = params.toString();
+        router.push(`${pathname}?${query}` as any, { scroll: false });
     };
 
     const handleOpenCreate = () => {

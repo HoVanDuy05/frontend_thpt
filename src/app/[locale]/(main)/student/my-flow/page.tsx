@@ -64,7 +64,8 @@ export default function MyFlowPage() {
 
         if (changed) {
             const query = params.toString();
-            router.push(query ? `?${query}` : pathname, { scroll: false });
+            const fullPath = query ? `${pathname}?${query}` : pathname;
+            router.replace(fullPath as any, { scroll: false });
         }
     };
 
@@ -367,7 +368,8 @@ function CreateRequestDrawer({ opened, onClose, templates }: { opened: boolean, 
             if (value === null) params.delete(key);
             else params.set(key, value);
         });
-        router.push(`?${params.toString()}`, { scroll: false });
+        const query = params.toString();
+        router.push(`${pathname}?${query}` as any, { scroll: false });
     };
 
     const handleBack = () => {
@@ -547,7 +549,8 @@ function DynamicRequestForm({ template, onBack, onSuccess }: { template: TQuyTri
     const navigateToStep = (step: "flow" | "data") => {
         const params = new URLSearchParams(searchParams.toString());
         params.set("step", step);
-        router.push(`?${params.toString()}`, { scroll: false });
+        const query = params.toString();
+        router.push(`${pathname}?${query}` as any, { scroll: false });
     };
 
     const handleSubmit = async () => {
